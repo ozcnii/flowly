@@ -14,6 +14,7 @@
 
 ## Зависимости и границы
 
+- Этап начинается после явного approval UX/UI-пакета в E0-D0-T06 (`DEC-012`).
 - Входящих продуктовых зависимостей нет.
 - Решения по внешним квотам связаны с `DEC-011`, но не блокируют локальную основу.
 - Базовый UI не включает продуктовые экраны следующих этапов.
@@ -24,7 +25,7 @@
 
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
 - **prd_refs:** §41.3 (`docs/PRD.md:1697-1720`)
-- **depends_on:** — · **decisions:** —
+- **depends_on:** E0-D0-T06 · **decisions:** DEC-012
 - **scope:** структура `apps/web`, `apps/scheduler`, `packages/db`, `packages/shared`, `packages/ui`, `migrations`, `scripts`.
 - **acceptance:** [ ] структура соответствует PRD; [ ] shared-код не дублируется; [ ] команды workspace документированы.
 - **validation/evidence:** дерево файлов, package scripts, успешная установка зависимостей.

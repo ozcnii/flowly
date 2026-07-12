@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 180" role="img" aria-labelledby="title desc">
+  <title id="title">Flowly</title>
+  <desc id="desc">Логотип Flowly: плавный знак бесконечности и словесный знак</desc>
+  <defs>
+    <linearGradient id="flowlyGradient" x1="18" y1="130" x2="166" y2="35" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#28C8D1"/>
+      <stop offset="0.52" stop-color="#56D3B8"/>
+      <stop offset="1" stop-color="#A8E766"/>
+    </linearGradient>
+  </defs>
+  <path d="M22 92C22 54 66 39 92 66L127 102C145 121 177 113 177 84C177 54 143 44 122 65L86 101C61 126 22 117 22 92Z"
+        fill="none" stroke="url(#flowlyGradient)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="218" y="118" fill="#102033" font-family="Inter, Arial, Helvetica, sans-serif" font-size="88" font-weight="500" letter-spacing="-3">Flowly</text>
+</svg>

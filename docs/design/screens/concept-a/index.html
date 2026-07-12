@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f7f6f2" />
+  <title>Flowly — Концепт A</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600;700&display=swap');
+    :root{
+      --sage-100:#e9f1ec;
+      --sage-200:#d5e4dc;
+      --sage-300:#a7c1b5;
+      --sage-500:#6d9282;
+      --sage-650:#547868;
+      --sage-800:#2f5246;
+      --cream:#f7f6f2;
+      --paper:#fffdf9;
+      --sand:#f0ede6;
+      --taupe:#cbbfae;
+      --ink:#24322d;
+      --muted:#7c8781;
+      --line:rgba(70,92,82,.12);
+      --shadow:0 18px 45px rgba(58,77,68,.12);
+      --shadow-soft:0 8px 24px rgba(58,77,68,.08);
+      --serif:'Cormorant Garamond', Georgia, serif;
+      --sans:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      color:var(--ink);
+      font-family:var(--sans);
+      background:
+        radial-gradient(circle at 5% 2%, rgba(167,193,181,.33), transparent 18rem),
+        radial-gradient(circle at 95% 6%, rgba(203,191,174,.23), transparent 19rem),
+        linear-gradient(180deg,#fffdf9 0%,var(--cream) 100%);
+      min-height:100vh;
+    }
+    button{font:inherit}
+    .board{max-width:1500px;margin:0 auto;padding:34px 28px 22px;position:relative;overflow:hidden}
+    .blob{position:absolute;border:1px solid rgba(109,146,130,.25);border-radius:48% 52% 56% 44%/42% 45% 55% 58%;pointer-events:none}
+    .blob.one{width:260px;height:180px;top:-80px;left:-100px;transform:rotate(-18deg);background:linear-gradient(140deg,rgba(167,193,181,.3),rgba(255,255,255,0))}
+    .blob.two{width:220px;height:150px;top:-62px;left:20px;transform:rotate(22deg)}
+    .hero{display:grid;grid-template-columns:320px 1fr 310px;gap:38px;align-items:center;margin-bottom:22px;position:relative;z-index:2}
+    .brand-block{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+    .brand-logo{width:290px;max-width:100%;height:auto}
+    .tagline{font-size:12px;letter-spacing:.28em;color:#7b827e;margin-left:18px;text-transform:uppercase}
+    .hero-copy h1{font-family:var(--serif);font-size:51px;line-height:1;margin:0 0 14px;color:#547868;font-weight:600}
+    .hero-copy .mood{font-family:var(--serif);font-size:23px;color:#6d7d74;margin-bottom:18px}
+    .hero-copy p{font-size:16px;line-height:1.7;color:#59655f;margin:0;max-width:560px}
+    .hero-art{height:250px;border-radius:52% 0 44% 54%/42% 0 58% 58%;overflow:hidden;border-left:1px solid rgba(109,146,130,.25);box-shadow:var(--shadow-soft);background:#e9eee8}
+    .hero-art img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.78) brightness(1.06)}
+    .section-labels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px;margin:18px 10px 12px}
+    .screen-label{display:flex;gap:12px;align-items:flex-start}
+    .screen-label .n{width:34px;height:34px;flex:0 0 34px;border-radius:50%;background:var(--sage-500);color:white;display:grid;place-items:center;font-family:var(--serif);font-size:22px}
+    .screen-label h2{font-family:var(--serif);font-size:24px;margin:0;color:#51695d;font-weight:600}
+    .screen-label p{margin:2px 0 0;color:var(--muted);font-size:13px}
+    .phones{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;align-items:start}
+    .phone{background:#070908;border-radius:46px;padding:8px;box-shadow:0 25px 45px rgba(28,38,34,.18),0 0 0 2px rgba(42,48,45,.75);position:relative;min-width:0}
+    .phone::after{content:"";position:absolute;inset:4px;border-radius:42px;border:1px solid rgba(255,255,255,.45);pointer-events:none}
+    .screen{background:linear-gradient(180deg,#fffefb,#fbfaf6);border-radius:38px;min-height:710px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+    .status{height:38px;display:flex;justify-content:space-between;align-items:center;padding:0 18px 0 15px;font-size:12px;font-weight:700;color:#111}
+    .island{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:96px;height:24px;background:#050505;border-radius:20px;z-index:3}
+    .status-icons{display:flex;gap:5px;align-items:center}
+    .status-icons i{display:block;background:#111;border-radius:2px}
+    .status-icons i:nth-child(1){width:12px;height:8px;clip-path:polygon(0 100%,0 75%,20% 75%,20% 55%,40% 55%,40% 35%,60% 35%,60% 15%,80% 15%,80% 0,100% 0,100% 100%)}
+    .status-icons i:nth-child(2){width:10px;height:8px;border-radius:50% 50% 2px 2px;clip-path:polygon(0 55%,15% 35%,35% 15%,50% 5%,65% 15%,85% 35%,100% 55%,82% 55%,65% 40%,50% 32%,35% 40%,18% 55%)}
+    .status-icons i:nth-child(3){width:17px;height:8px;border:1px solid #111;background:linear-gradient(90deg,#111 70%,transparent 70%);border-radius:2px}
+    .screen-body{padding:12px 16px 78px;flex:1;overflow:hidden}
+    .top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+    .top-row h3,.title{font-family:var(--serif);font-size:27px;line-height:1;margin:0;font-weight:600;color:#293631}
+    .subtle{color:#89918d;font-size:12px;margin-top:6px}
+    .icon-btn{border:1px solid var(--line);background:rgba(255,255,255,.9);width:34px;height:34px;border-radius:12px;display:grid;place-items:center;color:var(--sage-650);box-shadow:0 5px 12px rgba(50,70,60,.07);cursor:pointer}
+    .icon-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .card{background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 7px 18px rgba(57,75,67,.055)}
+    .progress-card{margin:16px 0 12px;display:grid;grid-template-columns:76px 1fr;gap:12px;align-items:center}
+    .ring{--p:72;width:72px;height:72px;border-radius:50%;background:conic-gradient(var(--sage-500) calc(var(--p)*1%),#e8e8e1 0);display:grid;place-items:center;position:relative}
+    .ring::before{content:"";position:absolute;inset:7px;background:#fff;border-radius:50%}
+    .ring span{position:relative;font-family:var(--serif);font-size:22px;font-weight:600}
+    .progress-card strong{font-family:var(--serif);font-size:19px;color:#51695d}
+    .progress-card p{margin:3px 0 0;font-size:11px;color:#89918d;line-height:1.35}
+    .chips{display:flex;gap:7px;overflow:hidden;margin:10px 0 14px}
+    .chip{border:none;border-radius:10px;padding:8px 10px;background:#f0eee7;color:#607068;font-size:11px;white-space:nowrap;display:flex;align-items:center;gap:5px}
+    .chip.active{background:linear-gradient(135deg,#759b89,#5f8877);color:white;box-shadow:0 8px 14px rgba(96,137,119,.2)}
+    .section-title{font-family:var(--serif);font-size:18px;margin:12px 0 8px;font-weight:600}
+    .program{height:165px;padding:0;overflow:hidden;position:relative;background:#ddd}
+    .program img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.82)}
+    .program::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(247,244,234,.95) 0%,rgba(247,244,234,.65) 45%,transparent 74%)}
+    .program-copy{position:absolute;inset:18px auto auto 16px;z-index:2;width:52%}
+    .program-copy h4{font-family:var(--serif);font-size:26px;line-height:.95;margin:0 0 8px;font-weight:600}
+    .program-copy p{font-size:10px;line-height:1.4;color:#707a74;margin:0}
+    .mini-progress{position:absolute;left:16px;right:16px;bottom:12px;height:4px;background:rgba(255,255,255,.5);border-radius:4px;z-index:2}
+    .mini-progress::after{content:"";display:block;width:38%;height:100%;background:#9abdaf;border-radius:4px}
+    .habit-list{display:grid;gap:7px}
+    .habit{display:flex;align-items:center;gap:10px;padding:9px 10px;background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:12px;min-height:46px}
+    .habit-ico{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:16px;flex:0 0 30px}
+    .habit-info{min-width:0;flex:1}
+    .habit-info b{font-size:11px;font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .habit-info small{font-size:9px;color:#909792}
+    .check{width:22px;height:22px;border:1.5px solid #bac3bd;border-radius:50%;display:grid;place-items:center;color:white;background:white;cursor:pointer;flex:0 0 22px}
+    .check.done{background:var(--sage-500);border-color:var(--sage-500)}
+    .check svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+    .primary{border:none;border-radius:14px;background:linear-gradient(135deg,#779c8b,#5c8573);color:white;padding:14px 18px;font-weight:600;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;box-shadow:0 11px 20px rgba(91,130,113,.22);margin-top:12px}
+    .primary:active{transform:translateY(1px)}
+    .primary svg{width:17px;height:17px;fill:currentColor}
+    .nav{position:absolute;left:0;right:0;bottom:0;height:66px;background:rgba(255,255,255,.95);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);align-items:center;padding:3px 8px 6px;backdrop-filter:blur(12px)}
+    .nav button{border:none;background:none;color:#8d9691;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:8px;cursor:pointer}
+    .nav button.active{color:var(--sage-650);font-weight:700}
+    .nav svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .filter-row{display:flex;gap:8px;margin-bottom:9px}
+    .filter-row .chip{padding:7px 10px;background:#fff;border:1px solid var(--line)}
+    .workouts{display:grid;gap:9px}
+    .workout{display:grid;grid-template-columns:94px 1fr 22px;gap:10px;align-items:center;background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:14px;padding:8px;box-shadow:0 5px 14px rgba(50,70,60,.05)}
+    .workout-thumb{height:77px;border-radius:10px;overflow:hidden;position:relative;background:#ddd}
+    .workout-thumb img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.8)}
+    .duration{position:absolute;top:5px;left:5px;background:rgba(255,255,255,.88);font-size:8px;padding:4px 5px;border-radius:6px;font-weight:600}
+    .workout small{font-size:9px;color:#949a96}
+    .workout h4{font-family:var(--serif);font-size:17px;margin:3px 0 4px;line-height:1}
+    .workout p{font-size:9px;line-height:1.35;color:#69736d;margin:0}
+    .bookmark{color:#78837d}.bookmark svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8}
+    .float-filter{position:absolute;right:17px;bottom:81px;width:44px;height:44px;border-radius:50%;border:none;background:var(--sage-500);color:white;display:grid;place-items:center;box-shadow:0 12px 20px rgba(85,125,107,.28)}
+    .float-filter svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8}
+    .date-switch{display:flex;justify-content:space-between;align-items:center;margin:18px 0 12px}
+    .date-switch b{font-size:12px}.date-switch small{display:block;color:#8e9691;margin-top:3px}
+    .arrows{display:flex;gap:7px}.arrows button{border:1px solid var(--line);background:#fff;width:31px;height:31px;border-radius:11px;color:#718078}
+    .rhythm-summary{display:grid;grid-template-columns:82px 1fr;align-items:center;gap:13px;margin:6px 0 16px}
+    .rhythm-summary .ring{width:80px;height:80px;--p:70}.rhythm-summary .ring span{font-size:17px;text-align:center;line-height:.9}.rhythm-summary .ring small{font-size:9px;font-family:var(--sans);font-weight:400}
+    .rhythm-summary h4{font-family:var(--serif);font-size:20px;color:var(--sage-650);margin:0 0 5px}.rhythm-summary p{font-size:11px;color:#7f8882;margin:0;line-height:1.4}
+    .outline{width:100%;padding:12px;border-radius:13px;border:1.4px solid #94b3a5;background:#fff;color:#567868;font-weight:600;margin-top:12px;cursor:pointer}
+    .calendar-head{display:flex;justify-content:space-between;align-items:center;margin:18px 0 15px}.calendar-head h4{font-family:var(--serif);font-size:22px;margin:0}
+    .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;text-align:center;font-size:10px}
+    .dow{color:#909792;font-size:9px;padding-bottom:4px}
+    .day{height:35px;border:none;background:transparent;border-radius:50%;position:relative;color:#38453f;cursor:pointer}
+    .day.muted{color:#bcc1be}.day.selected{background:var(--sage-500);color:#fff}.day .dots{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);display:flex;gap:2px}.day .dots i{width:4px;height:4px;border-radius:50%;background:#84aa9a}.day .dots i:nth-child(2){background:#b699d4}.day .dots i:nth-child(3){background:#e2a542}
+    .day.selected .dots i{background:#fff;opacity:.75}
+    .day-card{margin-top:15px}.day-card .head{display:flex;justify-content:space-between;font-size:11px;font-weight:600;margin-bottom:10px}.summary-row{display:flex;justify-content:space-between;align-items:center;font-size:10px;padding:6px 0}.summary-row span:first-child{display:flex;align-items:center;gap:7px}
+    .style-system{margin-top:42px;border-top:1px solid rgba(109,146,130,.16);padding:28px 12px 0;display:grid;grid-template-columns:1.15fr 1.1fr .95fr 1.15fr;gap:28px}
+    .style-col{min-width:0}.style-col+ .style-col{border-left:1px solid rgba(109,146,130,.16);padding-left:28px}
+    .style-col h3{font-family:var(--serif);font-size:21px;color:#4f6e60;margin:0 0 15px}
+    .style-list{display:grid;gap:11px;font-size:12px;color:#626e68}.style-list span{display:flex;gap:9px;align-items:center}.style-list i{color:#6d9282;font-style:normal;font-size:16px}
+    .swatches{display:grid;grid-template-columns:repeat(3,1fr);gap:16px 10px}.swatch{text-align:center;font-size:9px;color:#707a75}.swatch i{display:block;width:54px;height:54px;border-radius:50%;margin:0 auto 7px;border:1px solid rgba(0,0,0,.04)}
+    .type-sample{display:grid;grid-template-columns:60px 1fr;gap:12px;align-items:center;margin-bottom:18px}.type-sample .aa{font-family:var(--serif);font-size:53px;line-height:.8;color:#466456}.type-sample.sans .aa{font-family:var(--sans);font-size:33px;color:#2f3934}.type-sample b{font-family:var(--serif);font-size:18px}.type-sample.sans b{font-family:var(--sans);font-size:14px}.type-sample small{display:block;color:#8d9590;margin-top:4px;font-size:10px}
+    .icon-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;color:#5d7d6e}.icon-grid svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+    .icon-note{font-size:11px;color:#89918d;margin-top:16px;text-align:center}
+    .footer{margin-top:28px;border-top:1px solid rgba(109,146,130,.14);padding:18px 14px 2px;display:flex;justify-content:space-between;align-items:center;color:#789085;font-family:var(--serif);font-size:16px}.footer-left{display:flex;align-items:center;gap:9px;font-family:var(--sans);font-size:11px}.tg{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--sage-500);color:white}.footer img{height:40px;width:auto}
+    .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,130%);background:#2f5246;color:white;border-radius:14px;padding:12px 18px;font-size:13px;box-shadow:0 15px 30px rgba(0,0,0,.18);transition:.25s ease;z-index:100}.toast.show{transform:translate(-50%,0)}
+    @media (max-width:1150px){.hero{grid-template-columns:270px 1fr 250px}.hero-copy h1{font-size:44px}.phones,.section-labels{grid-template-columns:repeat(2,minmax(0,1fr))}.section-labels .screen-label:nth-child(3),.section-labels .screen-label:nth-child(4){display:none}.style-system{grid-template-columns:repeat(2,1fr)}.style-col:nth-child(3){border-left:none;padding-left:0}.phone{max-width:380px;width:100%;justify-self:center}.screen{min-height:720px}}
+    @media (max-width:760px){.board{padding:20px 14px}.hero{grid-template-columns:1fr;gap:18px}.brand-block{align-items:center}.tagline{margin-left:0}.hero-copy{text-align:center}.hero-copy h1{font-size:38px}.hero-copy p{font-size:14px}.hero-art{height:190px;border-radius:28px}.section-labels{display:none}.phones{grid-template-columns:1fr;gap:28px}.phone{max-width:390px}.style-system{grid-template-columns:1fr}.style-col+ .style-col{border-left:none;padding-left:0;border-top:1px solid rgba(109,146,130,.16);padding-top:20px}.footer{flex-direction:column;gap:12px;text-align:center}.footer img{height:34px}}
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute;visibility:hidden" aria-hidden="true">
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></symbol>
+    <symbol id="i-lotus" viewBox="0 0 24 24"><path d="M12 21c-4.5-2-7-5-7-9 3 0 5 1 7 4 2-3 4-4 7-4 0 4-2.5 7-7 9Z"/><path d="M12 16c-2-3-2.5-6 0-10 2.5 4 2 7 0 10Z"/><path d="M5 19c-2-1-3-3-3-5 2 0 3 .5 4 2"/><path d="M19 19c2-1 3-3 3-5-2 0-3 .5-4 2"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4 10-10"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z"/></symbol>
+    <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4Z"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M3 5h18M6 12h12M10 19h4"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><path d="M8 4v4M16 10v4M10 16v4"/></symbol>
+    <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19V3"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.4 5.4 0 0 0-7.6 0L12 5.8l-1.2-1.2a5.4 5.4 0 1 0-7.6 7.6L12 21l8.8-8.8a5.4 5.4 0 0 0 0-7.6Z"/></symbol>
+    <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 2S5 10 5 15a7 7 0 0 0 14 0c0-5-7-13-7-13Z"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M4 4v15.5A2.5 2.5 0 0 0 6.5 22H20V6a2 2 0 0 0-2-2Z"/></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M20 4C12 4 5 8 5 15c0 3 2 5 5 5 7 0 10-8 10-16Z"/><path d="M5 20c3-5 7-8 12-10"/></symbol>
+  </svg>
+
+  <main class="board">
+    <div class="blob one"></div><div class="blob two"></div>
+    <header class="hero">
+      <div class="brand-block">
+        <img class="brand-logo" src="assets/flowly-logo.svg" alt="Flowly" />
+        <div class="tagline">Твой поток здоровья</div>
+      </div>
+      <div class="hero-copy">
+        <h1>Flowly — Концепт A</h1>
+        <div class="mood">Спокойствие • Баланс • Энергия</div>
+        <p>Telegram Mini App для ежедневной заботы о теле и уме. Йога, привычки и осознанность в твоём ритме.</p>
+      </div>
+      <div class="hero-art"><img src="assets/hero-plant.jpg" alt="Минималистичный интерьер с растением" /></div>
+    </header>
+
+    <div class="section-labels">
+      <div class="screen-label"><span class="n">1</span><div><h2>Главный экран</h2><p>Обзор дня и прогресс</p></div></div>
+      <div class="screen-label"><span class="n">2</span><div><h2>Каталог тренировок</h2><p>Йога-практики и фильтры</p></div></div>
+      <div class="screen-label"><span class="n">3</span><div><h2>Мой ритм</h2><p>Привычки и прогресс</p></div></div>
+      <div class="screen-label"><span class="n">4</span><div><h2>Календарь</h2><p>История и динамика</p></div></div>
+    </div>
+
+    <section class="phones" aria-label="Экраны приложения Flowly">
+      <!-- HOME -->
+      <article class="phone">
+        <div class="screen">
+          <div class="island"></div>
+          <div class="status"><span>9:41</span><span class="status-icons"><i></i><i></i><i></i></span></div>
+          <div class="screen-body">
+            <div class="top-row"><div><h3>Привет, Алина! 🌿</h3><div class="subtle">Рада видеть тебя в потоке.</div></div><button class="icon-btn" aria-label="Уведомления"><svg><use href="#i-bell"/></svg></button></div>
+            <div class="card progress-card">
+              <div class="ring"><span>72%</span></div>
+              <div><strong>Отличная работа!</strong><p>Ты на пути к гармонии 🍃</p></div>
+            </div>
+            <div class="chips"><button class="chip">🧘 Спина</button><button class="chip">🌙 Сон</button><button class="chip">🌿 Растяжка</button><button class="chip">☀️ Энергия</button></div>
+            <div class="section-title">Текущая программа</div>
+            <div class="card program">
+              <img src="assets/program.jpg" alt="Йога для гибкой спины" />
+              <div class="program-copy"><h4>Гибкая<br>спина</h4><p>7 дней • 15–20 мин в день</p></div><div class="mini-progress"></div>
+            </div>
+            <div class="section-title">Сегодняшние привычки</div>
+            <div class="habit-list">
+              <div class="habit"><span class="habit-ico" style="background:#edf3ec">🌿</span><span class="habit-info"><b>Утренняя растяжка</b><small>10 мин</small></span><button class="check done" aria-label="Выполнено"><svg><use href="#i-check"/></svg></button></div>
+              <div class="habit"><span class="habit-ico" style="background:#e9f4f6">💧</span><span class="habit-info"><b>Выпить воду</b><small>1,5 л</small></span><button class="check done" aria-label="Выполнено"><svg><use href="#i-check"/></svg></button></div>
+              <div class="habit"><span class="habit-ico" style="background:#f1ecf6">🪷</span><span class="habit-info"><b>Практика осознанности</b><small>5 мин</small></span><button class="check" aria-label="Отметить"></button></div>
+            </div>
+            <button class="primary action-toast"><svg><use href="#i-play"/></svg>Начать тренировку</button>
+          </div>
+          <nav class="nav"><button class="active"><svg><use href="#i-home"/></svg>Главная</button><button><svg><use href="#i-lotus"/></svg>Тренировки</button><button><svg><use href="#i-leaf"/></svg>Мой ритм</button><button><svg><use href="#i-calendar"/></svg>Календарь</button></nav>
+        </div>
+      </article>
+
+      <!-- WORKOUTS -->
+      <article class="phone">
+        <div class="screen">
+          <div class="island"></div><div class="status"><span>9:41</span><span class="status-icons"><i></i><i></i><i></i></span></div>
+          <div class="screen-body">
+            <div class="top-row"><h3>Тренировки</h3></div>
+            <div class="chips"><button class="icon-btn" style="flex:0 0 34px"><svg><use href="#i-sliders"/></svg></button><button class="chip active">Все</button><button class="chip">Йога</button><button class="chip">Спина</button><button class="chip">Сон</button></div>
+            <div class="filter-row"><button class="chip">Уровень⌄</button><button class="chip">Длительность⌄</button><button class="chip">Цель⌄</button></div>
+            <div class="workouts">
+              <div class="workout"><div class="workout-thumb"><img src="assets/workout-1.jpg" alt="Энергия утра"><span class="duration">18 мин</span></div><div><small>Средний</small><h4>Энергия утра</h4><p>Пробуди тело и настройся на продуктивный день</p></div><span class="bookmark"><svg><use href="#i-bookmark"/></svg></span></div>
+              <div class="workout"><div class="workout-thumb"><img src="assets/workout-2.jpg" alt="Йога для спины"><span class="duration">22 мин</span></div><div><small>Лёгкий</small><h4>Йога для спины</h4><p>Мягкая практика для здоровой спины</p></div><span class="bookmark"><svg><use href="#i-bookmark"/></svg></span></div>
+              <div class="workout"><div class="workout-thumb"><img src="assets/workout-3.jpg" alt="Гибкость и баланс"><span class="duration">25 мин</span></div><div><small>Средний</small><h4>Гибкость и баланс</h4><p>Улучшаем гибкость и концентрацию</p></div><span class="bookmark"><svg><use href="#i-bookmark"/></svg></span></div>
+              <div class="workout"><div class="workout-thumb"><img src="assets/workout-4.jpg" alt="Перед сном"><span class="duration">15 мин</span></div><div><small>Лёгкий</small><h4>Перед сном</h4><p>Расслабление и мягкая растяжка</p></div><span class="bookmark"><svg><use href="#i-bookmark"/></svg></span></div>
+            </div>
+          </div>
+          <button class="float-filter action-toast" aria-label="Фильтры"><svg><use href="#i-filter"/></svg></button>
+          <nav class="nav"><button><svg><use href="#i-home"/></svg>Главная</button><button class="active"><svg><use href="#i-lotus"/></svg>Тренировки</button><button><svg><use href="#i-leaf"/></svg>Мой ритм</button><button><svg><use href="#i-calendar"/></svg>Календарь</button></nav>
+        </div>
+      </article>
+
+      <!-- RHYTHM -->
+      <article class="phone">
+        <div class="screen">
+          <div class="island"></div><div class="status"><span>9:41</span><span class="status-icons"><i></i><i></i><i></i></span></div>
+          <div class="screen-body">
+            <div class="top-row"><h3>Мой ритм</h3><button class="icon-btn"><svg><use href="#i-chart"/></svg></button></div>
+            <div class="date-switch"><div><b>Сегодня</b><small>24 мая, пятница</small></div><div class="arrows"><button><svg width="15" height="15"><use href="#i-chevron-left"/></svg></button><button><svg width="15" height="15"><use href="#i-chevron-right"/></svg></button></div></div>
+            <div class="rhythm-summary"><div class="ring" id="habitRing"><span><b id="habitCount">4</b><br><small>из 5</small></span></div><div><h4>Отличный день!</h4><p>Ты формируешь полезные привычки 🍃</p></div></div>
+            <div class="habit-list" id="rhythmHabits">
+              <div class="habit"><span class="habit-ico" style="background:#fff1d9">☀️</span><span class="habit-info"><b>Утренняя растяжка</b><small>10 мин</small></span><button class="check done"><svg><use href="#i-check"/></svg></button></div>
+              <div class="habit"><span class="habit-ico" style="background:#e7f5f7">💧</span><span class="habit-info"><b>Выпить воду</b><small>1,5 л • 6 из 8 стаканов</small></span><button class="check"></button></div>
+              <div class="habit"><span class="habit-ico" style="background:#eeeaf7">🪷</span><span class="habit-info"><b>Практика осознанности</b><small>5 мин</small></span><button class="check done"><svg><use href="#i-check"/></svg></button></div>
+              <div class="habit"><span class="habit-ico" style="background:#f9ecec">📖</span><span class="habit-info"><b>Чтение</b><small>15 мин</small></span><button class="check"></button></div>
+              <div class="habit"><span class="habit-ico" style="background:#f0eafa">🌙</span><span class="habit-info"><b>Ложиться спать вовремя</b><small>23:00</small></span><button class="check done"><svg><use href="#i-check"/></svg></button></div>
+            </div>
+            <button class="outline action-toast">＋ Добавить привычку</button>
+          </div>
+          <nav class="nav"><button><svg><use href="#i-home"/></svg>Главная</button><button><svg><use href="#i-lotus"/></svg>Тренировки</button><button class="active"><svg><use href="#i-leaf"/></svg>Мой ритм</button><button><svg><use href="#i-calendar"/></svg>Календарь</button></nav>
+        </div>
+      </article>
+
+      <!-- CALENDAR -->
+      <article class="phone">
+        <div class="screen">
+          <div class="island"></div><div class="status"><span>9:41</span><span class="status-icons"><i></i><i></i><i></i></span></div>
+          <div class="screen-body">
+            <div class="top-row"><h3>Календарь</h3><button class="icon-btn"><svg><use href="#i-calendar"/></svg></button></div>
+            <div class="calendar-head"><h4>Май 2024</h4><div class="arrows"><button><svg width="15" height="15"><use href="#i-chevron-left"/></svg></button><button><svg width="15" height="15"><use href="#i-chevron-right"/></svg></button></div></div>
+            <div class="calendar" id="calendar">
+              <span class="dow">Пн</span><span class="dow">Вт</span><span class="dow">Ср</span><span class="dow">Чт</span><span class="dow">Пт</span><span class="dow">Сб</span><span class="dow">Вс</span>
+              <button class="day muted">29</button><button class="day muted">30</button><button class="day">1<div class="dots"><i></i></div></button><button class="day">2<div class="dots"><i></i><i></i></div></button><button class="day">3<div class="dots"><i></i></div></button><button class="day">4<div class="dots"><i></i><i></i><i></i></div></button><button class="day">5</button>
+              <button class="day">6<div class="dots"><i></i></div></button><button class="day">7<div class="dots"><i></i><i></i></div></button><button class="day">8</button><button class="day">9<div class="dots"><i></i></div></button><button class="day">10<div class="dots"><i></i></div></button><button class="day">11<div class="dots"><i></i></div></button><button class="day">12</button>
+              <button class="day">13<div class="dots"><i></i><i></i></div></button><button class="day">14<div class="dots"><i></i></div></button><button class="day">15<div class="dots"><i></i><i></i></div></button><button class="day">16<div class="dots"><i></i></div></button><button class="day">17<div class="dots"><i></i></div></button><button class="day">18<div class="dots"><i></i></div></button><button class="day">19</button>
+              <button class="day">20<div class="dots"><i></i></div></button><button class="day">21<div class="dots"><i></i><i></i></div></button><button class="day">22<div class="dots"><i></i></div></button><button class="day">23<div class="dots"><i></i></div></button><button class="day selected">24<div class="dots"><i></i><i></i></div></button><button class="day">25<div class="dots"><i></i></div></button><button class="day">26</button>
+              <button class="day">27<div class="dots"><i></i></div></button><button class="day">28<div class="dots"><i></i></div></button><button class="day">29<div class="dots"><i></i></div></button><button class="day">30<div class="dots"><i></i><i></i></div></button><button class="day">31<div class="dots"><i></i></div></button><button class="day muted">1</button><button class="day muted">2</button>
+            </div>
+            <div class="card day-card"><div class="head"><span id="selectedDate">24 мая, пятница</span><span style="color:var(--sage-650)">7 из 10</span></div><div class="summary-row"><span>🪷 Тренировки</span><b>1</b></div><div class="summary-row"><span>☀️ Привычки</span><b>6 из 7</b></div><div class="summary-row"><span>🌿 Осознанность</span><b>5 мин</b></div><div class="summary-row"><span>💧 Вода</span><b>6 из 8 стаканов</b></div></div>
+          </div>
+          <nav class="nav"><button><svg><use href="#i-home"/></svg>Главная</button><button><svg><use href="#i-lotus"/></svg>Тренировки</button><button><svg><use href="#i-leaf"/></svg>Мой ритм</button><button class="active"><svg><use href="#i-calendar"/></svg>Календарь</button></nav>
+        </div>
+      </article>
+    </section>
+
+    <section class="style-system">
+      <div class="style-col"><h3>СТИЛЬ И НАСТРОЕНИЕ</h3><div class="style-list"><span><i>☾</i>Спокойствие и баланс</span><span><i>♧</i>Природные формы</span><span><i>◌</i>Мягкие градиенты</span><span><i>⌁</i>Много воздуха и света</span><span><i>❀</i>Премиальная забота о деталях</span></div></div>
+      <div class="style-col"><h3>ПАЛИТРА</h3><div class="swatches"><div class="swatch"><i style="background:#a7c1b5"></i>#A7C1B5</div><div class="swatch"><i style="background:#6d9282"></i>#6D9282</div><div class="swatch"><i style="background:#e9f1ec"></i>#E9F1EC</div><div class="swatch"><i style="background:#f7f6f2"></i>#F7F6F2</div><div class="swatch"><i style="background:#f0ede6"></i>#F0EDE6</div><div class="swatch"><i style="background:#cbbfae"></i>#CBBFAE</div></div></div>
+      <div class="style-col"><h3>ТИПОГРАФИКА</h3><div class="type-sample"><div class="aa">Aa</div><div><b>Cormorant<br>Garamond</b><small>Заголовки / Акценты</small></div></div><div class="type-sample sans"><div class="aa">Aa</div><div><b>Inter</b><small>Текст / Интерфейс</small></div></div></div>
+      <div class="style-col"><h3>ИКОНКИ</h3><div class="icon-grid"><svg><use href="#i-lotus"/></svg><svg><use href="#i-leaf"/></svg><svg><use href="#i-drop"/></svg><svg><use href="#i-book"/></svg><svg><use href="#i-bell"/></svg><svg><use href="#i-chart"/></svg><svg><use href="#i-calendar"/></svg><svg><use href="#i-home"/></svg><svg><use href="#i-heart"/></svg><svg><use href="#i-check"/></svg></div><div class="icon-note">Лёгкие, дружелюбные, в стиле line</div></div>
+    </section>
+
+    <footer class="footer"><div class="footer-left"><span class="tg">➤</span>Telegram Mini App</div><div>Твой поток. Твой ритм. Твоя лучшая версия. 🍃</div><img src="assets/flowly-logo.svg" alt="Flowly"></footer>
+  </main>
+  <div class="toast" id="toast">Действие выполнено</div>
+  <script>
+    const toast = document.getElementById('toast');
+    let toastTimer;
+    function showToast(text){toast.textContent=text;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),1800)}
+    document.querySelectorAll('.action-toast').forEach(el=>el.addEventListener('click',()=>showToast(el.textContent.trim() || 'Фильтры открыты')));
+    document.querySelectorAll('.check').forEach(btn=>btn.addEventListener('click',()=>{
+      btn.classList.toggle('done');
+      btn.innerHTML=btn.classList.contains('done')?'<svg><use href="#i-check"/></svg>':'';
+      const list=btn.closest('#rhythmHabits');
+      if(list){const done=list.querySelectorAll('.check.done').length;document.getElementById('habitCount').textContent=done;document.getElementById('habitRing').style.setProperty('--p',done/5*100)}
+      showToast(btn.classList.contains('done')?'Отмечено как выполненное':'Отметка снята');
+    }));
+    document.querySelectorAll('.nav button').forEach(btn=>btn.addEventListener('click',()=>{const nav=btn.parentElement;nav.querySelectorAll('button').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}));
+    const weekdays=['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+    document.querySelectorAll('#calendar .day:not(.muted)').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('#calendar .day').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');const day=Number(btn.childNodes[0].textContent.trim());const d=new Date(2024,4,day);document.getElementById('selectedDate').textContent=`${day} мая, ${weekdays[d.getDay()]}`;showToast(`Выбрано: ${day} мая`)}));
+  </script>
+</body>
+</html>

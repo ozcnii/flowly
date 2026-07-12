@@ -6,9 +6,9 @@
 
 ## Текущий фокус
 
-- **Активный этап:** не выбран
+- **Активный этап:** 0. UX/UI-дизайн
 - **Активная задача:** отсутствует
-- **Следующее действие:** выбрать первую задачу этапа 1
+- **Следующее действие:** начать E0-D0-T01 — информационная архитектура и user flows с учётом gap-analysis Concept A
 - **Блокеры:** открытые решения перечислены в [`DECISIONS.md`](DECISIONS.md)
 - **Контекст продолжения:** [`HANDOFF.md`](HANDOFF.md)
 
@@ -16,6 +16,7 @@
 
 | Этап | Статус | Backlog | In progress | Blocked | Review | Done | Файл |
 |---|---|---:|---:|---:|---:|---:|---|
+| 0. UX/UI-дизайн | in_progress | 6 | 0 | 0 | 0 | 1 | [`00-design.md`](stages/00-design.md) |
 | 1. Основа | backlog | 9 | 0 | 0 | 0 | 0 | [`01-foundation.md`](stages/01-foundation.md) |
 | 2. Йога | backlog | 10 | 0 | 0 | 0 | 0 | [`02-yoga.md`](stages/02-yoga.md) |
 | 3. Программы | backlog | 7 | 0 | 0 | 0 | 0 | [`03-programs.md`](stages/03-programs.md) |
@@ -25,12 +26,13 @@
 | 7. Социальные функции | backlog | 7 | 0 | 0 | 0 | 0 | [`07-social.md`](stages/07-social.md) |
 | 8. Стабилизация | backlog | 8 | 0 | 0 | 0 | 0 | [`08-stabilization.md`](stages/08-stabilization.md) |
 
-**Итого:** 65 backlog / 0 in progress / 0 blocked / 0 review / 0 done.
+**Итого:** 71 backlog / 0 in progress / 0 blocked / 0 review / 1 done.
 
 ## Зависимости этапов
 
 ```text
-Этап 1: auth + DB + R2 + environments
+Этап 0: flows + wireframes + UI-kit + макеты + prototype + explicit approval
+  └── Этап 1: auth + DB + R2 + environments
   ├── Этап 2: каталог + тренировки
   │     └── Этап 3: программы + program jobs
   └── Этап 4: привычки + schedule engine + occurrences
@@ -42,6 +44,8 @@
 
 ## Зафиксированные границы этапов
 
+- Этап 0 создаёт полный UX/UI-пакет v1.0 в `docs/design/`; разработка этапов 1–8 начинается только после явного approval пользователя (`DEC-012`).
+- Изменение утверждённого дизайн-пакета требует повторного approval затронутых артефактов.
 - Этап 3 создаёт модель программных напоминаний и jobs; end-to-end Telegram delivery закрывает этап 5.
 - Одиночные программы закрываются этапом 3; совместные программы — этапом 7.
 - Backend lifecycle `activity_occurrences` создаётся на этапах 3–4; calendar UI и агрегация — этапом 6.
