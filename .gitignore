@@ -1,0 +1,46 @@
+# Temporary and generated agent artifacts
+.temp/
+.playwright-mcp/
+
+# Dependencies
+node_modules/
+
+# Build and framework output
+.next/
+dist/
+build/
+out/
+coverage/
+.turbo/
+.wrangler/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local databases and runtime data
+*.sqlite
+*.sqlite3
+*.db
+.local/
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS metadata
+.DS_Store
+Thumbs.db

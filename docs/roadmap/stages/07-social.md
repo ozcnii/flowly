@@ -1,0 +1,74 @@
+# Этап 7 — Социальные функции
+
+> PRD: §7.2, §8.4, §20.6, §32–35, §43.4–43.5, §43.11, §43.18, §43.25–43.27, §44.11–44.12, §50, §54 этап 7, §55.8.
+
+## Цель
+
+Добавить друзей, явный sharing, совместные программы, челленджи, реакции и ограниченные партнёрские напоминания при приватности по умолчанию.
+
+## Сводка
+
+| Backlog | In progress | Blocked | Review | Done |
+|---:|---:|---:|---:|---:|
+| 7 | 0 | 0 | 0 | 0 |
+
+## Зависимости и инварианты
+
+- Зависит от auth/permissions и объектов этапов 2–4.
+- Друг видит только явно расшаренные данные; доступ отзывается.
+- Совместные программы закрываются здесь (`DEC-002`).
+
+## Deliverable E7-D8 — Социальный контур
+
+### E7-D8-T01 — Реализовать приглашения и friendships
+- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
+- **prd_refs:** §32.1–32.3, §43.4–43.5, §44.11, §55.8 · **depends_on:** E1-D1-T06
+- **scope:** create/accept/reject invite, несколько друзей и состояния связи.
+- **acceptance:** [ ] invite уникален/безопасен; [ ] состояния валидны; [ ] нельзя создать связь с нарушением правил; [ ] несколько друзей поддержаны.
+- **validation/evidence:** invitation state matrix и permission failures.
+
+### E7-D8-T02 — Реализовать удаление друга и отзыв доступа
+- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
+- **prd_refs:** §32.4, §33.3, §55.8 · **depends_on:** E7-D8-T01
+- **scope:** disconnect/revoke semantics и немедленная проверка доступа.
+- **acceptance:** [ ] удалённый друг теряет доступ; [ ] владелец сохраняет данные; [ ] stale links не обходят revoke.
+- **validation/evidence:** before/after authorization requests.
+
+### E7-D8-T03 — Реализовать sharing привычек и тренировок
+- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
+- **prd_refs:** §8.4, §33.1–33.2, §43.11, §43.18, §47.2 · **depends_on:** E2-D3-T03, E4-D5-T02, E7-D8-T01
+- **scope:** явный per-object sharing только после создания.
+- **acceptance:** [ ] default private; [ ] видны только разрешённые данные; [ ] public link не раскрывает owner/private fields; [ ] revoke работает.
+- **validation/evidence:** owner/friend/stranger access matrix.
+
+### E7-D8-T04 — Реализовать совместные программы
+- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
+- **prd_refs:** §20.6, §55.3, §55.8 · **depends_on:** E3-D4-T07, E7-D8-T01–T03 · **decisions:** DEC-002
+- **scope:** joint enrollment, участники и разрешённая видимость прогресса без сдвига программы.
+- **acceptance:** [ ] участники явно согласны; [ ] индивидуальные статусы защищены; [ ] программа сохраняет инварианты этапа 3.
+- **validation/evidence:** two-user lifecycle and revoke case.
+
+### E7-D8-T05 — Реализовать челленджи
+- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
+- **prd_refs:** §34, §43.25–43.26, §44.12, §55.8 · **depends_on:** E7-D8-T01, E4-D5-T05
+- **scope:** создание, типы, membership и результаты по PRD.
+- **acceptance:** [ ] membership/ownership проверяются; [ ] результаты основаны на occurrences; [ ] unauthorized data скрыты.
+- **validation/evidence:** challenge lifecycle and access matrix.
+
+### E7-D8-T06 — Реализовать реакции
+- **status:** backlog · **priority:** normal · **owner:** unassigned · **updated:** 2026-07-13
+- **prd_refs:** §34.3, §43.27, §55.8 · **depends_on:** E7-D8-T05
+- **scope:** разрешённые реакции на доступные социальные результаты.
+- **acceptance:** [ ] реакция требует доступа; [ ] повторное действие детерминировано; [ ] revoke исключает дальнейшее взаимодействие.
+- **validation/evidence:** reaction add/change/remove cases.
+
+### E7-D8-T07 — Реализовать партнёрские напоминания и закрыть DoD
+- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
+- **prd_refs:** §35, §50.1–50.3, §55.8 · **depends_on:** E5-D6-T08, E7-D8-T01–T06 · **decisions:** DEC-007
+- **scope:** ограниченные reminders между друзьями и полная проверка social permissions.
+- **acceptance:** [ ] отправитель/получатель связаны и имеют разрешение; [ ] лимиты применены; [ ] каждый пункт §55.8 имеет evidence; [ ] нерасшаренные данные недоступны.
+- **validation/evidence:** permission/E2E matrix и итоговый checklist.
+
+## Handoff этапа
+
+Фиксировать IDs двух тестовых пользователей, friendship/share state, конкретный permission matrix case и следующий запрос.
