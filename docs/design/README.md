@@ -4,7 +4,7 @@
 
 ## Структура
 
-- `flows/` — информационная архитектура, screen inventory и user flows.
+- [`flows/`](flows/) — утверждённый к review пакет E0-D0-T01: [screen inventory](flows/screen-inventory.md), [F01–F11](flows/flow-inventory.md), [traceability](flows/traceability-matrix.md), [Mermaid diagrams](flows/diagrams/00-overview.md) и [validation evidence](flows/validation-report.md).
 - `wireframes/` — wireframes экранов и состояний.
 - `ui-kit/` — design tokens, компоненты, темы и accessibility rules.
 - `screens/` — визуальные концепты и финальные versioned snapshots макетов.

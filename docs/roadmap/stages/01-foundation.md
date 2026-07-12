@@ -19,6 +19,13 @@
 - Решения по внешним квотам связаны с `DEC-011`, но не блокируют локальную основу.
 - Базовый UI не включает продуктовые экраны следующих этапов.
 
+## Обязательные подтверждённые contracts
+
+- UI реализует ровно пять вкладок; профиль открывается avatar с Главной; deep links проходят auth/access recovery (`DEC-013`).
+- Bot connection — обязательный onboarding gate (`DEC-014`); Flowly name/photo редактируются отдельно от Telegram (`DEC-020`).
+- Shell/auth errors full-screen, module errors inline, mutation сохраняет ввод, offline поддерживает draft, loading использует skeleton (`DEC-022`).
+- Источник screen/state/flow contracts: [`docs/design/flows/`](../../design/flows/).
+
 ## Deliverable E1-D1 — Рабочая основа приложения
 
 ### E1-D1-T01 — Создать монорепозиторий
@@ -34,7 +41,7 @@
 
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
 - **prd_refs:** §9, §40, §41.1, §55.1
-- **depends_on:** E1-D1-T01
+- **depends_on:** E1-D1-T01 · **decisions:** DEC-012, DEC-013, DEC-014, DEC-020, DEC-022
 - **scope:** оболочка, пять основных вкладок, профильные разделы, светлая/тёмная темы, loading/empty/error/disabled states.
 - **acceptance:** [ ] навигация соответствует §9; [ ] темы работают; [ ] состояния различимы; [ ] базовая доступность соблюдена.
 - **validation/evidence:** build/typecheck при наличии, screenshots ключевых состояний, ручной keyboard-check.
@@ -70,7 +77,7 @@
 
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
 - **prd_refs:** §10.2–10.3, §43.1–43.3, §44.1, §47.1, §55.1
-- **depends_on:** E1-D1-T02, E1-D1-T04
+- **depends_on:** E1-D1-T02, E1-D1-T04 · **decisions:** DEC-013, DEC-014, DEC-022
 - **scope:** проверка Telegram init data, создание пользователя/сессии, fallback-экран вне Telegram.
 - **acceptance:** [ ] пароль не требуется; [ ] подпись и freshness проверяются; [ ] сессия безопасна; [ ] вне Telegram показано корректное состояние.
 - **validation/evidence:** canonical auth requests/responses и screenshots отказа/успеха.
@@ -97,7 +104,7 @@
 
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
 - **prd_refs:** §40.3, §47.1, §55.1, применимая часть §55.9
-- **depends_on:** E1-D1-T02–T08
+- **depends_on:** E1-D1-T02–T08 · **decisions:** DEC-013, DEC-014, DEC-020, DEC-022
 - **scope:** review этапа, ownership defaults, headers/cookies, secret scan, проверка критериев основы.
 - **acceptance:** [ ] каждый пункт §55.1 имеет evidence; [ ] применимые меры §47.1 закрыты; [ ] остаточные риски записаны.
 - **validation/evidence:** review checklist, команды проверок, screenshots и ссылки на артефакты.

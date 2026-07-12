@@ -18,25 +18,32 @@
 - Этап не является местом для скрытого добавления нового product scope.
 - Открытые operational decisions должны быть закрыты либо явно оставить карточку blocked.
 
+## Обязательные подтверждённые contracts
+
+- Verification обязана проверять все linked `DEC-*` карточек и 69 screen / 11 flow contracts из [`docs/design/flows/`](../../design/flows/).
+- Account deletion: 7-day grace + re-auth cancellation; joint results preserve anonymized integrity. Clear history сохраняет account/settings/objects; export — protected JSON + bot notice (`DEC-020`).
+- Share-card retention 30 дней (`DEC-018`); open operational decisions `DEC-006`–`DEC-008`, `DEC-010`, `DEC-011` должны быть закрыты либо оставить соответствующую карточку blocked.
+- Security/privacy validation включает deep-link recovery, revoke/block, status audit и contextual UI states (`DEC-013`–`DEC-022`).
+
 ## Deliverable E8-D9 — Production readiness
 
 ### E8-D9-T01 — Закрыть unit/integration verification matrix
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §50.1–50.2, §55.9 · **depends_on:** этапы 1–7 · **decisions:** DEC-003
+- **prd_refs:** §50.1–50.2, §55.9 · **depends_on:** этапы 1–7 · **decisions:** DEC-003, DEC-013–DEC-022
 - **scope:** инвентаризировать выполненные проверки, закрыть явно запрошенные пользователем пробелы и сохранить evidence.
 - **acceptance:** [ ] каждый обязательный сценарий §50.1–50.2 имеет результат; [ ] failures не скрыты; [ ] отложенные проверки согласованы.
 - **validation/evidence:** verification matrix и команды с exit codes. Автотесты писать только по явному запросу пользователя.
 
 ### E8-D9-T02 — Закрыть E2E и Cron verification
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §50.3–50.4, §55.9 · **depends_on:** E8-D9-T01
+- **prd_refs:** §50.3–50.4, §55.9 · **depends_on:** E8-D9-T01 · **decisions:** DEC-003, DEC-013–DEC-022
 - **scope:** четыре E2E-потока PRD и проверка Cron через Wrangler в доступной среде.
 - **acceptance:** [ ] каждый flow имеет воспроизводимый результат; [ ] Cron evidence сохранено; [ ] ограничения окружения указаны.
 - **validation/evidence:** сценарии, screenshots/HTTP traces, команды. Автотесты — только по явному запросу.
 
 ### E8-D9-T03 — Реализовать backup, restore, export и deletion
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §47.3, §51, §55.9 · **depends_on:** E1-D1-T04, E1-D1-T05 · **decisions:** DEC-008
+- **prd_refs:** §47.3, §51, §55.9 · **depends_on:** E1-D1-T04, E1-D1-T05 · **decisions:** DEC-008, DEC-018, DEC-020
 - **scope:** D1 export, R2 retention, test restore, user export и account deletion.
 - **acceptance:** [ ] backup повторяем; [ ] restore фактически проверен; [ ] user data удаляются/экспортируются по PRD; [ ] schedule mechanism утверждён.
 - **validation/evidence:** sanitized backup/restore logs и deletion inventory.
@@ -50,7 +57,7 @@
 
 ### E8-D9-T05 — Провести security и privacy validation
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §39, §47, §55.9, §56.5–56.6 · **depends_on:** этапы 1–7
+- **prd_refs:** §39, §47, §55.9, §56.5–56.6 · **depends_on:** этапы 1–7 · **decisions:** DEC-013–DEC-022
 - **scope:** auth, ownership, public links, uploads, secrets, deletion и health-content warnings.
 - **acceptance:** [ ] применимые меры §47 подтверждены; [ ] permission matrix закрыта; [ ] production secrets отсутствуют в repo; [ ] риски записаны.
 - **validation/evidence:** security checklist и concrete request results.
@@ -71,7 +78,7 @@
 
 ### E8-D9-T08 — Production deployment и финальный DoD v1.0
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §49, §54, §55, §56 · **depends_on:** E8-D9-T01–T07
+- **prd_refs:** §49, §54, §55, §56 · **depends_on:** E8-D9-T01–T07 · **decisions:** DEC-003, DEC-006, DEC-007, DEC-008, DEC-010–DEC-022
 - **scope:** deploy, smoke verification, полный checklist §55 и release handoff.
 - **acceptance:** [ ] все пункты §55 подтверждены либо релиз заблокирован; [ ] rollback/runbook доступны; [ ] migrations применены; [ ] monitoring активен; [ ] residual risks приняты пользователем.
 - **validation/evidence:** deploy logs, smoke results, финальная traceability matrix.

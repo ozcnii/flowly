@@ -8,7 +8,7 @@
 - **Текущий этап:** 0. UX/UI-дизайн
 - **Активная задача:** отсутствует
 - **Статус:** in_progress
-- **Последний завершённый результат:** E0-D0-T00 — исходный HTML-мокап перенесён, проверен и описан
+- **Последний завершённый результат:** подтверждённые DEC-013–DEC-022 синхронизированы с downstream task cards и stage contracts
 
 ## Что сделано
 
@@ -18,6 +18,12 @@
 - Дизайн-артефакты и evidence закреплены за `docs/design/`.
 - Concept A перенесён в `docs/design/screens/concept-a/`: четыре экрана, визуальное направление, логотип, standalone HTML и browser preview.
 - В `STATUS.md` зафиксированы покрытие Concept A и пробелы относительно PRD; approval отсутствует.
+- Реализован и скорректирован пакет E0-D0-T01: 69 screen/surface IDs, F01–F11, 12 Mermaid diagrams, explicit per-ID state profiles, atomic observable traceability и механически симметричные 98 screen↔flow membership pairs.
+- Deep-review corrections: безопасные F04/F08 terminal branches, F01 browser recovery, F10 relationship/revoke/permission paths, F11 deletion-grace re-auth; §19.4 cache and §51.2 export contents made observable.
+- Workshop decisions зафиксированы как DEC-013–DEC-022; DEC-009 заменён DEC-018.
+- Linked decisions синхронизированы в metadata 63 downstream-карточек; 68 из 72 карточек теперь имеют применимое поле `decisions`, остальные четыре инфраструктурные карточки не зависят от зафиксированных DEC.
+- Во все 9 stage-файлов добавлены обязательные подтверждённые contracts; `AGENTS.md` требует читать linked DEC и `docs/design/flows/**` перед началом UI/UX-задачи.
+- В корневом `README.md` полный wordmark заменён на icon Flowly.
 - Согласованы границы программных напоминаний и совместных программ.
 - Согласовано выполнение проверок по ходу этапов.
 - Согласован workflow из пяти статусов.
@@ -25,14 +31,13 @@
 
 ## Что делать следующим
 
-1. Начать E0-D0-T01 — спроектировать полную информационную архитектуру и user flows, используя Concept A как неутверждённый визуальный референс.
-2. Добавить отсутствующую вкладку «Программы», дополнительные разделы профиля и обязательные состояния в screen/flow inventory.
+1. Начать E0-D0-T02 — wireframes по утверждённому inventory; Concept A использовать только как неутверждённый референс.
+2. Не выходить за зафиксированные screen/state/flow contracts; новую продуктовую неясность вынести в `DECISIONS.md`.
 3. Не начинать этапы 1–8 до завершения E0-D0-T06 с явно зафиксированным approval пользователя.
-4. Любую продуктовую неясность дизайна вынести в `DECISIONS.md`, не решая её по предположению.
 
 ## Открытые блокеры
 
-См. `DEC-006`–`DEC-011` в [`DECISIONS.md`](DECISIONS.md). Они не блокируют начало этапа 0, но блокируют соответствующие финальные карточки. Разработка этапов 1–8 заблокирована до explicit approval E0-D0-T06 согласно `DEC-012`.
+Открыты `DEC-006`, `DEC-007`, `DEC-008`, `DEC-010`, `DEC-011` в [`DECISIONS.md`](DECISIONS.md); DEC-009 superseded. Они не блокируют завершённую E0-D0-T01, но блокируют соответствующие downstream детали. Новых неоднозначностей navigation/permissions/destructive/status/bot gate не обнаружено. Разработка этапов 1–8 заблокирована до explicit approval E0-D0-T06 согласно `DEC-012`.
 
 ## Изменённые артефакты
 
@@ -43,21 +48,63 @@
 - `docs/roadmap/HANDOFF.md`
 - `docs/roadmap/stages/00-design.md` … `08-stabilization.md`
 - `docs/design/README.md`
+- `docs/design/flows/**` — план, inventories, traceability, validation и 12 diagrams
 - `docs/design/screens/concept-a/**`
 
 ## Проверка текущего изменения
 
 Проверено 2026-07-13 автоматическим анализом Markdown:
 
-- [x] существуют индекс, журналы и все 9 stage-файлов;
-- [x] создано 72 карточки, все 72 ID уникальны;
-- [x] количества карточек и статусов совпадают с индексом;
-- [x] каждый этап содержит ссылки на §54 и применимые критерии §55;
-- [x] все Markdown-ссылки общего индекса ведут к существующим файлам;
-- [x] принятое решение DEC-012 и обязательный approval отражены в зависимостях;
-- [x] неизвестные operational параметры вынесены в DEC-006–DEC-011.
+- [x] 69 unique screen IDs и F01–F11;
+- [x] двунаправленное сравнение: 98 screen↔flow pairs с каждой стороны, symmetric difference пуст;
+- [x] 69 explicit ID→state-profile assignments, 15 profiles с обоснованными N/A, включая отдельные read-only profiles;
+- [x] 12 Mermaid blocks; 11 canonical headers совпадают с F-rows; каждый Rendered set совпадает с node IDs;
+- [x] 250 traceability rows; list-valued obligations §11.3/§13.1/§16.1/§20.2/§22.1/§28.3/§34.1–34.2/§37.1/§39 разложены по requirement bullets; §19.4/§30/§31/§51.2 имеют observable contracts;
+- [x] 0 broken repository-relative Markdown links;
+- [x] roadmap: 72 unique cards = 70 backlog / 0 review / 2 done;
+- [x] `git diff --check`, 0 trailing-whitespace lines, 0 staged files;
+- [x] независимая semantic re-review: blockers отсутствуют, E0-D0-T01 разрешено перевести в done;
+- [x] 72 task cards parsed; 68 имеют decisions metadata, все DEC refs существуют, active task refs не содержат superseded DEC-009;
+- [x] все 9 stages содержат «Обязательные подтверждённые contracts»; README icon path существует;
+- [ ] Mermaid renderer/CLI не выполнен — принят как residual risk до визуальной стадии.
 
 ## Журнал handoff
+
+### 2026-07-13 — Синхронизация решений с downstream-задачами
+
+- **От кого / кому:** пользователь → AI agent → все следующие агенты.
+- **Результат:** DEC-013–DEC-022 связаны с конкретными task cards; stage contracts и agent workflow делают их обязательными для исполнения.
+- **Изменённые файлы:** `README.md`, `AGENTS.md`, `docs/roadmap/README.md`, `DECISIONS.md`, `HANDOFF.md`, `stages/00-design.md` … `08-stabilization.md`.
+- **Проверки:** 72 cards parsed; 68 cards с decisions; 0 неизвестных DEC; 0 active refs на superseded DEC-009; 9/9 stage contract sections; icon и repository-relative links существуют.
+- **Следующее точное действие:** commit/push текущего пакета, затем начать E0-D0-T02.
+
+### 2026-07-13 — E0-D0-T01 / deep review завершён
+
+- **От кого / кому:** AI agent → независимые reviewers → следующий агент.
+- **Статус задачи:** done.
+- **Findings:** исправлены F04 active-session branching, F08 terminal/snooze/Start, social revoke/permissions, deletion re-auth, bidirectional membership, per-ID states, atomic PRD traceability, Concept A mapping и diagram evidence.
+- **Проверки:** финальный независимый gate — blockers отсутствуют; 69 IDs, 98 symmetric pairs, 15 profiles, 250 traceability rows, 12 Mermaid blocks, 0 broken links, roadmap sync и `git diff --check` PASS.
+- **Residual risk:** Mermaid не проверялся реальным renderer/CLI; визуальная проверка переносится в E0-D0-T02.
+- **Следующее точное действие:** начать E0-D0-T02.
+
+### 2026-07-13 — E0-D0-T01 / реализация IA и flows
+
+- **От кого / кому:** пользователь → AI agent → независимый reviewer.
+- **Статус задачи:** review.
+- **Сделано:** утверждённый план реализован в Markdown + Mermaid; добавлены 69 surface IDs, F01–F11, overview + 11 diagrams, state/privacy и PRD traceability; workshop decisions перенесены в DEC-013–DEC-022.
+- **Изменённые файлы:** `docs/design/README.md`, `docs/design/flows/**`, `docs/roadmap/DECISIONS.md`, `docs/roadmap/stages/00-design.md`, `docs/roadmap/README.md`, `docs/roadmap/HANDOFF.md`.
+- **Проверки и результаты:** custom Python validation PASS (IDs, F01–F11, state columns, reverse refs, Markdown links, balanced Mermaid fences); roadmap counts PASS; `git diff --check` PASS; tests не добавлялись.
+- **Evidence:** [`validation-report.md`](../design/flows/validation-report.md), [`traceability-matrix.md`](../design/flows/traceability-matrix.md), [`diagrams/`](../design/flows/diagrams/).
+- **Блокеры / решения:** open DEC-006/007/008/010/011 — downstream; новых UX-блокеров нет. Mermaid не проверялся renderer CLI.
+- **Следующее точное действие:** независимый acceptance review E0-D0-T01; затем `done` или возврат замечаний в `in_progress`.
+
+### 2026-07-13 — E0-D0-T01 / deep analysis и план
+
+- **От кого / кому:** пользователь → AI agent.
+- **Статус задачи:** in_progress; реализация ожидает approval плана.
+- **Сделано:** после commit `cbc5acd` карточка назначена AI agent; проанализированы PRD, Concept A и 11 flow families; проведён UX-workshop; создан `docs/design/flows/E0-D0-T01-plan.md`.
+- **Решения:** Markdown + Mermaid, overview + 11 доменов, Concept A как референс; ответы пользователя перечислены в плане и должны быть перенесены в `DECISIONS.md` после approval.
+- **Следующее точное действие:** получить явное approval плана E0-D0-T01.
 
 ### 2026-07-13 — E0-D0-T00 / импорт Concept A
 
