@@ -8,6 +8,7 @@ import { WelcomeScreen } from "@/features/onboarding/ui/welcome-screen";
 import { PreferencesScreen } from "@/features/onboarding/ui/preferences-screen";
 import { HabitInviteScreen } from "@/features/onboarding/ui/habit-invite-screen";
 import { BotConnectionScreen } from "@/features/onboarding/ui/bot-connection-screen";
+import { DeepLinkRecoveryScreen } from "@/features/recovery/ui/deep-link-recovery-screen";
 import { resolveShellScenario } from "@/lib/scenarios";
 
 type PageProps = { searchParams: Promise<Record<string, string | string[] | undefined>> };
@@ -23,6 +24,14 @@ export default async function Page({ searchParams }: PageProps) {
     if (params.onboarding === "preferences") return <PreferencesScreen />;
     if (params.onboarding === "habit") return <HabitInviteScreen />;
     if (params.onboarding === "bot") return <BotConnectionScreen />;
+  }
+
+  if (process.env.NODE_ENV !== "production" && typeof params.recovery === "string") {
+    const r = params.recovery;
+    if (r === "unavailable" || r === "auth" || r === "permission") {
+      return <DeepLinkRecoveryScreen variant={r} />;
+    }
+    return <DeepLinkRecoveryScreen />;
   }
 
   return (
