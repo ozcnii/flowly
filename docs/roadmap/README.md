@@ -7,8 +7,8 @@
 ## Текущий фокус
 
 - **Активный этап:** 1. Основа
-- **Активная задача:** E1-D1-T06 (Telegram auth/sessions) — Phase 0 backend auth done; далее UI slices
-- **Следующее действие:** S-MA-003 (timezone/preferences) approved; следующий шаг — S-MA-004.
+- **Активная задача:** E1-D1-T06 (Telegram auth/sessions) — UI slices
+- **Следующее действие:** S-MA-001…004 approved; **S-MA-005 (bot gate) preview готов, ждёт approval** → далее S-MA-006.
 - **UI workflow:** один screen slice + все применимые states/интеракции + явный approval (`DEC-024`)
 - **Блокеры:** открытые решения перечислены в [`DECISIONS.md`](DECISIONS.md)
 - **Контекст продолжения:** [`HANDOFF.md`](HANDOFF.md)

@@ -4,11 +4,11 @@
 
 ## Текущее состояние
 
-- **Обновлено:** 2026-07-13
+- **Обновлено:** 2026-07-14
 - **Текущий этап:** 1. Основа
-- **Активная задача:** E1-D1-T06 (Telegram auth/sessions) — Phase 0 backend auth core
-- **Статус:** E1-D1-T06 backend/auth + 2 approved onboarding slices + **S-MA-004 implemented (preview only)**; T06 остаётся `in_progress` (перед финальным approval, осталось 5 UI slices). E1-D1-T04 done.
-- **Последний завершённый результат:** E1-D1-T06 — S-MA-004 (first habit/invite prompts) dev-preview реализован в `apps/web/features/onboarding/ui/habit-invite-screen.tsx` (`?onboarding=habit`), проверка `typecheck/lint` + `@flowly/web` preview-screenshot `apps/web/.next/static/sma004-430.png`.
+- **Активная задача:** E1-D1-T06 (Telegram auth/sessions) — UI slices
+- **Статус:** Phase 0 backend auth + **S-MA-001/002/003/004 approved** + **S-MA-005 (bot connection gate) preview реализован, ждёт approval**; T06 `in_progress` (осталось 3 slice: S-MA-006, S-WEB-001, S-WEB-002). Блокер «чек-иконки» был по Главной (S-MA-010), починен другим агентом; S-MA-004 чек-иконок не имел.
+- **Последний завершённый результат:** E1-D1-T06 — S-MA-005 (bot connection gate) dev-preview в `apps/web/features/onboarding/ui/bot-connection-screen.tsx` (`?onboarding=bot`, dev-force `?bot=checking|linked|error`); typecheck/lint PASS, browser-verify 430 light/dark overflow 0, таргеты ≥44px. Плюс фикс habit-экрана: `appearance:none` + кастомная caret у `<select>`.
 
 ## Что сделано
 
@@ -33,13 +33,14 @@
 
 ## Что делать следующим
 
-1. E1-D1-T06: выполнить approval для **S-MA-004** по DEC-024 (screen + все states/interactions + short UX review).
-2. Только после approval запустить следующий slice **S-MA-005**, затем S-MA-006, S-WEB-001, S-WEB-002.
+1. E1-D1-T06: получить approval на **S-MA-005** (`?onboarding=bot`, состояния `?bot=checking|linked|error`) — пользователь сначала смотрит вживую.
+2. Только после approval запустить следующий slice **S-MA-006** (safe reason + auth/recovery/exit), затем S-WEB-001, S-WEB-002.
 3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
 
 Открыты `DEC-006`, `DEC-007`, `DEC-008`, `DEC-010`, `DEC-011` в [`DECISIONS.md`](DECISIONS.md); DEC-009 и DEC-012 superseded. Они не блокируют E0-D0-T04. Production UI-kit утверждён; сохраняется обязательный per-screen approval по DEC-024.
+- ~~Внешний blocker по визуалу для S-MA-004 (чек-маркер/расположение)~~ — **resolved**: блокер был по Главной (S-MA-010, галочка `.habitAction`), починен другим агентом в 3 коммитах; S-MA-004 чек-иконок не имел. Evidence оставлен: `docs/roadmap/evidence/check-spacing-blocker-2026-07-14.png`.
 
 ## Изменённые артефакты
 
@@ -58,6 +59,7 @@
 - `.temp/E0-D0-T04/next-interactive-plan.md` — утверждённый migration/implementation plan
 - `apps/**`, `packages/**`, `migrations/`, `seeds/`, `scripts/` — E1-D1-T01/T02
 - `apps/web/features/home/**`, `apps/web/public/media/**` — E0-D0-T04 full state set visual-approved и done
+- `docs/roadmap/evidence/check-spacing-blocker-2026-07-14.png` — blocker proof для текущего UI-issue
 - `packages/ui/**`, `apps/web/app/ui-kit/**` — E1-D1-T11 production UI-kit
 - `apps/web/{open-next.config.ts,wrangler.jsonc,.dev.vars.example,public/_headers}` — OpenNext test web deployment
 - `apps/scheduler/{src/index.ts,wrangler.jsonc,.dev.vars.example,worker-configuration.d.ts}` — scheduler health/no-op Cron Worker
@@ -85,6 +87,20 @@ Roadmap migration / bootstrap verification:
 - [x] remote Chromium: scheduler `/health`, web `/`, web `/ui-kit` = 200; production Workers untouched.
 
 ## Журнал handoff
+
+### 2026-07-14 — E1-D1-T06 / Slice S-MA-005 preview + fix(habit select)
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** T06 `in_progress` (S-MA-005 — preview, ждёт approval).
+- **Сделано:**
+  - **S-MA-005 (bot connection gate)** — `features/onboarding/ui/bot-connection-screen.{tsx,module.css}`, route `?onboarding=bot` в `app/page.tsx`; mandatory P-GATE (DEC-014, §10.1 step 9, §36), состояния `checking|linked|error`, dev-force `?bot=checking|linked|error`; completion disabled до верификации; дефолт авто checking→linked ~1.2с; убран `padding-left` у `.diagnostics`. Реальный `getChat` — этап 5.
+  - **fix(habit):** нативная стрелка `<select>` поля «Время напоминания» не двигалась `padding-right` → `appearance:none` + `.selectWrap`/`.selectCaret` (chevron-down из `@flowly/ui`, тема-адаптивный, ~14px от края).
+  - **S-MA-004 approved** пользователем; уточнено, что блокер «чек-иконки» был по Главной (S-MA-010), починен другим агентом.
+  - Создан vision-субагент `code-analysis.vision-checker` на `openai-codex/gpt-5.3-codex-spark` для анализа скриншотов.
+- **Проверки:** typecheck/lint PASS (`@flowly/web`); browser-verify 430 light/dark: overflow 0, таргеты ≥44px, 0 console errors на экранах; select-caret confirmed (`appearance:none`, caret 14px от края).
+- **Evidence:** `.temp/E1-D1-T06/screenshots/sma005-{checking,error}-430-light.png`, `sma005-linked-430-{light,dark}.png`, `sma004-select-caret-430-light.png`.
+- **Блокеры / решения:** S-MA-005 ждёт явного approval (пользователь смотрит вживую); реальный `getChat` verify и Telegram WebView — этап 5/downstream.
+- **Следующее точное действие:** approval S-MA-005 → запуск S-MA-006 (safe reason + auth/recovery/exit).
 
 ### 2026-07-13 — E1-D1-T06 / Slice S-MA-004 preview implemented
 
