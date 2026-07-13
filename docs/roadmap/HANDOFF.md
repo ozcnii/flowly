@@ -7,8 +7,8 @@
 - **Обновлено:** 2026-07-13
 - **Текущий этап:** 1. Основа
 - **Активная задача:** E1-D1-T06 (Telegram auth/sessions) — Phase 0 backend auth core
-- **Статус:** E1-D1-T06 backend/auth + 2 onboarding slices + **S-MA-003 (preferences) approved по варианту A**; T06 остаётся in_progress (осталось 5 UI slices). E1-D1-T04 done.
-- **Последний завершённый результат:** E1-D1-T06 — S-MA-003 (preferences): searchable timezone select с UX улучшениями для onboarding; dev-preview `?onboarding=preferences`.
+- **Статус:** E1-D1-T06 backend/auth + 2 approved onboarding slices + **S-MA-004 implemented (preview only)**; T06 остаётся `in_progress` (перед финальным approval, осталось 5 UI slices). E1-D1-T04 done.
+- **Последний завершённый результат:** E1-D1-T06 — S-MA-004 (first habit/invite prompts) dev-preview реализован в `apps/web/features/onboarding/ui/habit-invite-screen.tsx` (`?onboarding=habit`), проверка `typecheck/lint` + `@flowly/web` preview-screenshot `apps/web/.next/static/sma004-430.png`.
 
 ## Что сделано
 
@@ -33,8 +33,8 @@
 
 ## Что делать следующим
 
-1. E1-D1-T06: следующий шаг — S-MA-004 (после подтверждённого S-MA-003) по DEC-024 (один slice + states + approval).
-2. Затем остальные slices последовательно (S-MA-005, S-MA-006, S-WEB-001, S-WEB-002).
+1. E1-D1-T06: выполнить approval для **S-MA-004** по DEC-024 (screen + все states/interactions + short UX review).
+2. Только после approval запустить следующий slice **S-MA-005**, затем S-MA-006, S-WEB-001, S-WEB-002.
 3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
@@ -85,6 +85,13 @@ Roadmap migration / bootstrap verification:
 - [x] remote Chromium: scheduler `/health`, web `/`, web `/ui-kit` = 200; production Workers untouched.
 
 ## Журнал handoff
+
+### 2026-07-13 — E1-D1-T06 / Slice S-MA-004 preview implemented
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Сделано:** добавлен экран `features/onboarding/ui/habit-invite-screen.tsx` + `habit-invite-screen.module.css`, подключён route `?onboarding=habit` в `apps/web/app/page.tsx`. Экран даёт два prompt в рамках S-MA-004: `create/skip habit` и `invite/skip`, без принудительной мутации при skip.
+- **Проверки:** `npm run lint --workspace @flowly/web` и `npm run typecheck --workspace @flowly/web` PASS, локальный browser-preview `/?onboarding=habit` (http://localhost:3002) без console-errors.
+- **Следующее точное действие:** получить подтверждение/approval на S-MA-004 и только после него переходить к S-MA-005.
 
 ### 2026-07-13 — E1-D1-T06 / Slice S-MA-003 approved
 
