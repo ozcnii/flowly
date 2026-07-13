@@ -7,8 +7,8 @@
 - **Обновлено:** 2026-07-13
 - **Текущий этап:** 1. Основа
 - **Активная задача:** E1-D1-T06 (Telegram auth/sessions) — Phase 0 backend auth core
-- **Статус:** E1-D1-T06 Phase 0 (backend auth core) done и runtime-проверен (curl-repro PASS); T06 остаётся in_progress (8 UI slices впереди). E1-D1-T04 done.
-- **Последний завершённый результат:** E1-D1-T06 Phase 0 — initData verify, session/cookie/CSRF, /me, logout; runtime PASS в workerd preview.
+- **Статус:** E1-D1-T06 backend/auth + 2 onboarding slices + **S-MA-003 (preferences) approved по варианту A**; T06 остаётся in_progress (осталось 5 UI slices). E1-D1-T04 done.
+- **Последний завершённый результат:** E1-D1-T06 — S-MA-003 (preferences): searchable timezone select с UX улучшениями для onboarding; dev-preview `?onboarding=preferences`.
 
 ## Что сделано
 
@@ -33,8 +33,8 @@
 
 ## Что делать следующим
 
-1. E1-D1-T06 Phase 1: UI slice S-MA-001 (auth bootstrap) по DEC-024 (один slice + states + approval).
-2. Затем остальные slices последовательно (S-MA-002…006, S-WEB-001, S-WEB-002).
+1. E1-D1-T06: следующий шаг — S-MA-004 (после подтверждённого S-MA-003) по DEC-024 (один slice + states + approval).
+2. Затем остальные slices последовательно (S-MA-005, S-MA-006, S-WEB-001, S-WEB-002).
 3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
@@ -49,6 +49,7 @@
 - `docs/roadmap/DECISIONS.md`
 - `docs/roadmap/HANDOFF.md`
 - `docs/roadmap/stages/00-design.md` … `08-stabilization.md`
+- `docs/roadmap/stages/01-foundation.md`
 - `docs/design/README.md`
 - `docs/design/flows/**` — план, inventories, traceability, validation и 12 diagrams
 - `docs/design/wireframes/**` — утверждённый план, HTML, CSS/JS registry, coverage, validation, capture toolchain и 42 PNG
@@ -84,6 +85,14 @@ Roadmap migration / bootstrap verification:
 - [x] remote Chromium: scheduler `/health`, web `/`, web `/ui-kit` = 200; production Workers untouched.
 
 ## Журнал handoff
+
+### 2026-07-13 — E1-D1-T06 / Slice S-MA-003 approved
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Сделано:** S-MA-003 (preferences) одобрен как вариант «A»; `features/onboarding/ui/preferences-screen.tsx` с searchable Select по таймзонам (+ `packages/ui/src/select.tsx`, экспорт через `packages/ui/src/index.ts`), route-hook `?onboarding=preferences` в `apps/web/app/page.tsx`.
+- **Технические детали:** поиск по городу/региону/времени, live-счётчик результатов, clear, фокус/keyboard скролл и сохранение timezone как PATCH /me.
+- **Проверки:** typecheck/lint PASS (`@flowly/ui`, `@flowly/web`).
+- **Следующее точное действие:** запускать следующий onboard-скрин **S-MA-004** только после короткого preview по UX.
 
 ### 2026-07-13 — E1-D1-T06 / Phase 0 (backend auth core) done
 
