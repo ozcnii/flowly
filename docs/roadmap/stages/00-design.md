@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 5 | 0 | 0 | 0 | 2 |
+| 4 | 0 | 0 | 0 | 3 |
 
 ## Зависимости и границы
 
@@ -50,11 +50,14 @@
 
 ### E0-D0-T02 — Создать wireframes всех экранов
 
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
+- **status:** done · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-13
 - **prd_refs:** §9–39, §40.2 · **depends_on:** E0-D0-T01 · **decisions:** DEC-012–DEC-022
 - **scope:** wireframes всех экранов и ключевых состояний Mini App, Telegram-сценариев и responsive-вариантов, требуемых PRD.
-- **acceptance:** [ ] покрыт инвентарь E0-D0-T01; [ ] переходы соответствуют user flows; [ ] ключевые состояния различимы; [ ] snapshots сохранены в `docs/design/wireframes/`.
-- **validation/evidence:** перечень wireframes, coverage matrix и versioned snapshots.
+- **acceptance:** [x] покрыт инвентарь E0-D0-T01; [x] переходы соответствуют user flows; [x] ключевые состояния различимы; [x] snapshots сохранены в `docs/design/wireframes/`.
+- **validation/evidence:** [`README`](../../design/wireframes/README.md), [69-row coverage matrix](../../design/wireframes/coverage-matrix.md), [39 canonical + 3 evidence PNG manifest](../../design/wireframes/snapshot-manifest.md), [validation report](../../design/wireframes/validation-report.md). Validation PASS: 69 unique surfaces (59/8/2), 15 profiles/105 state demos, F01–F11/98 symmetric memberships, 38 tailored critical frames, 69 Russian title/action contracts, 0 hidden declared items, 0 content-label primary CTAs, 0 broken links, 78 light/dark browser runs + 13 runs at 200% text, 0 overflow/console/unlabelled controls, reproducible 39+3 snapshot hashes, `git diff --check`.
+- **plan:** [`E0-D0-T02-plan.md`](../../design/wireframes/E0-D0-T02-plan.md) — утверждён пользователем 2026-07-13; реализация выполнена строго в согласованном scope.
+- **residual risks:** ненулевые safe-area inset не проверены в реальном notched Telegram WebView; full-page PNG достигают ~23.3k px; финальный UX copy/UI-kit не входит в T02; staged `AGENTS.md` — внешнее состояние worktree и этой задачей не изменялось.
+- **journal:** 2026-07-13 — план утверждён; HTML+PNG wireframes по F01–F11 реализованы. Findings независимых review по states, observable content, shell, keyboard, CTA, critical branches и snapshot reproducibility закрыты. После последней точечной правки bot CTA выполнена финальная механическая проверка; задача переведена `in_progress -> review`. Пользователь явно подтвердил «всё ок» и дал добро закрыть задачу; выполнен переход `review -> done`.
 
 ### E0-D0-T03 — Создать UI-kit и дизайн-систему
 

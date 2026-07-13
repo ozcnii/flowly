@@ -7,8 +7,8 @@
 - **Обновлено:** 2026-07-13
 - **Текущий этап:** 0. UX/UI-дизайн
 - **Активная задача:** отсутствует
-- **Статус:** in_progress
-- **Последний завершённый результат:** подтверждённые DEC-013–DEC-022 синхронизированы с downstream task cards и stage contracts
+- **Статус:** E0-D0-T02 завершена (`done`)
+- **Последний завершённый результат:** пользователь явно принял HTML+PNG wireframes 69 surfaces; E0-D0-T02 переведена `review -> done`
 
 ## Что сделано
 
@@ -19,6 +19,7 @@
 - Concept A перенесён в `docs/design/screens/concept-a/`: четыре экрана, визуальное направление, логотип, standalone HTML и browser preview.
 - В `STATUS.md` зафиксированы покрытие Concept A и пробелы относительно PRD; approval отсутствует.
 - Реализован и скорректирован пакет E0-D0-T01: 69 screen/surface IDs, F01–F11, 12 Mermaid diagrams, explicit per-ID state profiles, atomic observable traceability и механически симметричные 98 screen↔flow membership pairs.
+- Реализован E0-D0-T02: 13 HTML pages по F01–F11, 69 canonical surfaces, 15 profiles/105 state demos, 38 tailored critical frames, 39 canonical + 3 evidence PNG, pinned reproducible Playwright capture и 69-row coverage matrix.
 - Deep-review corrections: безопасные F04/F08 terminal branches, F01 browser recovery, F10 relationship/revoke/permission paths, F11 deletion-grace re-auth; §19.4 cache and §51.2 export contents made observable.
 - Workshop decisions зафиксированы как DEC-013–DEC-022; DEC-009 заменён DEC-018.
 - Linked decisions синхронизированы в metadata 63 downstream-карточек; 68 из 72 карточек теперь имеют применимое поле `decisions`, остальные четыре инфраструктурные карточки не зависят от зафиксированных DEC.
@@ -31,7 +32,7 @@
 
 ## Что делать следующим
 
-1. Начать E0-D0-T02 — wireframes по утверждённому inventory; Concept A использовать только как неутверждённый референс.
+1. Начать E0-D0-T03 — UI-kit и дизайн-система на основе утверждённых flows/wireframes.
 2. Не выходить за зафиксированные screen/state/flow contracts; новую продуктовую неясность вынести в `DECISIONS.md`.
 3. Не начинать этапы 1–8 до завершения E0-D0-T06 с явно зафиксированным approval пользователя.
 
@@ -49,6 +50,7 @@
 - `docs/roadmap/stages/00-design.md` … `08-stabilization.md`
 - `docs/design/README.md`
 - `docs/design/flows/**` — план, inventories, traceability, validation и 12 diagrams
+- `docs/design/wireframes/**` — утверждённый план, HTML, CSS/JS registry, coverage, validation, capture toolchain и 42 PNG
 - `docs/design/screens/concept-a/**`
 
 ## Проверка текущего изменения
@@ -61,7 +63,7 @@
 - [x] 12 Mermaid blocks; 11 canonical headers совпадают с F-rows; каждый Rendered set совпадает с node IDs;
 - [x] 250 traceability rows; list-valued obligations §11.3/§13.1/§16.1/§20.2/§22.1/§28.3/§34.1–34.2/§37.1/§39 разложены по requirement bullets; §19.4/§30/§31/§51.2 имеют observable contracts;
 - [x] 0 broken repository-relative Markdown links;
-- [x] roadmap: 72 unique cards = 70 backlog / 0 review / 2 done;
+- [x] roadmap: 72 unique cards = 69 backlog / 0 in progress / 1 review / 2 done;
 - [x] `git diff --check`, 0 trailing-whitespace lines, 0 staged files;
 - [x] независимая semantic re-review: blockers отсутствуют, E0-D0-T01 разрешено перевести в done;
 - [x] 72 task cards parsed; 68 имеют decisions metadata, все DEC refs существуют, active task refs не содержат superseded DEC-009;
@@ -69,6 +71,37 @@
 - [ ] Mermaid renderer/CLI не выполнен — принят как residual risk до визуальной стадии.
 
 ## Журнал handoff
+
+### 2026-07-13 — E0-D0-T02 / пользователь принял wireframes
+
+- **От кого / кому:** пользователь → AI agent → следующий агент.
+- **Статус задачи:** `review -> done`.
+- **Подтверждение:** пользователь явно сообщил, что всё ок, и дал добро закрыть задачу; дополнительный review не требуется.
+- **Evidence:** acceptance checklist закрыт; validation PASS; `docs/design/wireframes/**` содержит coverage, manifest и reproducible captures.
+- **Блокеры / риски:** продуктовых блокеров нет; residual risks сохранены в карточке и validation report.
+- **Следующее точное действие:** начать E0-D0-T03 — UI-kit и дизайн-система.
+
+### 2026-07-13 — E0-D0-T02 / реализация переведена в review
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** `in_progress -> review`.
+- **Сделано:** реализованы 69 canonical wireframes по F01–F11, visual state profiles и tailored critical branches; закрыты review findings по content caps, CTA semantics, shell/accessibility и snapshot reproducibility.
+- **Изменённые файлы:** `docs/design/wireframes/**`, `docs/design/README.md`, `docs/roadmap/stages/00-design.md`, `docs/roadmap/README.md`, `docs/roadmap/HANDOFF.md`.
+- **Проверки и результаты:** 69/15/98/38 coverage PASS; browser responsive/theme/text-scale PASS; 42 PNG + hashes PASS; два последовательных captures byte-identical; `git diff --check` PASS; автотесты не добавлялись.
+- **Evidence:** `docs/design/wireframes/coverage-matrix.md`, `snapshot-manifest.md`, `validation-report.md`.
+- **Блокеры / решения:** продуктовых блокеров нет; staged `AGENTS.md` — внешнее состояние worktree; non-zero safe-area остаётся residual risk.
+- **Следующее точное действие:** пользовательский review; затем `done` либо точечные замечания.
+
+### 2026-07-13 — E0-D0-T02 / старт deep analysis
+
+- **От кого / кому:** пользователь → AI agent → следующий агент.
+- **Статус задачи:** `backlog -> in_progress`; owner — AI agent.
+- **Сделано:** пользователь подтвердил старт E0-D0-T02, отдельный русский deep plan, HTML+PNG, организацию по F01–F11, grayscale low-fi и стратегию «15 profiles + critical states»; deep analysis завершён.
+- **Изменённые файлы:** `docs/design/wireframes/E0-D0-T02-plan.md`, `docs/roadmap/stages/00-design.md`, `docs/roadmap/README.md`, `docs/roadmap/HANDOFF.md`.
+- **Проверки и результаты:** изучены PRD §9–39/§40.2, DEC-012–DEC-022, 69 surfaces, 15 profiles, F01–F11/98 memberships, diagrams, traceability и Concept A gaps; одновременно других активных карточек нет.
+- **Evidence:** отдельный план и синхронизированные карточка, stage summary, общий индекс и handoff.
+- **Блокеры / решения:** пользователь явно утвердил план; новые продуктовые решения самостоятельно не принимаются. Findings первого review закрыты: отдельные visual state/critical frames, observable layouts, русская семантика, contextual shell, keyboard semantics и корректные S-MA-094/095; validation report и единый snapshot set созданы.
+- **Следующее точное действие:** завершить финальный независимый re-review; затем перевести карточку в `review` либо вернуть findings в реализацию.
 
 ### 2026-07-13 — Синхронизация решений с downstream-задачами
 

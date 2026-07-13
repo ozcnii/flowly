@@ -8,7 +8,7 @@
 
 - **Активный этап:** 0. UX/UI-дизайн
 - **Активная задача:** отсутствует
-- **Следующее действие:** начать E0-D0-T02 — wireframes всех экранов по утверждённым IA/user flows
+- **Следующее действие:** начать E0-D0-T03 — UI-kit и дизайн-система по утверждённым flows/wireframes
 - **Блокеры:** открытые решения перечислены в [`DECISIONS.md`](DECISIONS.md)
 - **Контекст продолжения:** [`HANDOFF.md`](HANDOFF.md)
 
@@ -16,7 +16,7 @@
 
 | Этап | Статус | Backlog | In progress | Blocked | Review | Done | Файл |
 |---|---|---:|---:|---:|---:|---:|---|
-| 0. UX/UI-дизайн | in_progress | 5 | 0 | 0 | 0 | 2 | [`00-design.md`](stages/00-design.md) |
+| 0. UX/UI-дизайн | in_progress | 4 | 0 | 0 | 0 | 3 | [`00-design.md`](stages/00-design.md) |
 | 1. Основа | backlog | 9 | 0 | 0 | 0 | 0 | [`01-foundation.md`](stages/01-foundation.md) |
 | 2. Йога | backlog | 10 | 0 | 0 | 0 | 0 | [`02-yoga.md`](stages/02-yoga.md) |
 | 3. Программы | backlog | 7 | 0 | 0 | 0 | 0 | [`03-programs.md`](stages/03-programs.md) |
@@ -26,7 +26,7 @@
 | 7. Социальные функции | backlog | 7 | 0 | 0 | 0 | 0 | [`07-social.md`](stages/07-social.md) |
 | 8. Стабилизация | backlog | 8 | 0 | 0 | 0 | 0 | [`08-stabilization.md`](stages/08-stabilization.md) |
 
-**Итого:** 70 backlog / 0 in progress / 0 blocked / 0 review / 2 done.
+**Итого:** 69 backlog / 0 in progress / 0 blocked / 0 review / 3 done.
 
 ## Зависимости этапов
 
