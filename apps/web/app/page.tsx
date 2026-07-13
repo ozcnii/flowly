@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AppShell } from "@/components/shell/app-shell";
 import { homeBase } from "@/features/home/fixtures/base";
+import { resolveHomeScenario } from "@/features/home/model/home-scenario";
 import { HomeScreen } from "@/features/home/ui/home-screen";
 import { resolveShellScenario } from "@/lib/scenarios";
 
@@ -8,16 +9,17 @@ type PageProps = { searchParams: Promise<Record<string, string | string[] | unde
 
 export default async function Page({ searchParams }: PageProps) {
   const params = await searchParams;
-  const scenario = resolveShellScenario(typeof params.scenario === "string" ? params.scenario : undefined);
+  const homeScenario = resolveHomeScenario(typeof params.home === "string" ? params.home : undefined);
+  const scenario = homeScenario === "offline" ? "offline" : resolveShellScenario(typeof params.scenario === "string" ? params.scenario : undefined);
   const activeTab = typeof params.tab === "string" ? params.tab : "home";
 
   return (
-    <AppShell activeTab={activeTab} scenario={scenario} showScenario={process.env.NODE_ENV !== "production"}>
+    <AppShell activeTab={activeTab} scenario={scenario} stateLabel={`home:${homeScenario}`} showScenario={process.env.NODE_ENV !== "production"}>
       {scenario === "loading" ? (
         <div aria-label="Загрузка оболочки" className="grid gap-4"><div className="shell-skeleton h-9 w-2/3 rounded-full" /><div className="shell-skeleton h-40 rounded-3xl" /><div className="shell-skeleton h-24 rounded-2xl" /></div>
       ) : scenario === "error" ? (
         <section role="alert" className="m-auto grid max-w-md gap-4 rounded-3xl border border-border bg-surface p-6 text-center"><h1 className="font-display text-3xl font-semibold">Не удалось открыть Flowly</h1><p className="text-text-muted">Повторите загрузку оболочки. Личные данные не отображаются до успешной проверки.</p><LinkButton /></section>
-      ) : <HomeScreen data={homeBase} />}
+      ) : <HomeScreen key={homeScenario} data={homeBase} scenario={homeScenario} />}
     </AppShell>
   );
 }

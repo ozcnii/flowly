@@ -6,9 +6,9 @@
 
 ## Текущий фокус
 
-- **Активный этап:** 0. UX/UI-контракты и первый интерактивный screen slice
-- **Активная задача:** E0-D0-T04 — интерактивная Главная S-MA-010 (`in_progress`)
-- **Следующее действие:** пересобрать Главную из утверждённых компонентов `@flowly/ui`, затем последовательно закрыть states и visual approval
+- **Активный этап:** 1. Основа
+- **Активная задача:** не выбрана
+- **Следующее действие:** согласовать следующую foundation-карточку; E1-D1-T03 и E1-D1-T04 готовы по зависимостям
 - **UI workflow:** один screen slice + все применимые states/интеракции + явный approval (`DEC-024`)
 - **Блокеры:** открытые решения перечислены в [`DECISIONS.md`](DECISIONS.md)
 - **Контекст продолжения:** [`HANDOFF.md`](HANDOFF.md)
@@ -17,7 +17,7 @@
 
 | Этап | Статус | Backlog | In progress | Blocked | Review | Done | Файл |
 |---|---|---:|---:|---:|---:|---:|---|
-| 0. UX/UI-контракты | in_progress | 0 | 1 | 0 | 0 | 4 | [`00-design.md`](stages/00-design.md) |
+| 0. UX/UI-контракты | done | 0 | 0 | 0 | 0 | 5 | [`00-design.md`](stages/00-design.md) |
 | 1. Основа | in_progress | 8 | 0 | 0 | 0 | 3 | [`01-foundation.md`](stages/01-foundation.md) |
 | 2. Йога | backlog | 10 | 0 | 0 | 0 | 0 | [`02-yoga.md`](stages/02-yoga.md) |
 | 3. Программы | backlog | 7 | 0 | 0 | 0 | 0 | [`03-programs.md`](stages/03-programs.md) |
@@ -27,7 +27,7 @@
 | 7. Социальные функции | backlog | 7 | 0 | 0 | 0 | 0 | [`07-social.md`](stages/07-social.md) |
 | 8. Стабилизация | backlog | 8 | 0 | 0 | 0 | 0 | [`08-stabilization.md`](stages/08-stabilization.md) |
 
-**Итого:** 64 backlog / 1 in progress / 0 blocked / 0 review / 7 done.
+**Итого:** 64 backlog / 0 in progress / 0 blocked / 0 review / 8 done.
 
 ## Зависимости этапов
 

@@ -16,11 +16,12 @@ type AppShellProps = {
   activeTab: string;
   scenario: ShellScenario;
   showScenario: boolean;
+  stateLabel?: string;
   immersive?: boolean;
   children: ReactNode;
 };
 
-export function AppShell({ activeTab, scenario, showScenario, immersive = false, children }: AppShellProps) {
+export function AppShell({ activeTab, scenario, showScenario, stateLabel, immersive = false, children }: AppShellProps) {
   return (
     <div className="safe-shell mx-auto flex min-h-dvh w-full max-w-[75rem] flex-col bg-canvas">
       {!immersive && <header className="flex min-h-18 items-center justify-between gap-4 border-b border-border px-4 py-3 sm:px-6">
@@ -37,7 +38,7 @@ export function AppShell({ activeTab, scenario, showScenario, immersive = false,
 
       {showScenario && (
         <aside aria-label="Development scenarios" className="mx-4 mb-3 rounded-xl border border-dashed border-border bg-surface px-3 py-2 text-xs text-text-muted">
-          Dev scenario: <strong>{scenario}</strong>
+          Dev scenario: <strong>{stateLabel ?? scenario}</strong>
         </aside>
       )}
 

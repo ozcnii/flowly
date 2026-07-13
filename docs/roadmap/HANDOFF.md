@@ -5,10 +5,10 @@
 ## Текущее состояние
 
 - **Обновлено:** 2026-07-13
-- **Текущий этап:** 0. UX/UI-контракты и первый интерактивный screen slice
-- **Активная задача:** E0-D0-T04 — интерактивная Главная S-MA-010
-- **Статус:** `in_progress`; E1-D1-T11 done
-- **Последний завершённый результат:** пользователь подтвердил новый base state Главной фразой «главная теперь выглядит замечательно»; разрешён переход к contextual states
+- **Текущий этап:** 1. Основа
+- **Активная задача:** не выбрана
+- **Статус:** E0-D0-T04 `done`; E1-D1-T11 `done`
+- **Последний завершённый результат:** интерактивная Главная S-MA-010 со всеми states утверждена и закрыта; пользователь явно отказался от deep review
 
 ## Что сделано
 
@@ -33,9 +33,9 @@
 
 ## Что делать следующим
 
-1. Реализовать loading skeleton для независимых модулей Главной.
-2. Реализовать empty day с CTA к тренировке, программе и привычке; module-error/retry, offline и resume variants.
-3. Выполнить browser matrix всех states и получить финальный approval Главной до следующего screen slice.
+1. Согласовать следующую foundation-карточку: E1-D1-T03 (Cloudflare deployments) или E1-D1-T04 (D1 и миграции) готовы по зависимостям.
+2. Перед стартом прочитать связанные decisions/acceptance и перевести только выбранную карточку в `in_progress`.
+3. Для следующего UI slice продолжать направление Concept A и workflow DEC-024; Главную не переоткрывать без нового подтверждённого scope.
 
 ## Открытые блокеры
 
@@ -56,7 +56,7 @@
 - `docs/design/screens/concept-a/**`
 - `.temp/E0-D0-T04/next-interactive-plan.md` — утверждённый migration/implementation plan
 - `apps/**`, `packages/**`, `migrations/`, `seeds/`, `scripts/` — E1-D1-T01/T02
-- `apps/web/features/home/**`, `apps/web/public/media/**` — неутверждённый E0-D0-T04 base state, остановлен
+- `apps/web/features/home/**`, `apps/web/public/media/**` — E0-D0-T04 full state set visual-approved и done
 - `packages/ui/**`, `apps/web/app/ui-kit/**` — E1-D1-T11 production UI-kit
 
 ## Проверка текущего изменения
@@ -74,9 +74,35 @@ Roadmap migration / bootstrap verification:
 - [x] E1-D1-T11 package/public API: Button/IconButton/Card/Badge/Progress/AppHeader/BottomNavigation/Skeleton/EmptyState/InlineError/OfflineBanner;
 - [x] `/ui-kit` browser matrix: 360/430/1280, light/dark, keyboard/focus, ≥44px targets, no overflow, interactions и reduced motion PASS;
 - [x] `/ui-kit` visual approval: пользователь подтвердил «утверждаю ui kit» 2026-07-13;
-- [ ] E0-D0-T04 пересборка из утверждённых components и approval Главной — in progress.
+- [x] E0-D0-T04 пересборка, full state set и visual approval Главной — done; deep review явно отклонён пользователем.
 
 ## Журнал handoff
+
+### 2026-07-13 — E0-D0-T04 / closed without deep review
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** `review -> done`.
+- **Решение:** пользователь явно отказался от deep review: «не стоит, можешь закрывать».
+- **Итог:** acceptance полностью закрыт; проверки/evidence сохранены; следующий screen slice разблокирован.
+- **Residual risks:** mock data не подтверждает backend behavior; реальный Telegram WebView/device safe-area проверяется downstream.
+- **Следующее точное действие:** выбрать E1-D1-T03 либо E1-D1-T04; самостоятельно выбор не делать.
+
+### 2026-07-13 — E0-D0-T04 / final visual approval
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** `in_progress -> review`.
+- **Approval evidence:** дословно: «заебись» после демонстрации base и полного state set.
+- **Acceptance:** все пункты закрыты; typecheck/lint/build и browser evidence PASS; residual risk реального Telegram WebView остаётся за device validation.
+- **Следующее точное действие:** спросить «Провести deep review?»; без ответа не переводить задачу в `done` и не начинать следующий screen slice.
+
+### 2026-07-13 — E0-D0-T04 / contextual states implemented
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** `in_progress`; implementation complete, final visual approval pending.
+- **Сделано:** dev-only `home` scenarios `loading`, `empty`, `module-error`, `offline`, `resume`; skeleton modules, empty-day с 3 CTA, local error/retry, offline local-save feedback и distinct resume banner. Все состояния продолжают визуальное направление Concept A и используют production UI-kit.
+- **Проверки:** root typecheck/lint/build PASS; 360/430/1280 light/dark; overflow 0; targets ≥44px; console errors 0; reduced motion, non-zero safe-area, empty actions, error retry lifecycle, offline habit mutation и resume action PASS.
+- **Evidence:** `.temp/E0-D0-T04/screenshots/home-state-{loading,empty,module-error,offline,resume}-430.png`, `home-state-module-error-card.png`, `home-states-contact-sheet.jpg`.
+- **Следующее точное действие:** финальный user review полного state set; не начинать следующий screen slice.
 
 ### 2026-07-13 — E0-D0-T04 / base state approved
 
