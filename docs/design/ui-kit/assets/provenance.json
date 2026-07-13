@@ -1,0 +1,89 @@
+{
+  "fonts": [
+    {
+      "name": "Inter",
+      "version": "5.2.8",
+      "package": "@fontsource/inter",
+      "license": "OFL-1.1",
+      "weights": [
+        400,
+        500,
+        600,
+        700
+      ],
+      "subsets": [
+        "cyrillic",
+        "latin"
+      ]
+    },
+    {
+      "name": "Cormorant Garamond",
+      "version": "5.2.11",
+      "package": "@fontsource/cormorant-garamond",
+      "license": "OFL-1.1",
+      "weights": [
+        500,
+        600
+      ],
+      "subsets": [
+        "cyrillic",
+        "latin"
+      ]
+    }
+  ],
+  "icons": {
+    "name": "Lucide",
+    "version": "1.24.0",
+    "package": "lucide-static",
+    "license": "ISC",
+    "subset": [
+      "house",
+      "heart",
+      "calendar-days",
+      "chart-no-axes-column",
+      "user-round",
+      "search",
+      "chevron-left",
+      "chevron-right",
+      "chevron-down",
+      "plus",
+      "x",
+      "check",
+      "circle-check",
+      "triangle-alert",
+      "info",
+      "refresh-cw",
+      "wifi-off",
+      "loader-circle",
+      "play",
+      "pause",
+      "square",
+      "timer",
+      "ellipsis",
+      "settings",
+      "bell",
+      "sun",
+      "moon",
+      "lock",
+      "shield",
+      "share-2",
+      "copy",
+      "download",
+      "trash-2",
+      "flag",
+      "eye-off",
+      "ban",
+      "users",
+      "bot",
+      "external-link",
+      "upload",
+      "clock-3",
+      "circle-help",
+      "sparkles",
+      "dumbbell",
+      "leaf",
+      "menu"
+    ]
+  },
+  "runtimeExternalDependencies": []
+}

@@ -139,6 +139,15 @@
 - **PRD:** §40.
 - **Влияет на:** E0-D0-T01–T06 и все task cards, где metadata содержит `DEC-022`; особенно UI/review cards этапов 1–8.
 
+### DEC-023 — Visual foundation и формат UI-kit
+
+- **Статус:** approved
+- **Дата:** 2026-07-13
+- **Решение:** UI-kit развивает wellness-направление Concept A без признания самого концепта финальным дизайном; основной UI-шрифт — локально хранимый Inter, display-шрифт — локально хранимый Cormorant Garamond с кириллицей; иконки — локально закреплённый Lucide. Артефакт включает переносимый HTML-каталог, CSS custom properties, machine-readable JSON tokens и versioned PNG snapshots; все внешние runtime-зависимости исключены.
+- **Основание:** явный выбор пользователя при старте E0-D0-T03.
+- **PRD:** §40, §55.1.
+- **Влияет на:** E0-D0-T03–T06, `docs/design/ui-kit/**`, финальные макеты и прототип.
+
 ## Открытые решения
 
 ### DEC-006 — Operational thresholds

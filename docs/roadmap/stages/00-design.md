@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 4 | 0 | 0 | 0 | 3 |
+| 3 | 0 | 0 | 0 | 4 |
 
 ## Зависимости и границы
 
@@ -22,7 +22,7 @@
 
 ## Обязательные подтверждённые contracts
 
-- `DEC-013`–`DEC-022` и [`docs/design/flows/`](../../design/flows/) — нормативная основа всех следующих дизайн-карточек.
+- `DEC-013`–`DEC-023` и [`docs/design/flows/`](../../design/flows/) — нормативная основа следующих дизайн-карточек; `DEC-023` задаёт visual foundation и переносимый формат E0-D0-T03–T06.
 - Concept A остаётся неутверждённым visual reference; он не заменяет screen/state/flow inventory.
 - Новая продуктовая неоднозначность требует `DEC-*`; нельзя молча менять утверждённые navigation, statuses, permissions, destructive flows или bot gate.
 
@@ -61,16 +61,19 @@
 
 ### E0-D0-T03 — Создать UI-kit и дизайн-систему
 
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §40, §55.1 · **depends_on:** E0-D0-T01 · **decisions:** DEC-012–DEC-022
+- **status:** done · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-13
+- **prd_refs:** §40, §55.1 · **depends_on:** E0-D0-T01 · **decisions:** DEC-012–DEC-023
 - **scope:** design tokens, типографика, цвета, spacing, iconography, компоненты, светлая/тёмная темы и правила доступных состояний.
-- **acceptance:** [ ] токены и компоненты документированы; [ ] темы покрыты; [ ] состояния компонентов заданы; [ ] контраст, focus и touch targets проверяемы; [ ] артефакты сохранены в `docs/design/ui-kit/`.
-- **validation/evidence:** component inventory, token specification, accessibility checklist и snapshots.
+- **acceptance:** [x] токены и компоненты документированы; [x] темы покрыты; [x] состояния компонентов заданы; [x] контраст, focus и touch targets проверяемы; [x] артефакты сохранены в `docs/design/ui-kit/`.
+- **validation/evidence:** [`README`](../../design/ui-kit/README.md), [canonical JSON/CSS tokens](../../design/ui-kit/tokens/tokens.json), [component inventory](../../design/ui-kit/component-inventory.md), [Telegram mapping](../../design/ui-kit/telegram-environment.md), [accessibility checklist](../../design/ui-kit/accessibility-checklist.md), [23 snapshot manifest](../../design/ui-kit/snapshot-manifest.md), [validation report](../../design/ui-kit/validation-report.md). Deep-review corrections complete: per-family contracts/state laboratory, selected ARIA semantics, Telegram environment mapping, reproducible `npm run validate`, true 200% reflow, four-sided safe area, pinned browser setup, safe capture-server root guard and complete interactive-target audit. Validation PASS: generated drift 0; 22/22 contrast pairs; 69/69 surfaces; 18 canonical + 5 evidence PNG; overflow/labels/selection/touch/console PASS; two captures byte-identical.
+- **plan:** [`E0-D0-T03-plan.md`](../../design/ui-kit/E0-D0-T03-plan.md) — явно утверждён пользователем 2026-07-13; реализован с закрытием всех findings одного independent deep review.
+- **residual risks:** реальный Telegram iOS/Android WebView/notch и production async announcements не проверены; cross-OS font rasterization может менять PNG bytes; high-fi composition всех 69 surfaces относится к E0-D0-T04.
+- **journal:** 2026-07-13 — после review FAIL задача возвращалась `review -> in_progress`. По подтверждению пользователя все 5 blockers и 4 warnings исправлены одним проходом; corrected generation/capture/validation PASS, новый review не запускался; выполнен переход `in_progress -> review`. Пользователь явно подтвердил завершение и поручил перевести задачу, закоммитить и запушить; выполнен переход `review -> done`.
 
 ### E0-D0-T04 — Создать финальные макеты Flowly v1.0
 
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §9–40, §55 · **depends_on:** E0-D0-T02, E0-D0-T03 · **decisions:** DEC-012–DEC-022
+- **prd_refs:** §9–40, §55 · **depends_on:** E0-D0-T02, E0-D0-T03 · **decisions:** DEC-012–DEC-023
 - **scope:** high-fidelity макеты всех экранов и ключевых состояний на основе утверждаемого UI-kit без добавления функций вне PRD.
 - **acceptance:** [ ] покрыты все wireframes; [ ] использован единый UI-kit; [ ] light/dark и применимые responsive-состояния представлены; [ ] макеты сохранены в `docs/design/screens/`.
 - **validation/evidence:** screen inventory, coverage matrix и versioned final snapshots.
@@ -78,7 +81,7 @@
 ### E0-D0-T05 — Собрать и проверить интерактивный прототип
 
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §9–40, §55 · **depends_on:** E0-D0-T04 · **decisions:** DEC-012–DEC-022
+- **prd_refs:** §9–40, §55 · **depends_on:** E0-D0-T04 · **decisions:** DEC-012–DEC-023
 - **scope:** интерактивный прототип ключевых end-to-end сценариев v1.0 по утверждаемым макетам.
 - **acceptance:** [ ] ключевые flows E0-D0-T01 кликабельны; [ ] переходы и возвраты согласованы с макетами; [ ] ограничения прототипа записаны; [ ] переносимый prototype artifact сохранён в `docs/design/prototype/`.
 - **validation/evidence:** список пройденных сценариев, screenshots/recording и версия prototype artifact.
@@ -86,7 +89,7 @@
 ### E0-D0-T06 — Провести дизайн-review и получить явный approval
 
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §8–40, §54–55 · **depends_on:** E0-D0-T01–T05 · **decisions:** DEC-012–DEC-022
+- **prd_refs:** §8–40, §54–55 · **depends_on:** E0-D0-T01–T05 · **decisions:** DEC-012–DEC-023
 - **scope:** проверить полноту UX/UI-пакета, закрыть или зафиксировать замечания и запросить явное утверждение пользователя до начала разработки.
 - **acceptance:** [ ] coverage PRD подтверждён; [ ] замечания имеют статус; [ ] approved snapshots перечислены; [ ] пользователь явно утвердил пакет; [ ] дата и формулировка approval сохранены в `docs/design/APPROVAL.md`.
 - **validation/evidence:** review checklist, traceability matrix, список approved artifacts и дословно зафиксированный approval пользователя.
