@@ -28,6 +28,12 @@
       "migrations_dir": "../../migrations"
     }
   ],
+  "r2_buckets": [
+    {
+      "binding": "STORAGE",
+      "bucket_name": "flowly-storage"
+    }
+  ],
   "env": {
     "test": {
       "name": "flowly-web-test",

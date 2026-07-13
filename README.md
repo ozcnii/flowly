@@ -110,6 +110,17 @@ Rollback / forward:
 
 Schema-конвенции (все 31 таблицы): id = `text` (UUIDv7 app-side), timestamps = `text` ISO-8601 UTC, local dates = `text YYYY-MM-DD`, local times = `text HH:MM`, bool = `integer 0/1`, enums = `text` + Zod-валидация. FK объявлены с `ON DELETE CASCADE`; enforcement активен в локальной D1 (miniflare, проверено: orphan-INSERT отвергнут, CASCADE сработал) — production D1 подтвердить downstream (T06+).
 
+## Storage (R2)
+
+Файлы — Cloudflare R2 (PRD §46): пользовательские изображения, GIF, обложки, карточки отчётов, резервные JSON-экспорты. E1-D1-T05 покрывает только R2-binding и безопасный adapter; продуктовые upload/access flows (валидация MIME/размера, авторизованный маршрут чтения, удаление orphan-файлов) — этап 2.
+
+R2 binding (`STORAGE`, bucket `flowly-storage`) объявлен в `apps/web/wrangler.jsonc` для локального окружения (local-only scope). Реальные test/production bucket не создаются (отдельный scope, по аналогии с D1). **Прямой публичный доступ не включён** — доступ только через adapter (`getStorage()` из `apps/web/lib/cloudflare.ts`); авторизованные маршруты чтения появляются на этапе 2.
+
+Adapter — `@flowly/storage`: `createStorage(bucket): StorageAdapter` с методами `put/get/delete/exists` и хелпером `storageKey({ kind, id, ext })` (серверная генерация ключа, §46.2). Бизнес-код зависит от интерфейса `StorageAdapter`, а не от `R2Bucket` напрямую.
+
+- Ключи объектов: `<kind>/<uuidv7>.<ext>`, `kind ∈ images|gifs|covers|reports|exports`.
+- Лимиты/форматы (§46.2): image ≤5 МБ, GIF ≤10 МБ, MIME проверяется, SVG/исполняемые форматы запрещены — реализуется в upload flow этапа 2.
+
 ## Auth и сессии
 
 Авторизация — Telegram Mini App `initData` (PRD §10.2, §47.1). Без email/пароля.
