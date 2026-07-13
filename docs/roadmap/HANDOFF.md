@@ -7,8 +7,8 @@
 - **Обновлено:** 2026-07-14
 - **Текущий этап:** 1. Основа
 - **Активная задача:** E1-D1-T06 (Telegram auth/sessions) — UI slices
-- **Статус:** Phase 0 backend auth + **S-MA-001/002/003/004 approved** + **S-MA-005 (bot connection gate) preview реализован, ждёт approval**; T06 `in_progress` (осталось 3 slice: S-MA-006, S-WEB-001, S-WEB-002). Блокер «чек-иконки» был по Главной (S-MA-010), починен другим агентом; S-MA-004 чек-иконок не имел.
-- **Последний завершённый результат:** E1-D1-T06 — S-MA-005 (bot connection gate) dev-preview в `apps/web/features/onboarding/ui/bot-connection-screen.tsx` (`?onboarding=bot`, dev-force `?bot=checking|linked|error`); typecheck/lint PASS, browser-verify 430 light/dark overflow 0, таргеты ≥44px. Плюс фикс habit-экрана: `appearance:none` + кастомная caret у `<select>`.
+- **Статус:** Phase 0 backend auth + **S-MA-001/002/003/004/005/006 approved**; T06 `in_progress` (осталось 2 slice: S-WEB-001, S-WEB-002).
+- **Последний завершённый результат:** E1-D1-T06 — S-MA-006 (deep-link recovery) approved в `apps/web/features/recovery/ui/deep-link-recovery-screen.tsx` (`?recovery=unavailable|auth|permission`); typecheck/lint PASS, overflow 0, таргеты ≥44px.
 
 ## Что сделано
 
@@ -33,8 +33,8 @@
 
 ## Что делать следующим
 
-1. E1-D1-T06: получить approval на **S-MA-005** (`?onboarding=bot`, состояния `?bot=checking|linked|error`) — пользователь сначала смотрит вживую.
-2. Только после approval запустить следующий slice **S-MA-006** (safe reason + auth/recovery/exit), затем S-WEB-001, S-WEB-002.
+1. E1-D1-T06: следующий slice **S-WEB-001** (open via Telegram — открытие вне Telegram), затем S-WEB-002.
+2. После approval всех 8 slice закрыть acceptance T06 («вне Telegram — корректное состояние») и перевести T06 в review.
 3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
@@ -101,6 +101,17 @@ Roadmap migration / bootstrap verification:
 - **Evidence:** `.temp/E1-D1-T06/screenshots/sma005-{checking,error}-430-light.png`, `sma005-linked-430-{light,dark}.png`, `sma004-select-caret-430-light.png`.
 - **Блокеры / решения:** S-MA-005 ждёт явного approval (пользователь смотрит вживую); реальный `getChat` verify и Telegram WebView — этап 5/downstream.
 - **Следующее точное действие:** approval S-MA-005 → запуск S-MA-006 (safe reason + auth/recovery/exit).
+
+### 2026-07-14 — E1-D1-T06 / S-MA-005 approved + S-MA-006 approved
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** T06 `in_progress`; S-MA-005 (bot gate) и S-MA-006 (deep-link recovery) одобрены пользователем.
+- **Сделано:**
+  - **S-MA-006 (deep-link recovery)** — `features/recovery/ui/deep-link-recovery-screen.{tsx,module.css}`, отдельный dev-route `?recovery=unavailable|auth|permission` в `app/page.tsx` (не onboarding). Full-screen recovery (DEC-022): безопасная причина без раскрытия + recovery/auth + релевантный выход. 3 варианта: unavailable (→ Главная/Открыть в Telegram), auth (→ Войти заново loading→home / Главная), permission (→ Главная/Справка). Интеракция «Войти заново» проверена.
+- **Проверки:** typecheck/lint PASS (`@flowly/web`); browser-verify 430 light/dark: overflow 0, таргеты ≥44px, 0 console errors на экранах; «Войти заново» → loading → `/?tab=home` confirmed.
+- **Evidence:** `.temp/E1-D1-T06/screenshots/sma006-{unavailable,auth,permission}-430-light.png`, `sma006-unavailable-430-dark.png`.
+- **Блокеры / решения:** реальный access-recheck и Telegram WebView — downstream этапов; S-WEB-001/002 остались.
+- **Следующее точное действие:** S-WEB-001 (open via Telegram).
 
 ### 2026-07-13 — E1-D1-T06 / Slice S-MA-004 preview implemented
 
