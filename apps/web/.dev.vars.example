@@ -1,0 +1,5 @@
+# Copy to .dev.vars for local workerd preview.
+NEXTJS_ENV=development
+
+# Future bindings/secrets are added by E1-D1-T04/T05/T06.
+# Never commit real tokens or credentials.

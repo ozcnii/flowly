@@ -1,0 +1,3 @@
+# Copy to .dev.vars for local scheduler development when bindings arrive.
+# Future DB and Telegram bindings are added by E1-D1-T04/T06.
+# Never commit real tokens or credentials.

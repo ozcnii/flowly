@@ -172,6 +172,16 @@
 - **PRD:** §40, §41.3, §55.1.
 - **Влияет на:** E1-D1-T11, E0-D0-T04, все downstream `ui_slices`, `packages/ui/**`, `apps/web/app/ui-kit/**`, `AGENTS.md`.
 
+### DEC-026 — Cloudflare workers.dev subdomain
+
+- **Статус:** approved
+- **Дата:** 2026-07-13
+- **Решение:** использовать account-level subdomain `getflowly.workers.dev` для test web/scheduler deployments.
+- **Основание:** Cloudflare Dashboard подтвердил доступность `getflowly`; пользователь явно выбрал его из проверенных доступных вариантов. Dashboard update выполнен, Cloudflare API GET подтвердил `subdomain: getflowly`.
+- **Контекст:** исходный interactive prompt создал malformed-имя из-за повторного ввода; оно исправлено dashboard rename и не используется как deployment evidence.
+- **PRD:** §41.1–41.4, §49.
+- **Влияет на:** E1-D1-T03, test Worker URLs и deployment evidence.
+
 ## Открытые решения
 
 ### DEC-006 — Operational thresholds

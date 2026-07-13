@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 8 | 0 | 0 | 0 | 3 |
+| 7 | 0 | 0 | 0 | 4 |
 
 ## Зависимости и границы
 
@@ -54,12 +54,15 @@
 
 ### E1-D1-T03 — Настроить Cloudflare deployments
 
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
+- **status:** done · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-13
 - **prd_refs:** §41.1–41.2, §42, §49
-- **depends_on:** E1-D1-T01 · **decisions:** DEC-011
+- **depends_on:** E1-D1-T01 · **decisions:** DEC-011, DEC-026
 - **scope:** отдельные web и scheduler deployments, конфигурация bindings без production-секретов в репозитории.
-- **acceptance:** [ ] web и scheduler изолированы; [ ] bindings описаны; [ ] секреты внешние; [ ] локальный запуск документирован.
-- **validation/evidence:** deploy config, dry-run/local start, список bindings.
+- **acceptance:** [x] web и scheduler изолированы; [x] bindings описаны; [x] секреты внешние; [x] локальный запуск документирован.
+- **validation/evidence:** pinned OpenNext 1.20.1/Wrangler 4.110.0; separate `apps/web|scheduler/wrangler.jsonc`; generated env types; local root typecheck/lint/build/audit PASS; web workerd `/` + `/ui-kit` 200; scheduler `/health` + `/__scheduled` 200; workspace dry-runs PASS (web 4711.05 KiB / gzip 981.22 KiB, scheduler 0.41 KiB / gzip 0.28 KiB); candidate-file secret scan 0. Real test deploys: `flowly-scheduler-test` version `cbca80ee-1d97-4c33-811b-12fdf282b38a`, Cron `* * * * *`, URL `https://flowly-scheduler-test.getflowly.workers.dev`; `flowly-web-test` version `f482628c-a193-499d-b595-fc223cb15aab`, URL `https://flowly-web-test.getflowly.workers.dev`. Remote Chromium smoke PASS: scheduler `/health` 200 with `status: ok`, web `/` 200, `/ui-kit` 200; web console errors 0. Final typecheck/lint/audit/diff-check PASS; production Workers untouched.
+- **residual risks:** реальный Cron invocation/log не наблюдался — подтверждены registered trigger и local scheduled smoke; non-browser `urllib` получает Cloudflare edge 403/1010 по client signature, тогда как Chromium проходит 200; production deploy/domain/bindings остаются вне scope T03.
+- **plan:** `.temp/E1-D1-T03/plan.md` — Plan confidence 95%, Implementation confidence 86%; явно утверждён пользователем 2026-07-13.
+- **journal:** 2026-07-13 — пользователь выбрал Cloudflare deployment следующей foundation-задачей; `backlog -> in_progress`. Подтверждены real test deploy, имена `flowly-web-test`/`flowly-scheduler-test`, документирование future bindings без placeholders и health + no-op cron bootstrap. Изучены PRD/DEC-011, current manifests, OpenNext 1.20.1/Wrangler 4.110.0 и official deployment contracts; создан отдельный план. 2026-07-13 — пользователь явно утвердил план фразой «да»; реализация разрешена в утверждённом scope. Локальная реализация завершена: separate configs/bundles, web/scheduler workerd smoke и dry-runs PASS; Wrangler OAuth PASS; scheduler test upload выполнен, но Cloudflare потребовал account-level workers.dev subdomain; `in_progress -> blocked`, создан DEC-026. Первичная interactive registration создала временное malformed-имя; через Cloudflare Dashboard проверены нормальные доступные варианты. Пользователь выбрал `getflowly`; dashboard rename и Cloudflare API GET подтвердили `getflowly.workers.dev`. DEC-026 approved, `blocked -> in_progress`. Оба test Worker развернуты, Cron зарегистрирован, remote Chromium smoke и финальные проверки PASS; evidence/residual risks заполнены, `in_progress -> review`. Пользователь явно отклонил deep review фразой «Нет, закрыть»; acceptance/evidence подтверждены, `review -> done`. Production Workers не затронуты.
 
 ### E1-D1-T04 — Подключить D1 и миграции
 

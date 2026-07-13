@@ -1,5 +1,8 @@
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import type { NextConfig } from "next";
 import { fileURLToPath } from "node:url";
+
+initOpenNextCloudflareForDev();
 
 export default {
   poweredByHeader: false,

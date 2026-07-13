@@ -6,9 +6,9 @@
 
 - **Обновлено:** 2026-07-13
 - **Текущий этап:** 1. Основа
-- **Активная задача:** не выбрана
-- **Статус:** E0-D0-T04 `done`; E1-D1-T11 `done`
-- **Последний завершённый результат:** интерактивная Главная S-MA-010 со всеми states утверждена и закрыта; пользователь явно отказался от deep review
+- **Активная задача:** нет
+- **Статус:** E1-D1-T03, E0-D0-T04 и E1-D1-T11 done
+- **Последний завершённый результат:** E1-D1-T03 закрыта; `flowly-scheduler-test` и `flowly-web-test` развернуты на `getflowly.workers.dev`, remote Chromium smoke PASS
 
 ## Что сделано
 
@@ -33,9 +33,9 @@
 
 ## Что делать следующим
 
-1. Согласовать следующую foundation-карточку: E1-D1-T03 (Cloudflare deployments) или E1-D1-T04 (D1 и миграции) готовы по зависимостям.
-2. Перед стартом прочитать связанные decisions/acceptance и перевести только выбранную карточку в `in_progress`.
-3. Для следующего UI slice продолжать направление Concept A и workflow DEC-024; Главную не переоткрывать без нового подтверждённого scope.
+1. Выбрать следующую foundation-карточку.
+2. Перед работой прочитать её dependencies/decisions/PRD refs и синхронизировать статус по обязательному workflow.
+3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
 
@@ -58,6 +58,9 @@
 - `apps/**`, `packages/**`, `migrations/`, `seeds/`, `scripts/` — E1-D1-T01/T02
 - `apps/web/features/home/**`, `apps/web/public/media/**` — E0-D0-T04 full state set visual-approved и done
 - `packages/ui/**`, `apps/web/app/ui-kit/**` — E1-D1-T11 production UI-kit
+- `apps/web/{open-next.config.ts,wrangler.jsonc,.dev.vars.example,public/_headers}` — OpenNext test web deployment
+- `apps/scheduler/{src/index.ts,wrangler.jsonc,.dev.vars.example,worker-configuration.d.ts}` — scheduler health/no-op Cron Worker
+- root/workspace manifests, `.gitignore`, `README.md` — Cloudflare toolchain и documented commands
 
 ## Проверка текущего изменения
 
@@ -75,8 +78,96 @@ Roadmap migration / bootstrap verification:
 - [x] `/ui-kit` browser matrix: 360/430/1280, light/dark, keyboard/focus, ≥44px targets, no overflow, interactions и reduced motion PASS;
 - [x] `/ui-kit` visual approval: пользователь подтвердил «утверждаю ui kit» 2026-07-13;
 - [x] E0-D0-T04 пересборка, full state set и visual approval Главной — done; deep review явно отклонён пользователем.
+- [x] E1-D1-T03 local workerd/dry-run, typecheck/lint/build/audit/diff-check и candidate-file secret scan PASS;
+- [x] `flowly-scheduler-test` deployed, version `cbca80ee-1d97-4c33-811b-12fdf282b38a`, Cron `* * * * *`;
+- [x] `flowly-web-test` deployed, version `f482628c-a193-499d-b595-fc223cb15aab`;
+- [x] remote Chromium: scheduler `/health`, web `/`, web `/ui-kit` = 200; production Workers untouched.
 
 ## Журнал handoff
+
+### 2026-07-13 — E1-D1-T03 done
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** `review -> done`.
+- **Решение:** пользователь явно отклонил deep review фразой «Нет, закрыть».
+- **Итог:** acceptance/evidence подтверждены, test deployments работают, residual risks записаны, production не затронут.
+- **Следующее точное действие:** выбрать новую foundation-карточку; текущая задача закрыта.
+
+### 2026-07-13 — E1-D1-T03 / test deployments ready for review
+
+- **От кого / кому:** AI agent → reviewer / следующий агент.
+- **Статус задачи:** `in_progress -> review`.
+- **Результат:** scheduler/web test Workers deployed отдельно; scheduler Cron зарегистрирован; remote Chromium smoke 200; финальные проверки PASS.
+- **Evidence:** URLs/version IDs и команды записаны в карточке E1-D1-T03; 22 working-tree files относятся к Cloudflare implementation/roadmap.
+- **Residual risks:** Cron execution/log не наблюдался; `urllib` блокируется edge 403/1010, Chromium проходит 200; production вне scope и не затрагивался.
+- **Следующее точное действие:** провести или отклонить deep review, затем решить `review -> done`.
+
+### 2026-07-13 — DEC-026 approved / getflowly registered
+
+- **От кого / кому:** пользователь + Cloudflare Dashboard/API → AI agent / следующий агент.
+- **Статус задачи:** `blocked -> in_progress`; DEC-026 approved.
+- **Факт:** `getflowly.workers.dev` проверен как available, выбран пользователем, зарегистрирован через Dashboard и подтверждён API GET.
+- **Безопасность:** production Workers не затронуты; OAuth token не выводился/не сохранялся в проект.
+- **Следующее точное действие:** test-only scheduler/web deploy и remote smoke.
+
+### 2026-07-13 — DEC-026 / malformed subdomain correction
+
+- **От кого / кому:** Cloudflare Dashboard/API → AI agent → пользователь / следующий агент.
+- **Статус задачи:** `in_progress -> blocked`; DEC-026 `approved -> open` до корректного выбора.
+- **Факт:** interactive prompt сначала отклонил `flowly-wellness`, затем из-за повторного ввода зарегистрировал malformed account subdomain. Последующий API `409` / code `10036` означал «account already has an associated subdomain» и не являлся проверкой доступности нового имени; доступные варианты позже проверены через Dashboard без подтверждения update.
+- **Безопасность:** production Workers не затронуты; OAuth token не выводился/не сохранялся в проект.
+- **Следующее точное действие:** выбрать подтверждённый Dashboard вариант, выполнить dashboard rename и test-only deploy.
+
+### 2026-07-13 — DEC-026 / first choice
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** `blocked -> in_progress`.
+- **Решение:** попытаться зарегистрировать `flowly-wellness.workers.dev`; финальным решением позже стал `getflowly.workers.dev`.
+- **Следующее точное действие:** повторить только test scheduler/web deploy и remote smoke; production не трогать.
+
+### 2026-07-13 — E1-D1-T03 / workers.dev subdomain blocker
+
+- **От кого / кому:** Cloudflare runtime → AI agent → пользователь / следующий агент.
+- **Статус задачи:** `in_progress -> blocked`; создан DEC-026.
+- **Факт:** OAuth PASS; scheduler bundle upload PASS, publish FAIL до регистрации account-level workers.dev subdomain.
+- **Безопасность:** OAuth code/token не сохранён в репозитории; production Workers не затронуты.
+- **Следующее точное действие:** пользователь выбирает уникальное `<name>.workers.dev`; после регистрации повторить test deploy.
+
+### 2026-07-13 — E1-D1-T03 / local deployment verification PASS
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** `in_progress`; remote test deploy pending OAuth.
+- **Сделано:** OpenNext web config, separate scheduler health/no-op cron, test/production Worker identities, generated env types, documented binding/secret contract, Node >=22 toolchain.
+- **Checks:** typecheck/lint/build/audit PASS; web workerd `/` + `/ui-kit` 200; scheduler `/health` + `/__scheduled` 200; web/scheduler dry-runs PASS; secret scan 0.
+- **Bundle evidence:** web 4711.05 KiB upload / 981.22 KiB gzip; scheduler 0.41 KiB / 0.28 KiB.
+- **Blocker:** Cloudflare OAuth callback server работает на localhost:8976; пользователь должен войти/authorize в открытом tab.
+- **Следующее точное действие:** после подтверждения пользователя проверить `wrangler whoami` и выполнить только test deploy.
+
+### 2026-07-13 — E1-D1-T03 / plan approved
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** `in_progress`; implementation authorized.
+- **Approval:** пользователь явно ответил «да» на `.temp/E1-D1-T03/plan.md`.
+- **Scope:** OpenNext web, isolated scheduler health/no-op cron, local/dry-run, затем real test deploy; production deploy/D1/R2/business logic запрещены.
+- **Следующее точное действие:** установить pinned toolchain и реализовать configs/bootstrap.
+
+### 2026-07-13 — E1-D1-T03 / deep plan ready
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** `in_progress`; implementation not started, plan approval pending.
+- **Plan:** `.temp/E1-D1-T03/plan.md`; Plan confidence 95%, Implementation confidence 86%.
+- **Подтверждено:** real test deploy; canonical worker names; no fake D1/R2 IDs; scheduler health + no-op cron.
+- **Evidence:** current repo inspected; official Cloudflare/OpenNext docs and OpenNext commit `97ef330c6c976b15dd870f8cc280540f41e8833b`; current Next 16.2.10 входит в OpenNext 1.20.1 peer range; Wrangler 4.110 requires Node >=22.
+- **Blocker:** Wrangler unauthenticated; remote verification needs user OAuth during approved implementation.
+- **Следующее точное действие:** получить явный approval плана; до этого code/deploy запрещены.
+
+### 2026-07-13 — E1-D1-T03 / deep analysis started
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** `backlog -> in_progress`; owner `unassigned -> AI agent`.
+- **Решение:** следующая задача — Cloudflare deployments; отдельный русский plan-файл обязателен.
+- **Границы:** web/scheduler deployments раздельны; production secrets не попадают в репозиторий; реализация до approval плана запрещена.
+- **Следующее точное действие:** изучить PRD/DEC-011, текущие manifests/config и актуальные OpenNext/Cloudflare contracts; написать `.temp/E1-D1-T03/plan.md`.
 
 ### 2026-07-13 — E0-D0-T04 / closed without deep review
 

@@ -2,5 +2,23 @@
   "name": "@flowly/scheduler",
   "private": true,
   "version": "0.0.0",
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --env test --test-scheduled",
+    "preview": "wrangler dev --env test --test-scheduled",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "deploy:check": "wrangler deploy --env test --dry-run --outdir .wrangler/dry-run",
+    "deploy:test": "wrangler deploy --env test",
+    "deploy:production": "wrangler deploy",
+    "cf-typegen": "wrangler types --env test --env-interface CloudflareEnv --include-runtime false worker-configuration.d.ts"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260713.1",
+    "@eslint/js": "9.39.5",
+    "eslint": "9.39.5",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.63.0",
+    "wrangler": "4.110.0"
+  }
 }
