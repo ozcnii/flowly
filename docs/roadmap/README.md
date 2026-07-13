@@ -8,7 +8,7 @@
 
 - **Активный этап:** 1. Основа
 - **Активная задача:** E1-D1-T06 (Telegram auth/sessions) — UI slices
-- **Следующее действие:** S-MA-001…006 approved; следующий slice **S-WEB-001** (open via Telegram), затем S-WEB-002.
+- **Следующее действие:** S-MA-001…006 + S-WEB-001 approved; финальный slice **S-WEB-002** (unavailable deep link).
 - **UI workflow:** один screen slice + все применимые states/интеракции + явный approval (`DEC-024`)
 - **Блокеры:** открытые решения перечислены в [`DECISIONS.md`](DECISIONS.md)
 - **Контекст продолжения:** [`HANDOFF.md`](HANDOFF.md)

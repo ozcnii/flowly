@@ -7,8 +7,8 @@
 - **Обновлено:** 2026-07-14
 - **Текущий этап:** 1. Основа
 - **Активная задача:** E1-D1-T06 (Telegram auth/sessions) — UI slices
-- **Статус:** Phase 0 backend auth + **S-MA-001/002/003/004/005/006 approved**; T06 `in_progress` (осталось 2 slice: S-WEB-001, S-WEB-002).
-- **Последний завершённый результат:** E1-D1-T06 — S-MA-006 (deep-link recovery) approved в `apps/web/features/recovery/ui/deep-link-recovery-screen.tsx` (`?recovery=unavailable|auth|permission`); typecheck/lint PASS, overflow 0, таргеты ≥44px.
+- **Статус:** Phase 0 backend auth + **S-MA-001…006 + S-WEB-001 approved**; T06 `in_progress` (остался 1 slice: S-WEB-002).
+- **Последний завершённый результат:** E1-D1-T06 — S-WEB-001 (outside-Telegram fallback) approved в `apps/web/features/web-fallback/ui/open-via-telegram-screen.tsx` (`?web=open`); логотип убран по просьбе пользователя, typecheck/lint PASS.
 
 ## Что сделано
 
@@ -33,8 +33,8 @@
 
 ## Что делать следующим
 
-1. E1-D1-T06: следующий slice **S-WEB-001** (open via Telegram — открытие вне Telegram), затем S-WEB-002.
-2. После approval всех 8 slice закрыть acceptance T06 («вне Telegram — корректное состояние») и перевести T06 в review.
+1. E1-D1-T06: финальный slice **S-WEB-002** (unavailable deep link: safe reason + open Telegram/re-auth + exit, без утечки target).
+2. После approval S-WEB-002 закрыть acceptance T06 («вне Telegram — корректное состояние») и перевести T06 в review.
 3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
@@ -112,6 +112,15 @@ Roadmap migration / bootstrap verification:
 - **Evidence:** `.temp/E1-D1-T06/screenshots/sma006-{unavailable,auth,permission}-430-light.png`, `sma006-unavailable-430-dark.png`.
 - **Блокеры / решения:** реальный access-recheck и Telegram WebView — downstream этапов; S-WEB-001/002 остались.
 - **Следующее точное действие:** S-WEB-001 (open via Telegram).
+
+### 2026-07-14 — E1-D1-T06 / S-WEB-001 approved
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** T06 `in_progress`; S-WEB-001 (outside-Telegram fallback) одобрен пользователем («чотко»). Остался S-WEB-002.
+- **Сделано:** `features/web-fallback/ui/open-via-telegram-screen.{tsx,module.css}`, route `?web=open`. P-WEB (§10.3, unauthenticated): одна badge-иконка + «Откройте Flowly через Telegram» + «Открыть в Telegram»/«Справка»; данных приложения не показывается. Логотип убран по просьбе пользователя (был избыточен вместе с badge).
+- **Проверки:** typecheck/lint PASS; 430 light/dark: overflow 0, таргеты ≥44px, 0 console errors, 0 `<img>`.
+- **Evidence:** `.temp/E1-D1-T06/screenshots/sweb001-open-430-{light,dark}.png`, `sweb001-open-430-light-nologo.png`.
+- **Следующее точное действие:** S-WEB-002 (unavailable deep link).
 
 ### 2026-07-13 — E1-D1-T06 / Slice S-MA-004 preview implemented
 
