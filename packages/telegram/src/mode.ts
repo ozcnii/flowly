@@ -51,12 +51,13 @@ export interface TelegramLogger {
 
 /** Создаёт logger для текущего режима. `buffer` опционален (внутренний по умолчанию). */
 export function createTelegramLogger(mode: TelegramMode, buffer: MockMessage[] = []): TelegramLogger {
+  let seq = 0;
   return {
     mode,
     log(recipient, body) {
       if (mode !== "mock") return null;
       const msg: MockMessage = {
-        id: `mock_${Date.now()}_${buffer.length}`,
+        id: `mock_${Date.now()}_${seq++}`,
         to: recipient,
         body,
         ts: new Date().toISOString(),

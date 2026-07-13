@@ -149,7 +149,7 @@ Dev-эмуляция Telegram-пользователя (PRD §10.3) для `next
 | Среда | Next.js | D1 | R2 | Telegram | Cron | Домен | Данные/секреты |
 |---|---|---|---|---|---|---|---|
 | **local** | `next dev` | локальная (miniflare, `.wrangler/state`) | локальная (miniflare) | **mock** | — | `localhost` | `.dev.vars` (gitignored), тестовые пользователи |
-| **test** | preview/deploy `--env test` | отдельная test D1 | отдельный test bucket | test-бот (`TELEGRAM_MODE=test`) | test Cron | preview/`*.workers.dev` | отдельные test-ресурсы, test-токен как secret |
+| **test** | preview/deploy `--env test` | отдельная test D1 | отдельный test bucket | test-бот (`TELEGRAM_MODE=test` — ставить **явно**, иначе prod-build даст `production`) | test Cron | preview/`*.workers.dev` | отдельные test-ресурсы, test-токен как secret |
 | **production** | deploy | production D1 | production R2 | основной бот (`TELEGRAM_MODE=production`) | production Cron | production-домен | prod-секреты только через Cloudflare secret store |
 
 Local D1/R2 создаются Wrangler/miniflare и **не затрагивают** test/production (PRD §49.2). Реальные test/prod D1/R2 и test-бот создаются отдельным scope (без фейковых ID в репо).

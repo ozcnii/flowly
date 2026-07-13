@@ -6,9 +6,9 @@
 
 - **Обновлено:** 2026-07-14
 - **Текущий этап:** 1. Основа
-- **Активная задача:** E1-D1-T07 (envs) → **review**; следующая — T08 (seeds).
-- **Статус:** T07 реализован (Telegram modes mock/test/production + env-matrix docs), ждёт решения `review -> done`. Foundation backlog: T08 (seeds), T09 (security/DoD), T10 (profile/help).
-- **Последний завершённый результат:** E1-D1-T07 — env-matrix + `resolveTelegramMode`/`createTelegramLogger` (mock→0 fetch, mode-check PASS), `getTelegramMode()`, README «Среды и режимы».
+- **Активная задача:** E1-D1-T08 (seed тестовых пользователей) — следующая.
+- **Статус:** **T07 done** (deep review PASS). Foundation backlog: T08 (seeds), T09 (security/DoD), T10 (profile/help).
+- **Последний завершённый результат:** E1-D1-T07 done — env-matrix + Telegram modes (mock→0 fetch), deep review PASS, W1/S1 закрыты.
 
 ## Что сделано
 
@@ -33,8 +33,8 @@
 
 ## Что делать следующим
 
-1. Решить по T07: deep review или `review -> done`.
-2. Следующая foundation-задача: T08 (seeds), затем T09 (security/DoD gate), T10 (profile/help).
+1. E1-D1-T08 (seed): deep plan → approval → реализация (повторяемые seed-данные, без production PII).
+2. Затем T09 (security/DoD gate) → T10 (profile/help).
 3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
@@ -169,6 +169,12 @@ Roadmap migration / bootstrap verification:
 - **Проверки:** root typecheck/lint PASS; `@flowly/web` next build PASS; **mode-check PASS** (tsx, 6 случаев resolve + mock buffer/drain + «mock makes 0 fetch»); `.gitignore` покрывает `.wrangler/`/`.dev.vars`; secret scan 0.
 - **Residual risks:** реальные test/prod D1/R2/test-bot — отдельный scope; реальный outbound sender — этап 5; `test`/`test:e2e` — stab; test обязан ставить `TELEGRAM_MODE=test`.
 - **Следующее точное действие:** решение пользователя по T07 (review→done) → T08 (seeds).
+
+### 2026-07-14 — E1-D1-T07 done (deep review PASS) / старт E1-D1-T08 (seeds)
+
+- **От кого / кому:** пользователь + субагент-reviewer → AI agent / следующий агент.
+- **Статус задачи:** T07 `review -> done` (deep review PASS gate, 0 багов; пункт process.env-in-Worker robust; закрыты W1 README-уточнение + S1 mock-ID счётчик). Следующая — E1-D1-T08 (seeds).
+- **Следующее точное действие:** deep plan E1-D1-T08.
 
 ### 2026-07-13 — E1-D1-T06 / Slice S-MA-004 preview implemented
 
