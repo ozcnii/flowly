@@ -78,7 +78,7 @@ npm run deploy:test
 |---|---|---|---|
 | Web | `ASSETS`, `IMAGES`, `WORKER_SELF_REFERENCE` | static assets, image transforms, self service | E1-D1-T03 |
 | Web | `DB` | D1 | E1-D1-T04 |
-| Web | `MEDIA` | R2 | E1-D1-T05 |
+| Web | `STORAGE` | R2 | E1-D1-T05 |
 | Web | Telegram/YouTube secrets | Worker secrets | E1-D1-T06 и downstream integration cards |
 | Scheduler | `DB` | D1 | E1-D1-T04 |
 | Scheduler | `TELEGRAM_BOT_TOKEN` | Worker secret | E1-D1-T06 |

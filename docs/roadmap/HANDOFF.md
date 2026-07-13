@@ -6,9 +6,9 @@
 
 - **Обновлено:** 2026-07-14
 - **Текущий этап:** 1. Основа
-- **Активная задача:** E1-D1-T05 (R2) → **review**; следующая — T07 (envs).
-- **Статус:** **T05 реализован** (`@flowly/storage` adapter + R2 binding `STORAGE` + `getStorage()`), ждёт `review -> done`. Foundation backlog: T07 (envs), T08 (seeds), T09 (security/DoD), T10 (profile/help).
-- **Последний завершённый результат:** E1-D1-T05 — R2 storage: `packages/storage/**`, `r2_buckets` в `apps/web/wrangler.jsonc`, `getStorage()` в `lib/cloudflare.ts`; typecheck/lint/build/deploy:check PASS, local R2 roundtrip smoke PASS.
+- **Активная задача:** E1-D1-T07 (local/test/prod environments) — следующая.
+- **Статус:** **T05 done** (deep review PASS). Foundation backlog: T07 (envs), T08 (seeds), T09 (security/DoD), T10 (profile/help).
+- **Последний завершённый результат:** E1-D1-T05 done — R2 storage (`@flowly/storage` + binding `STORAGE` + `getStorage()`), deep review PASS, README binding-name sync.
 
 ## Что сделано
 
@@ -33,8 +33,8 @@
 
 ## Что делать следующим
 
-1. Решить по T05: deep review или `review -> done` (как T03/T04/T06 без deep review).
-2. Следующая foundation-задача: T07 (local/test/prod environments), затем T08 (seeds), T09 (DoD gate), T10 (profile/help).
+1. E1-D1-T07 (local/test/prod environments): deep plan → approval → реализация (режимы, переменные, команды, Telegram mock/real modes).
+2. Затем T08 (seeds) → T09 (security/DoD gate) → T10 (profile/help).
 3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
@@ -147,6 +147,12 @@ Roadmap migration / bootstrap verification:
 - **Проверки:** clean `npm install`; root typecheck/lint PASS; `@flowly/web` next build PASS; `deploy:check` (wrangler dry-run парсит `r2_buckets`) PASS; **local R2 roundtrip smoke PASS** (miniflare, `.temp/E1-D1-T05/r2-smoke.mjs`); secret scan 0.
 - **Residual risks:** реальный test/prod bucket — отдельный scope; `getStorage()` runtime через OpenNext request context — downstream этап 2 (как D1 в T04→T06); upload/access flows — этап 2.
 - **Следующее точное действие:** решение пользователя по T05 (review→done) → T07 (envs).
+
+### 2026-07-14 — E1-D1-T05 done (deep review PASS) / старт E1-D1-T07 (envs)
+
+- **От кого / кому:** пользователь + субагент-reviewer → AI agent / следующий агент.
+- **Статус задачи:** T05 `review -> done` (независимый deep review: PASS gate, 0 багов; warning `MEDIA`→`STORAGE` в README исправлена). Следующая — E1-D1-T07 (envs).
+- **Следующее точное действие:** deep plan E1-D1-T07.
 
 ### 2026-07-13 — E1-D1-T06 / Slice S-MA-004 preview implemented
 

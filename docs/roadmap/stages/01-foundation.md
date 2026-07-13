@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 5 | 0 | 0 | 1 | 6 |
+| 5 | 0 | 0 | 0 | 7 |
 
 ## Зависимости и границы
 
@@ -78,7 +78,7 @@
 
 ### E1-D1-T05 — Подключить R2
 
-- **status:** review · **priority:** high · **owner:** AI agent · **updated:** 2026-07-14
+- **status:** done · **priority:** high · **owner:** AI agent · **updated:** 2026-07-14
 - **prd_refs:** §41.1, §46, §49.2
 - **depends_on:** E1-D1-T01, E1-D1-T03 · **decisions:** DEC-026 (не блокирует)
 - **plan:** [`.temp/E1-D1-T05/plan.md`](../../../.temp/E1-D1-T05/plan.md) — local-only R2 binding + `@flowly/storage` adapter; без upload/access flows (этап 2); без публичного доступа. Plan confidence 92%, Implementation confidence 90%; approved пользователем 2026-07-14 (local-only).
@@ -86,7 +86,7 @@
 - **acceptance:** [x] local/test/prod bindings разделены (R2 `STORAGE` объявлен local-only на top-level `apps/web/wrangler.jsonc`; реальный test/prod bucket — отдельный scope, без фейковых ID, по аналогии с D1); [x] прямой публичный доступ не включён (нет R2 public bucket/custom domain, нет S3 access keys в репо; доступ только через `getStorage()` adapter, авторизованные маршруты — этап 2); [x] adapter не связывает бизнес-логику напрямую с R2 (`@flowly/storage` экспортирует `StorageAdapter` interface + `createStorage(R2Bucket)`, веб использует `getStorage()`, бизнес-код зависит от интерфейса).
 - **validation/evidence:** `packages/storage/{package.json,tsconfig.json,eslint.config.mjs,src/{storage,keys,index}.ts}`; `r2_buckets` в `apps/web/wrangler.jsonc` (binding `STORAGE`, bucket `flowly-storage`); `getStorage()` в `apps/web/lib/cloudflare.ts`; `@flowly/storage` + `@cloudflare/workers-types` в web deps. Clean `npm install`; root `typecheck`/`lint` PASS; `@flowly/web` `next build` PASS; `deploy:check` (wrangler dry-run парсит `r2_buckets`) PASS; **local R2 roundtrip smoke PASS** (`.temp/E1-D1-T05/r2-smoke.mjs`: put→exists→get text/contentType/customMetadata→delete→exists false). Secret scan 0 (binding local, ключи не нужны).
 - **residual risks:** (1) реальный test/prod R2 bucket не создаётся (отдельный scope, как D1). (2) `getStorage()` runtime через OpenNext `getRequestContext().env.STORAGE` не проверялся в T05 (downstream этап 2, по аналогии с D1 в T04→T06). (3) `createStorage` runtime не гонялся напрямую — тонкая делегирующая обёртка, typechecked против canonical workers-types; raw-R2 roundtrip smoke PASS. (4) S3-compatible presigned URLs / access keys — этап 2. (5) MIME/размер валидация, удаление orphan-файлов, авторизованный маршрут чтения — этап 2.
-- **journal:** 2026-07-14 — `backlog -> in_progress`; deep plan готов и утверждён (local-only). 2026-07-14 — реализовано: `@flowly/storage` (adapter `put/get/delete/exists` + `storageKey`), `r2_buckets` в `apps/web/wrangler.jsonc`, `getStorage()` в `lib/cloudflare.ts`; typecheck/lint/build/deploy:check PASS; local R2 roundtrip smoke PASS; `in_progress -> review`. Ждёт решения пользователя `review -> done`.
+- **journal:** 2026-07-14 — `backlog -> in_progress`; deep plan готов и утверждён (local-only). 2026-07-14 — реализовано: `@flowly/storage` (adapter `put/get/delete/exists` + `storageKey`), `r2_buckets` в `apps/web/wrangler.jsonc`, `getStorage()` в `lib/cloudflare.ts`; typecheck/lint/build/deploy:check PASS; local R2 roundtrip smoke PASS; `in_progress -> review`. 2026-07-14 — независимый deep review (субагент, fresh context): **PASS gate**, багов 0; одна warning — устаревшее `MEDIA`→`STORAGE` в binding-таблице README (stale с T03), исправлено однострочно. `review -> done`.
 
 ### E1-D1-T06 — Реализовать Telegram auth и sessions
 
