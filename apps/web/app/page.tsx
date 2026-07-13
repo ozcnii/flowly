@@ -5,6 +5,7 @@ import { homeBase } from "@/features/home/fixtures/base";
 import { resolveHomeScenario } from "@/features/home/model/home-scenario";
 import { HomeScreen } from "@/features/home/ui/home-screen";
 import { WelcomeScreen } from "@/features/onboarding/ui/welcome-screen";
+import { PreferencesScreen } from "@/features/onboarding/ui/preferences-screen";
 import { resolveShellScenario } from "@/lib/scenarios";
 
 type PageProps = { searchParams: Promise<Record<string, string | string[] | undefined>> };
@@ -15,8 +16,9 @@ export default async function Page({ searchParams }: PageProps) {
   const scenario = homeScenario === "offline" ? "offline" : resolveShellScenario(typeof params.scenario === "string" ? params.scenario : undefined);
   const activeTab = typeof params.tab === "string" ? params.tab : "home";
 
-  if (process.env.NODE_ENV !== "production" && params.onboarding === "welcome") {
-    return <WelcomeScreen />;
+  if (process.env.NODE_ENV !== "production" && typeof params.onboarding === "string") {
+    if (params.onboarding === "welcome") return <WelcomeScreen />;
+    if (params.onboarding === "preferences") return <PreferencesScreen />;
   }
 
   return (

@@ -138,7 +138,7 @@
   --color-on-danger:#ffffff;
   --color-info:#1d5fd1;
   --color-info-soft:#e8f0ff;
-  --color-focus:#1d5fd1;
+  --color-focus:var(--color-accent);
   --color-overlay:rgba(13,17,15,.58);
   --color-skeleton:#d8dedb;
 }
@@ -164,7 +164,7 @@
   --color-on-danger:#3d1515;
   --color-info:#a9c5ff;
   --color-info-soft:#1b3157;
-  --color-focus:#93b4ff;
+  --color-focus:var(--color-accent);
   --color-overlay:rgba(0,0,0,.72);
   --color-skeleton:#34433c;
 }
