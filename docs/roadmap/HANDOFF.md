@@ -6,9 +6,9 @@
 
 - **Обновлено:** 2026-07-14
 - **Текущий этап:** 1. Основа
-- **Активная задача:** E1-D1-T07 (local/test/prod environments) — следующая.
-- **Статус:** **T05 done** (deep review PASS). Foundation backlog: T07 (envs), T08 (seeds), T09 (security/DoD), T10 (profile/help).
-- **Последний завершённый результат:** E1-D1-T05 done — R2 storage (`@flowly/storage` + binding `STORAGE` + `getStorage()`), deep review PASS, README binding-name sync.
+- **Активная задача:** E1-D1-T07 (envs) → **review**; следующая — T08 (seeds).
+- **Статус:** T07 реализован (Telegram modes mock/test/production + env-matrix docs), ждёт решения `review -> done`. Foundation backlog: T08 (seeds), T09 (security/DoD), T10 (profile/help).
+- **Последний завершённый результат:** E1-D1-T07 — env-matrix + `resolveTelegramMode`/`createTelegramLogger` (mock→0 fetch, mode-check PASS), `getTelegramMode()`, README «Среды и режимы».
 
 ## Что сделано
 
@@ -33,8 +33,8 @@
 
 ## Что делать следующим
 
-1. E1-D1-T07 (local/test/prod environments): deep plan → approval → реализация (режимы, переменные, команды, Telegram mock/real modes).
-2. Затем T08 (seeds) → T09 (security/DoD gate) → T10 (profile/help).
+1. Решить по T07: deep review или `review -> done`.
+2. Следующая foundation-задача: T08 (seeds), затем T09 (security/DoD gate), T10 (profile/help).
 3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
@@ -153,6 +153,22 @@ Roadmap migration / bootstrap verification:
 - **От кого / кому:** пользователь + субагент-reviewer → AI agent / следующий агент.
 - **Статус задачи:** T05 `review -> done` (независимый deep review: PASS gate, 0 багов; warning `MEDIA`→`STORAGE` в README исправлена). Следующая — E1-D1-T07 (envs).
 - **Следующее точное действие:** deep plan E1-D1-T07.
+
+### 2026-07-14 — E1-D1-T07 (envs) in_progress + правка счётчиков
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** T07 `backlog -> in_progress`; deep plan утверждён (явный TELEGRAM_MODE+fallback; mock=console+buffer).
+- ** правка счётчиков:** обнаружен наследованный off-by-one (stage 1 и глобальный индекс). Пересчёт по картам: stage 1 = 3 backlog/1 in_progress/7 done (11); глобально 59 backlog/1 in_progress/12 done (72). Исправлено в stage summary, README index и «Итого».
+- **Следующее точное действие:** реализовать T07 (mode resolver + mock logger + env-matrix docs).
+
+### 2026-07-14 — E1-D1-T07 (envs) реализован, переведён в review
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** T07 `in_progress -> review`.
+- **Сделано:** `@flowly/telegram` `mode.ts` (TelegramMode, `resolveTelegramMode` — явный `TELEGRAM_MODE`+fallback, `createTelegramLogger` — mock→console+buffer, 0 сети); `getTelegramMode()` в `lib/cloudflare.ts`; `TELEGRAM_MODE` в `.dev.vars.example`; README «Среды и режимы» (таблица local/test/prod + режимы + команды + изоляция).
+- **Проверки:** root typecheck/lint PASS; `@flowly/web` next build PASS; **mode-check PASS** (tsx, 6 случаев resolve + mock buffer/drain + «mock makes 0 fetch»); `.gitignore` покрывает `.wrangler/`/`.dev.vars`; secret scan 0.
+- **Residual risks:** реальные test/prod D1/R2/test-bot — отдельный scope; реальный outbound sender — этап 5; `test`/`test:e2e` — stab; test обязан ставить `TELEGRAM_MODE=test`.
+- **Следующее точное действие:** решение пользователя по T07 (review→done) → T08 (seeds).
 
 ### 2026-07-13 — E1-D1-T06 / Slice S-MA-004 preview implemented
 

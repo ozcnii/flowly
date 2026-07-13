@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 5 | 0 | 0 | 0 | 7 |
+| 3 | 0 | 0 | 1 | 7 |
 
 ## Зависимости и границы
 
@@ -111,12 +111,15 @@
 
 ### E1-D1-T07 — Настроить local, test и production environments
 
-- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
+- **status:** review · **priority:** high · **owner:** AI agent · **updated:** 2026-07-14
 - **prd_refs:** §49.1–49.4, §55.9
 - **depends_on:** E1-D1-T03, E1-D1-T04, E1-D1-T05
+- **plan:** [`.temp/E1-D1-T07/plan.md`](../../../.temp/E1-D1-T07/plan.md) — env-matrix local/test/prod + Telegram modes (mock/test/production; mock → console+buffer, 0 network); команды §49.3 уже есть; изоляция `.dev.vars`/`.wrangler/state`. Plan confidence 90%, Implementation confidence 88%; approved пользователем 2026-07-14 (явный TELEGRAM_MODE+fallback; mock=console+buffer).
 - **scope:** режимы, переменные, команды и Telegram mock/real modes.
-- **acceptance:** [ ] среды не разделяют данные/секреты; [ ] команды воспроизводимы; [ ] mock mode не отправляет реальные сообщения.
-- **validation/evidence:** env matrix и результаты запуска каждой доступной среды.
+- **acceptance:** [x] среды не разделяют данные/секреты (local D1/R2 — miniflare `.wrangler/state`, gitignored; `.dev.vars` gitignored, `.dev.vars.example` отслеживается; test/prod — отдельные ресурсы; prod-секреты только через Cloudflare secret; README «Среды и режимы» + `.gitignore` проверен); [x] команды воспроизводимы (§49.3 в root `package.json`: dev/preview/test/test:e2e/db:*/deploy:*; `dev`/`preview`/`db:migrate`/`db:reset` запускаются); [x] mock mode не отправляет реальные сообщения (`resolveTelegramMode` + `createTelegramLogger`; mode-check PASS incl. «mock makes 0 fetch»).
+- **validation/evidence:** `packages/telegram/src/{mode.ts,index.ts}` (TelegramMode/resolveTelegramMode/createTelegramLogger); `getTelegramMode()` в `apps/web/lib/cloudflare.ts`; `TELEGRAM_MODE` в `apps/web/.dev.vars.example`; README «Среды и режимы» (таблица local/test/prod). root typecheck/lint PASS; `@flowly/web` next build PASS; **mode-check PASS** (`.temp/E1-D1-T07/mode-check.mjs`, tsx): 6 случаев resolve + mock buffer/drain + **mock → 0 fetch**. `.gitignore`: `.wrangler/`, `.dev.vars`, `.dev.vars.*` (example сохранён). Secret scan 0.
+- **residual risks:** (1) реальные test/prod D1/R2/test-bot — отдельный scope. (2) Реальный outbound Telegram sender — этап 5 (маршрутизируется через mode). (3) `test`/`test:e2e` — stab-команды (без фреймворка автотестов; политика тестов: только полезные). (4) test-окружение должно явно ставить `TELEGRAM_MODE=test` (CF_ENV-based авто-detect не используется).
+- **journal:** 2026-07-14 — `backlog -> in_progress`; deep plan утверждён (явный TELEGRAM_MODE+fallback; mock=console+buffer). 2026-07-14 — реализовано: `@flowly/telegram` mode resolver + mock logger, `getTelegramMode()`, `.dev.vars.example` `TELEGRAM_MODE`, README «Среды и режимы»; typecheck/lint/build PASS, mode-check PASS (mock→0 fetch); `in_progress -> review`.
 
 ### E1-D1-T08 — Создать seed тестовых пользователей и данных
 
