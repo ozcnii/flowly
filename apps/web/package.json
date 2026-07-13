@@ -20,9 +20,13 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@flowly/core": "*",
+    "@flowly/database": "*",
+    "@flowly/telegram": "*",
     "@opennextjs/cloudflare": "1.20.1",
     "@tanstack/react-query": "5.101.2",
     "date-fns": "4.4.0",
+    "drizzle-orm": "0.45.2",
     "next": "16.2.10",
     "react": "19.2.7",
     "react-dom": "19.2.7",

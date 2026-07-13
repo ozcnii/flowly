@@ -1,5 +1,11 @@
 # Copy to .dev.vars for local workerd preview.
 NEXTJS_ENV=development
 
-# Future bindings/secrets are added by E1-D1-T04/T05/T06.
-# Never commit real tokens or credentials.
+# Telegram bot token (E1-D1-T06). Local dev/test only — use a test bot token.
+# Real production token is set as a Cloudflare secret via dashboard/wrangler and
+# is never committed. Required by /api/v1/auth/telegram to verify initData.
+TELEGRAM_BOT_TOKEN=
+
+# Optional: enable dev-only Telegram user emulation (PRD §10.3) for `next dev`.
+# NEVER enable in production.
+FLOWLY_DEV_EMULATION=

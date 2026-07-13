@@ -6,9 +6,9 @@
 
 - **Обновлено:** 2026-07-13
 - **Текущий этап:** 1. Основа
-- **Активная задача:** нет; E1-D1-T04 закрыта
-- **Статус:** E1-D1-T04 done (D1 + Drizzle + миграции). E1-D1-T03, E0-D0-T04, E1-D1-T11 тоже done.
-- **Последний завершённый результат:** E1-D1-T04 закрыта — `@flowly/database` (Drizzle), миграции `0000_foundation` + `0001_token_hash_unique`, local D1 binding, команды `db:*`; comprehensive verification PASS (typecheck/lint/build/deploy:check), deep review 0 багов.
+- **Активная задача:** E1-D1-T06 (Telegram auth/sessions) — Phase 0 backend auth core
+- **Статус:** E1-D1-T06 Phase 0 (backend auth core) done и runtime-проверен (curl-repro PASS); T06 остаётся in_progress (8 UI slices впереди). E1-D1-T04 done.
+- **Последний завершённый результат:** E1-D1-T06 Phase 0 — initData verify, session/cookie/CSRF, /me, logout; runtime PASS в workerd preview.
 
 ## Что сделано
 
@@ -33,8 +33,9 @@
 
 ## Что делать следующим
 
-1. Выбрать следующую foundation-карточку: E1-D1-T05 (R2) или E1-D1-T06 (Telegram auth/sessions, теперь разблокирована T04).
-2. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
+1. E1-D1-T06 Phase 1: UI slice S-MA-001 (auth bootstrap) по DEC-024 (один slice + states + approval).
+2. Затем остальные slices последовательно (S-MA-002…006, S-WEB-001, S-WEB-002).
+3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
 
@@ -83,6 +84,25 @@ Roadmap migration / bootstrap verification:
 - [x] remote Chromium: scheduler `/health`, web `/`, web `/ui-kit` = 200; production Workers untouched.
 
 ## Журнал handoff
+
+### 2026-07-13 — E1-D1-T06 / Phase 0 (backend auth core) done
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** T06 `in_progress` (Phase 0 — milestone done; 8 UI slices впереди).
+- **Сделано:** `@flowly/core` (UUIDv7, ISO-time, константы TTL/freshness); `@flowly/telegram` (`verifyInitData` HMAC-SHA256 WebAppData + constant-time + freshness + parse user; `hasUserStartedBot` getChat); `apps/web/lib/{cloudflare.ts,auth/{session,cookies,csrf,rate-limit,schemas,users,session-user,dev}.ts}`; API routes `/api/v1/{auth/telegram,auth/logout,me}/route.ts`; `.dev.vars.example` (TELEGRAM_BOT_TOKEN, FLOWLY_DEV_EMULATION); README auth-раздел.
+- **Проверки и результаты:** typecheck/lint/build PASS во всех workspaces. Runtime curl-repro (workerd preview, default env + D1, тестовый bot token): valid initData→200+HttpOnly/Secure `__Host-flowly-session` cookie+user created; tampered hash→401; tampered user→401; expired auth_date→401; GET /me cookie→200 / no-cookie→401; mutating без Origin→403 (CSRF); PATCH onboarding→200; logout→200. `git diff --check` PASS; secret scan 0 (.dev.vars gitignored, тестовый токен не в репо).
+- **Архитектурные решения (утверждены):** cookie `__Host-flowly-session` (HttpOnly/Secure/SameSite=Lax); token=random32B, в БД SHA-256 hash (UNIQUE); CSRF=Origin-check; rate limit=min in-memory (prod→этап 8/DEC-007); id=UUIDv7 в `@flowly/core`; PATCH /me=onboarding-поля; freshness 24ч; сессия 30д+sliding.
+- **Residual risks:** dev-emulation path (`FLOWLY_DEV_EMULATION`, gate `NODE_ENV!=='production'`) не runtime-тестировался в Phase 0 (workerd preview=production build); активируется в `next dev` после `initOpenNextCloudflareForDev`. `getChat` bot gate (S-MA-005) использует real bot — stage 5. Cookie в реальном Telegram WebView/device — residual (slices). Rate limit in-memory per-isolate (слабый, documented).
+- **Следующее точное действие:** Phase 1 — UI slice S-MA-001 (auth bootstrap) по DEC-024 с approval.
+
+### 2026-07-13 — E1-D1-T06 / старт Phase 0 (backend auth core)
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** `backlog -> in_progress`; Phase 0 plan approved, реализация начата.
+- **Решено:** фазирование backend-first; бот gate = getChat verify (bot-cmds → этап 5); архитектура §5 (cookie __Host-/HttpOnly/Secure/Lax, token=random32B+SHA-256, CSRF=Origin-check, RL=min in-memory, UUIDv7 в packages/core, PATCH /me=onboarding-поля); freshness auth_date 24ч; сессия 30д+sliding.
+- **Проверено:** PRD §10.2–10.3/§43.1–43.3/§44.1/§47.1/§55.1, F01 auth flow, screen inventory S-MA-001…006/S-WEB-001/002, DEC-013/014/022/027; canonical Telegram initData algorithm (HMAC-SHA256 WebAppData).
+- **Plan:** [`.temp/E1-D1-T06/plan.md`](../../.temp/E1-D1-T06/plan.md); Plan confidence 85%, Phase 0 implementation confidence 82%.
+- **Следующее точное действие:** реализовать Phase 0 (packages/core id, packages/telegram init-data+bot, apps/web lib/auth + API routes), затем verify (typecheck/lint/build + curl-repro валидного/невалидного initData).
 
 ### 2026-07-13 — E1-D1-T04 done
 

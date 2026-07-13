@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 6 | 0 | 0 | 0 | 5 |
+| 6 | 1 | 0 | 0 | 5 |
 
 ## Зависимости и границы
 
@@ -87,13 +87,15 @@
 
 ### E1-D1-T06 — Реализовать Telegram auth и sessions
 
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
+- **status:** in_progress · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-13
 - **prd_refs:** §10.2–10.3, §43.1–43.3, §44.1, §47.1, §55.1
 - **depends_on:** E1-D1-T02, E1-D1-T04 · **decisions:** DEC-013, DEC-014, DEC-022, DEC-024, DEC-025, DEC-027
 - **ui_slices:** S-MA-001, S-MA-002, S-MA-003, S-MA-004, S-MA-005, S-MA-006, S-WEB-001, S-WEB-002 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** проверка Telegram init data, создание пользователя/сессии, onboarding и безопасные browser/deep-link recovery states; bot command surfaces остаются этапу 5.
 - **acceptance:** [ ] пароль не требуется; [ ] подпись и freshness проверяются; [ ] сессия безопасна; [ ] вне Telegram показано корректное состояние.
 - **validation/evidence:** canonical auth requests/responses и screenshots отказа/успеха.
+- **plan:** [`.temp/E1-D1-T06/plan.md`](../../../.temp/E1-D1-T06/plan.md) — фазирование backend-first; Phase 0 (backend auth core) approved 2026-07-13 (архитектура §5, freshness 24ч, сессия 30д+sliding). Plan confidence 85%, Phase 0 implementation confidence 82%.
+- **journal:** 2026-07-13 — выбрана следующей после E1-D1-T04; `backlog -> in_progress`; фазирование утверждено (backend auth core → UI slices); bot gate scope = getChat verify, bot-cmds → этап 5; закрыты open questions (freshness 24ч, TTL 30д+sliding, PATCH /me = onboarding-поля, categories → этапы 2/4). Phase 0 implementation started. 2026-07-13 — **Phase 0 done**: `@flowly/core` (UUIDv7, time), `@flowly/telegram` (verifyInitData HMAC-SHA256, getChat), `apps/web/lib/{cloudflare,auth/*}` (session/cookie/CSRF/rate-limit/zod/users), API routes `/api/v1/{auth/telegram,auth/logout,me}`. Runtime curl-repro PASS (workerd preview, default env + D1): valid initData→200+HttpOnly/Secure cookie+user created; tampered hash→401; tampered user→401; expired auth_date→401; /me cookie→200 / no-cookie→401; no-Origin mutating→403 (CSRF); PATCH onboarding→200; logout→200. typecheck/lint/build PASS; secret scan 0 (.dev.vars gitignored, test token не в репо). Длительность T06 = in_progress (остаются 8 UI slices + acceptance «вне Telegram состояние»).
 
 ### E1-D1-T07 — Настроить local, test и production environments
 

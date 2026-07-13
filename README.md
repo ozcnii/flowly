@@ -110,4 +110,25 @@ Rollback / forward:
 
 Schema-конвенции (все 31 таблицы): id = `text` (UUIDv7 app-side), timestamps = `text` ISO-8601 UTC, local dates = `text YYYY-MM-DD`, local times = `text HH:MM`, bool = `integer 0/1`, enums = `text` + Zod-валидация. FK объявлены с `ON DELETE CASCADE`; enforcement активен в локальной D1 (miniflare, проверено: orphan-INSERT отвергнут, CASCADE сработал) — production D1 подтвердить downstream (T06+).
 
+## Auth и сессии
+
+Авторизация — Telegram Mini App `initData` (PRD §10.2, §47.1). Без email/пароля.
+
+- `POST /api/v1/auth/telegram` — проверка подписи initData (HMAC-SHA256, алгоритм Telegram) + freshness `auth_date` (24ч) → find/create user + сессия → HttpOnly+Secure cookie.
+- `POST /api/v1/auth/logout` — уничтожение сессии, очистка cookie.
+- `GET /api/v1/me` — текущий пользователь (требует сессию).
+- `PATCH /api/v1/me` — onboarding-поля (timezone, locale, week_starts_on); полный профиль/имя/фото → T10 (DEC-020).
+
+Безопасность: cookie `__Host-flowly-session` (HttpOnly+Secure+SameSite=Lax), raw token не хранится (в БД — SHA-256 hash, UNIQUE), CSRF — проверка `Origin`, sliding session TTL 30д, Zod-валидация, minimal rate limit (production-grade → этап 8 / DEC-007), bot-токен только в Cloudflare secret.
+
+Локальная проверка auth без реального Telegram: сгенерировать валидный initData тестовым токеном и гонять через workerd preview (default env, с D1):
+
+```bash
+cp apps/web/.dev.vars.example apps/web/.dev.vars   # вписать тестовый TELEGRAM_BOT_TOKEN
+node .temp/E1-D1-T06/gen-init-data.mjs <botToken> <telegramId>   # → initData
+npm run preview                                       # default env (D1 binding)
+```
+
+Dev-эмуляция Telegram-пользователя (PRD §10.3) для `next dev` — флаг `FLOWLY_DEV_EMULATION=1`; **никогда не включать в production**.
+
 Актуальная реализация и следующий шаг указаны в [HANDOFF](docs/roadmap/HANDOFF.md).

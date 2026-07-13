@@ -7,8 +7,8 @@
 ## Текущий фокус
 
 - **Активный этап:** 1. Основа
-- **Активная задача:** нет; E1-D1-T04 закрыта
-- **Следующее действие:** выбрать следующую foundation-карточку (E1-D1-T05 R2 или E1-D1-T06 Telegram auth)
+- **Активная задача:** E1-D1-T06 (Telegram auth/sessions) — Phase 0 backend auth done; далее UI slices
+- **Следующее действие:** Phase 1 — UI slice S-MA-001 (auth bootstrap) с approval (DEC-024)
 - **UI workflow:** один screen slice + все применимые states/интеракции + явный approval (`DEC-024`)
 - **Блокеры:** открытые решения перечислены в [`DECISIONS.md`](DECISIONS.md)
 - **Контекст продолжения:** [`HANDOFF.md`](HANDOFF.md)
@@ -18,7 +18,7 @@
 | Этап | Статус | Backlog | In progress | Blocked | Review | Done | Файл |
 |---|---|---:|---:|---:|---:|---:|---|
 | 0. UX/UI-контракты | done | 0 | 0 | 0 | 0 | 5 | [`00-design.md`](stages/00-design.md) |
-| 1. Основа | backlog | 6 | 0 | 0 | 0 | 5 | [`01-foundation.md`](stages/01-foundation.md) |
+| 1. Основа | in progress | 6 | 1 | 0 | 0 | 5 | [`01-foundation.md`](stages/01-foundation.md) |
 | 2. Йога | backlog | 10 | 0 | 0 | 0 | 0 | [`02-yoga.md`](stages/02-yoga.md) |
 | 3. Программы | backlog | 7 | 0 | 0 | 0 | 0 | [`03-programs.md`](stages/03-programs.md) |
 | 4. Мой ритм | backlog | 8 | 0 | 0 | 0 | 0 | [`04-my-rhythm.md`](stages/04-my-rhythm.md) |
@@ -27,7 +27,7 @@
 | 7. Социальные функции | backlog | 7 | 0 | 0 | 0 | 0 | [`07-social.md`](stages/07-social.md) |
 | 8. Стабилизация | backlog | 8 | 0 | 0 | 0 | 0 | [`08-stabilization.md`](stages/08-stabilization.md) |
 
-**Итого:** 62 backlog / 0 in progress / 0 blocked / 0 review / 10 done.
+**Итого:** 62 backlog / 1 in progress / 0 blocked / 0 review / 10 done.
 
 ## Зависимости этапов
 
