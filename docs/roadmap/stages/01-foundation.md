@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 2 | 0 | 0 | 1 | 8 |
+| 2 | 0 | 0 | 0 | 9 |
 
 ## Зависимости и границы
 
@@ -123,14 +123,14 @@
 
 ### E1-D1-T08 — Создать seed тестовых пользователей и данных
 
-- **status:** review · **priority:** normal · **owner:** AI agent · **updated:** 2026-07-14
+- **status:** done · **priority:** normal · **owner:** AI agent · **updated:** 2026-07-14
 - **prd_refs:** §49.5
 - **depends_on:** E1-D1-T04, E1-D1-T07
 - **scope:** повторяемые seed-данные для ролей и базовых состояний без production PII. **Foundation-only scope (решение пользователя 2026-07-14):** seed покрывает только foundation-таблицы (`users`, `user_settings`); entity-seed (тренировки/программы/привычки/история/челлендж) добавляется по этапам 2–4, когда появляются таблицы.
 - **acceptance:** [x] seed идемпотентен (INSERT OR IGNORE по `users.telegram_id` UNIQUE и `user_settings.user_id` PK; повторный `db:seed` не добавляет дублей — проверено); [x] сценарии документированы (README «Seed»: 4 test-пользователя — владелец/девушка/2 друга); [x] production запуск защищён (`db:seed` ≡ `wrangler d1 execute flowly-db --local`; `--local` only, production forbidden).
 - **validation/evidence:** `seeds/0001_test_users.sql`; `db:seed` в `apps/web/package.json` + root `package.json` (`npm run db:seed` → web). reset→migrate→seed PASS; **counts: users=4, user_settings=4** (Анна/Мария/Олег/Игорь); re-seed idempotent (counts не изменились); root typecheck/lint PASS.
 - **residual risks:** (1) entity-seed §49.5 (workouts/programs/habits/challenge) — этапы 2–4. (2) auth_sessions не сижятся (dev login через `FLOWLY_DEV_EMULATION`). (3) production D1 не создаётся (отдельный scope); seed local-only. (4) INSERT OR IGNORE не обновляет изменённые значения при re-run (идемпотентность «ignore-if-exists», приемлемо для seed).
-- **journal:** 2026-07-14 — `backlog -> in_progress -> review`; scope согласован с пользователем (foundation-only); реализован `seeds/0001_test_users.sql` + `db:seed` (web, local-only); reset/migrate/seed PASS, counts 4/4, idempotent; README seed-нота добавлена. Ждёт решения пользователя `review -> done`.
+- **journal:** 2026-07-14 — `backlog -> in_progress -> review`; scope согласован с пользователем (foundation-only); реализован `seeds/0001_test_users.sql` + `db:seed` (web, local-only); reset/migrate/seed PASS, counts 4/4, idempotent; README seed-нота добавлена. 2026-07-14 — `review -> done` без deep review (по решению пользователя; тривиальный SQL, проверен counts + идемпотентностью).
 
 ### E1-D1-T09 — Закрыть foundation security и DoD
 

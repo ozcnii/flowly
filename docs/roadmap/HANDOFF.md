@@ -6,9 +6,9 @@
 
 - **Обновлено:** 2026-07-14
 - **Текущий этап:** 1. Основа
-- **Активная задача:** E1-D1-T08 (seed) → **review**; следующая — T09 (security/DoD gate).
-- **Статус:** T08 реализован (foundation seed: 4 test-пользователя + user_settings, local-only, идемпотентный), ждёт `review -> done`. Foundation backlog: T09 (security/DoD), T10 (profile/help).
-- **Последний завершённый результат:** E1-D1-T08 — `seeds/0001_test_users.sql` + `db:seed` (web, `--local`); users=4, user_settings=4, re-seed idempotent.
+- **Активная задача:** E1-D1-T09 (security/DoD gate) — следующая.
+- **Статус:** **T08 done** (без review). Foundation осталось: T09 (security/DoD), T10 (profile/help).
+- **Последний завершённый результат:** E1-D1-T08 done — foundation seed (`seeds/0001_test_users.sql`, 4 test-пользователя + settings, local-only, идемпотентный).
 
 ## Что сделано
 
@@ -33,8 +33,8 @@
 
 ## Что делать следующим
 
-1. Решить по T08: deep review или `review -> done`.
-2. Следующая foundation-задача: T09 (security/DoD gate), затем T10 (profile/help).
+1. E1-D1-T09 (security/DoD gate): deep plan → approval → реализация (review этапа, ownership defaults, headers/cookies, secret scan, §55.1 evidence, §47.1 меры, residual risks).
+2. Затем T10 (profile/help).
 3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
@@ -184,6 +184,12 @@ Roadmap migration / bootstrap verification:
 - **Проверки:** reset→migrate→seed PASS; **users=4, user_settings=4**; re-seed idempotent (без дублей); root typecheck/lint PASS; production-защита через `--local`.
 - **Residual risks:** entity-seed §49.5 — этапы 2–4; auth_sessions не сижятся (dev login через FLOWLY_DEV_EMULATION); production D1 — отдельный scope.
 - **Следующее точное действие:** решение пользователя по T08 (review→done) → T09 (security/DoD gate).
+
+### 2026-07-14 — E1-D1-T08 done / старт E1-D1-T09 (security/DoD gate)
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** T08 `review -> done` (без deep review). Следующая — E1-D1-T09 (security/DoD gate, разблокирована: T02–T08 done).
+- **Следующее точное действие:** deep plan E1-D1-T09.
 
 ### 2026-07-13 — E1-D1-T06 / Slice S-MA-004 preview implemented
 
