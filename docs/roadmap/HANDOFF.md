@@ -6,9 +6,9 @@
 
 - **Обновлено:** 2026-07-14
 - **Текущий этап:** 1. Основа
-- **Активная задача:** E1-D1-T06 (Telegram auth/sessions) — UI slices
-- **Статус:** Phase 0 backend auth + **S-MA-001…006 + S-WEB-001 approved**; T06 `in_progress` (остался 1 slice: S-WEB-002).
-- **Последний завершённый результат:** E1-D1-T06 — S-WEB-001 (outside-Telegram fallback) approved в `apps/web/features/web-fallback/ui/open-via-telegram-screen.tsx` (`?web=open`); логотип убран по просьбе пользователя, typecheck/lint PASS.
+- **Активная задача:** E1-D1-T06 → **review** (все 8 UI slice approved, acceptance закрыт); следующая — на выборе пользователя.
+- **Статус:** Phase 0 backend auth + **все 8 onboarding/auth/recovery slice (S-MA-001…006, S-WEB-001/002) approved**; T06 в `review`. Foundation backlog: T05 (R2), T07 (envs), T08 (seeds), T09 (security/DoD), T10 (profile/help).
+- **Последний завершённый результат:** E1-D1-T06 — S-WEB-002 (unavailable deep link) approved; `features/web-fallback/ui/unavailable-deep-link-screen.tsx` (`?web=unavailable`). typecheck/lint PASS, overflow 0, таргеты ≥44px.
 
 ## Что сделано
 
@@ -33,8 +33,8 @@
 
 ## Что делать следующим
 
-1. E1-D1-T06: финальный slice **S-WEB-002** (unavailable deep link: safe reason + open Telegram/re-auth + exit, без утечки target).
-2. После approval S-WEB-002 закрыть acceptance T06 («вне Telegram — корректное состояние») и перевести T06 в review.
+1. Решить по T06: deep review или закрыть `review -> done` (как ранее T03/T04 без deep review).
+2. Выбрать следующую задачу: foundation T05 (R2)/T07 (envs)/T08 (seeds)/T09 (DoD gate)/T10 (profile UI) — либо перейти к этапу 2 «Йога».
 3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
@@ -121,6 +121,15 @@ Roadmap migration / bootstrap verification:
 - **Проверки:** typecheck/lint PASS; 430 light/dark: overflow 0, таргеты ≥44px, 0 console errors, 0 `<img>`.
 - **Evidence:** `.temp/E1-D1-T06/screenshots/sweb001-open-430-{light,dark}.png`, `sweb001-open-430-light-nologo.png`.
 - **Следующее точное действие:** S-WEB-002 (unavailable deep link).
+
+### 2026-07-14 — E1-D1-T06 / S-WEB-002 approved → все 8 slice готовы, T06 в review
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** T06 `in_progress -> review`; все 8 UI slice approved (S-MA-001…006, S-WEB-001/002); acceptance закрыт.
+- **Сделано:** S-WEB-002 `features/web-fallback/ui/unavailable-deep-link-screen.{tsx,module.css}`, route `?web=unavailable`. P-WEB (§10/§32/§36): safe reason без утечки target + «Открыть в Telegram»/«Справка».
+- **Проверки:** typecheck/lint PASS; 430 light/dark: overflow 0, таргеты ≥44px, 0 console errors.
+- **Evidence:** `.temp/E1-D1-T06/screenshots/sweb002-unavailable-430-{light,dark}.png`.
+- **Следующее точное действие:** решение пользователя по T06 (review→done) и выбор следующей задачи (foundation T05/T07/T08/T09/T10 либо этап 2).
 
 ### 2026-07-13 — E1-D1-T06 / Slice S-MA-004 preview implemented
 
