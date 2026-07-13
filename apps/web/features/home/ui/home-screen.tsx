@@ -62,7 +62,7 @@ export function HomeScreen({ data, scenario = "base" }: Props) {
       <div className={styles.sectionHeading}><div><p className={styles.eyebrow}>Сегодня</p><h2 id="habits-title">Привычки</h2></div>{offline ? <Badge tone="warning">Сохранится локально</Badge> : <Badge tone="success">{completedHabits.size}/{data.habits.length}</Badge>}</div>
       <Card className={styles.habits}>{data.habits.map(item => {
         const done = completedHabits.has(item.id);
-        return <div key={item.id}><span className={styles.habitIcon}><Icon name={item.id === "water" ? "heart" : item.id === "mindfulness" ? "leaf" : "sun"} /></span><span><strong>{item.title}</strong><small>{done ? "Выполнено" : item.meta}</small></span><IconButton label={`${done ? "Вернуть" : "Выполнить"}: ${item.title}`} variant={done ? "secondary" : "ghost"} icon={<Icon name={done ? "check" : "square"} />} onClick={() => toggleHabit(item.id, item.title)} /></div>;
+        return <div key={item.id}><span className={styles.habitIcon}><Icon name={item.id === "water" ? "heart" : item.id === "mindfulness" ? "leaf" : "sun"} /></span><span><strong>{item.title}</strong><small>{done ? "Выполнено" : item.meta}</small></span><IconButton className={styles.habitAction} label={`${done ? "Вернуть" : "Выполнить"}: ${item.title}`} variant={done ? "secondary" : "ghost"} icon={<Icon name={done ? "check" : "square"} />} onClick={() => toggleHabit(item.id, item.title)} /></div>;
       })}</Card>
     </section>
 
