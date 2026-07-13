@@ -1,6 +1,7 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createDatabase, type Database } from "@flowly/database";
 import { createStorage, type StorageAdapter } from "@flowly/storage";
+import { resolveTelegramMode, type TelegramMode } from "@flowly/telegram";
 import type { AnyD1Database } from "drizzle-orm/d1";
 import type { R2Bucket } from "@cloudflare/workers-types";
 
@@ -14,6 +15,8 @@ interface WebEnv {
   DB?: AnyD1Database;
   STORAGE?: R2Bucket;
   TELEGRAM_BOT_TOKEN?: string;
+  TELEGRAM_MODE?: string;
+  NODE_ENV?: string;
 }
 
 function webEnv(): WebEnv {
@@ -41,4 +44,14 @@ export function getStorage(): StorageAdapter {
   const bucket = webEnv().STORAGE;
   if (!bucket) throw new Error("R2 binding 'STORAGE' is not available in this environment");
   return createStorage(bucket);
+}
+
+/**
+ * Telegram-режим (PRD §49.4): `mock` | `test` | `production`. Явный `TELEGRAM_MODE`
+ * выигрывает; иначе local `next dev` -> mock, deployed -> production. В `mock`
+ * исходящие сообщения пишутся в локальный журнал и не отправляются.
+ */
+export function getTelegramMode(): TelegramMode {
+  const env = webEnv();
+  return resolveTelegramMode({ TELEGRAM_MODE: env.TELEGRAM_MODE, NODE_ENV: env.NODE_ENV ?? process.env.NODE_ENV });
 }

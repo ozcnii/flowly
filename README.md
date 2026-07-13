@@ -142,4 +142,32 @@ npm run preview                                       # default env (D1 binding)
 
 Dev-эмуляция Telegram-пользователя (PRD §10.3) для `next dev` — флаг `FLOWLY_DEV_EMULATION=1`; **никогда не включать в production**.
 
+## Среды и режимы (environments)
+
+Три среды (PRD §49.1) с строгой изоляцией данных/секретов:
+
+| Среда | Next.js | D1 | R2 | Telegram | Cron | Домен | Данные/секреты |
+|---|---|---|---|---|---|---|---|
+| **local** | `next dev` | локальная (miniflare, `.wrangler/state`) | локальная (miniflare) | **mock** | — | `localhost` | `.dev.vars` (gitignored), тестовые пользователи |
+| **test** | preview/deploy `--env test` | отдельная test D1 | отдельный test bucket | test-бот (`TELEGRAM_MODE=test`) | test Cron | preview/`*.workers.dev` | отдельные test-ресурсы, test-токен как secret |
+| **production** | deploy | production D1 | production R2 | основной бот (`TELEGRAM_MODE=production`) | production Cron | production-домен | prod-секреты только через Cloudflare secret store |
+
+Local D1/R2 создаются Wrangler/miniflare и **не затрагивают** test/production (PRD §49.2). Реальные test/prod D1/R2 и test-бот создаются отдельным scope (без фейковых ID в репо).
+
+**Telegram-режимы** (PRD §49.4): `mock` | `test` | `production` — `@flowly/telegram` `resolveTelegramMode(env)`. Явный `TELEGRAM_MODE` выигрывает; иначе local `next dev` → `mock`, deployed → `production` (test обязан явно ставить `TELEGRAM_MODE=test`). В **`mock`** исходящие сообщения пишутся в локальный журнал (`createTelegramLogger`, console + in-memory buffer) и **не отправляются** (0 сетевых вызовов). Реальный outbound sender появляется на этапе 5 и обязан маршрутизировать отправку через режим.
+
+Команды (PRD §49.3, из root):
+
+```bash
+npm run dev               # local Next.js + local D1/R2 + mock Telegram
+npm run preview           # OpenNext workerd preview (--env test)
+npm run db:migrate        # применить миграции в локальную D1
+npm run db:reset          # пересобрать локальную D1
+npm run deploy:test       # deploy в test-окружение
+npm run deploy:production # deploy в production
+npm run typecheck / lint / build / test / test:e2e
+```
+
+Изоляция: `.dev.vars`, `**/.wrangler/` gitignored (см. `.gitignore`); `.dev.vars.example` отслеживается как шаблон; prod-токен — только Cloudflare secret, никогда в репо.
+
 Актуальная реализация и следующий шаг указаны в [HANDOFF](docs/roadmap/HANDOFF.md).

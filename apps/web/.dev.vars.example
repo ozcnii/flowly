@@ -9,3 +9,9 @@ TELEGRAM_BOT_TOKEN=
 # Optional: enable dev-only Telegram user emulation (PRD §10.3) for `next dev`.
 # NEVER enable in production.
 FLOWLY_DEV_EMULATION=
+
+# Optional: Telegram mode (PRD §49.4): mock | test | production.
+# Empty = auto: local `next dev` -> mock; deployed -> production.
+# Test environment MUST set TELEGRAM_MODE=test explicitly.
+# In `mock`, outbound messages are written to a local log and never sent.
+TELEGRAM_MODE=
