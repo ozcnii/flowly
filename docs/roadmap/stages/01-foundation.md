@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 6 | 0 | 0 | 1 | 5 |
+| 6 | 0 | 0 | 0 | 6 |
 
 ## Зависимости и границы
 
@@ -87,7 +87,7 @@
 
 ### E1-D1-T06 — Реализовать Telegram auth и sessions
 
-- **status:** review · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-14
+- **status:** done · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-14
 - **prd_refs:** §10.2–10.3, §43.1–43.3, §44.1, §47.1, §55.1
 - **depends_on:** E1-D1-T02, E1-D1-T04 · **decisions:** DEC-013, DEC-014, DEC-022, DEC-024, DEC-025, DEC-027
 - **ui_slices:** S-MA-001, S-MA-002, S-MA-003, S-MA-004, S-MA-005, S-MA-006, S-WEB-001, S-WEB-002 — выполнять последовательно; approval каждого ID обязателен до следующего.
@@ -104,6 +104,7 @@
 2026-07-14 — **Slice S-WEB-001 (outside-Telegram fallback) implemented + approved**: `features/web-fallback/ui/open-via-telegram-screen.{tsx,module.css}`, route `?web=open` в `app/page.tsx`. P-WEB (§10.3, unauthenticated): одна badge-иконка (`external-link`) + «Откройте Flowly через Telegram» + «Открыть в Telegram»/«Справка»; данных приложения не показывается. Логотип убран по просьбе пользователя. typecheck/lint PASS; 430 light/dark: overflow 0, таргеты ≥44px, 0 console errors. Evidence: `.temp/E1-D1-T06/screenshots/sweb001-open-430-{light,dark}.png`. **approved (DEC-024, пользователь «чотко»)**. Остался S-WEB-002.
 2026-07-14 — **Slice S-WEB-002 (unavailable deep link, outside Telegram) implemented + approved**: `features/web-fallback/ui/unavailable-deep-link-screen.{tsx,module.css}`, route `?web=unavailable`. P-WEB (§10/§32/§36): safe reason без утечки target + «Открыть в Telegram»/«Справка». typecheck/lint PASS; 430 light/dark: overflow 0, таргеты ≥44px, 0 console errors. Evidence: `.temp/E1-D1-T06/screenshots/sweb002-unavailable-430-{light,dark}.png`. **approved (DEC-024, пользователь «давай дальше по плану»)**.
 2026-07-14 — **Все 8 UI slice T06 approved; acceptance закрыт; T06 `in_progress -> review`**. Остаются foundation-задачи T05 (R2), T07 (envs), T08 (seeds), T09 (security/DoD gate), T10 (profile/help).
+2026-07-14 — **T06 `review -> done` без deep review** (по решению пользователя, как T03/T04). Acceptance подтверждён evidence (Phase 0 curl-repro + 8 approved slice). Остаточные риски: реальный Telegram WebView/safe-area и delivery — downstream этапов; rate limit in-memory per-isolate (слабый, documented); dev-emulation path (`FLOWLY_DEV_EMULATION`) не runtime-тестировался в production build.
 
 ### E1-D1-T07 — Настроить local, test и production environments
 

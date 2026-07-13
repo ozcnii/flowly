@@ -6,9 +6,9 @@
 
 - **Обновлено:** 2026-07-14
 - **Текущий этап:** 1. Основа
-- **Активная задача:** E1-D1-T06 → **review** (все 8 UI slice approved, acceptance закрыт); следующая — на выборе пользователя.
-- **Статус:** Phase 0 backend auth + **все 8 onboarding/auth/recovery slice (S-MA-001…006, S-WEB-001/002) approved**; T06 в `review`. Foundation backlog: T05 (R2), T07 (envs), T08 (seeds), T09 (security/DoD), T10 (profile/help).
-- **Последний завершённый результат:** E1-D1-T06 — S-WEB-002 (unavailable deep link) approved; `features/web-fallback/ui/unavailable-deep-link-screen.tsx` (`?web=unavailable`). typecheck/lint PASS, overflow 0, таргеты ≥44px.
+- **Активная задача:** E1-D1-T05 (R2 storage) — deep plan + реализация следующей.
+- **Статус:** **T06 done** (Phase 0 + все 8 slice approved, без deep review). Foundation backlog: T05 (R2), T07 (envs), T08 (seeds), T09 (security/DoD), T10 (profile/help).
+- **Последний завершённый результат:** E1-D1-T06 done — Telegram auth/sessions (backend + 8 UI slice: S-MA-001…006, S-WEB-001/002).
 
 ## Что сделано
 
@@ -33,8 +33,8 @@
 
 ## Что делать следующим
 
-1. Решить по T06: deep review или закрыть `review -> done` (как ранее T03/T04 без deep review).
-2. Выбрать следующую задачу: foundation T05 (R2)/T07 (envs)/T08 (seeds)/T09 (DoD gate)/T10 (profile UI) — либо перейти к этапу 2 «Йога».
+1. E1-D1-T05 (R2): deep plan → approval → реализация (bindings local/test/prod, безопасный storage adapter, без прямого public access, бизнес-логика не завязана на R2).
+2. Затем T07 (envs) → T08 (seeds) → T09 (security/DoD gate) → T10 (profile/help).
 3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
@@ -130,6 +130,14 @@ Roadmap migration / bootstrap verification:
 - **Проверки:** typecheck/lint PASS; 430 light/dark: overflow 0, таргеты ≥44px, 0 console errors.
 - **Evidence:** `.temp/E1-D1-T06/screenshots/sweb002-unavailable-430-{light,dark}.png`.
 - **Следующее точное действие:** решение пользователя по T06 (review→done) и выбор следующей задачи (foundation T05/T07/T08/T09/T10 либо этап 2).
+
+### 2026-07-14 — E1-D1-T06 done (без deep review) / старт E1-D1-T05 (R2)
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** T06 `review -> done` (пользователь «Закрыть без review»); следующая — E1-D1-T05 (R2 storage), `backlog -> in_progress` после deep plan.
+- **Сделано:** T06 закрыт: Phase 0 backend auth + 8 UI slice approved (S-MA-001…006, S-WEB-001/002), acceptance подтверждён evidence.
+- **Остаточные риски T06:** реальный Telegram WebView/safe-area и end-to-end delivery — downstream; rate limit in-memory per-isolate; dev-emulation path не runtime-тестировался в production build.
+- **Следующее точное действие:** deep plan E1-D1-T05 (R2).
 
 ### 2026-07-13 — E1-D1-T06 / Slice S-MA-004 preview implemented
 
