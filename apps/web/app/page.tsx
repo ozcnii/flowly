@@ -7,6 +7,7 @@ import { HomeScreen } from "@/features/home/ui/home-screen";
 import { WelcomeScreen } from "@/features/onboarding/ui/welcome-screen";
 import { PreferencesScreen } from "@/features/onboarding/ui/preferences-screen";
 import { HabitInviteScreen } from "@/features/onboarding/ui/habit-invite-screen";
+import { BotConnectionScreen } from "@/features/onboarding/ui/bot-connection-screen";
 import { resolveShellScenario } from "@/lib/scenarios";
 
 type PageProps = { searchParams: Promise<Record<string, string | string[] | undefined>> };
@@ -21,6 +22,7 @@ export default async function Page({ searchParams }: PageProps) {
     if (params.onboarding === "welcome") return <WelcomeScreen />;
     if (params.onboarding === "preferences") return <PreferencesScreen />;
     if (params.onboarding === "habit") return <HabitInviteScreen />;
+    if (params.onboarding === "bot") return <BotConnectionScreen />;
   }
 
   return (
