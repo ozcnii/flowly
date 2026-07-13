@@ -6,9 +6,9 @@
 
 - **Обновлено:** 2026-07-14
 - **Текущий этап:** 1. Основа
-- **Активная задача:** E1-D1-T05 (R2 storage) — deep plan + реализация следующей.
-- **Статус:** **T06 done** (Phase 0 + все 8 slice approved, без deep review). Foundation backlog: T05 (R2), T07 (envs), T08 (seeds), T09 (security/DoD), T10 (profile/help).
-- **Последний завершённый результат:** E1-D1-T06 done — Telegram auth/sessions (backend + 8 UI slice: S-MA-001…006, S-WEB-001/002).
+- **Активная задача:** E1-D1-T05 (R2) → **review**; следующая — T07 (envs).
+- **Статус:** **T05 реализован** (`@flowly/storage` adapter + R2 binding `STORAGE` + `getStorage()`), ждёт `review -> done`. Foundation backlog: T07 (envs), T08 (seeds), T09 (security/DoD), T10 (profile/help).
+- **Последний завершённый результат:** E1-D1-T05 — R2 storage: `packages/storage/**`, `r2_buckets` в `apps/web/wrangler.jsonc`, `getStorage()` в `lib/cloudflare.ts`; typecheck/lint/build/deploy:check PASS, local R2 roundtrip smoke PASS.
 
 ## Что сделано
 
@@ -33,8 +33,8 @@
 
 ## Что делать следующим
 
-1. E1-D1-T05 (R2): deep plan → approval → реализация (bindings local/test/prod, безопасный storage adapter, без прямого public access, бизнес-логика не завязана на R2).
-2. Затем T07 (envs) → T08 (seeds) → T09 (security/DoD gate) → T10 (profile/help).
+1. Решить по T05: deep review или `review -> done` (как T03/T04/T06 без deep review).
+2. Следующая foundation-задача: T07 (local/test/prod environments), затем T08 (seeds), T09 (DoD gate), T10 (profile/help).
 3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
@@ -138,6 +138,15 @@ Roadmap migration / bootstrap verification:
 - **Сделано:** T06 закрыт: Phase 0 backend auth + 8 UI slice approved (S-MA-001…006, S-WEB-001/002), acceptance подтверждён evidence.
 - **Остаточные риски T06:** реальный Telegram WebView/safe-area и end-to-end delivery — downstream; rate limit in-memory per-isolate; dev-emulation path не runtime-тестировался в production build.
 - **Следующее точное действие:** deep plan E1-D1-T05 (R2).
+
+### 2026-07-14 — E1-D1-T05 (R2) реализован, переведён в review
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** T05 `in_progress -> review`.
+- **Сделано:** `@flowly/storage` (adapter `put/get/delete/exists` + `storageKey`, типы выведены из R2-интерфейсов), `r2_buckets` (`STORAGE` / `flowly-storage`, local-only) в `apps/web/wrangler.jsonc`, `getStorage()` в `apps/web/lib/cloudflare.ts`, web deps `@flowly/storage` + `@cloudflare/workers-types`. README — раздел «Storage (R2)».
+- **Проверки:** clean `npm install`; root typecheck/lint PASS; `@flowly/web` next build PASS; `deploy:check` (wrangler dry-run парсит `r2_buckets`) PASS; **local R2 roundtrip smoke PASS** (miniflare, `.temp/E1-D1-T05/r2-smoke.mjs`); secret scan 0.
+- **Residual risks:** реальный test/prod bucket — отдельный scope; `getStorage()` runtime через OpenNext request context — downstream этап 2 (как D1 в T04→T06); upload/access flows — этап 2.
+- **Следующее точное действие:** решение пользователя по T05 (review→done) → T07 (envs).
 
 ### 2026-07-13 — E1-D1-T06 / Slice S-MA-004 preview implemented
 

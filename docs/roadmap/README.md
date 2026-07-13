@@ -8,7 +8,7 @@
 
 - **Активный этап:** 1. Основа
 - **Активная задача:** E1-D1-T05 (R2 storage) — следующая foundation-инфра.
-- **Следующее действие:** T06 done; deep plan + реализация T05 (R2 bindings + безопасный storage adapter), затем T07 (envs), T08 (seeds).
+- **Следующее действие:** T05 (R2) → review; next foundation T07 (envs) → T08 (seeds) → T09 (DoD gate) → T10 (profile).
 - **UI workflow:** один screen slice + все применимые states/интеракции + явный approval (`DEC-024`)
 - **Блокеры:** открытые решения перечислены в [`DECISIONS.md`](DECISIONS.md)
 - **Контекст продолжения:** [`HANDOFF.md`](HANDOFF.md)
@@ -18,7 +18,7 @@
 | Этап | Статус | Backlog | In progress | Blocked | Review | Done | Файл |
 |---|---|---:|---:|---:|---:|---:|---|
 | 0. UX/UI-контракты | done | 0 | 0 | 0 | 0 | 5 | [`00-design.md`](stages/00-design.md) |
-| 1. Основа | in progress | 6 | 0 | 0 | 0 | 6 | [`01-foundation.md`](stages/01-foundation.md) |
+| 1. Основа | in progress | 5 | 0 | 0 | 1 | 6 | [`01-foundation.md`](stages/01-foundation.md) |
 | 2. Йога | backlog | 10 | 0 | 0 | 0 | 0 | [`02-yoga.md`](stages/02-yoga.md) |
 | 3. Программы | backlog | 7 | 0 | 0 | 0 | 0 | [`03-programs.md`](stages/03-programs.md) |
 | 4. Мой ритм | backlog | 8 | 0 | 0 | 0 | 0 | [`04-my-rhythm.md`](stages/04-my-rhythm.md) |
@@ -27,7 +27,7 @@
 | 7. Социальные функции | backlog | 7 | 0 | 0 | 0 | 0 | [`07-social.md`](stages/07-social.md) |
 | 8. Стабилизация | backlog | 8 | 0 | 0 | 0 | 0 | [`08-stabilization.md`](stages/08-stabilization.md) |
 
-**Итого:** 62 backlog / 0 in progress / 0 blocked / 0 review / 12 done.
+**Итого:** 61 backlog / 0 in progress / 0 blocked / 1 review / 12 done.
 
 ## Зависимости этапов
 
