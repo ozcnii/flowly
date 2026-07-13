@@ -16,6 +16,7 @@
     "cf-typegen": "wrangler types --env test --env-interface CloudflareEnv --include-runtime false .wrangler/cloudflare-env.d.ts",
     "db:migrate": "wrangler d1 migrations apply flowly-db --local",
     "db:reset": "node scripts/db-reset-local.mjs",
+    "db:seed": "wrangler d1 execute flowly-db --local --file=../../seeds/0001_test_users.sql",
     "typecheck": "tsc --noEmit",
     "lint": "eslint ."
   },
