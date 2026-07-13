@@ -6,9 +6,9 @@
 
 - **Обновлено:** 2026-07-14
 - **Текущий этап:** 1. Основа
-- **Активная задача:** E1-D1-T08 (seed тестовых пользователей) — следующая.
-- **Статус:** **T07 done** (deep review PASS). Foundation backlog: T08 (seeds), T09 (security/DoD), T10 (profile/help).
-- **Последний завершённый результат:** E1-D1-T07 done — env-matrix + Telegram modes (mock→0 fetch), deep review PASS, W1/S1 закрыты.
+- **Активная задача:** E1-D1-T08 (seed) → **review**; следующая — T09 (security/DoD gate).
+- **Статус:** T08 реализован (foundation seed: 4 test-пользователя + user_settings, local-only, идемпотентный), ждёт `review -> done`. Foundation backlog: T09 (security/DoD), T10 (profile/help).
+- **Последний завершённый результат:** E1-D1-T08 — `seeds/0001_test_users.sql` + `db:seed` (web, `--local`); users=4, user_settings=4, re-seed idempotent.
 
 ## Что сделано
 
@@ -33,8 +33,8 @@
 
 ## Что делать следующим
 
-1. E1-D1-T08 (seed): deep plan → approval → реализация (повторяемые seed-данные, без production PII).
-2. Затем T09 (security/DoD gate) → T10 (profile/help).
+1. Решить по T08: deep review или `review -> done`.
+2. Следующая foundation-задача: T09 (security/DoD gate), затем T10 (profile/help).
 3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
@@ -175,6 +175,15 @@ Roadmap migration / bootstrap verification:
 - **От кого / кому:** пользователь + субагент-reviewer → AI agent / следующий агент.
 - **Статус задачи:** T07 `review -> done` (deep review PASS gate, 0 багов; пункт process.env-in-Worker robust; закрыты W1 README-уточнение + S1 mock-ID счётчик). Следующая — E1-D1-T08 (seeds).
 - **Следующее точное действие:** deep plan E1-D1-T08.
+
+### 2026-07-14 — E1-D1-T08 (seed) реализован, переведён в review
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** T08 `backlog -> in_progress -> review`. Scope — foundation-only (entity-seed на этапы 2–4 по решению пользователя).
+- **Сделано:** `seeds/0001_test_users.sql` (4 test-пользователя: Анна/Мария/Олег/Игорь + `user_settings`, INSERT OR IGNORE); `db:seed` в `apps/web/package.json` (`wrangler d1 execute --local`) + root `package.json` → web; убран stub `db:seed` из `@flowly/database`; README seed-нота.
+- **Проверки:** reset→migrate→seed PASS; **users=4, user_settings=4**; re-seed idempotent (без дублей); root typecheck/lint PASS; production-защита через `--local`.
+- **Residual risks:** entity-seed §49.5 — этапы 2–4; auth_sessions не сижятся (dev login через FLOWLY_DEV_EMULATION); production D1 — отдельный scope.
+- **Следующее точное действие:** решение пользователя по T08 (review→done) → T09 (security/DoD gate).
 
 ### 2026-07-13 — E1-D1-T06 / Slice S-MA-004 preview implemented
 
