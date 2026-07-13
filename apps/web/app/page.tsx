@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AppShell } from "@/components/shell/app-shell";
+import { AuthGate } from "@/components/auth/auth-gate";
 import { homeBase } from "@/features/home/fixtures/base";
 import { resolveHomeScenario } from "@/features/home/model/home-scenario";
 import { HomeScreen } from "@/features/home/ui/home-screen";
@@ -14,6 +15,7 @@ export default async function Page({ searchParams }: PageProps) {
   const activeTab = typeof params.tab === "string" ? params.tab : "home";
 
   return (
+    <AuthGate>
     <AppShell activeTab={activeTab} scenario={scenario} stateLabel={`home:${homeScenario}`} showScenario={process.env.NODE_ENV !== "production"}>
       {scenario === "loading" ? (
         <div aria-label="Загрузка оболочки" className="grid gap-4"><div className="shell-skeleton h-9 w-2/3 rounded-full" /><div className="shell-skeleton h-40 rounded-3xl" /><div className="shell-skeleton h-24 rounded-2xl" /></div>
@@ -21,6 +23,7 @@ export default async function Page({ searchParams }: PageProps) {
         <section role="alert" className="m-auto grid max-w-md gap-4 rounded-3xl border border-border bg-surface p-6 text-center"><h1 className="font-display text-3xl font-semibold">Не удалось открыть Flowly</h1><p className="text-text-muted">Повторите загрузку оболочки. Личные данные не отображаются до успешной проверки.</p><LinkButton /></section>
       ) : <HomeScreen key={homeScenario} data={homeBase} scenario={homeScenario} />}
     </AppShell>
+    </AuthGate>
   );
 }
 
