@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@flowly/ui";
+import { Button, Icon } from "@flowly/ui";
 import styles from "./habit-invite-screen.module.css";
 
 type PromptChoice = "create" | "skip";
@@ -105,15 +105,18 @@ export function HabitInviteScreen() {
 
             <label className={styles.field}>
               <span>Время напоминания</span>
-              <select
-                className={styles.select}
-                value={habitTime}
-                onChange={(event) => setHabitTime(event.target.value as HabitTime)}
-              >
-                <option value="утро">Утро</option>
-                <option value="день">День</option>
-                <option value="вечер">Вечер</option>
-              </select>
+              <div className={styles.selectWrap}>
+                <select
+                  className={styles.select}
+                  value={habitTime}
+                  onChange={(event) => setHabitTime(event.target.value as HabitTime)}
+                >
+                  <option value="утро">Утро</option>
+                  <option value="день">День</option>
+                  <option value="вечер">Вечер</option>
+                </select>
+                <Icon name="chevron-down" className={styles.selectCaret} />
+              </div>
             </label>
 
             <p className={styles.hint}>Дни выполнения</p>

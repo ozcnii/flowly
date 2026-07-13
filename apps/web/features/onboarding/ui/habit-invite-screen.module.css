@@ -113,6 +113,28 @@
   font-size: 1rem;
 }
 
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 2.5rem;
+}
+
+.selectWrap {
+  position: relative;
+  display: grid;
+}
+
+.selectCaret {
+  position: absolute;
+  right: 0.85rem;
+  top: 50%;
+  width: 1.15rem;
+  height: 1.15rem;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
 .input:focus-visible,
 .select:focus-visible,
 .day:focus-visible,
