@@ -20,6 +20,8 @@
 
 ## Обязательные подтверждённые contracts
 
+- По `DEC-024` каждый указанный `ui_slices` screen slice выполняется строго по одному ID в реальном `apps/web`; все states/интеракции и явный approval обязательны до следующего ID.
+- По `DEC-025` production UI-kit из `packages/ui` и его public API обязательны для всех screen slices; app-local дубли shared primitives запрещены.
 - Program lifecycle минимальный: start from date, progression без сдвигов, explicit leave; restart создаёт новое enrollment (`DEC-016`).
 - Skip/rest/no_response не смешиваются; status mutations подтверждаются и журналируются (`DEC-015`).
 - Joint participation требует acceptance, scoped visibility и owner transfer либо завершение объекта (`DEC-019`, `DEC-020`); реализация joint UI остаётся этапу 7.
@@ -29,35 +31,40 @@
 
 ### E3-D4-T01 — Реализовать каталог программ
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §20.1–20.2, §43.13–43.14, §44.6 · **depends_on:** E2-D2-T01 · **decisions:** DEC-016, DEC-022
+- **prd_refs:** §20.1–20.2, §43.13–43.14, §44.6 · **depends_on:** E2-D2-T01 · **decisions:** DEC-016, DEC-022, DEC-024, DEC-025
+- **ui_slices:** S-MA-050, S-MA-051 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** модели/API/UI программ и их дней для длительностей 7/14/30.
 - **acceptance:** [ ] порядок дней стабилен; [ ] workout/rest day различимы; [ ] данные валидируются.
 - **validation/evidence:** program fixtures и API/UI samples.
 
 ### E3-D4-T02 — Реализовать начало программы с выбранной даты
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §20.3, §43.15, §44.6, §55.3 · **depends_on:** E3-D4-T01, E1-D1-T06 · **decisions:** DEC-016, DEC-019, DEC-022
+- **prd_refs:** §20.3, §43.15, §44.6, §55.3 · **depends_on:** E3-D4-T01, E1-D1-T06 · **decisions:** DEC-016, DEC-019, DEC-022, DEC-024, DEC-025
+- **ui_slices:** S-MA-052 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** enrollment, дата старта и вычисление календарных дат в timezone пользователя.
 - **acceptance:** [ ] дата выбирается явно; [ ] enrollment принадлежит пользователю; [ ] day mapping воспроизводим.
 - **validation/evidence:** date/timezone examples и stored enrollment.
 
 ### E3-D4-T03 — Реализовать текущий день и прогресс
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §20.2–20.3, §55.3 · **depends_on:** E3-D4-T02, E2-D3-T01 · **decisions:** DEC-016, DEC-022
+- **prd_refs:** §20.2–20.3, §55.3 · **depends_on:** E3-D4-T02, E2-D3-T01 · **decisions:** DEC-016, DEC-022, DEC-024, DEC-025
+- **ui_slices:** S-MA-053 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** вычисление текущего дня, completed count и отображение прогресса.
 - **acceptance:** [ ] прогресс основан на фактических статусах; [ ] будущие дни не выполнены; [ ] границы timezone корректны.
 - **validation/evidence:** state matrix по датам и statuses.
 
 ### E3-D4-T04 — Обработать пропуск без сдвига программы
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §20.4, §26, §55.3, §57 · **depends_on:** E3-D4-T02 · **decisions:** DEC-015, DEC-016, DEC-022
+- **prd_refs:** §20.4, §26, §55.3, §57 · **depends_on:** E3-D4-T02 · **decisions:** DEC-015, DEC-016, DEC-022, DEC-024, DEC-025
+- **ui_slices:** S-MA-053 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** missed/skipped occurrence без изменения дат последующих дней.
 - **acceptance:** [ ] календарь программы неизменен; [ ] статус записан отдельно; [ ] прогресс пересчитан корректно.
 - **validation/evidence:** canonical missed-day sequence до/после.
 
 ### E3-D4-T05 — Реализовать дни отдыха
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §8.6, §20.5, §55.3 · **depends_on:** E3-D4-T02 · **decisions:** DEC-015, DEC-016, DEC-022
+- **prd_refs:** §8.6, §20.5, §55.3 · **depends_on:** E3-D4-T02 · **decisions:** DEC-015, DEC-016, DEC-022, DEC-024, DEC-025
+- **ui_slices:** S-MA-051, S-MA-053 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** rest day как отдельный тип/статус, не равный skip.
 - **acceptance:** [ ] UI и данные различают rest/skip; [ ] rest не требует тренировки; [ ] серии/прогресс получают корректный сигнал.
 - **validation/evidence:** rest vs skip examples.

@@ -20,6 +20,8 @@
 
 ## Обязательные подтверждённые contracts
 
+- По `DEC-024` каждый указанный `ui_slices` screen slice выполняется строго по одному ID в реальном `apps/web`; все states/интеракции и явный approval обязательны до следующего ID.
+- По `DEC-025` production UI-kit из `packages/ui` и его public API обязательны для всех screen slices; app-local дубли shared primitives запрещены.
 - Verification обязана проверять все linked `DEC-*` карточек и 69 screen / 11 flow contracts из [`docs/design/flows/`](../../design/flows/).
 - Account deletion: 7-day grace + re-auth cancellation; joint results preserve anonymized integrity. Clear history сохраняет account/settings/objects; export — protected JSON + bot notice (`DEC-020`).
 - Share-card retention 30 дней (`DEC-018`); open operational decisions `DEC-006`–`DEC-008`, `DEC-010`, `DEC-011` должны быть закрыты либо оставить соответствующую карточку blocked.
@@ -43,7 +45,8 @@
 
 ### E8-D9-T03 — Реализовать backup, restore, export и deletion
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §47.3, §51, §55.9 · **depends_on:** E1-D1-T04, E1-D1-T05 · **decisions:** DEC-008, DEC-018, DEC-020
+- **prd_refs:** §47.3, §51, §55.9 · **depends_on:** E1-D1-T04, E1-D1-T05 · **decisions:** DEC-008, DEC-018, DEC-020, DEC-024, DEC-025
+- **ui_slices:** S-MA-092, S-MA-093, S-MA-094, S-MA-095, S-BOT-008 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** D1 export, R2 retention, test restore, user export и account deletion.
 - **acceptance:** [ ] backup повторяем; [ ] restore фактически проверен; [ ] user data удаляются/экспортируются по PRD; [ ] schedule mechanism утверждён.
 - **validation/evidence:** sanitized backup/restore logs и deletion inventory.

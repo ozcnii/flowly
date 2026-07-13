@@ -50,12 +50,13 @@
 
 ### DEC-012 — Обязательный UX/UI-этап до разработки
 
-- **Статус:** approved
+- **Статус:** superseded
 - **Дата:** 2026-07-13
 - **Решение:** добавить отдельный этап 0 до разработки; обязательны user flows, wireframes, UI-kit, финальные макеты и интерактивный прототип; артефакты и evidence хранятся в `docs/design/`; переход к разработке разрешён только после явного approval пользователя.
-- **Основание:** явный выбор пользователя.
+- **Основание:** явный выбор пользователя; monolithic pre-development gate позднее отменён после неудачной попытки generated high-fidelity package.
 - **PRD:** §8–40, §54–55.
-- **Влияет на:** E0-D0-T01–T06, этапы 1–8, `docs/design/**`.
+- **Влияет на:** исторические E0-D0-T00–T03 и design artifacts; для текущей и будущей работы применять DEC-024.
+- **Заменено:** DEC-024.
 
 ### DEC-013 — IA, навигация и deep links
 
@@ -146,7 +147,30 @@
 - **Решение:** UI-kit развивает wellness-направление Concept A без признания самого концепта финальным дизайном; основной UI-шрифт — локально хранимый Inter, display-шрифт — локально хранимый Cormorant Garamond с кириллицей; иконки — локально закреплённый Lucide. Артефакт включает переносимый HTML-каталог, CSS custom properties, machine-readable JSON tokens и versioned PNG snapshots; все внешние runtime-зависимости исключены.
 - **Основание:** явный выбор пользователя при старте E0-D0-T03.
 - **PRD:** §40, §55.1.
-- **Влияет на:** E0-D0-T03–T06, `docs/design/ui-kit/**`, финальные макеты и прототип.
+- **Влияет на:** E0-D0-T03–T04, `docs/design/ui-kit/**`, production UI screen slices.
+
+### DEC-024 — Интерактивные Next.js screen slices вместо общего design gate
+
+- **Статус:** approved
+- **Дата:** 2026-07-13
+- **Решение:** отказаться от единовременного generated high-fidelity пакета и общего pre-development approval. Реальный UI создаётся в `apps/web` на утверждённом Next.js-стеке итерациями «один экран + все применимые states и интеракции». Каждый screen slice требует отдельного пользовательского approval до начала следующего; scripts используются только для проверки/capture, а не для генерации дизайна. Bootstrap E1-D1-T01/T02 разрешён до screen approval. T00–T03 сохраняются как нормативные requirements/reference; провальный T04 package удаляется.
+- **Основание:** явное решение пользователя после неудовлетворительного результата monolithic T04 и review-loop.
+- **Техническая фиксация:** npm workspaces; Next.js 16.2.10; React/React DOM 19.2.7; Tailwind CSS 4.3.2; TypeScript 5.9.3. OpenNext Cloudflare проверяется отдельной карточкой E1-D1-T03.
+- **Approval contract:** применимая карточка содержит `ui_slices`; route/component, base и contextual states, интеракции, responsive/theme/accessibility evidence и дословный approval пользователя фиксируются до перехода к следующему screen slice.
+- **PRD:** §9–40, §41.1, §41.3, §54–55.
+- **Влияет на:** E0-D0-T04; E1-D1-T01/T02/T06/T09; все downstream UI cards этапов 2–8; `AGENTS.md`, roadmap, handoff и `apps/web/**`.
+- **Заменяет:** DEC-012.
+
+### DEC-025 — Production UI-kit до продолжения screen slices
+
+- **Статус:** approved
+- **Дата:** 2026-07-13
+- **Решение:** до продолжения Главной создать production UI-kit в `packages/ui` и отдельный интерактивный route `/ui-kit`. UI-kit включает canonical tokens/themes/typography, Button/IconButton, Card, Badge, Progress, AppHeader, BottomNavigation, Skeleton, EmptyState, InlineError и OfflineBanner с focus/touch/reduced-motion contracts. Product screen использует только утверждённые production components; app-local компонент допускается лишь как кандидат и не считается shared до явного решения. Главная остаётся blocked до visual approval `/ui-kit`.
+- **Основание:** пользователь обнаружил, что `packages/ui` пуст, а Главная собрана напрямую на app-local CSS; пользователь явно потребовал сначала production UI-kit.
+- **Approval contract:** `/ui-kit` должен быть интерактивно проверяемым в light/dark, 360–430/wide, keyboard/focus и component states; дословный approval фиксируется до разблокировки E0-D0-T04.
+- **Approval evidence:** 2026-07-13 пользователь явно подтвердил: «утверждаю ui kit»; E1-D1-T11 завершена, E0-D0-T04 разблокирована.
+- **PRD:** §40, §41.3, §55.1.
+- **Влияет на:** E1-D1-T11, E0-D0-T04, все downstream `ui_slices`, `packages/ui/**`, `apps/web/app/ui-kit/**`, `AGENTS.md`.
 
 ## Открытые решения
 

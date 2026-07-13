@@ -1,32 +1,34 @@
-# Этап 0 — UX/UI-дизайн
+# Этап 0 — UX/UI-контракты и первый интерактивный screen slice
 
-> PRD: §8–10, §11–39, §40, §54–55. Процесс утверждён в `DEC-012`.
+> PRD: §8–10, §11–39, §40, §54–55. Текущий процесс утверждён в `DEC-024`; `DEC-012` superseded.
 
 ## Цель
 
-До начала разработки создать, проверить и явно утвердить полный UX/UI-пакет Flowly v1.0 в репозитории.
+Сохранить проверенные IA/wireframe/UI-kit contracts как нормативную основу и утвердить первый реальный интерактивный экран в Next.js без единовременной генерации всех surfaces.
 
 ## Сводка
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 3 | 0 | 0 | 0 | 4 |
+| 0 | 1 | 0 | 0 | 4 |
 
 ## Зависимости и границы
 
-- Входящих зависимостей нет.
+- T00–T03 остаются утверждёнными requirements/reference и не превращаются в production UI автоматически.
+- E0-D0-T04 начинается после Next.js bootstrap E1-D1-T01/T02 и реализуется непосредственно в `apps/web`.
+- UI развивается по одному screen slice; следующий экран не начинается до явного approval текущего.
 - Этап не расширяет продуктовый scope PRD: неясности фиксируются в `DECISIONS.md` и блокируют соответствующую карточку.
-- Все артефакты и evidence хранятся в `docs/design/`.
-- Разработка этапов 1–8 не начинается до явного approval пользователя в E0-D0-T06.
-- Approval фиксируется датой, ссылками на утверждённые версии и неизменяемыми snapshots; последующие изменения требуют повторного approval затронутого пакета.
+- Monolithic generated final screens и отдельный общий prototype/approval gate отменены `DEC-024`.
 
 ## Обязательные подтверждённые contracts
 
-- `DEC-013`–`DEC-023` и [`docs/design/flows/`](../../design/flows/) — нормативная основа следующих дизайн-карточек; `DEC-023` задаёт visual foundation и переносимый формат E0-D0-T03–T06.
+- `DEC-013`–`DEC-024` и [`docs/design/flows/`](../../design/flows/) — нормативная основа production UI; `DEC-024` задаёт iterative approval workflow.
+- `DEC-025` требует утверждённый production UI-kit в `packages/ui` до продолжения E0-D0-T04.
+- `DEC-023` задаёт visual foundation, но каждую композицию нужно проектировать вручную в реальном screen slice.
 - Concept A остаётся неутверждённым visual reference; он не заменяет screen/state/flow inventory.
 - Новая продуктовая неоднозначность требует `DEC-*`; нельзя молча менять утверждённые navigation, statuses, permissions, destructive flows или bot gate.
 
-## Deliverable E0-D0 — Утверждённый UX/UI-пакет Flowly v1.0
+## Deliverable E0-D0 — UX/UI contracts и утверждённая интерактивная Главная
 
 ### E0-D0-T00 — Зафиксировать исходный HTML-мокап
 
@@ -70,30 +72,18 @@
 - **residual risks:** реальный Telegram iOS/Android WebView/notch и production async announcements не проверены; cross-OS font rasterization может менять PNG bytes; high-fi composition всех 69 surfaces относится к E0-D0-T04.
 - **journal:** 2026-07-13 — после review FAIL задача возвращалась `review -> in_progress`. По подтверждению пользователя все 5 blockers и 4 warnings исправлены одним проходом; corrected generation/capture/validation PASS, новый review не запускался; выполнен переход `in_progress -> review`. Пользователь явно подтвердил завершение и поручил перевести задачу, закоммитить и запушить; выполнен переход `review -> done`.
 
-### E0-D0-T04 — Создать финальные макеты Flowly v1.0
+### E0-D0-T04 — Спроектировать и утвердить интерактивную Главную
 
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §9–40, §55 · **depends_on:** E0-D0-T02, E0-D0-T03 · **decisions:** DEC-012–DEC-023
-- **scope:** high-fidelity макеты всех экранов и ключевых состояний на основе утверждаемого UI-kit без добавления функций вне PRD.
-- **acceptance:** [ ] покрыты все wireframes; [ ] использован единый UI-kit; [ ] light/dark и применимые responsive-состояния представлены; [ ] макеты сохранены в `docs/design/screens/`.
-- **validation/evidence:** screen inventory, coverage matrix и versioned final snapshots.
-
-### E0-D0-T05 — Собрать и проверить интерактивный прототип
-
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §9–40, §55 · **depends_on:** E0-D0-T04 · **decisions:** DEC-012–DEC-023
-- **scope:** интерактивный прототип ключевых end-to-end сценариев v1.0 по утверждаемым макетам.
-- **acceptance:** [ ] ключевые flows E0-D0-T01 кликабельны; [ ] переходы и возвраты согласованы с макетами; [ ] ограничения прототипа записаны; [ ] переносимый prototype artifact сохранён в `docs/design/prototype/`.
-- **validation/evidence:** список пройденных сценариев, screenshots/recording и версия prototype artifact.
-
-### E0-D0-T06 — Провести дизайн-review и получить явный approval
-
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §8–40, §54–55 · **depends_on:** E0-D0-T01–T05 · **decisions:** DEC-012–DEC-023
-- **scope:** проверить полноту UX/UI-пакета, закрыть или зафиксировать замечания и запросить явное утверждение пользователя до начала разработки.
-- **acceptance:** [ ] coverage PRD подтверждён; [ ] замечания имеют статус; [ ] approved snapshots перечислены; [ ] пользователь явно утвердил пакет; [ ] дата и формулировка approval сохранены в `docs/design/APPROVAL.md`.
-- **validation/evidence:** review checklist, traceability matrix, список approved artifacts и дословно зафиксированный approval пользователя.
+- **status:** in_progress · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-13
+- **prd_refs:** §9, §11, §40, §44.2, §55.1 · **depends_on:** E1-D1-T02, E1-D1-T11 · **decisions:** DEC-013, DEC-016, DEC-022, DEC-023, DEC-024, DEC-025
+- **ui_slices:** S-MA-010
+- **scope:** вручную реализовать в `apps/web` реальную Главную и применимые base/loading/empty/module-error/offline/resume states; не создавать другие product screens или registry-генератор.
+- **acceptance:** [x] экран отвечает «что мне нужно сделать сегодня»; [ ] independent modules и empty-day CTA соответствуют DEC-016; [ ] states соответствуют DEC-022; [x] интеракции, пять tabs и avatar entry работают; [ ] light/dark, 360–430/wide, safe area, keyboard/focus проверены; [ ] пользователь явно утвердил Главную до начала следующего screen slice.
+- **validation/evidence:** Concept A + contracts base checkpoint: `apps/web/features/home/**`, `apps/web/public/media/home-{resume,program}.webp`, shell использует `BottomNavigation`/`OfflineBanner`/`Icon` из `@flowly/ui`; generated originals/prompts `.temp/E0-D0-T04/generated/**`; root typecheck/lint/build PASS; screenshots `.temp/E0-D0-T04/screenshots/home-concept-a-contracts-{360-dark-viewport,430-light,1280-light}.png`; 360 overflow 0, targets ≥44px, console errors 0, tabs 5/current 1, focus, category selection, habit toggle и live notice PASS. Остальные contextual states, safe-area device check и approval ещё не выполнены.
+- **plan:** [`.temp/E0-D0-T04/next-interactive-plan.md`](../../../.temp/E0-D0-T04/next-interactive-plan.md) — утверждён пользователем 2026-07-13.
+- **residual risks:** mock view-model не доказывает backend behavior; Telegram device/WebView проверяется отдельно.
+- **journal:** 2026-07-13 — прежний generated 69-screen scope удалён как неудовлетворительный; после завершения E1-D1-T02 вручную реализован base state. Пользователь потребовал сначала production UI-kit; выполнен переход `in_progress -> blocked` до E1-D1-T11 и visual approval `/ui-kit`. 2026-07-13 — пользователь явно утвердил production UI-kit фразой «утверждаю ui kit»; E1-D1-T11 завершена, выполнен переход `blocked -> in_progress`. 2026-07-13 — base state Главной пересобран из approved `@flowly/ui`, дополнен нормальными модулями S-MA-010 и проверен на 360/430/1280; пользователь отклонил длинный dashboard и векторные изображения, выбрал направление `Concept A + contracts` и фотореалистичную генерацию через ChatGPT MCP. Композиция упрощена, обязательные модули сохранены компактно, сгенерированы и локально оптимизированы два изображения реальных людей; остановка на повторном пользовательском review base state. Пользователь подтвердил base state фразой «главная теперь выглядит замечательно»; разрешён переход к loading/empty/module-error/offline/resume. Финальный approval Главной остаётся обязательным после всех states.
 
 ## Handoff этапа
 
-Фиксировать версии и пути артефактов, покрытие PRD, открытые `DEC-*`, замечания review, approved snapshots и следующее точное действие. Без evidence явного approval E0-D0-T06 и этап 0 не переводятся в `done`.
+T00–T03 остаются нормативными references. Для T04 фиксировать route/component, все применимые scenarios, screenshots, browser checks и дословный approval. Следующий screen slice не начинать до завершения текущего.

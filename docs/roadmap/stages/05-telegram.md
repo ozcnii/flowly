@@ -20,6 +20,8 @@
 
 ## Обязательные подтверждённые contracts
 
+- По `DEC-024` каждый указанный `ui_slices` screen slice выполняется строго по одному ID в реальном `apps/web`; все states/интеракции и явный approval обязательны до следующего ID.
+- По `DEC-025` production UI-kit из `packages/ui` и его public API обязательны для всех screen slices; app-local дубли shared primitives запрещены.
 - Bot/deep links открывают exact target с auth/access recovery; `/app` → Главная, `/help` → справка (`DEC-013`).
 - Onboarding bot gate обязателен (`DEC-014`). Done/already-done/skip/rest terminal; snooze only defers current occurrence; Start hands off to workout without terminal mutation (`DEC-015`).
 - Quiet-hours delivery выполняется только пока актуальна; stale callbacks idempotently return current state; no response becomes only `no_response` (`DEC-015`).
@@ -36,14 +38,16 @@
 
 ### E5-D6-T02 — Реализовать сообщения и callback actions
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §25.1–25.4, §36.1–36.2, §55.5 · **depends_on:** E5-D6-T01, E4-D5-T05 · **decisions:** DEC-013, DEC-015, DEC-022
-- **scope:** сообщения привычки/йоги и действия «Готово», «Уже выполнено».
+- **prd_refs:** §25.1–25.4, §36.1–36.2, §55.5 · **depends_on:** E5-D6-T01, E4-D5-T05 · **decisions:** DEC-013, DEC-015, DEC-022, DEC-024, DEC-025
+- **ui_slices:** S-BOT-002, S-BOT-003, S-BOT-004, S-BOT-005 — выполнять последовательно; approval каждого ID обязателен до следующего.
+- **scope:** command results `/app`/`today`/`help`, сообщения привычки/йоги и действия «Готово», «Уже выполнено».
 - **acceptance:** [ ] callback связан с occurrence/user; [ ] повторное нажатие безопасно; [ ] completion останавливает повторы.
 - **validation/evidence:** callback sequences и persisted status history.
 
 ### E5-D6-T03 — Реализовать snooze, skip и rest
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §25.5–25.7, §26 · **depends_on:** E5-D6-T02 · **decisions:** DEC-015, DEC-022
+- **prd_refs:** §25.5–25.7, §26 · **depends_on:** E5-D6-T02 · **decisions:** DEC-015, DEC-022, DEC-024, DEC-025
+- **ui_slices:** S-BOT-003, S-BOT-004, S-BOT-005 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** готовое/произвольное откладывание, «Сегодня пропущу», «Сегодня отдыхаю» по разрешённым правилам.
 - **acceptance:** [ ] snooze создаёт корректный job; [ ] skip/rest различаются; [ ] запрещённое действие недоступно; [ ] timezone соблюдён.
 - **validation/evidence:** request/state matrix.
@@ -71,7 +75,8 @@
 
 ### E5-D6-T07 — Реализовать quiet hours, лимиты и no_response
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §24.5, §26.1, §37.2–37.3, §55.5 · **depends_on:** E5-D6-T03, E5-D6-T04 · **decisions:** DEC-015, DEC-022
+- **prd_refs:** §24.5, §26.1, §37.2–37.3, §55.5 · **depends_on:** E5-D6-T03, E5-D6-T04 · **decisions:** DEC-015, DEC-022, DEC-024, DEC-025
+- **ui_slices:** S-MA-091, S-BOT-003, S-BOT-004, S-BOT-005 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** пользовательские настройки, перенос delivery из quiet period, global limits и отдельный `no_response`.
 - **acceptance:** [ ] в quiet hours отправки нет; [ ] перенос не создаёт дублей; [ ] no_response не равен skip; [ ] timezone корректен.
 - **validation/evidence:** boundary-time scenarios.

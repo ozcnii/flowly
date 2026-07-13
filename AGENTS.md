@@ -30,7 +30,9 @@
 ### Во время работы
 
 - Linked `DEC-*`, stage-level «Обязательные подтверждённые contracts» и `docs/design/flows/**` являются обязательной частью scope карточки, а не рекомендациями.
-- Любой подтверждённый факт, решение, ограничение или изменение автоматически синхронизировать во всех связанных артефактах, не ожидая отдельного напоминания пользователя: task metadata (`decisions`, `depends_on`, scope, acceptance), `DECISIONS.md` и его `Влияет на`, stage contracts/summary, downstream-карточки, design flows/traceability, общий roadmap и `HANDOFF.md`. Если изменение затрагивает workflow агентов — обновить также `AGENTS.md`.
+- По `DEC-024` production UI проектируется в реальном `apps/web` итерациями «один screen slice + все применимые states/интеракции». Scripts не генерируют дизайн. Следующий screen slice нельзя начинать до явного approval текущего; route/component, scenarios, screenshots/checks и формулировка approval фиксируются в карточке/HANDOFF.
+- По `DEC-025` shared production UI сначала реализуется и утверждается в `packages/ui` через интерактивный `/ui-kit`. Product screen обязан использовать утверждённый public API; app-local компонент не переносится в shared автоматически. До approval UI-kit E0-D0-T04 и следующие screen slices blocked.
+- Любой подтверждённый факт, решение, ограничение или изменение автоматически синхронизировать во всех связанных артефактах, не ожидая отдельного напоминания пользователя: task metadata (`decisions`, `depends_on`, `ui_slices`, scope, acceptance), `DECISIONS.md` и его `Влияет на`, stage contracts/summary, downstream-карточки, design flows/traceability, общий roadmap и `HANDOFF.md`. Если изменение затрагивает workflow агентов — обновить также `AGENTS.md`.
 - Работа не считается завершённой, пока связанные представления не синхронизированы и не проверены на противоречия, устаревшие ссылки и superseded `DEC-*`.
 - Выполнять только scope карточки.
 - Каждый новый факт, ограничение, отклонение или блокер фиксировать в артефактах.

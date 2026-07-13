@@ -1,6 +1,6 @@
 # Flowly — UX/UI design artifacts
 
-Этот каталог хранит переносимые дизайн-артефакты Flowly v1.0 и evidence их утверждения согласно `docs/roadmap/stages/00-design.md` и `DEC-012`.
+Этот каталог хранит нормативные design references Flowly v1.0 согласно `docs/roadmap/stages/00-design.md`. `DEC-012` superseded; production UI и его approval выполняются поэкранно в `apps/web` по `DEC-024`.
 
 ## Структура
 
@@ -9,11 +9,11 @@
 - [`ui-kit/`](ui-kit/) — E0-D0-T03: HTML-каталог, JSON/CSS tokens, локальные fonts/icons, components/states, accessibility evidence и 23 versioned snapshots; [план](ui-kit/E0-D0-T03-plan.md) реализован.
 - `screens/` — визуальные концепты и финальные versioned snapshots макетов.
   - [`screens/concept-a/`](screens/concept-a/) — предоставленный пользователем исходный HTML-концепт; покрытие и пробелы описаны в [`STATUS.md`](screens/concept-a/STATUS.md).
-- `prototype/` — переносимый интерактивный прототип и сценарии проверки.
-- `APPROVAL.md` — явное утверждение конкретных версий пользователем; создаётся в E0-D0-T06.
 
-Каталоги артефактов создаются соответствующими карточками. Любая продуктовая неясность фиксируется в `docs/roadmap/DECISIONS.md`, а не решается внутри макета по предположению.
+T00–T03 остаются requirements/reference и не являются production UI. Провальный monolithic T04 удалён; отдельный общий prototype больше не создаётся.
+
+Каталоги артефактов создаются соответствующими карточками. Любая продуктовая неясность фиксируется в `docs/roadmap/DECISIONS.md`, а не решается внутри UI по предположению.
 
 ## Правило approval
 
-Разработка этапов 1–8 начинается только после явного утверждения UX/UI-пакета. Approval должен содержать дату, формулировку пользователя и точный список утверждённых файлов/версий. Изменение утверждённого артефакта требует повторного approval затронутого пакета.
+Каждый production screen slice реализуется вручную в `apps/web` вместе со всеми применимыми states и интеракциями. Approval должен содержать route/component, список scenarios, screenshots/checks, дату и дословную формулировку пользователя. Следующий screen slice не начинается до approval текущего.

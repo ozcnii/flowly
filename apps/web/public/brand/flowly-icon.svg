@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Иконка Flowly</title>
+  <desc id="desc">Плавный знак бесконечности в бирюзово-зелёном градиенте</desc>
+  <defs>
+    <linearGradient id="g" x1="86" y1="355" x2="424" y2="145" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#28C8D1"/>
+      <stop offset="0.52" stop-color="#56D3B8"/>
+      <stop offset="1" stop-color="#A8E766"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#28453f" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+  <rect x="36" y="36" width="440" height="440" rx="112" fill="#FCFCFB" filter="url(#shadow)"/>
+  <path d="M90 278C90 196 184 166 240 222L312 294C350 333 420 316 420 253C420 190 347 169 302 215L228 289C174 343 90 324 90 278Z"
+        fill="none" stroke="url(#g)" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

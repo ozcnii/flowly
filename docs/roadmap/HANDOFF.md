@@ -5,25 +5,26 @@
 ## Текущее состояние
 
 - **Обновлено:** 2026-07-13
-- **Текущий этап:** 0. UX/UI-дизайн
-- **Активная задача:** отсутствует
-- **Статус:** E0-D0-T03 завершена (`done`)
-- **Последний завершённый результат:** пользователь явно принял corrected UI-kit после закрытия всех deep-review findings
+- **Текущий этап:** 0. UX/UI-контракты и первый интерактивный screen slice
+- **Активная задача:** E0-D0-T04 — интерактивная Главная S-MA-010
+- **Статус:** `in_progress`; E1-D1-T11 done
+- **Последний завершённый результат:** пользователь подтвердил новый base state Главной фразой «главная теперь выглядит замечательно»; разрешён переход к contextual states
 
 ## Что сделано
 
 - Проанализирован `docs/PRD.md`.
 - Зафиксированы восемь этапов разработки из §54.
-- По явному решению пользователя добавлен этап 0: user flows, wireframes, UI-kit, финальные макеты, интерактивный прототип и обязательный approval.
-- Дизайн-артефакты и evidence закреплены за `docs/design/`.
+- Исторический общий design gate DEC-012 superseded решением DEC-024: production UI теперь создаётся в реальном Next.js по одному screen slice со всеми states/интеракциями и отдельным approval.
+- Провальный monolithic E0-D0-T04 package и его review artifacts удалены; T00–T03 сохранены как normative requirements/reference.
+- Подтверждены npm workspaces и pinned bootstrap stack: Next.js 16.2.10, React 19.2.7, Tailwind 4.3.2, TypeScript 5.9.3.
 - Concept A перенесён в `docs/design/screens/concept-a/`: четыре экрана, визуальное направление, логотип, standalone HTML и browser preview.
 - В `STATUS.md` зафиксированы покрытие Concept A и пробелы относительно PRD; approval отсутствует.
 - Реализован и скорректирован пакет E0-D0-T01: 69 screen/surface IDs, F01–F11, 12 Mermaid diagrams, explicit per-ID state profiles, atomic observable traceability и механически симметричные 98 screen↔flow membership pairs.
 - Реализован E0-D0-T02: 13 HTML pages по F01–F11, 69 canonical surfaces, 15 profiles/105 state demos, 38 tailored critical frames, 39 canonical + 3 evidence PNG, pinned reproducible Playwright capture и 69-row coverage matrix.
 - Deep-review corrections: безопасные F04/F08 terminal branches, F01 browser recovery, F10 relationship/revoke/permission paths, F11 deletion-grace re-auth; §19.4 cache and §51.2 export contents made observable.
 - Workshop decisions зафиксированы как DEC-013–DEC-022; DEC-009 заменён DEC-018.
-- Linked decisions синхронизированы в metadata 63 downstream-карточек; 68 из 72 карточек теперь имеют применимое поле `decisions`, остальные четыре инфраструктурные карточки не зависят от зафиксированных DEC.
-- Во все 9 stage-файлов добавлены обязательные подтверждённые contracts; `AGENTS.md` требует читать linked DEC и `docs/design/flows/**` перед началом UI/UX-задачи.
+- Linked decisions синхронизированы с downstream metadata; 40 UI-bearing карточек имеют `ui_slices`, DEC-024/025 и обязательный последовательный approval; все 69 canonical surface IDs назначены хотя бы одной карточке.
+- Во все 9 stage-файлов добавлены обязательные contracts; `AGENTS.md` требует реальный `apps/web`, запрещает design generation и требует утверждённый public API `packages/ui` до product screens.
 - В корневом `README.md` полный wordmark заменён на icon Flowly.
 - Согласованы границы программных напоминаний и совместных программ.
 - Согласовано выполнение проверок по ходу этапов.
@@ -32,13 +33,13 @@
 
 ## Что делать следующим
 
-1. Начать E0-D0-T04 — финальные high-fidelity макеты всех 69 surfaces на основе утверждённых wireframes и UI-kit.
-2. Не выходить за зафиксированные screen/state/flow/UI-kit contracts; новую продуктовую неясность вынести в `DECISIONS.md`.
-3. Не начинать этапы 1–8 до завершения E0-D0-T06 с явно зафиксированным approval пользователя.
+1. Реализовать loading skeleton для независимых модулей Главной.
+2. Реализовать empty day с CTA к тренировке, программе и привычке; module-error/retry, offline и resume variants.
+3. Выполнить browser matrix всех states и получить финальный approval Главной до следующего screen slice.
 
 ## Открытые блокеры
 
-Открыты `DEC-006`, `DEC-007`, `DEC-008`, `DEC-010`, `DEC-011` в [`DECISIONS.md`](DECISIONS.md); DEC-009 superseded. Они не блокируют завершённую E0-D0-T01, но блокируют соответствующие downstream детали. Новых неоднозначностей navigation/permissions/destructive/status/bot gate не обнаружено. Разработка этапов 1–8 заблокирована до explicit approval E0-D0-T06 согласно `DEC-012`.
+Открыты `DEC-006`, `DEC-007`, `DEC-008`, `DEC-010`, `DEC-011` в [`DECISIONS.md`](DECISIONS.md); DEC-009 и DEC-012 superseded. Они не блокируют E0-D0-T04. Production UI-kit утверждён; сохраняется обязательный per-screen approval по DEC-024.
 
 ## Изменённые артефакты
 
@@ -53,27 +54,99 @@
 - `docs/design/wireframes/**` — утверждённый план, HTML, CSS/JS registry, coverage, validation, capture toolchain и 42 PNG
 - `docs/design/ui-kit/**` — утверждённый plan, HTML, JSON/CSS tokens, local fonts/icons, inventory, accessibility/validation, capture toolchain и 22 PNG
 - `docs/design/screens/concept-a/**`
+- `.temp/E0-D0-T04/next-interactive-plan.md` — утверждённый migration/implementation plan
+- `apps/**`, `packages/**`, `migrations/`, `seeds/`, `scripts/` — E1-D1-T01/T02
+- `apps/web/features/home/**`, `apps/web/public/media/**` — неутверждённый E0-D0-T04 base state, остановлен
+- `packages/ui/**`, `apps/web/app/ui-kit/**` — E1-D1-T11 production UI-kit
 
 ## Проверка текущего изменения
 
-Проверено 2026-07-13 автоматическим анализом Markdown:
+Roadmap migration / bootstrap verification:
 
-- [x] 69 unique screen IDs и F01–F11;
-- [x] двунаправленное сравнение: 98 screen↔flow pairs с каждой стороны, symmetric difference пуст;
-- [x] 69 explicit ID→state-profile assignments, 15 profiles с обоснованными N/A, включая отдельные read-only profiles;
-- [x] 12 Mermaid blocks; 11 canonical headers совпадают с F-rows; каждый Rendered set совпадает с node IDs;
-- [x] 250 traceability rows; list-valued obligations §11.3/§13.1/§16.1/§20.2/§22.1/§28.3/§34.1–34.2/§37.1/§39 разложены по requirement bullets; §19.4/§30/§31/§51.2 имеют observable contracts;
-- [x] 0 broken repository-relative Markdown links;
-- [x] roadmap: 72 unique cards = 68 backlog / 0 in progress / 1 review / 3 done;
-- [x] UI-kit: 163 generated declarations; 22/22 contrast pairs; 12 local font files; 46 Lucide icons; 69/69 surface coverage;
-- [x] UI-kit browser matrix: 18 canonical + 5 evidence PNG; 0 overflow/unlabelled controls/selected-state mismatches/small effective targets/console errors; true 200% and four-sided Telegram safe-area evidence; two captures byte-identical;
-- [x] `git diff --check`, 0 trailing-whitespace lines, 0 staged files;
-- [x] независимая semantic re-review: blockers отсутствуют, E0-D0-T01 разрешено перевести в done;
-- [x] 72 task cards parsed; 68 имеют decisions metadata, все DEC refs существуют, active task refs не содержат superseded DEC-009;
-- [x] все 9 stages содержат «Обязательные подтверждённые contracts»; README icon path существует;
-- [ ] Mermaid renderer/CLI не выполнен — принят как residual risk до визуальной стадии.
+- [x] провальный `docs/design/screens/final/**`, старый T04 plan/reviews и `.pi-subagents` удалены;
+- [x] DEC-024 approved; DEC-012 superseded;
+- [x] старые T05/T06 удалены; T04 ограничен S-MA-010 и зависит от E1-D1-T02;
+- [x] E1-D1-T01 `in_progress`; E1-D1-T02 разблокирован последовательностью T01 → T02;
+- [x] 40 UI-bearing cards имеют `ui_slices`, sequential approval contract и покрывают все 69 canonical surface IDs;
+- [x] E1-D1-T01: 9 npm workspaces, root lockfile, `npm install` 0 vulnerabilities, workspace query/build/typecheck/lint PASS;
+- [x] E1-D1-T02: pinned stack, clean install, typecheck/lint/build/audit PASS; 24 browser runs, 2 screenshots, focus/overflow/nav/theme/dev-production isolation PASS;
+- [x] E0-D0-T04 base checkpoint существует, но должен быть пересобран из approved `@flowly/ui`;
+- [x] E1-D1-T11 package/public API: Button/IconButton/Card/Badge/Progress/AppHeader/BottomNavigation/Skeleton/EmptyState/InlineError/OfflineBanner;
+- [x] `/ui-kit` browser matrix: 360/430/1280, light/dark, keyboard/focus, ≥44px targets, no overflow, interactions и reduced motion PASS;
+- [x] `/ui-kit` visual approval: пользователь подтвердил «утверждаю ui kit» 2026-07-13;
+- [ ] E0-D0-T04 пересборка из утверждённых components и approval Главной — in progress.
 
 ## Журнал handoff
+
+### 2026-07-13 — E0-D0-T04 / base state approved
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** `in_progress`; base state approved, contextual states ещё не реализованы.
+- **Approval evidence:** дословно: «главная теперь выглядит замечательно».
+- **Закрыто:** normal/base composition, visual direction `Concept A + contracts`, generated photography, core interactions.
+- **Следующее точное действие:** реализовать loading/empty/module-error/offline/resume, затем показать полный state set для финального approval Главной.
+
+### 2026-07-13 — E0-D0-T04 / Concept A + generated photography checkpoint
+
+- **От кого / кому:** пользователь → AI agent → пользователь / следующий агент.
+- **Статус задачи:** `in_progress`; base state повторно ожидает visual approval.
+- **Feedback:** пользователь отклонил длинный dashboard и векторные изображения как непохожие на Concept A; выбрал `Concept A + contracts` и генерацию реальных людей через ChatGPT MCP.
+- **Сделано:** Главная возвращена к спокойной mobile-first иерархии Concept A; resume стал компактным условным блоком; progress/categories/current program/habits/primary CTA образуют основной сценарий; weekly/recommendation/shared activity сохранены ниже как компактные contracts. Через ChatGPT сгенерированы 4:3 resume-photo и 1:1 program-photo, скачаны оригиналы, созданы WebP 1200×900 и 1000×1000.
+- **Изменённые файлы:** `apps/web/features/home/**`, `apps/web/public/media/home-{resume,program}.webp`, `.temp/E0-D0-T04/generated/**`, task evidence/handoff.
+- **Проверки и результаты:** root typecheck/lint/build PASS; Playwright 360/430/1280 light/dark; overflow 0; targets ≥44px; tabs 5/current 1; interactions/live notice PASS; console errors 0.
+- **Evidence:** `.temp/E0-D0-T04/screenshots/home-concept-a-contracts-{360-dark-viewport,430-light,1280-light}.png`; generated prompts/originals в `.temp/E0-D0-T04/generated/`.
+- **Следующее точное действие:** получить approval или единый пакет замечаний по новому base state; contextual states до этого не начинать.
+
+### 2026-07-13 — E0-D0-T04 / approved-kit base checkpoint
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** `in_progress`; остановка на review base state по DEC-024.
+- **Сделано:** `/` снова показывает Главную; normal state пересобран на `Card`, `Button`, `IconButton`, `Badge`, `Progress`, `Icon`; shell переведён на production `BottomNavigation` и `OfflineBanner`; представлены day progress, resume, today plan, quick start, current program, habits, weekly rhythm, recommendation и explicitly shared friend activity.
+- **Изменённые файлы:** `apps/web/app/page.tsx`, `components/shell/app-shell.tsx`, `features/home/**`, task evidence/handoff.
+- **Проверки и результаты:** root typecheck/lint/build PASS; Playwright 360/430/1280 light/dark; overflow 0; interactive targets ≥44px; focus 3px; tabs 5/current 1; profile href, category selection, habit toggle/live notice PASS; console errors 0.
+- **Evidence:** `.temp/E0-D0-T04/screenshots/home-approved-kit-base-{360-light-viewport,430-dark-viewport,1280-light}.png`.
+- **Блокеры / решения:** технических блокеров нет; contextual states не начинать до пользовательского review base state.
+- **Следующее точное действие:** принять пакет визуальных замечаний либо approval base state.
+
+### 2026-07-13 — E1-D1-T11 утверждена / E0-D0-T04 разблокирована
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задач:** E1-D1-T11 `in_progress -> review -> done`; E0-D0-T04 `blocked -> in_progress`.
+- **Approval:** дословно: «утверждаю ui kit».
+- **Синхронизация:** acceptance T11 закрыт; stage 0/1 summaries, roadmap index, DEC-025 evidence и handoff обновлены.
+- **Residual risk:** реальный Telegram WebView/safe-area переносится в device validation product screens.
+- **Следующее точное действие:** пересобрать base Главной из `@flowly/ui` и остановиться на пользовательском review base state.
+
+### 2026-07-13 — E1-D1-T11 / production UI-kit ожидает approval
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** `in_progress`; E0-D0-T04 остаётся `blocked`.
+- **Сделано:** создан независимый `@flowly/ui` с canonical tokens/themes и 12 production component families; собран интерактивный `/ui-kit`; заглушка `F` в app shell заменена фирменным знаком Flowly, знак также используется как favicon.
+- **Изменённые файлы:** `packages/ui/**`, `apps/web/app/ui-kit/**`, `apps/web/public/brand/flowly-icon.svg`, `apps/web/app/icon.svg`, shell/config/global imports и task evidence.
+- **Проверки и результаты:** root typecheck/lint/build PASS; `/ui-kit` static; Playwright 360/430/1280 light/dark, no overflow, ≥44px targets, keyboard focus 3px, loading/disabled/live status, navigation и reduced motion PASS; console errors 0.
+- **Evidence:** `.temp/E1-D1-T11/ui-kit-{360-light,430-dark,1280-light}.png`, `.temp/E1-D1-T11/shell-real-logo-430.png`.
+- **Блокеры / решения:** требуется только явный visual approval пользователя; Telegram WebView/safe-area остаётся residual risk.
+- **Следующее точное действие:** принять пакет визуальных замечаний либо явный approval; product screens до этого не продолжать.
+
+### 2026-07-13 — DEC-025 / production UI-kit gate
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задач:** E0-D0-T04 `in_progress -> blocked`; E1-D1-T11 `backlog -> in_progress`.
+- **Причина:** статический reference UI-kit использовался только как tokens/fonts/icons, а `packages/ui` оставался пуст; consistency production screens не гарантировалась.
+- **Решение:** сначала создать/утвердить production components и `/ui-kit`, затем пересобрать Главную исключительно из утверждённого public API.
+- **Следующее точное действие:** реализовать T11 и остановиться на visual approval `/ui-kit`.
+
+### 2026-07-13 — DEC-024 / переход к интерактивным Next.js screen slices
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** E1-D1-T01 `backlog -> in_progress`; старый T04 scope superseded.
+- **Решение:** удалить только провальный generated T04, сохранить T00–T03, bootstrap реальный Next.js через npm workspaces, затем реализовывать по одному экрану + states; первой будет Главная S-MA-010.
+- **Roadmap:** DEC-012 superseded DEC-024; E0-D0-T05/T06 удалены; downstream UI cards получили `ui_slices` и per-ID approval contract.
+- **План:** `.temp/E0-D0-T04/next-interactive-plan.md`, Plan confidence 94%, Implementation confidence 91%; утверждён пользователем.
+- **T01 evidence:** root package/lockfile, 9 workspace manifests, `npm install` и `npm query .workspace` PASS; выполнен `in_progress -> review -> done`.
+- **T02 evidence:** `npm ci`, typecheck/lint/build/audit PASS; 24 browser runs; `.temp/E1-D1-T02/screenshots/**`; выполнен `in_progress -> review -> done`.
+- **T04 base evidence:** `apps/web/features/home/**`; `.temp/E0-D0-T04/screenshots/home-base-clean-{360-light,430-dark,1280-light}.png`; typecheck/lint/build и browser interaction checks PASS.
+- **Следующее точное действие:** показать base state пользователю и остановиться до feedback; никакого review-loop или следующего state заранее.
 
 ### 2026-07-13 — E0-D0-T03 / пользователь принял corrected UI-kit
 
@@ -210,7 +283,7 @@
 - **Результат:** добавлен этап 0 до разработки с обязательными user flows, wireframes, UI-kit, финальными макетами, интерактивным прототипом и явным approval.
 - **Изменённые файлы:** `docs/roadmap/README.md`, `DECISIONS.md`, `HANDOFF.md`, `stages/00-design.md`, `stages/01-foundation.md`, `docs/design/README.md`.
 - **Следующее действие:** начать E0-D0-T01 и сохранять артефакты в `docs/design/flows/`.
-- **Блокер разработки:** этапы 1–8 не начинать до approval E0-D0-T06.
+- **Исторический блокер:** этапы 1–8 не начинать до approval E0-D0-T06 — superseded решением DEC-024 от 2026-07-13.
 
 ### 2026-07-13 — Инициализация roadmap
 
