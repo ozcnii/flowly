@@ -1,6 +1,7 @@
 # Temporary and generated agent artifacts
 .temp/
 .playwright-mcp/
+.pi-subagents/
 
 # Dependencies
 node_modules/

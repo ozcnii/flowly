@@ -20,6 +20,14 @@
   "observability": {
     "enabled": true
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "flowly-db",
+      "database_id": "local",
+      "migrations_dir": "../../migrations"
+    }
+  ],
   "env": {
     "test": {
       "name": "flowly-web-test",

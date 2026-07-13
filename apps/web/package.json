@@ -14,6 +14,8 @@
     "deploy:test": "opennextjs-cloudflare build && opennextjs-cloudflare deploy --env test",
     "deploy:production": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "cf-typegen": "wrangler types --env test --env-interface CloudflareEnv --include-runtime false .wrangler/cloudflare-env.d.ts",
+    "db:migrate": "wrangler d1 migrations apply flowly-db --local",
+    "db:reset": "node scripts/db-reset-local.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint ."
   },

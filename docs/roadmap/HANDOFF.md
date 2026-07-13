@@ -6,9 +6,9 @@
 
 - **Обновлено:** 2026-07-13
 - **Текущий этап:** 1. Основа
-- **Активная задача:** нет
-- **Статус:** E1-D1-T03, E0-D0-T04 и E1-D1-T11 done
-- **Последний завершённый результат:** E1-D1-T03 закрыта; `flowly-scheduler-test` и `flowly-web-test` развернуты на `getflowly.workers.dev`, remote Chromium smoke PASS
+- **Активная задача:** нет; E1-D1-T04 закрыта
+- **Статус:** E1-D1-T04 done (D1 + Drizzle + миграции). E1-D1-T03, E0-D0-T04, E1-D1-T11 тоже done.
+- **Последний завершённый результат:** E1-D1-T04 закрыта — `@flowly/database` (Drizzle), миграции `0000_foundation` + `0001_token_hash_unique`, local D1 binding, команды `db:*`; comprehensive verification PASS (typecheck/lint/build/deploy:check), deep review 0 багов.
 
 ## Что сделано
 
@@ -33,9 +33,8 @@
 
 ## Что делать следующим
 
-1. Выбрать следующую foundation-карточку.
-2. Перед работой прочитать её dependencies/decisions/PRD refs и синхронизировать статус по обязательному workflow.
-3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
+1. Выбрать следующую foundation-карточку: E1-D1-T05 (R2) или E1-D1-T06 (Telegram auth/sessions, теперь разблокирована T04).
+2. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
 
@@ -84,6 +83,46 @@ Roadmap migration / bootstrap verification:
 - [x] remote Chromium: scheduler `/health`, web `/`, web `/ui-kit` = 200; production Workers untouched.
 
 ## Журнал handoff
+
+### 2026-07-13 — E1-D1-T04 done
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** `review -> done`; автотесты для T04 не добавлялись (политика тестов смягчена, но пользователь решил, что ручная comprehensive verification достаточна).
+- **Comprehensive verification (по запросу пользователя «проверь всё целиком»):** `npm ci` / typecheck / lint / `next build` / `deploy:check` (OpenNext + wrangler dry-run `--env test`) — все PASS. Закрыло прежний residual #7 (build/deploy теперь реально запущены). Зафиксировано ожидаемое wrangler-warning: `d1_databases` на top-level, но не в `env.test` — нормально для local-only scope; добавляется при создании test D1 (отдельный scope, без фейковых `database_id`).
+- **AGENTS.md (проект):** политика тестов обновлена — автотесты разрешены, но только полезные на реальный функционал, не бойлерплейт.
+- **Итог по T04:** `@flowly/database` (Drizzle schema 3 таблиц + client + drizzle.config); миграции `0000_foundation.sql` + `0001_token_hash_unique.sql`; D1 binding `DB` в `apps/web/wrangler.jsonc` (local-only); root/web `db:*` скрипты; README rollback/forward; DEC-027 nullability-контракт; deep review 0 багов. T06/T08/T10 разблокированы.
+- **Следующее точное действие:** выбрать E1-D1-T05 (R2) или E1-D1-T06 (Telegram auth/sessions).
+
+### 2026-07-13 — E1-D1-T04 / deep review пройден, fixes применены
+
+- **От кого / кому:** субагент (reviewer, fresh context) → AI agent → пользователь / следующий агент.
+- **Статус задачи:** `review`; deep review завершён, post-review fixes применены, ждёт `review -> done`.
+- **Deep review:** 0 багов; подтверждено schema↔PRD §43.1–43.3 (1:1), конвенции, FK CASCADE + orphan-reject (проверено эмпирически на local D1), `db:generate` идемпотентен, `db:reset`→`db:migrate` чистый, local-only scope, пиннинг, pattern-консистентность, roadmap sync.
+- **Закрытые находки (по решению пользователя):** (1) `auth_sessions.token_hash` → UNIQUE — правка `schema.ts`, миграция `0001_token_hash_unique.sql`, forward-apply и dup-insert reject проверены. (2) nullability/types-контракт 3 foundation-таблиц зафиксирован в DEC-027 (approved), слинкован с E1-D1-T06/T10. (3) residual-risk #2 смяггчён: FK enforcement активен в local D1 (проверено), production подтвердить downstream.
+- **Проверки:** typecheck/lint PASS; `git diff --check` CLEAN; secret scan 0; evidence `.temp/E1-D1-T04/evidence/schema-snapshot.json` обновлён (включает `auth_sessions_token_hash_unique`).
+- **Изменённые артефакты:** `packages/database/src/schema.ts`, `migrations/0001_token_hash_unique.sql` + meta, `docs/roadmap/DECISIONS.md` (DEC-027), `docs/roadmap/stages/01-foundation.md` (T04/T06/T10 decisions + journal), `docs/roadmap/HANDOFF.md`, `README.md`.
+- **Следующее точное действие:** пользователь решает `review -> done`.
+
+### 2026-07-13 — E1-D1-T04 / реализована, переведена в review
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** `in_progress -> review`; deep review ждёт решения пользователя.
+- **Сделано:** `@flowly/database` (Drizzle schema 3 foundation-таблиц + `createDatabase` client + `drizzle.config`); миграция `migrations/0000_foundation.sql` (flat-layout) + `migrations/meta/`; D1 binding `DB` в `apps/web/wrangler.jsonc` (local-only, `migrations_dir: ../../migrations`); `apps/web/scripts/db-reset-local.mjs`; root `db:generate`/`db:migrate`/`db:reset`/`db:seed` скрипты; README — раздел «Database (D1) и миграции» с rollback/forward procedure и schema-конвенциями.
+- **Schema-конвенции (утверждены):** id = TEXT UUIDv7 (app-side), timestamps = TEXT ISO-8601 UTC, local dates `YYYY-MM-DD`, local times `HH:MM`, bool = integer 0/1, enums = text+Zod; FK ON DELETE CASCADE; `users.telegram_id` UNIQUE, `auth_sessions.token_hash` index.
+- **Проверки и результаты:** clean `npm install`; `npm run typecheck`/`lint` PASS во всех workspaces; `db:generate` идемпотентен («No schema changes»); `db:reset`→`db:migrate` PASS (6 команд, `0000_foundation.sql` ✅); повторный `db:migrate` = «No migrations to apply!»; `.schema` snapshot — ровно `users`/`user_settings`/`auth_sessions`; `git diff --check` PASS; candidate-file secret scan 0. Risk-first: wrangler корректно резолвит `../../migrations` из apps/web без `migrations_pattern` (flat layout drizzle-kit 0.31.10).
+- **Evidence:** `.temp/E1-D1-T04/evidence/schema-snapshot.json`, `.temp/E1-D1-T04/plan.md`.
+- **Residual risks:** 4 moderate npm audit (esbuild dev-server advisory via drizzle-kit devDep, не применима к `generate`, override ломает tree — принято); FK enforcement активен в локальной D1 (проверено: orphan-INSERT отвергнут, CASCADE сработал), production подтвердить downstream (T06+); `default_reminder_policy_id` FK — этап 3; UUIDv7 app-side; OpenNext `getRequestContext().env.DB` не проверялся (downstream T06); scheduler D1 binding — этап 3; `next build` не запускался (D1 binding не влияет на него).
+- **Следующее точное действие:** пользователь решает по deep review; затем `review -> done`.
+
+### 2026-07-13 — E1-D1-T04 / deep plan готов, ждёт approval
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** `backlog -> in_progress`; код/deploy до approval не пишется.
+- **Решено (4 развилки):** migration workflow = Drizzle Kit (TS schema → `generate` → SQL → `wrangler d1 migrations apply --local`); scope = 3 foundation-таблицы (`users`, `user_settings`, `auth_sessions`); D1 окружение = local-only; plan-файл создан.
+- **Проверено:** изучены PRD §41/§43/§49.1–49.3, текущие `packages/database` (пусто), `migrations/seeds/scripts` (`.gitkeep`), root `package.json` (скрипты `db:*` уже заданы), web/scheduler wrangler.jsonc (D1 binding отсутствует), DEC-006/007/008/010/011 (блокируют только этап 8). Pinned: drizzle-orm 0.45.2, drizzle-kit 0.31.10, wrangler 4.110.0, Node ≥22. Подтверждён canonical workflow из Drizzle D1 get-started и Cloudflare D1 migrations docs.
+- **Plan:** [`.temp/E1-D1-T04/plan.md`](../../.temp/E1-D1-T04/plan.md); Plan confidence 92%, Implementation confidence 88%. Главный риск — поведение wrangler с `../` в migrations_dir/pattern (risk-first шаг).
+- **Изменённые артефакты:** `.temp/E1-D1-T04/plan.md`, `docs/roadmap/stages/01-foundation.md`, `docs/roadmap/README.md`, `docs/roadmap/HANDOFF.md`.
+- **Следующее точное действие:** пользователь утверждает/корректирует schema-конвенции (§5) и план целиком; затем risk-first верификация wrangler migrations path и реализация.
 
 ### 2026-07-13 — E1-D1-T03 done
 

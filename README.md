@@ -85,4 +85,29 @@ npm run deploy:test
 
 Фиктивные D1/R2 IDs и production secrets в репозиторий не добавляются. Secrets устанавливаются отдельно для каждого environment через Wrangler/Cloudflare dashboard.
 
+## Database (D1) и миграции
+
+База данных — Cloudflare D1 (SQLite). ORM — Drizzle, миграции — SQL, источник истины — TypeScript-схема в `packages/database/src/schema.ts`. E1-D1-T04 покрывает только foundation-таблицы (`users`, `user_settings`, `auth_sessions`); остальные таблицы добавляются по этапам.
+
+D1 binding (`DB`) объявлен в `apps/web/wrangler.jsonc` для локального окружения; миграции лежат в корневом `migrations/` и применяются в локальную (miniflare) D1. Реальные test/production D1 не создаются (local-only scope).
+
+Команды (из root):
+
+```bash
+npm run db:generate     # сгенерировать SQL-миграцию из TS-схемы (drizzle-kit generate)
+npm run db:migrate       # применить миграции в локальную D1 (wrangler d1 migrations apply --local)
+npm run db:reset         # очистить локальную D1 и заново применить все миграции
+npm run db:seed          # seed (реализуется в E1-D1-T08)
+```
+
+Чтобы добавить таблицу/колонку: отредактируйте `packages/database/src/schema.ts`, запустите `npm run db:generate -- --name <описание>`, проверьте сгенерированный SQL в `migrations/`, затем `npm run db:migrate`.
+
+Rollback / forward:
+
+- D1-миграции forward-only: `db:migrate` применяет новые миграции последовательно, `d1_migrations` хранит применённые.
+- Rollback выполняется новой миграцией, обращающей предыдущую (drop/revert). Руками удалять строки из `d1_migrations` не нужно.
+- Полный пересбор локальной БД: `npm run db:reset`.
+
+Schema-конвенции (все 31 таблицы): id = `text` (UUIDv7 app-side), timestamps = `text` ISO-8601 UTC, local dates = `text YYYY-MM-DD`, local times = `text HH:MM`, bool = `integer 0/1`, enums = `text` + Zod-валидация. FK объявлены с `ON DELETE CASCADE`; enforcement активен в локальной D1 (miniflare, проверено: orphan-INSERT отвергнут, CASCADE сработал) — production D1 подтвердить downstream (T06+).
+
 Актуальная реализация и следующий шаг указаны в [HANDOFF](docs/roadmap/HANDOFF.md).

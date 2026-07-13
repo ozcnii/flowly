@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 7 | 0 | 0 | 0 | 4 |
+| 6 | 0 | 0 | 0 | 5 |
 
 ## Зависимости и границы
 
@@ -66,12 +66,15 @@
 
 ### E1-D1-T04 — Подключить D1 и миграции
 
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
+- **status:** done · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-13
 - **prd_refs:** §41, §43, §49.2–49.3
-- **depends_on:** E1-D1-T01
+- **depends_on:** E1-D1-T01 · **decisions:** DEC-011, DEC-026, DEC-027 (не блокируют; operational DEC-006/007/008/010/011 относятся к этапу 8)
 - **scope:** DB package, migration workflow и начальная схема для foundation-сущностей; остальные таблицы добавляются по этапам.
-- **acceptance:** [ ] миграции повторяемы; [ ] local/test DB разделены; [ ] rollback/forward procedure документирована; [ ] schema соответствует реализуемому scope PRD.
-- **validation/evidence:** migration output и schema snapshot.
+- **acceptance:** [x] миграции повторяемы (`db:reset`+`db:migrate` дают идентичный `.schema`; `db:generate` идемпотентен «No schema changes»); [x] local/test DB разделены (local-only miniflare state в `apps/web/.wrangler/state/v3/d1`; реальные test/prod D1 не создаются; separation documented); [x] rollback/forward procedure документирована (README: forward = apply новых миграций, rollback = новая reverse-миграция, полный пересбор через `db:reset`); [x] schema соответствует реализуемому scope PRD (3 таблицы = §43.1–43.3; snapshot evidence).
+- **validation/evidence:** `packages/database/{package.json,tsconfig.json,eslint.config.mjs,drizzle.config.ts,src/{schema,client,index}.ts}`; миграции `migrations/0000_foundation.sql` + `migrations/0001_token_hash_unique.sql` + `migrations/meta/`; D1 binding в `apps/web/wrangler.jsonc` (`DB`, `database_name: flowly-db`, local `database_id`, `migrations_dir: ../../migrations`); `apps/web/scripts/db-reset-local.mjs`; root `package.json` db-скрипты. Clean `npm install`; `npm run typecheck`/`lint` PASS во всех workspaces; `db:generate` идемпотентен; `db:reset`→`db:migrate` PASS (6 команд, `0000_foundation.sql` ✅); повторный `db:migrate` = «No migrations to apply!»; schema snapshot `.temp/E1-D1-T04/evidence/schema-snapshot.json` — ровно `users`/`user_settings`/`auth_sessions` + `users_telegram_id_unique` + `auth_sessions_token_hash_unique` (UNIQUE, проверено dup-insert reject) + FK ON DELETE CASCADE; `git diff --check` PASS; candidate-file secret scan 0; независимый deep review PASS (0 багов; findings закрыты: `token_hash`→UNIQUE, DEC-027 nullability-контракт).
+- **residual risks:** (1) 4 moderate npm audit — esbuild dev-server advisory (GHSA-67mh-4wv8-2f99) через legacy `@esbuild-kit` в devDep drizzle-kit; не применима к офлайн `drizzle-kit generate`; override esbuild создаёт invalid tree, даунгрейд drizzle-kit до 0.18.1 ломает API — принято как dev-only residual. (2) FK enforcement активен в локальной D1 (miniflare, проверено: orphan-INSERT отвергнут, CASCADE сработал); production D1 подтвердить downstream (T06+). (3) `user_settings.default_reminder_policy_id` — FK добавляется этапом 3. (4) id = UUIDv7 app-side; downstream-inserts обязаны передавать id. (5) OpenNext `getRequestContext().env.DB` не проверялся в T04 (downstream T06). (6) scheduler D1 binding — этап 3. (7) `next build` и OpenNext `deploy:check` запущены при comprehensive verification — PASS (next build compiled успешно, OpenNext worker 4711.05 KiB / gzip 981.22 KiB, wrangler dry-run `--env test` OK). Замечание wrangler: `d1_databases` объявлен на top-level, но не в `env.test` (environments не наследуют) — ожидаемо для local-only scope; добавляется в `env.test` при создании test D1 (отдельный scope, фейковые `database_id` не добавляются).
+- **plan:** [`.temp/E1-D1-T04/plan.md`](../../../.temp/E1-D1-T04/plan.md) — Drizzle Kit, 3 таблицы, local-only D1; Plan confidence 92%, Implementation confidence 88%; утверждён пользователем 2026-07-13 (TEXT UUIDv7, TEXT ISO-8601).
+- **journal:** 2026-07-13 — пользователь выбрал E1-D1-T04 следующей foundation-задачей; `backlog -> in_progress`; закрыты 4 развилки (Drizzle Kit / 3 таблицы / local-only / plan-файл); deep plan готов. 2026-07-13 — план утверждён (UUIDv7, ISO-8601); реализация: `@flowly/database` (Drizzle schema + client + drizzle.config), flat-layout миграция `0000_foundation.sql`, D1 binding в `apps/web/wrangler.jsonc`, root/web db-скрипты, README rollback/forward. Risk-first: wrangler корректно резолвит `../../migrations` из apps/web (flat, без `migrations_pattern`). Проверки PASS; `in_progress -> review`. 2026-07-13 — независимый deep review (субагент, fresh context): 0 багов; FK CASCADE и orphan-reject проверены эмпирически на local D1; residual-risk #2 смяггчён (FK активен в local). Закрыты 2 находки по решению пользователя: `auth_sessions.token_hash` → UNIQUE (миграция `0001_token_hash_unique.sql`, forward-apply и dup-reject проверены); nullability/types-контракт 3 таблиц зафиксирован в DEC-027 и слинкован с T06/T10. 2026-07-13 — comprehensive verification по запросу пользователя: `npm ci`/typecheck/lint/`next build`/`deploy:check` PASS (включая OpenNext + wrangler dry-run `--env test`); зафиксировано ожидаемое wrangler-warning про `d1_databases` вне `env.test` (local-only). AGENTS.md: политика тестов смягчена — автотесты разрешены, но только полезные на реальный функционал. Состояние — `review`, ждёт решения `review -> done`. 2026-07-13 — пользователь решил закрыть без автотестов (политика тестов в AGENTS.md смягчена: автотесты разрешены, но только полезные на реальный функционал; для T04 ручная comprehensive verification достаточна); `review -> done`.
 
 ### E1-D1-T05 — Подключить R2
 
@@ -86,7 +89,7 @@
 
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
 - **prd_refs:** §10.2–10.3, §43.1–43.3, §44.1, §47.1, §55.1
-- **depends_on:** E1-D1-T02, E1-D1-T04 · **decisions:** DEC-013, DEC-014, DEC-022, DEC-024, DEC-025
+- **depends_on:** E1-D1-T02, E1-D1-T04 · **decisions:** DEC-013, DEC-014, DEC-022, DEC-024, DEC-025, DEC-027
 - **ui_slices:** S-MA-001, S-MA-002, S-MA-003, S-MA-004, S-MA-005, S-MA-006, S-WEB-001, S-WEB-002 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** проверка Telegram init data, создание пользователя/сессии, onboarding и безопасные browser/deep-link recovery states; bot command surfaces остаются этапу 5.
 - **acceptance:** [ ] пароль не требуется; [ ] подпись и freshness проверяются; [ ] сессия безопасна; [ ] вне Telegram показано корректное состояние.
@@ -122,7 +125,7 @@
 ### E1-D1-T10 — Реализовать профиль, настройки профиля и справку
 
 - **status:** backlog · **priority:** normal · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §9, §10.1, §38.1, §55.1 · **depends_on:** E1-D1-T06, E1-D1-T08 · **decisions:** DEC-013, DEC-020, DEC-022, DEC-024, DEC-025
+- **prd_refs:** §9, §10.1, §38.1, §55.1 · **depends_on:** E1-D1-T06, E1-D1-T08 · **decisions:** DEC-013, DEC-020, DEC-022, DEC-024, DEC-025, DEC-027
 - **ui_slices:** S-MA-080, S-MA-090, S-MA-096 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** профиль Flowly, отдельное от Telegram редактирование имени/фото/timezone/preferences и help/status; data lifecycle/notification settings остаются своим downstream cards.
 - **acceptance:** [ ] avatar entry ведёт в профиль; [ ] Flowly identity редактируется отдельно от Telegram; [ ] contextual states и help recovery покрыты; [ ] каждый screen ID утверждён отдельно.

@@ -182,6 +182,19 @@
 - **PRD:** §41.1–41.4, §49.
 - **Влияет на:** E1-D1-T03, test Worker URLs и deployment evidence.
 
+### DEC-027 — Nullability/types-контракт foundation-таблиц
+
+- **Статус:** approved
+- **Дата:** 2026-07-13
+- **Решение:** зафиксировать SQL-типы и nullability для foundation-таблиц E1-D1-T04 (`users`, `user_settings`, `auth_sessions`), поскольку PRD §43.1–43.3 задаёт только имена полей. Контракт:
+  - **users** — `id` (text PK, UUIDv7 app-side), `telegram_id` (text NOT NULL UNIQUE), `username` (text nullable), `first_name` (text NOT NULL), `last_name` (text nullable), `photo_url` (text nullable), `timezone` (text NOT NULL), `week_starts_on` (integer NOT NULL, 0–6, 0=Sunday), `locale` (text NOT NULL), `created_at`/`updated_at` (text NOT NULL ISO-8601 UTC), `deleted_at` (text nullable, soft-delete).
+  - **user_settings** — `user_id` (text PK, FK→`users.id` ON DELETE CASCADE), `quiet_hours_start`/`quiet_hours_end` (text nullable HH:MM), `quiet_hours_behavior` (text nullable), `default_reminder_policy_id` (text nullable; FK добавляется этапом 3), `weekly_report_enabled`/`monthly_report_enabled`/`friend_notifications_enabled`/`partner_reminders_enabled` (integer NOT NULL, bool 0/1), `weekly_report_day` (integer nullable 0–6), `weekly_report_time` (text nullable HH:MM).
+  - **auth_sessions** — `id` (text PK, UUIDv7 app-side), `user_id` (text NOT NULL FK→`users.id` ON DELETE CASCADE), `token_hash` (text NOT NULL UNIQUE), `expires_at`/`last_used_at`/`created_at` (text NOT NULL ISO-8601 UTC).
+  - Общие типы: id = text UUIDv7 (генерация app-side, D1 не имеет нативной UUID-функции); timestamps = text ISO-8601 UTC; bool = integer 0/1; enums = text + app-side Zod-валидация; FK = `ON DELETE CASCADE` (users использует soft-delete, CASCADE — safety net для hard-DELETE).
+- **Основание:** PRD не задаёт SQL-типы/nullability; явный контракт нужен T06 (insert user/session) и T10 (profile/settings) для корректной insert-логики, чтобы не выводить ограничения из кода. Выявлено независимым deep review E1-D1-T04.
+- **PRD:** §43.1–43.3, §41.1.
+- **Влияет на:** E1-D1-T04, E1-D1-T06, E1-D1-T10.
+
 ## Открытые решения
 
 ### DEC-006 — Operational thresholds
