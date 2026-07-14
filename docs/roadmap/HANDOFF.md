@@ -6,9 +6,9 @@
 
 - **Обновлено:** 2026-07-14
 - **Текущий этап:** 1. Основа
-- **Активная задача:** E1-D1-T10 (profile/help) — последняя foundation-задача.
-- **Статус:** **T09 done** (deep review PASS). Foundation осталось: T10 (profile/help).
-- **Последний завершённый результат:** E1-D1-T09 done — security gate (HSTS + headers/CSP dev-aware + size limit 413 + audit + evidence report §55.1/§47.1).
+- **Активная задача:** E1-D1-T10 (profile/help) — `in_progress`; slice **S-MA-080** (profile hub) preview, ждёт approval.
+- **Статус:** T10 в работе (3 slice: S-MA-080 hub / S-MA-090 settings / S-MA-096 help). S-MA-080 готов.
+- **Последний завершённый результат:** E1-D1-T10 / S-MA-080 — Profile hub (`features/profile/ui/profile-hub-screen.tsx`, `?screen=profile`); overflow 0, таргеты ≥44px.
 
 ## Что сделано
 
@@ -33,8 +33,8 @@
 
 ## Что делать следующим
 
-1. E1-D1-T10 (profile/help): deep plan → approval → UI slice S-MA-080/090/096 + contextual states/help; профиль Flowly separately от Telegram (DEC-020).
-2. После T10 — этап 1 закрыт полностью (10/11 + T11 done); переход к этапу 2 «Йога».
+1. E1-D1-T10: approval **S-MA-080** (profile hub) → S-MA-090 (settings, DEC-020) → S-MA-096 (help).
+2. После T10 — этап 1 закрыт полностью; переход к этапу 2 «Йога».
 3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
@@ -205,6 +205,15 @@ Roadmap migration / bootstrap verification:
 - **От кого / кому:** пользователь + субагент-reviewer → AI agent / следующий агент.
 - **Статус задачи:** T09 `review -> done` (deep review PASS gate, 0 багов; закрыты HSTS/X-Frame-DENY/me.patch-audit; W1 unsafe-inline + nonce-CSP — residual этап 8). Следующая (последняя foundation) — E1-D1-T10 (profile/help).
 - **Следующее точное действие:** deep plan E1-D1-T10.
+
+### 2026-07-14 — E1-D1-T10 / Slice S-MA-080 (profile hub) preview
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** T10 `backlog -> in_progress`; S-MA-080 — preview, ждёт approval.
+- **Сделано:** `features/profile/ui/profile-hub-screen.{tsx,module.css}`, route `?screen=profile` в `app/page.tsx`. P-COLLECTION-READ (§9, §38; DEC-013/020): header (Flowly name + Telegram read-only badge) + 9 секций с честным stage-mapping (friends/challenges→7, favorites→2, reports→6, settings→S-MA-090, notifications→5, export/delete→8, help→S-MA-096); hub только навигирует.
+- **Проверки:** typecheck/lint PASS; 430 light/dark: overflow 0, таргеты ≥44px, 0 console errors.
+- **Evidence:** `.temp/E1-D1-T10/screenshots/sma080-profile-430-{light,dark}.png`.
+- **Следующее точное действие:** approval S-MA-080 → S-MA-090 (settings).
 
 ### 2026-07-13 — E1-D1-T06 / Slice S-MA-004 preview implemented
 

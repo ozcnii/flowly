@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 1 | 0 | 0 | 0 | 10 |
+| 0 | 1 | 0 | 0 | 10 |
 
 ## Зависимости и границы
 
@@ -146,12 +146,13 @@
 
 ### E1-D1-T10 — Реализовать профиль, настройки профиля и справку
 
-- **status:** backlog · **priority:** normal · **owner:** unassigned · **updated:** 2026-07-13
+- **status:** in_progress · **priority:** normal · **owner:** AI agent · **updated:** 2026-07-14
 - **prd_refs:** §9, §10.1, §38.1, §55.1 · **depends_on:** E1-D1-T06, E1-D1-T08 · **decisions:** DEC-013, DEC-020, DEC-022, DEC-024, DEC-025, DEC-027
 - **ui_slices:** S-MA-080, S-MA-090, S-MA-096 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** профиль Flowly, отдельное от Telegram редактирование имени/фото/timezone/preferences и help/status; data lifecycle/notification settings остаются своим downstream cards.
 - **acceptance:** [ ] avatar entry ведёт в профиль; [ ] Flowly identity редактируется отдельно от Telegram; [ ] contextual states и help recovery покрыты; [ ] каждый screen ID утверждён отдельно.
 - **validation/evidence:** typed scenarios, screenshots/browser interactions, API evidence при наличии и дословный approval каждого ID.
+- **journal:** 2026-07-14 — `backlog -> in_progress`. 2026-07-14 — **Slice S-MA-080 (profile hub) implemented (preview only)**: `features/profile/ui/profile-hub-screen.{tsx,module.css}`, route `?screen=profile`. P-COLLECTION-READ (§9, §38; DEC-013/020): header (Flowly name + Telegram read-only badge; DEC-020 — name/photo отдельно) + 9 секций с честным stage-mapping; hub только навигирует. typecheck/lint PASS; 430 light/dark: overflow 0, таргеты ≥44px, 0 console errors. Evidence: `.temp/E1-D1-T10/screenshots/sma080-profile-430-{light,dark}.png`. Ждёт approval → S-MA-090.
 
 ### E1-D1-T11 — Создать и утвердить production UI-kit
 
