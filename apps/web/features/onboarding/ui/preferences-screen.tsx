@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Button, Icon, Select, type SelectOption } from "@flowly/ui";
+import { usePatchMeMutation } from "@/features/profile/model/me-queries";
 import styles from "./preferences-screen.module.css";
 
 const WEEK_STARTS = [
@@ -165,6 +166,7 @@ export function PreferencesScreen() {
   const [days, setDays] = useState<Set<string>>(new Set());
   const [times, setTimes] = useState<Set<string>>(new Set());
   const [notice, setNotice] = useState("");
+  const patchMe = usePatchMeMutation();
 
   const toggle = (set: Set<string>, value: string, update: (next: Set<string>) => void) => {
     const next = new Set(set);
@@ -176,12 +178,7 @@ export function PreferencesScreen() {
   const next = async () => {
     setNotice("Сохраняем настройки…");
     try {
-      await fetch("/api/v1/me", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
-        body: JSON.stringify({ timezone, weekStartsOn }),
-      });
+      await patchMe.mutateAsync({ timezone, weekStartsOn });
     } catch {
       // best-effort in dev preview; real persistence is verified via curl
     }

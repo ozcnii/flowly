@@ -8,7 +8,7 @@ import styles from "./profile-hub-screen.module.css";
 /**
  * S-MA-080 — Profile hub (F10/F11, §9, §38; DEC-013, DEC-020, DEC-022 P-COLLECTION-READ).
  * Opened via avatar from Home. Read-only hub: navigates to child surfaces; mutations
- * happen there. Flowly name/photo are edited separately from Telegram identity (DEC-020).
+ * happen there. Flowly name is edited separately; avatar is refreshed from Telegram.
  *
  * Dev-only preview (DEC-024): `?screen=profile`. Section targets land per stage
  * (friends/challenges→7, favorites→2, reports→6, export/delete→8/F11; settings→S-MA-090,
@@ -61,7 +61,6 @@ export function ProfileHubScreen() {
         <div className={styles.id}>
           <h1 className={styles.name}>Анна</h1>
           <p className={styles.sub}>
-            <span className={styles.tgBadge}>Telegram</span>
             <span className={styles.tgName}>@anna_flowly</span>
           </p>
         </div>
@@ -71,7 +70,7 @@ export function ProfileHubScreen() {
       </header>
 
       <p className={styles.note} aria-live="polite">
-        {notice || "Имя и фото Flowly редактируются отдельно от профиля Telegram."}
+        {notice || "Имя Flowly редактируется отдельно. Фото берём из актуального профиля Telegram."}
       </p>
 
       <nav className={styles.list} aria-label="Разделы профиля">

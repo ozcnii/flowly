@@ -29,7 +29,7 @@ export function AppShell({ activeTab, scenario, showScenario, stateLabel, immers
           <Image src="/brand/flowly-icon.svg" alt="" width={44} height={44} priority />
           <span>Flowly</span>
         </Link>
-        <Link href="/?section=profile" aria-label="Открыть профиль" className="grid size-11 place-items-center rounded-full border border-border bg-surface font-semibold no-underline">А</Link>
+        <Link href="/?screen=profile" aria-label="Открыть профиль" className="grid size-11 place-items-center rounded-full border border-border bg-surface font-semibold no-underline">А</Link>
       </header>}
 
       {scenario === "offline" && <OfflineBanner icon={<Icon name="wifi-off" />}>Офлайн: серверные изменения пока недоступны</OfflineBanner>}

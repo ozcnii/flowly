@@ -98,6 +98,8 @@ npm run db:generate     # сгенерировать SQL-миграцию из T
 npm run db:migrate       # применить миграции в локальную D1 (wrangler d1 migrations apply --local)
 npm run db:reset         # очистить локальную D1 и заново применить все миграции
 npm run db:seed          # test-пользователи (local only; INSERT OR IGNORE, идемпотентный)
+npm run catalog:build-seed # проверить JSON стартового каталога и сгенерировать SQL seed
+npm run db:seed:catalog  # стартовый каталог йоги (local only; UPSERT, идемпотентный)
 ```
 
 Чтобы добавить таблицу/колонку: отредактируйте `packages/database/src/schema.ts`, запустите `npm run db:generate -- --name <описание>`, проверьте сгенерированный SQL в `migrations/`, затем `npm run db:migrate`.
@@ -110,7 +112,9 @@ Rollback / forward:
 
 Schema-конвенции (все 31 таблицы): id = `text` (UUIDv7 app-side), timestamps = `text` ISO-8601 UTC, local dates = `text YYYY-MM-DD`, local times = `text HH:MM`, bool = `integer 0/1`, enums = `text` + Zod-валидация. FK объявлены с `ON DELETE CASCADE`; enforcement активен в локальной D1 (miniflare, проверено: orphan-INSERT отвергнут, CASCADE сработал) — production D1 подтвердить downstream (T06+).
 
-Seed (`seeds/0001_test_users.sql`, E1-D1-T08): 4 test-пользователя (владелец/девушка/2 друга) + `user_settings`, `INSERT OR IGNORE` (идемпотентно), local D1 only (`db:seed` ≡ `wrangler d1 execute --local`; production-запуск запрещён). Полный seed §49.5 (тренировки/программы/привычки/история/челлендж) добавляется по этапам 2–4, когда появляются соответствующие таблицы.
+Seed users (`seeds/0001_test_users.sql`, E1-D1-T08): 4 test-пользователя (владелец/девушка/2 друга) + `user_settings`, `INSERT OR IGNORE` (идемпотентно), local D1 only (`db:seed` ≡ `wrangler d1 execute --local`; production-запуск запрещён).
+
+Starter catalog (`seeds/catalog/starter-catalog.v1.json` → `seeds/0002_starter_catalog.sql`, E2-D2-T01): широкий каталог DEC-010 — 10 категорий, 20 тренировок, 60 упражнений. `catalog:build-seed` валидирует JSON и генерирует SQL; `db:seed:catalog` применяет local-only UPSERT seed. Качество каталога подтверждает пользователь по checklist перед `done`.
 
 ## Storage (R2)
 
@@ -130,7 +134,7 @@ Adapter — `@flowly/storage`: `createStorage(bucket): StorageAdapter` с мет
 - `POST /api/v1/auth/telegram` — проверка подписи initData (HMAC-SHA256, алгоритм Telegram) + freshness `auth_date` (24ч) → find/create user + сессия → HttpOnly+Secure cookie.
 - `POST /api/v1/auth/logout` — уничтожение сессии, очистка cookie.
 - `GET /api/v1/me` — текущий пользователь (требует сессию).
-- `PATCH /api/v1/me` — onboarding-поля (timezone, locale, week_starts_on); полный профиль/имя/фото → T10 (DEC-020).
+- `PATCH /api/v1/me` — timezone/locale/week start и Flowly name (`firstName`); avatar не редактируется в Flowly, `photoUrl` берётся из Telegram на re-auth (DEC-020).
 
 Безопасность: cookie `__Host-flowly-session` (HttpOnly+Secure+SameSite=Lax), raw token не хранится (в БД — SHA-256 hash, UNIQUE), CSRF — проверка `Origin`, sliding session TTL 30д, Zod-валидация, minimal rate limit (production-grade → этап 8 / DEC-007), bot-токен только в Cloudflare secret.
 

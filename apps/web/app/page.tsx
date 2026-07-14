@@ -12,6 +12,12 @@ import { DeepLinkRecoveryScreen } from "@/features/recovery/ui/deep-link-recover
 import { OpenViaTelegramScreen } from "@/features/web-fallback/ui/open-via-telegram-screen";
 import { UnavailableDeepLinkScreen } from "@/features/web-fallback/ui/unavailable-deep-link-screen";
 import { ProfileHubScreen } from "@/features/profile/ui/profile-hub-screen";
+import { ProfileSettingsScreen } from "@/features/profile/ui/profile-settings-screen";
+import { HelpScreen } from "@/features/profile/ui/help-screen";
+import { CatalogScreen } from "@/features/catalog/ui/catalog-screen";
+import { WorkoutDetailScreen } from "@/features/workout-detail/ui/workout-detail-screen";
+import { AuthorProfileScreen } from "@/features/workout-author/ui/author-profile-screen";
+import { UgcSafetyScreen } from "@/features/ugc-safety/ui/ugc-safety-screen";
 import { resolveShellScenario } from "@/lib/scenarios";
 
 type PageProps = { searchParams: Promise<Record<string, string | string[] | undefined>> };
@@ -42,8 +48,26 @@ export default async function Page({ searchParams }: PageProps) {
     if (params.web === "unavailable") return <UnavailableDeepLinkScreen />;
   }
 
-  if (process.env.NODE_ENV !== "production" && typeof params.screen === "string" && params.screen === "profile") {
-    return <ProfileHubScreen />;
+  if (process.env.NODE_ENV !== "production" && typeof params.screen === "string") {
+    if (params.screen === "profile") return <ProfileHubScreen />;
+    if (params.screen === "settings") return <ProfileSettingsScreen />;
+    if (params.screen === "help") return <HelpScreen />;
+    if (params.screen === "catalog") {
+      const forced = typeof params.catalog === "string" && ["loading", "empty", "error", "offline"].includes(params.catalog) ? params.catalog : null;
+      return <CatalogScreen forced={forced as "loading" | "empty" | "error" | "offline" | null} />;
+    }
+    if (params.screen === "workout") {
+      const forced = typeof params.workout === "string" && ["loading", "error", "offline", "hidden"].includes(params.workout) ? params.workout : null;
+      return <WorkoutDetailScreen id={typeof params.id === "string" ? params.id : ""} forced={forced as "loading" | "error" | "offline" | "hidden" | null} />;
+    }
+    if (params.screen === "author") {
+      const forced = typeof params.author === "string" && ["loading", "error", "empty", "blocked"].includes(params.author) ? params.author : null;
+      return <AuthorProfileScreen source={typeof params.source === "string" ? params.source : undefined} forced={forced as "loading" | "error" | "empty" | "blocked" | null} />;
+    }
+    if (params.screen === "ugc-safety") {
+      const forced = typeof params.safety === "string" && ["error", "success"].includes(params.safety) ? params.safety : null;
+      return <UgcSafetyScreen action={typeof params.action === "string" ? params.action : undefined} forced={forced as "error" | "success" | null} />;
+    }
   }
 
   return (

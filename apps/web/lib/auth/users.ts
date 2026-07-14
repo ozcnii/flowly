@@ -47,8 +47,8 @@ export async function getUser(db: Database, userId: string) {
 
 /**
  * Find an existing user by Telegram id, or create user + default settings.
- * Per DEC-020, Flowly identity is edited separately from Telegram, so we do not
- * overwrite existing fields on re-auth. Defaults satisfy DEC-027 NOT NULL fields;
+ * Per DEC-020, Flowly name is edited separately from Telegram, so we do not
+ * overwrite existing name fields on re-auth. Telegram username/avatar URL are refreshed;
  * onboarding (S-MA-003) lets the user refine timezone/locale/week start.
  */
 export async function findOrCreateUser(
@@ -60,7 +60,13 @@ export async function findOrCreateUser(
     .from(schema.users)
     .where(eq(schema.users.telegramId, String(tg.id)))
     .limit(1);
-  if (existing[0]) return { id: existing[0].id, isNew: false };
+  if (existing[0]) {
+    await db
+      .update(schema.users)
+      .set({ username: tg.username ?? null, photoUrl: tg.photo_url ?? null, updatedAt: nowIso() })
+      .where(eq(schema.users.id, existing[0].id));
+    return { id: existing[0].id, isNew: false };
+  }
 
   const id = generateId();
   const ts = nowIso();

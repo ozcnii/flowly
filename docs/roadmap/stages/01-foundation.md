@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 0 | 1 | 0 | 0 | 10 |
+| 0 | 0 | 0 | 0 | 11 |
 
 ## Зависимости и границы
 
@@ -24,7 +24,7 @@
 - По `DEC-024` каждый указанный `ui_slices` screen slice выполняется строго по одному ID в реальном `apps/web`; все states/интеракции и явный approval обязательны до следующего ID.
 - По `DEC-025` production UI-kit из `packages/ui` и его public API обязательны для всех screen slices; app-local дубли shared primitives запрещены.
 - UI реализует ровно пять вкладок; профиль открывается avatar с Главной; deep links проходят auth/access recovery (`DEC-013`).
-- Bot connection — обязательный onboarding gate (`DEC-014`); Flowly name/photo редактируются отдельно от Telegram (`DEC-020`).
+- Bot connection — обязательный onboarding gate (`DEC-014`); Flowly name редактируется отдельно от Telegram, avatar read-only из Telegram (`DEC-020`).
 - Shell/auth errors full-screen, module errors inline, mutation сохраняет ввод, offline поддерживает draft, loading использует skeleton (`DEC-022`).
 - Источник screen/state/flow contracts: [`docs/design/flows/`](../../design/flows/).
 
@@ -146,13 +146,13 @@
 
 ### E1-D1-T10 — Реализовать профиль, настройки профиля и справку
 
-- **status:** in_progress · **priority:** normal · **owner:** AI agent · **updated:** 2026-07-14
+- **status:** done · **priority:** normal · **owner:** AI agent · **updated:** 2026-07-14
 - **prd_refs:** §9, §10.1, §38.1, §55.1 · **depends_on:** E1-D1-T06, E1-D1-T08 · **decisions:** DEC-013, DEC-020, DEC-022, DEC-024, DEC-025, DEC-027
 - **ui_slices:** S-MA-080, S-MA-090, S-MA-096 — выполнять последовательно; approval каждого ID обязателен до следующего.
-- **scope:** профиль Flowly, отдельное от Telegram редактирование имени/фото/timezone/preferences и help/status; data lifecycle/notification settings остаются своим downstream cards.
-- **acceptance:** [ ] avatar entry ведёт в профиль; [ ] Flowly identity редактируется отдельно от Telegram; [ ] contextual states и help recovery покрыты; [ ] каждый screen ID утверждён отдельно.
-- **validation/evidence:** typed scenarios, screenshots/browser interactions, API evidence при наличии и дословный approval каждого ID.
-- **journal:** 2026-07-14 — `backlog -> in_progress`. 2026-07-14 — **Slice S-MA-080 (profile hub) implemented (preview only)**: `features/profile/ui/profile-hub-screen.{tsx,module.css}`, route `?screen=profile`. P-COLLECTION-READ (§9, §38; DEC-013/020): header (Flowly name + Telegram read-only badge; DEC-020 — name/photo отдельно) + 9 секций с честным stage-mapping; hub только навигирует. typecheck/lint PASS; 430 light/dark: overflow 0, таргеты ≥44px, 0 console errors. Evidence: `.temp/E1-D1-T10/screenshots/sma080-profile-430-{light,dark}.png`. Ждёт approval → S-MA-090.
+- **scope:** профиль Flowly, отдельное от Telegram редактирование имени/timezone/preferences и help/status; avatar read-only из Telegram; data lifecycle/notification settings остаются своим downstream cards.
+- **acceptance:** [x] avatar entry ведёт в профиль; [x] Flowly identity редактируется отдельно от Telegram, avatar read-only из Telegram; [x] contextual states и help recovery покрыты; [x] каждый screen ID утверждён отдельно.
+- **validation/evidence:** `?screen=profile`/`?screen=settings`/`?screen=help` browser interactions; avatar link `/?auth=ready` → `/?screen=profile` PASS; long Flowly name + long Telegram username layout PASS; settings save/offline states PASS; help bot diagnostic PASS; screenshots/browser interactions, API evidence при наличии и дословный approval каждого ID.
+- **journal:** 2026-07-14 — `backlog -> in_progress`. 2026-07-14 — **Slice S-MA-080 (profile hub) implemented (preview only)**: `features/profile/ui/profile-hub-screen.{tsx,module.css}`, route `?screen=profile`. P-COLLECTION-READ (§9, §38; DEC-013/020): header (Flowly name + Telegram username; DEC-020 — name/photo отдельно) + 9 секций с честным stage-mapping; hub только навигирует. typecheck/lint PASS; 430 light/dark: overflow 0, таргеты ≥44px, 0 console errors. Evidence: `.temp/E1-D1-T10/screenshots/sma080-profile-430-{light,dark}.png`. 2026-07-14 — **S-MA-080 approved** пользователем после UX-fix длинных имён/usernames: убран избыточный badge `Telegram`, имя clamp до 2 строк, username ellipsis, narrow layout переносит `Изменить` вниз; avatar entry исправлен `/?section=profile` → `/?screen=profile` и проверен кликом. Checks: `npm run typecheck --workspace @flowly/web` PASS; `npm run lint --workspace @flowly/web` PASS; browser 390 light: avatar→profile PASS, console errors 0, long-name screenshot `.temp/E1-D1-T10/screenshots/sma080-profile-long-name-390-light.png`. 2026-07-14 — **Slice S-MA-090 (profile settings) implemented (preview only)**: `features/profile/ui/profile-settings-screen.{tsx,module.css}`, route `?screen=settings`; DEC-020 уточнён пользователем: Flowly avatar не редактируется и не загружается, актуальная аватарка берётся из Telegram при входе/проверке. Settings покрывает Flowly name, timezone, week start, theme, report toggles; save/saved/offline/error draft states; profile hub ведёт в settings. API foundation расширен: PATCH `/api/v1/me` принимает `firstName`; re-auth обновляет Telegram `username`/`photoUrl`, не перетирая Flowly name. Checks: `npm run typecheck --workspace @flowly/web` PASS; `npm run lint --workspace @flowly/web` PASS; browser 390 light/dark: overflow 0, min target 44px, save/offline states PASS, timezone RU search `сама`→Samara PASS, console errors 0. Evidence: `.temp/E1-D1-T10/screenshots/sma090-settings-no-timeformat-theme-390-dark.png`, `sma090-settings-saved-390-light.png`, `sma090-settings-timezone-ru-search-390-dark.png`. 2026-07-14 — **S-MA-090 approved** пользователем: «так лучше апрув» после удаления time-format, лишних avatar-текстов/поля подписи и compact theme tabs. 2026-07-14 — **Slice S-MA-096 (help) implemented (preview only)**: `features/profile/ui/help-screen.{tsx,module.css}`, route `?screen=help`; profile hub ведёт в help. Help покрывает product topics, bot diagnostics check/retry, safe exits to profile/home/settings/open bot; `?help=bot-error` forced error state. Checks: `npm run typecheck --workspace @flowly/web` PASS; `npm run lint --workspace @flowly/web` PASS; browser 390 dark: profile→help PASS, overflow 0, min target 44px, bot diagnostic checking→ok PASS, console errors 0. Evidence: `.temp/E1-D1-T10/screenshots/sma096-help-390-dark.png`, `sma096-help-bot-ok-390-dark.png`. 2026-07-14 — **S-MA-096 approved** пользователем: «арпув идем дальше». Все 3 slice T10 approved, acceptance закрыт; T10 `in_progress -> review`. 2026-07-14 — пользователь подтвердил, что всё протестировал и дал добро; deep review отклонён, T10 `review -> done`. Этап 1 закрыт полностью. Следующее: этап 2 «Йога».
 
 ### E1-D1-T11 — Создать и утвердить production UI-kit
 

@@ -31,7 +31,7 @@
 
 ### E4-D5-T01 — Реализовать экран «Мой ритм»
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §21, §44.7 · **depends_on:** E1-D1-T02, E1-D1-T06 · **decisions:** DEC-017, DEC-022, DEC-024, DEC-025
+- **prd_refs:** §21, §44.7 · **depends_on:** E1-D1-T02, E1-D1-T06 · **decisions:** DEC-017, DEC-022, DEC-024, DEC-025, DEC-029
 - **ui_slices:** S-MA-060 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** empty state, список и карточка привычки с состояниями PRD.
 - **acceptance:** [ ] empty/list states есть; [ ] карточка показывает актуальное расписание/прогресс; [ ] чужие привычки недоступны.
@@ -39,7 +39,7 @@
 
 ### E4-D5-T02 — Реализовать CRUD привычки, иконки и цвета
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §22, §43.16, §44.7, §55.4 · **depends_on:** E4-D5-T01, E1-D1-T04 · **decisions:** DEC-017, DEC-019, DEC-022, DEC-024, DEC-025
+- **prd_refs:** §22, §43.16, §44.7, §55.4 · **depends_on:** E4-D5-T01, E1-D1-T04 · **decisions:** DEC-017, DEC-019, DEC-022, DEC-024, DEC-025, DEC-029
 - **ui_slices:** S-MA-061, S-MA-064 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** поля создания/редактирования, разрешение пропуска, icon/color choices.
 - **acceptance:** [ ] обязательные поля валидируются; [ ] icon/color сохраняются; [ ] default privacy соблюдена; [ ] sharing до создания отсутствует.
@@ -47,7 +47,7 @@
 
 ### E4-D5-T03 — Реализовать расписание «конкретное время» и дни недели
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §23.1–23.2, §27, §43.17 · **depends_on:** E4-D5-T02 · **decisions:** DEC-017, DEC-022, DEC-024, DEC-025
+- **prd_refs:** §23.1–23.2, §27, §43.17 · **depends_on:** E4-D5-T02 · **decisions:** DEC-017, DEC-022, DEC-024, DEC-025, DEC-029
 - **ui_slices:** S-MA-062 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** два schedule rule типа с пользовательским timezone.
 - **acceptance:** [ ] нужные локальные даты/время генерируются; [ ] DST/timezone учитываются; [ ] редактирование не создаёт скрытых дублей.
@@ -55,7 +55,7 @@
 
 ### E4-D5-T04 — Реализовать недельную цель и интервальное расписание
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §23.3–23.4, §27, §43.17 · **depends_on:** E4-D5-T02 · **decisions:** DEC-017, DEC-022, DEC-024, DEC-025
+- **prd_refs:** §23.3–23.4, §27, §43.17 · **depends_on:** E4-D5-T02 · **decisions:** DEC-017, DEC-022, DEC-024, DEC-025, DEC-029
 - **ui_slices:** S-MA-062 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** count-per-week и interval schedule согласно PRD.
 - **acceptance:** [ ] недельные границы корректны; [ ] interval anchor сохраняется; [ ] timezone не меняет уже подтверждённые выполнения.
@@ -63,7 +63,7 @@
 
 ### E4-D5-T05 — Реализовать несколько выполнений и lifecycle привычки
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §23.5, §26, §43.21, §44.8 · **depends_on:** E4-D5-T03, E4-D5-T04 · **decisions:** DEC-015, DEC-017, DEC-022, DEC-024, DEC-025
+- **prd_refs:** §23.5, §26, §43.21, §44.8 · **depends_on:** E4-D5-T03, E4-D5-T04 · **decisions:** DEC-015, DEC-017, DEC-022, DEC-024, DEC-025, DEC-029
 - **ui_slices:** S-MA-011, S-MA-064, S-MA-065 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** несколько occurrences в день, completion/skip/rest/no_response, pause/resume.
 - **acceptance:** [ ] каждое выполнение независимо; [ ] 0/partial/full progress различим; [ ] ручное изменение журналируется.
@@ -71,7 +71,7 @@
 
 ### E4-D5-T06 — Реализовать политики напоминаний
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §24, §43.19–43.20 · **depends_on:** E4-D5-T02 · **decisions:** DEC-015, DEC-017, DEC-022, DEC-024, DEC-025
+- **prd_refs:** §24, §43.19–43.20 · **depends_on:** E4-D5-T02 · **decisions:** DEC-015, DEC-017, DEC-022, DEC-024, DEC-025, DEC-029
 - **ui_slices:** S-MA-063 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** бережная, обычная, настойчивая и пользовательская policies с глобальными ограничениями.
 - **acceptance:** [ ] шаги policy сохраняются; [ ] ограничения §24.5 применены; [ ] неизвестные числовые параметры не изобретены.
@@ -79,14 +79,14 @@
 
 ### E4-D5-T07 — Генерировать occurrences и reminder jobs
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §26–27, §43.21–43.22, §45 · **depends_on:** E4-D5-T03–T06 · **decisions:** DEC-015, DEC-017
+- **prd_refs:** §26–27, §43.21–43.22, §45 · **depends_on:** E4-D5-T03–T06 · **decisions:** DEC-015, DEC-017, DEC-029
 - **scope:** идемпотентная генерация UTC occurrences/jobs без фактической Telegram delivery.
 - **acceptance:** [ ] повторный запуск не создаёт дублей; [ ] timezone changes обработаны явно; [ ] jobs связаны с policy steps.
 - **validation/evidence:** generation rerun и uniqueness evidence.
 
 ### E4-D5-T08 — Закрыть DoD привычек
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §50.1, §55.4, §57 · **depends_on:** E4-D5-T01–T07 · **decisions:** DEC-003, DEC-015, DEC-017, DEC-019, DEC-022
+- **prd_refs:** §50.1, §55.4, §57 · **depends_on:** E4-D5-T01–T07 · **decisions:** DEC-003, DEC-015, DEC-017, DEC-019, DEC-022, DEC-029
 - **scope:** проверить четыре schedule типа, multiple completions, privacy, skip policy, icons/colors.
 - **acceptance:** [ ] каждый пункт §55.4 имеет evidence; [ ] применимые проверки расписаний выполнены по явному запросу; [ ] остаточные timezone/DST риски записаны.
 - **validation/evidence:** итоговый checklist и scenario matrix.

@@ -22,7 +22,7 @@ const securityHeaders = [
       "default-src 'self'",
       `script-src ${scriptSrc}`,
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob:",
+      "img-src 'self' data: blob: https://i.ytimg.com",
       "font-src 'self' data:",
       "connect-src 'self'",
       "frame-ancestors 'none'",

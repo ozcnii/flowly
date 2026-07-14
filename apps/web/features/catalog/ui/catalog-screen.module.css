@@ -1,0 +1,377 @@
+.screen {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 42rem;
+  min-height: 100dvh;
+  margin: auto;
+  padding: 1.25rem 1.25rem 2.5rem;
+  background: var(--color-canvas);
+}
+
+.header {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.header h1 {
+  margin: 0;
+  font: 600 clamp(2.2rem, 9vw, 3.2rem) / 1 var(--primitive-font-family-display);
+}
+
+.header p,
+.notice,
+.offline {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.searchBox,
+.card,
+.empty {
+  border: 1px solid var(--color-border);
+  border-radius: var(--primitive-radius-lg);
+  background: var(--color-surface);
+}
+
+.searchBox {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.search {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.55rem;
+  align-items: center;
+  min-height: 3rem;
+  padding: 0 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--primitive-radius-md);
+  background: var(--color-canvas);
+}
+
+.search :global(.fl-icon) {
+  width: 1.05rem;
+  height: 1.05rem;
+  color: var(--color-text-muted);
+}
+
+.search input {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.75rem;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+}
+
+.chips {
+  display: flex;
+  gap: 0.45rem;
+  padding-bottom: 0.15rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.chips::-webkit-scrollbar {
+  display: none;
+}
+
+.filterActions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.filterToggle,
+.resetInline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  padding: 0 0.95rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.filterToggle :global(.fl-icon) {
+  width: 1rem;
+  height: 1rem;
+}
+
+.resetInline {
+  color: var(--color-text-muted);
+  font-weight: 650;
+}
+
+.filterPanel {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--primitive-radius-md);
+  background: color-mix(in srgb, var(--color-accent-soft) 22%, transparent);
+}
+
+.filterPanel p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.filterGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.chips button,
+.filterGrid button {
+  flex: 0 0 auto;
+  min-height: 2.75rem;
+  padding: 0 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-canvas);
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.chips button[aria-pressed="true"],
+.filterGrid button[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.resultBar {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  color: var(--color-text-muted);
+  font-size: 0.86rem;
+}
+
+.resultBar strong {
+  color: var(--color-text);
+  font-size: 1.25rem;
+}
+
+.list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 6.25rem minmax(0, 1fr);
+  grid-template-areas:
+    "cover head"
+    "details details";
+  gap: 0.7rem 0.75rem;
+  align-items: start;
+  padding: 0.8rem;
+  cursor: pointer;
+}
+
+.cardTextOnly {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "head"
+    "details";
+}
+
+.cover {
+  display: grid;
+  grid-area: cover;
+  width: 100%;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: var(--primitive-radius-md);
+  background: var(--color-accent-soft);
+  background-position: center;
+  background-size: cover;
+  color: var(--color-accent);
+}
+
+.cover[data-source="youtube"] {
+  color: white;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+}
+
+.cover :global(.fl-icon) {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.cardHead,
+.cardDetails {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.cardHead {
+  grid-area: head;
+  align-self: center;
+}
+
+.cardDetails {
+  grid-area: details;
+}
+
+.cardTop,
+.meta,
+.catList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.cardTop span,
+.meta span,
+.catList span,
+.source {
+  border-radius: 999px;
+  padding: 0.12rem 0.45rem;
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.cardTop span:not(.source),
+.meta span,
+.catList span {
+  background: var(--color-canvas);
+  color: var(--color-text-muted);
+}
+
+.card h2,
+.card p {
+  margin: 0;
+}
+
+.card h2 {
+  font-size: 1rem;
+}
+
+.card p {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.empty :global(.fl-icon) {
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-accent);
+}
+
+.empty h2,
+.empty p {
+  margin: 0;
+}
+
+.empty p {
+  color: var(--color-text-muted);
+}
+
+.skeleton {
+  min-height: 7rem;
+  overflow: hidden;
+}
+
+.skeleton i,
+.skeleton span,
+.skeleton b {
+  display: block;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-surface) 0%, var(--color-accent-soft) 45%, var(--color-surface) 90%);
+  animation: shimmer 1.4s infinite linear;
+}
+
+.skeleton i {
+  width: 6.25rem;
+  height: 100%;
+  min-height: 6.5rem;
+}
+
+.skeleton span {
+  width: 55%;
+  height: 1rem;
+}
+
+.skeleton b {
+  width: 80%;
+  height: 0.8rem;
+}
+
+.notice {
+  min-height: 1.2rem;
+}
+
+.offline {
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--primitive-radius-md);
+  background: var(--color-surface);
+}
+
+.search:focus-within,
+.chips button:focus-visible,
+.filterGrid button:focus-visible,
+.filterToggle:focus-visible,
+.resetInline:focus-visible,
+.card:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@keyframes shimmer {
+  to { background-position: 16rem 0; }
+}
+
+@media (max-width: 24rem) {
+  .screen { padding-inline: 1rem; }
+  .card { grid-template-columns: minmax(0, 1fr) auto; }
+  .cover { display: none; }
+}

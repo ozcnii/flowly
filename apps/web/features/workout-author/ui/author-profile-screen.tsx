@@ -1,0 +1,69 @@
+"use client";
+
+import Link from "next/link";
+import { useMemo } from "react";
+import { Icon, InlineError, Skeleton } from "@flowly/ui";
+import type { CatalogWorkout } from "@/features/catalog/model/catalog";
+import { DIFFICULTY, SOURCE, minutes } from "@/features/catalog/model/catalog";
+import { useAuthorWorkoutsQuery } from "@/features/catalog/model/catalog-queries";
+import styles from "./author-profile-screen.module.css";
+
+type Source = "flowly" | "youtube" | "user";
+type Forced = "loading" | "error" | "empty" | "blocked" | null;
+
+type Props = { source?: string; forced?: Forced };
+
+const sourceTitle: Record<Source, string> = { flowly: "Flowly", youtube: "YouTube-практики", user: "Пользователь" };
+const sourceDescription: Record<Source, string> = {
+  flowly: "Проверенные практики стартового каталога Flowly.",
+  youtube: "Внешние видео-практики, добавленные в стартовый каталог для примера.",
+  user: "Пользовательский контент ещё не подключён."
+};
+const safeSource = (source?: string): Source => source === "youtube" || source === "user" ? source : "flowly";
+const cover = (workout: CatalogWorkout) => workout.sourceType === "youtube" && workout.youtubeVideoId ? `https://i.ytimg.com/vi/${workout.youtubeVideoId}/hqdefault.jpg` : workout.coverObjectKey ? `/media/${workout.coverObjectKey}` : "";
+
+function WorkoutMiniCard({ workout }: { workout: CatalogWorkout }) {
+  const image = cover(workout);
+  return <Link className={styles.card} href={`/?screen=workout&id=${encodeURIComponent(workout.id)}`}>
+    {image && <span className={styles.cover} style={{ backgroundImage: `${workout.sourceType === "youtube" ? "linear-gradient(135deg, rgba(28,45,39,.08), rgba(28,45,39,.52)), " : ""}url(${image})` }}>{workout.sourceType === "youtube" && <Icon name="play" />}</span>}
+    <span className={styles.cardBody}>
+      <span className={styles.cardTop}>{minutes(workout.durationSeconds)} · {DIFFICULTY[workout.difficulty as keyof typeof DIFFICULTY] ?? workout.difficulty}</span>
+      <strong>{workout.title}</strong>
+      <small>{workout.categories.map((c) => c.name).slice(0, 2).join(" · ")}</small>
+    </span>
+  </Link>;
+}
+
+function Loading() {
+  return <div className={`${styles.screen} safe-shell`} aria-label="Загрузка автора"><Skeleton height="hero" /><Skeleton height="card" /><Skeleton height="card" /></div>;
+}
+
+export function AuthorProfileScreen({ source, forced = null }: Props) {
+  const src = safeSource(source);
+  const author = useAuthorWorkoutsQuery(src, !(forced === "loading" || forced === "error" || forced === "empty" || forced === "blocked"));
+  const data = author.data ?? null;
+  const items = useMemo(() => forced === "empty" || forced === "blocked" ? [] : data?.workouts ?? [], [data, forced]);
+
+  if (forced === "loading") return <Loading />;
+  if (forced === "error" || author.isError) return <div className={`${styles.screen} safe-shell`}><Link className={styles.back} href="/?screen=catalog"><Icon name="chevron-left" />Каталог</Link><InlineError icon={<Icon name="triangle-alert" />} title="Не удалось загрузить автора" description="Повторите позже. Доступ к тренировкам не менялся." /></div>;
+  if (!data && !forced) return <Loading />;
+
+  return <div className={`${styles.screen} safe-shell`}>
+    <Link className={styles.back} href="/?screen=catalog"><Icon name="chevron-left" />Каталог</Link>
+    <header className={styles.header}>
+      <p>{SOURCE[src] ?? sourceTitle[src]}</p>
+      <h1>{sourceTitle[src]}</h1>
+      <span>{sourceDescription[src]}</span>
+    </header>
+
+    <section className={styles.control} aria-label="Доступ к автору">
+      {src === "flowly" ? <p>Flowly — системный источник. Его нельзя скрыть или заблокировать.</p> : src === "youtube" ? <p>YouTube-каналы можно будет скрывать после подключения поиска.</p> : forced === "blocked" ? <p>Автор скрыт. Разблокирование будет доступно позже.</p> : <p>Действия для пользовательского контента.</p>}
+      {src === "user" && <div className={styles.safetyLinks}><Link className={styles.reportLink} href="/?screen=ugc-safety&action=report">Пожаловаться</Link><Link className={styles.hideLink} href="/?screen=ugc-safety&action=hide">Скрыть</Link><Link className={styles.blockLink} href="/?screen=ugc-safety&action=block">Заблокировать</Link></div>}
+    </section>
+
+    <section className={styles.content}>
+      <h2>Тренировки</h2>
+      {items.length === 0 ? <p className={styles.empty}>{src === "user" ? "Пользовательские тренировки появятся позже." : "Контент автора сейчас недоступен."}</p> : <div className={styles.list}>{items.map((workout) => <WorkoutMiniCard key={workout.id} workout={workout} />)}</div>}
+    </section>
+  </div>;
+}

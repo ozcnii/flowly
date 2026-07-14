@@ -5,10 +5,10 @@
 ## Текущее состояние
 
 - **Обновлено:** 2026-07-14
-- **Текущий этап:** 1. Основа
-- **Активная задача:** E1-D1-T10 (profile/help) — `in_progress`; slice **S-MA-080** (profile hub) preview, ждёт approval.
-- **Статус:** T10 в работе (3 slice: S-MA-080 hub / S-MA-090 settings / S-MA-096 help). S-MA-080 готов.
-- **Последний завершённый результат:** E1-D1-T10 / S-MA-080 — Profile hub (`features/profile/ui/profile-hub-screen.tsx`, `?screen=profile`); overflow 0, таргеты ≥44px.
+- **Текущий этап:** 2. Йога
+- **Активная задача:** E2-D2-T04 (YouTube search/cache/save) — следующий кандидат.
+- **Статус:** этап 2 «Йога» продолжается; E2-D2-T03 done; React Query migration done по DEC-029.
+- **Последний завершённый результат:** Workout detail polish — `favorite/share` перенесены в compact overlay icon buttons на обложку; React Query migration также done.
 
 ## Что сделано
 
@@ -33,9 +33,10 @@
 
 ## Что делать следующим
 
-1. E1-D1-T10: approval **S-MA-080** (profile hub) → S-MA-090 (settings, DEC-020) → S-MA-096 (help).
-2. После T10 — этап 1 закрыт полностью; переход к этапу 2 «Йога».
-3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
+1. Начать E2-D2-T04 — YouTube search/cache/save по workflow: прочитать карточку, dependencies, DEC-011/016/022/024/025/029 и design contracts.
+2. Подготовить deep plan E2-D2-T04 до кода.
+3. Все новые client API calls делать только через React Query hooks/mutations по DEC-029.
+4. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
 
@@ -62,6 +63,10 @@
 - `docs/roadmap/evidence/check-spacing-blocker-2026-07-14.png` — blocker proof для текущего UI-issue
 - `packages/ui/**`, `apps/web/app/ui-kit/**` — E1-D1-T11 production UI-kit
 - `apps/web/{open-next.config.ts,wrangler.jsonc,.dev.vars.example,public/_headers}` — OpenNext test web deployment
+- `apps/web/features/profile/ui/profile-hub-screen.{tsx,module.css}`, `apps/web/features/profile/ui/profile-settings-screen.{tsx,module.css}`, `apps/web/features/profile/ui/help-screen.{tsx,module.css}`, `apps/web/components/shell/app-shell.tsx`, `apps/web/lib/auth/{schemas,users}.ts` — E1-D1-T10 slices
+- `apps/web/app/api/v1/workouts/route.ts`, `apps/web/features/catalog/**`, `apps/web/public/media/catalog/covers/*.webp`, `seeds/catalog/starter-catalog.v1.json`, `seeds/0002_starter_catalog.sql`, `scripts/build-starter-catalog-sql.mjs`, `apps/web/next.config.ts` — E2-D2-T02 catalog/search/filters + covers + YouTube seed
+- `apps/web/app/api/v1/workouts/[id]/route.ts`, `apps/web/features/workout-detail/**`, `apps/web/features/workout-author/**`, `apps/web/features/ugc-safety/**`, `apps/web/app/page.tsx`, `docs/design/FRONTEND_REVIEW.md` — E2-D2-T03 detail/author/UGC safety + mandatory frontend review checklist
+- `apps/web/components/providers/query-provider.tsx`, `apps/web/lib/api/client.ts`, `apps/web/features/profile/model/me-queries.ts`, `apps/web/features/catalog/model/catalog-queries.ts`, migrated `AuthGate`/catalog/detail/author/settings/preferences — React Query migration DEC-029
 - `apps/scheduler/{src/index.ts,wrangler.jsonc,.dev.vars.example,worker-configuration.d.ts}` — scheduler health/no-op Cron Worker
 - root/workspace manifests, `.gitignore`, `README.md` — Cloudflare toolchain и documented commands
 
@@ -206,14 +211,106 @@ Roadmap migration / bootstrap verification:
 - **Статус задачи:** T09 `review -> done` (deep review PASS gate, 0 багов; закрыты HSTS/X-Frame-DENY/me.patch-audit; W1 unsafe-inline + nonce-CSP — residual этап 8). Следующая (последняя foundation) — E1-D1-T10 (profile/help).
 - **Следующее точное действие:** deep plan E1-D1-T10.
 
-### 2026-07-14 — E1-D1-T10 / Slice S-MA-080 (profile hub) preview
+### 2026-07-14 — E1-D1-T10 / Slice S-MA-080 (profile hub) approved
 
 - **От кого / кому:** AI agent → пользователь / следующий агент.
-- **Статус задачи:** T10 `backlog -> in_progress`; S-MA-080 — preview, ждёт approval.
-- **Сделано:** `features/profile/ui/profile-hub-screen.{tsx,module.css}`, route `?screen=profile` в `app/page.tsx`. P-COLLECTION-READ (§9, §38; DEC-013/020): header (Flowly name + Telegram read-only badge) + 9 секций с честным stage-mapping (friends/challenges→7, favorites→2, reports→6, settings→S-MA-090, notifications→5, export/delete→8, help→S-MA-096); hub только навигирует.
-- **Проверки:** typecheck/lint PASS; 430 light/dark: overflow 0, таргеты ≥44px, 0 console errors.
-- **Evidence:** `.temp/E1-D1-T10/screenshots/sma080-profile-430-{light,dark}.png`.
-- **Следующее точное действие:** approval S-MA-080 → S-MA-090 (settings).
+- **Статус задачи:** T10 `backlog -> in_progress`; S-MA-080 approved, T10 остаётся `in_progress` до S-MA-090/S-MA-096.
+- **Сделано:** `features/profile/ui/profile-hub-screen.{tsx,module.css}`, route `?screen=profile` в `app/page.tsx`. P-COLLECTION-READ (§9, §38; DEC-013/020): header (Flowly name + Telegram username) + 9 секций с честным stage-mapping (friends/challenges→7, favorites→2, reports→6, settings→S-MA-090, notifications→5, export/delete→8, help→S-MA-096); hub только навигирует. UX-fix по пользовательскому замечанию: убран избыточный badge `Telegram`; длинное имя clamp до 2 строк; длинный username ellipsis; на узком экране `Изменить` переносится вниз. Исправлен avatar entry: `/?section=profile` → `/?screen=profile`.
+- **Проверки:** `npm run typecheck --workspace @flowly/web` PASS; `npm run lint --workspace @flowly/web` PASS; browser 390 light: avatar→profile PASS, long-name/username layout PASS, console errors 0.
+- **Evidence:** `.temp/E1-D1-T10/screenshots/sma080-profile-430-{light,dark}.png`, `.temp/E1-D1-T10/screenshots/sma080-profile-long-name-390-light.png`.
+- **Approval:** пользователь: «круто» / «сделай так» после удаления Telegram badge и long-name UX-fix.
+- **Следующее точное действие:** S-MA-090 (settings).
+
+### 2026-07-14 — E1-D1-T10 / Slice S-MA-090 (profile settings) preview
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** T10 `in_progress`; S-MA-090 approved, T10 остаётся `in_progress` до S-MA-096.
+- **Сделано:** `features/profile/ui/profile-settings-screen.{tsx,module.css}`, route `?screen=settings` в `app/page.tsx`; profile hub/«Изменить» ведут в settings. Настройки покрывают Flowly name, timezone, week start, theme, report toggles, save/saved/offline/error draft states. По решению пользователя DEC-020 уточнён: аватар Flowly не редактируется и не загружается; актуальная аватарка берётся из Telegram при входе/проверке. API foundation расширен: PATCH `/api/v1/me` принимает `firstName`; re-auth обновляет Telegram `username`/`photoUrl`, не перетирая Flowly name.
+- **Проверки:** `npm run typecheck --workspace @flowly/web` PASS; `npm run lint --workspace @flowly/web` PASS; browser 390 light/dark: overflow 0, min target 44px, save/offline states PASS, timezone RU search `сама`→Samara PASS, console errors 0.
+- **Evidence:** `.temp/E1-D1-T10/screenshots/sma090-settings-no-timeformat-theme-390-dark.png`, `.temp/E1-D1-T10/screenshots/sma090-settings-saved-390-light.png`, `.temp/E1-D1-T10/screenshots/sma090-settings-timezone-ru-search-390-dark.png`.
+- **Approval:** пользователь: «так лучше апрув» после удаления time-format, лишних avatar-текстов/поля подписи и compact theme tabs.
+- **Блокеры / решения:** нет технических блокеров. Delivery отчётов — downstream этап 6.
+- **Следующее точное действие:** S-MA-096 (help).
+
+### 2026-07-14 — E1-D1-T10 / Slice S-MA-096 (help) preview
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** T10 `in_progress -> review`; S-MA-096 approved, все 3 slice T10 approved.
+- **Сделано:** `features/profile/ui/help-screen.{tsx,module.css}`, route `?screen=help`; profile hub/«Справка» ведёт в help. Help покрывает product topics, bot diagnostics check/retry, safe exits to profile/home/settings/open bot; `?help=bot-error` forced error state.
+- **Проверки:** `npm run typecheck --workspace @flowly/web` PASS; `npm run lint --workspace @flowly/web` PASS; browser 390 dark: profile→help PASS, overflow 0, min target 44px, bot diagnostic checking→ok PASS, console errors 0.
+- **Evidence:** `.temp/E1-D1-T10/screenshots/sma096-help-390-dark.png`, `.temp/E1-D1-T10/screenshots/sma096-help-bot-ok-390-dark.png`.
+- **Approval:** пользователь: «арпув идем дальше».
+- **Блокеры / решения:** нет технических блокеров; deep review отклонён пользователем.
+- **Следующее точное действие:** E2-D2-T01 (стартовый каталог).
+
+### 2026-07-14 — E1-D1-T10 done без deep review
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** T10 `review -> done`; этап 1 закрыт полностью.
+- **Сделано:** пользователь подтвердил, что все S-MA-080/S-MA-090/S-MA-096 протестированы и approved; deep review не проводится.
+- **Проверки и результаты:** ранее зафиксированы typecheck/lint PASS; browser evidence по profile/settings/help PASS; остаточные downstream — реальные отчёты/Telegram delivery/другие разделы профиля по этапам 2–8.
+- **Следующее точное действие:** E2-D2-T01 — стартовый каталог.
+
+### 2026-07-14 — E2-D2-T01 start
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** E2-D2-T01 `backlog -> in_progress`.
+- **Проверено:** roadmap/HANDOFF, карточка E2-D2-T01, dependencies E1-D1-T04/E1-D1-T08 done, активных карточек нет.
+- **Решения:** DEC-010 approved пользователем: широкий каталог (~10 категорий, 20 тренировок, 60 упражнений), качество подтверждает пользователь по checklist перед `done`; plan file — `.temp/E2-D2-T01/plan.md`.
+- **Следующее точное действие:** выдать deep plan и получить approval перед кодом.
+
+### 2026-07-14 — E2-D2-T01 implemented → review
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** E2-D2-T01 `in_progress -> review -> done`.
+- **Сделано:** добавлены таблицы §43.6–43.10 в `packages/database/src/schema.ts`; миграция `migrations/0002_long_spiral.sql`; широкий catalog source `seeds/catalog/starter-catalog.v1.json` (10 категорий, 20 тренировок, 60 упражнений); deterministic builder `scripts/build-starter-catalog-sql.mjs`; generated SQL `seeds/0002_starter_catalog.sql`; root/web scripts `catalog:build-seed`, `db:seed:catalog`; README seed/import docs.
+- **Проверки и результаты:** `npm run catalog:build-seed` PASS; `npm run db:reset && npm run db:migrate && npm run db:seed && npm run db:seed:catalog && npm run db:seed:catalog` PASS; local D1 counts: users=4, categories=10, workouts=20, exercises=60, workout_category_links=46, workout_exercises=115; sample workout/category queries PASS; `npm run typecheck --workspace @flowly/database` PASS; `npm run lint --workspace @flowly/database` PASS; повторный `npm run db:generate` = no schema changes; root `npm run typecheck`/`npm run lint` PASS.
+- **Deep review:** self review PASS, 0 blockers/bugs. Проверены catalog consistency, DB invariants, schema drift, typecheck/lint.
+- **Residual risks:** media object keys are placeholders; actual R2 images/GIF/upload/access downstream.
+- **Следующее точное действие:** E2-D2-T02 — категории, поиск и фильтры.
+
+### 2026-07-14 — E2-D2-T02 start
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Статус задачи:** E2-D2-T02 `backlog -> in_progress`.
+- **Проверено:** roadmap/HANDOFF, карточка E2-D2-T02, dependency E2-D2-T01 done, активных карточек нет, DEC-016/022/024/025, S-MA-020 contract, PRD refs.
+- **Блокеры / решения:** нет блокеров; перед кодом нужен deep plan approval.
+- **Следующее точное действие:** спросить plan file, затем выдать deep plan.
+
+### 2026-07-14 — E2-D2-T02 / S-MA-020 catalog preview
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** E2-D2-T02 `done`; S-MA-020 approved пользователем («кайф мне нравится»), deep review отклонён.
+- **Сделано:** `GET /api/v1/workouts` с filters search/category/duration/difficulty/format/source/equipment/favorite; D1 primary + dev-only JSON fallback for plain `next dev`; `features/catalog/ui/catalog-screen.{tsx,module.css}`; `features/catalog/model/catalog.ts`; route `?screen=catalog`. Source `youtube` и favorite честно показывают empty/explanation до downstream E2-D2-T04/T05. После user feedback UX упрощён: base показывает search + horizontal category chips + compact `Фильтры`; extended filters раскрываются по нажатию. Добавлены 3 стартовые YouTube-тренировки (`BU2iL0mz858`, `o29nP-jH3eA`, `qiKJRoX_2uo`), thumbnails через `https://i.ytimg.com`; CSP `img-src` обновлён.
+- **Проверки:** API canonical query set PASS (`base=23`, `source=youtube=3`); browser 390 light/dark base PASS (overflow 0, min target 44px, console errors 0); YouTube filter shows 3 cards with thumbnail backgrounds; ChatGPT-generated Flowly covers added under `apps/web/public/media/catalog/covers/*.webp`; all 23 catalog cards have real image backgrounds (0 text-only/fake icon covers); separate chevron open button removed, whole card is clickable/keyboard-accessible; card layout changed to top row image+title/meta and full-width details below; filter panel opens; forced `?catalog=empty` and `?catalog=error` render PASS; web `npm run typecheck --workspace @flowly/web` PASS; web `npm run lint --workspace @flowly/web` PASS; `npm run catalog:build-seed` PASS; local D1 `npm run db:seed:catalog` PASS.
+- **Evidence:** API output from context-mode; Playwright snapshots/evaluate checks. Note: `page.screenshot`/CDP screenshot timed out in this session despite render success, so no PNG artifact for S-MA-020 yet.
+- **Следующее точное действие:** утвердить deep plan E2-D2-T03 перед кодом.
+
+### 2026-07-14 — E2-D2-T03 start
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** E2-D2-T03 `done`; S-MA-022 detail API/UI approved пользователем («норм пойдет»); S-MA-024 author/source profile approved пользователем («нормальное кайф»); S-MA-088 UGC safety approved пользователем («ок идем дальше»); пользователь подтвердил закрытие без отдельного deep review («E2-D2-T03 переводи в done все нормально»).
+- **Проверено:** roadmap/HANDOFF, карточка E2-D2-T03, dependency E2-D2-T02 done, активных карточек нет, DEC-016/021/022/024/025, PRD §12.4/§13/§44.3–44.4, design flows README, S-MA-022/S-MA-024/S-MA-088 contracts, F03/F04/F10 diagrams, current catalog/API implementation.
+- **Сделано:** `GET /api/v1/workouts/[id]` with D1+dev fallback, `features/workout-detail/ui/workout-detail-screen.{tsx,module.css}`, route `?screen=workout&id=...`, catalog card navigation. UI/UX review corrections after user doubts: detail got catalog-like padding/max-width, large meta blocks replaced by compact summary chips, exercises moved directly after hero/summary, contraindications/source moved into bottom `Дополнительно`, actions moved below exercises, internal roadmap text removed, UGC-only actions hidden for Flowly/YouTube, exercise list text-first without repeated fake media placeholders. S-MA-024 implemented: `features/workout-author/ui/author-profile-screen.{tsx,module.css}`, route `?screen=author&source=...`, public workouts by source, user empty state, safe block/hide explanation without fake mutation for Flowly/YouTube. S-MA-088 implemented: `features/ugc-safety/ui/ugc-safety-screen.{tsx,module.css}`, route `?screen=ugc-safety&action=report|hide|block`, report reason required validation, separate hide/block outcomes, linked from user author profile. After user UI/UX feedback: top nav compacted, header/form visually merged into one compact panel, alternate actions changed from huge pills to lightweight links, service label replaced with user-facing `Безопасность`, author/safety actions visually differentiated by meaning (report neutral, hide accent, block danger) and changed to a predictable vertical action list to avoid random wrapping at 390px.
+- **Проверки:** API Flowly/YouTube/404 PASS; catalog click -> detail PASS; author Flowly=20 cards, YouTube=3 cards, user=empty PASS; S-MA-088 report empty validation/success, hide success, block success PASS; web `typecheck` PASS; web `lint` PASS; browser 390 light/dark overflow 0, targets >=44px, console errors 0.
+- **Следующее точное действие:** выполнить deep analysis и подготовить deep plan для полного перевода проекта на `@tanstack/react-query` перед кодом.
+
+### 2026-07-14 — React Query migration DEC-029
+
+- **От кого / кому:** пользователь → AI agent / следующий агент.
+- **Решение:** пользователь потребовал полностью перевести проект на `@tanstack/react-query`; план `.temp/react-query-migration/plan.md` approved вариантом «Внедрять по плану».
+- **Сделано:** добавлен `QueryProvider`, общий `apiJson` helper, `me` mutations/query, catalog/detail/author query hooks; migrated `AuthGate`, `CatalogScreen`, `WorkoutDetailScreen`, `AuthorProfileScreen`, `ProfileSettingsScreen`, `PreferencesScreen`; catalog card navigation переведена с `window.location.href` на `router.push`, чтобы не сбрасывать in-memory query cache.
+- **Правило дальше:** raw `fetch` в client components/features запрещён; новые API calls оформлять через `useQuery`/`useMutation` и query keys. Audit: raw `fetch` ожидается только в `apps/web/lib/api/client.ts` и server routes.
+- **Проверки:** `npm run typecheck --workspace @flowly/web` PASS; `npm run lint --workspace @flowly/web` PASS; raw fetch audit PASS; browser smoke catalog/detail/author/settings 390px PASS (overflow 0, targets >=44, console errors 0); API detail reasons не содержат service text.
+- **Follow-up polish:** после user feedback на `?screen=workout&id=wo-yt-malova-vinyasa-24` `favorite/share` убраны из нижних bulk actions и перенесены в compact disabled overlay icon buttons на обложку; проверка 390 dark PASS: overflow 0, targets >=44px, console errors 0, no service text.
+- **Следующее точное действие:** начинать E2-D2-T04 с учётом DEC-029.
+
+### 2026-07-14 — Frontend quality gate DEC-028
+
+- **От кого / кому:** пользователь → AI agent / все следующие агенты.
+- **Решение:** пользователь резко указал, что frontend screen slices нельзя делать как непроработанные технические заготовки. Зафиксирован DEC-028, обновлён `AGENTS.md`, создан обязательный чеклист [`docs/design/FRONTEND_REVIEW.md`](../design/FRONTEND_REVIEW.md): перед показом пользователю каждый production UI slice обязан пройти самостоятельный UI/UX quality pass агентом.
+- **Обязательная проверка:** 360–430px, light/dark, visual hierarchy, primary content first, плотность/отступы, отсутствие служебных ID/roadmap-текстов/fake controls, релевантные actions, overflow=0, touch targets ≥44px, console errors=0.
+- **Следующее точное действие:** текущий S-MA-088 и все дальнейшие UI slices проверять по `docs/design/FRONTEND_REVIEW.md`/DEC-028 до user review.
 
 ### 2026-07-13 — E1-D1-T06 / Slice S-MA-004 preview implemented
 
