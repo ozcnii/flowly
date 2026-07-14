@@ -11,6 +11,7 @@ import { BotConnectionScreen } from "@/features/onboarding/ui/bot-connection-scr
 import { DeepLinkRecoveryScreen } from "@/features/recovery/ui/deep-link-recovery-screen";
 import { OpenViaTelegramScreen } from "@/features/web-fallback/ui/open-via-telegram-screen";
 import { UnavailableDeepLinkScreen } from "@/features/web-fallback/ui/unavailable-deep-link-screen";
+import { ProfileHubScreen } from "@/features/profile/ui/profile-hub-screen";
 import { resolveShellScenario } from "@/lib/scenarios";
 
 type PageProps = { searchParams: Promise<Record<string, string | string[] | undefined>> };
@@ -39,6 +40,10 @@ export default async function Page({ searchParams }: PageProps) {
   if (process.env.NODE_ENV !== "production" && typeof params.web === "string") {
     if (params.web === "open") return <OpenViaTelegramScreen />;
     if (params.web === "unavailable") return <UnavailableDeepLinkScreen />;
+  }
+
+  if (process.env.NODE_ENV !== "production" && typeof params.screen === "string" && params.screen === "profile") {
+    return <ProfileHubScreen />;
   }
 
   return (
