@@ -7,8 +7,8 @@
 - **Обновлено:** 2026-07-14
 - **Текущий этап:** 2. Йога
 - **Активная задача:** E2-D2-T06 (Routing cleanup product paths) — `review`.
-- **Статус:** этап 2 «Йога» продолжается; E2-D2-T04 `done`; E2-D2-T06 реализована и DEC-032 routing/shell fix проверен, ждёт user review / решение пользователя.
-- **Последний завершённый результат:** E2-D2-T06 implementation — product routes вместо `/?screen=...`, без legacy redirects, dev query params временно сохранены.
+- **Статус:** этап 2 «Йога» продолжается; E2-D2-T04 `done`; E2-D2-T06 реализована и DEC-032 routing/shell fix проверен, ждёт user review / решение пользователя. Production deploy явно запрошен пользователем и выполнен.
+- **Последний завершённый результат:** Cloudflare production deploy `flowly-web` на `https://flowly-web.getflowly.workers.dev` (version `52d02644-da67-4d48-b770-4babecadb3aa`), remote D1 `flowly-db` создан/мигрирован/засеян каталогом.
 
 ## Что сделано
 
@@ -37,11 +37,12 @@
 2. После approval выполнить `.temp/ui-consistency-system/plan.md`: shared primitives/tokens, global CSS drift audit по всем `apps/web/features/**/ui` и route pages, `/profile -> /settings -> /help` как first repro, затем все найденные аналогичные geometry fixes, governance docs.
 3. Затем вернуться к user review E2-D2-T06 / done decision.
 3. Следующий выбор: E2-D2-T05 favorites или другая backlog-карточка.
-4. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
+4. Production deploy уже выполнен по явному запросу пользователя; для будущего auto-deploy нужно добавить GitHub secret `CLOUDFLARE_API_TOKEN` со стабильным Cloudflare API Token.
 
 ## Открытые блокеры
 
 Открыты `DEC-006`, `DEC-007`, `DEC-008`, `DEC-010`, `DEC-011` в [`DECISIONS.md`](DECISIONS.md); DEC-009 и DEC-012 superseded. Они не блокируют E0-D0-T04. Production UI-kit утверждён; сохраняется обязательный per-screen approval по DEC-024.
+- **Deploy secrets:** Cloudflare Worker secrets сейчас пустые. Для runtime Telegram auth нужен `TELEGRAM_BOT_TOKEN`; для live YouTube search нужен `INVIDIOUS_BASE_URL`; для GitHub Actions auto-deploy нужен stable `CLOUDFLARE_API_TOKEN` secret. `CLOUDFLARE_ACCOUNT_ID` secret уже установлен в GitHub.
 - ~~Внешний blocker по визуалу для S-MA-004 (чек-маркер/расположение)~~ — **resolved**: блокер был по Главной (S-MA-010, галочка `.habitAction`), починен другим агентом в 3 коммитах; S-MA-004 чек-иконок не имел. Evidence оставлен: `docs/roadmap/evidence/check-spacing-blocker-2026-07-14.png`.
 
 ## Изменённые артефакты
@@ -63,7 +64,7 @@
 - `apps/web/features/home/**`, `apps/web/public/media/**` — E0-D0-T04 full state set visual-approved и done
 - `docs/roadmap/evidence/check-spacing-blocker-2026-07-14.png` — blocker proof для текущего UI-issue
 - `packages/ui/**`, `apps/web/app/ui-kit/**` — E1-D1-T11 production UI-kit
-- `apps/web/{open-next.config.ts,wrangler.jsonc,.dev.vars.example,public/_headers}` — OpenNext test web deployment
+- `apps/web/{open-next.config.ts,wrangler.jsonc,.dev.vars.example,public/_headers}` — OpenNext web deployment; production D1 `flowly-db` and test D1 `flowly-db-test` bound in wrangler; R2 binding removed until Cloudflare R2 is enabled/needed.
 - `apps/web/features/profile/ui/profile-hub-screen.{tsx,module.css}`, `apps/web/features/profile/ui/profile-settings-screen.{tsx,module.css}`, `apps/web/features/profile/ui/help-screen.{tsx,module.css}`, `apps/web/components/shell/app-shell.tsx`, `apps/web/lib/auth/{schemas,users}.ts` — E1-D1-T10 slices
 - `apps/web/app/api/v1/workouts/route.ts`, `apps/web/features/catalog/**`, `apps/web/public/media/catalog/covers/*.webp`, `seeds/catalog/starter-catalog.v1.json`, `seeds/0002_starter_catalog.sql`, `scripts/build-starter-catalog-sql.mjs`, `apps/web/next.config.ts` — E2-D2-T02 catalog/search/filters + covers + YouTube seed
 - `apps/web/app/api/v1/workouts/[id]/route.ts`, `apps/web/features/workout-detail/**`, `apps/web/features/workout-author/**`, `apps/web/features/ugc-safety/**`, `apps/web/app/page.tsx`, `docs/design/FRONTEND_REVIEW.md` — E2-D2-T03 detail/author/UGC safety + mandatory frontend review checklist

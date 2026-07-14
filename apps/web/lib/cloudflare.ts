@@ -42,9 +42,9 @@ export function getInvidiousBaseUrl(): string | null {
 }
 
 /**
- * R2 storage adapter (PRD §46). Binding `STORAGE` declared at the top level of
- * wrangler.jsonc for local dev/preview; real test/prod bucket — separate scope.
- * No direct public access: read/write only via this adapter (auth routes — этап 2).
+ * R2 storage adapter (PRD §46). Binding `STORAGE` is optional until upload flows
+ * are enabled; Cloudflare R2 must be enabled and bound explicitly before use.
+ * No direct public access: read/write only via this adapter.
  */
 export function getStorage(): StorageAdapter {
   const bucket = webEnv().STORAGE;
