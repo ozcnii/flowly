@@ -7,8 +7,8 @@
 ## Текущий фокус
 
 - **Активный этап:** 2. Йога
-- **Активная задача:** E2-D2-T04 (YouTube search, cache и save) — следующий кандидат.
-- **Следующее действие:** начать E2-D2-T04 по workflow: проверить карточку, dependencies/decisions и подготовить deep plan.
+- **Активная задача:** E2-D2-T06 (Routing cleanup product paths) — `review`.
+- **Следующее действие:** пользовательский review E2-D2-T06 после DEC-032 fix; затем `done` или дополнительные fixes.
 - **UI workflow:** один screen slice + все применимые states/интеракции + обязательный frontend UI/UX quality pass по [`docs/design/FRONTEND_REVIEW.md`](../design/FRONTEND_REVIEW.md) до user review + явный approval (`DEC-024`, `DEC-028`); client API calls только через `@tanstack/react-query` (`DEC-029`)
 - **Блокеры:** открытые решения перечислены в [`DECISIONS.md`](DECISIONS.md)
 - **Контекст продолжения:** [`HANDOFF.md`](HANDOFF.md)
@@ -19,7 +19,7 @@
 |---|---|---:|---:|---:|---:|---:|---|
 | 0. UX/UI-контракты | done | 0 | 0 | 0 | 0 | 5 | [`00-design.md`](stages/00-design.md) |
 | 1. Основа | done | 0 | 0 | 0 | 0 | 11 | [`01-foundation.md`](stages/01-foundation.md) |
-| 2. Йога | in progress | 7 | 0 | 0 | 0 | 3 | [`02-yoga.md`](stages/02-yoga.md) |
+| 2. Йога | in progress | 6 | 0 | 0 | 1 | 4 | [`02-yoga.md`](stages/02-yoga.md) |
 | 3. Программы | backlog | 7 | 0 | 0 | 0 | 0 | [`03-programs.md`](stages/03-programs.md) |
 | 4. Мой ритм | backlog | 8 | 0 | 0 | 0 | 0 | [`04-my-rhythm.md`](stages/04-my-rhythm.md) |
 | 5. Telegram | backlog | 8 | 0 | 0 | 0 | 0 | [`05-telegram.md`](stages/05-telegram.md) |
@@ -27,7 +27,7 @@
 | 7. Социальные функции | backlog | 7 | 0 | 0 | 0 | 0 | [`07-social.md`](stages/07-social.md) |
 | 8. Стабилизация | backlog | 8 | 0 | 0 | 0 | 0 | [`08-stabilization.md`](stages/08-stabilization.md) |
 
-**Итого:** 53 backlog / 0 in progress / 0 blocked / 0 review / 19 done.
+**Итого:** 52 backlog / 0 in progress / 0 blocked / 1 review / 20 done.
 
 ## Зависимости этапов
 

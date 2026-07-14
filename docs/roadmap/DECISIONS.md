@@ -215,6 +215,45 @@
 - **PRD:** §41.3, §44.2–44.5, §55.
 - **Влияет на:** `apps/web/**`, все current/future client API calls, `AGENTS.md`, roadmap handoff.
 
+### DEC-030 — YouTube search provider v1: Invidious + controlled fallback
+
+- **Статус:** approved
+- **Дата:** 2026-07-14
+- **Решение:** E2-D2-T04 реализует YouTube search без `YOUTUBE_API_KEY` через Invidious-compatible API provider. Production/test provider base URL задаётся env `INVIDIOUS_BASE_URL`; hardcoded public instance не используется как contract. Если provider недоступен и есть stale cache — можно использовать stale fallback как внутренний data-source без пользовательского `из кэша`; если cache нет — controlled unavailable/error. Dev без `INVIDIOUS_BASE_URL` не показывает fixture как реальные результаты.
+- **Scope v1:** S-MA-021 использует свободный пользовательский input + фильтры с debounce; `на русском` не добавляется в запрос. `save` создаёт/возвращает idempotent private workout-copy для текущего пользователя (`sourceType=youtube`, `youtubeVideoId`, no video download). `create-workout` полноценным editor-flow не реализуется до downstream own-workout editor и не показывается как disabled CTA в S-MA-021. `Неподходящий результат` убран из S-MA-021 по user UI review; moderation/quality feedback вернётся отдельным scope, если понадобится.
+- **Основание:** пользователь спросил про поиск без `YOUTUBE_API_KEY`, после объяснения рисков official/oEmbed/Invidious выбрал `Try Invidious`; затем approved deep plan `.temp/E2-D2-T04/plan.md` вариантом `Approve v1 scope`; после UI review явно выбрал `Input + фильтры` для YouTube search.
+- **PRD:** §19, §43.28, §44.5, §55.2.
+- **Влияет на:** E2-D2-T04, `packages/youtube/**`, `apps/web/app/api/v1/youtube/**`, `youtube_search_cache`, `apps/web/features/youtube-search/**`, future provider swap to official YouTube Data API.
+
+### DEC-031 — Product routing cleanup после E2-D2-T04
+
+- **Статус:** approved
+- **Дата:** 2026-07-14
+- **Решение:** после закрытия E2-D2-T04 перевести пользовательские экраны с query-router `/?screen=...` на нормальные route paths (`/catalog`, `/youtube`, `/workouts/[id]`, `/authors/[source]` и т.п.). До завершения E2-D2-T04 routing cleanup не смешивать с YouTube scope.
+- **Основание:** пользователь указал, что текущие URLs вида `?screen=catalog&theme=light` не являются нормальным product routing; выбран порядок «после E2-D2-T04».
+- **PRD:** §44.2–44.5.
+- **Влияет на:** `apps/web/app/**`, app-shell navigation, screen links, browser/manual verification URLs, downstream UI slices.
+
+### DEC-032 — Persistent app shell, routing and UX architecture gate
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** все product routes Flowly должны использовать устойчивый shared app shell/layout pattern. Bottom navigation/header/avatar не должны пропадать между обычными product screens. Нельзя делать standalone product pages, которые обходят shell, если flow не approved как immersive/fullscreen. Нельзя использовать `?screen=`/`?tab=` как product routing. Навигация внутри приложения не должна показывать re-auth/auth-error/loading flicker при уже установленной сессии. Для Next.js нужно использовать route groups/nested `layout.tsx` там, где это сохраняет shell и предотвращает remount общего layout. Back/cancel placement должен быть консистентным внутри раздела; нельзя прыгать между верхней и нижней кнопкой без UX-основания. Внешний page padding должен иметь один owner: shell или screen, без двойных больших отступов.
+- **Основание:** пользователь указал на исчезающий navbar, `?tab=...`, inconsistent back placement, visible navigation flicker/re-auth и двойные padding как системные UX-ошибки, требующие обязательных правил и детального review.
+- **Обязательная проверка:** перед user review любого routing/layout/shell изменения: click navigation matrix, shell/nav persistence, no auth flicker, no `?screen=`/`?tab=`, one-padding-owner check, consistent back placement, console errors 0, overflow 0.
+- **PRD:** §44.2–44.5, §55.
+- **Влияет на:** `apps/web/app/**`, `apps/web/components/shell/**`, all product screen routes, `docs/design/FRONTEND_REVIEW.md`, `AGENTS.md`, E2-D2-T06 and future UI tasks.
+
+### DEC-033 — Product screen UI consistency primitives
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** все product screens Flowly должны использовать единые screen primitives/tokens для повторяемых layout atoms and typography hierarchy: page width/gutter/top padding/bottom padding/mobile density/vertical rhythm, top/back row, page eyebrow/title/subtitle, section title, card title, body/meta text, cards, list rows, controls, avatar/icon sizes, status text and semantic colors. Произвольные локальные значения для повторяемых отступов, цветов, радиусов, размеров и позиционирования запрещены без явного approved exception. First implementation lives in `apps/web/app/globals.css` as app-level primitives (`.flow-screen`, `.flow-top`, `.flow-back`, `.flow-card`, `.flow-list-row`, etc.) because текущая проблема находится в app screens; перенос в `packages/ui` требует отдельного решения о public API.
+- **Основание:** пользователь указал, что `/profile` и `/settings` визуально прыгают из-за разных padding/back placement, и что такая проблема вероятна на всех страницах. Это systemic UI drift, а не локальный баг.
+- **Обязательная проверка:** перед user review production UI агент должен выполнить global drift audit по всем route-accessible product screens: page edge/top/back/card/list geometry, typography hierarchy (`.flow-eyebrow`, `.flow-title`, `.flow-subtitle`, `.flow-section-title`, `.flow-card-title`), arbitrary spacing/color/radius/font values, light/dark, 360–430px, overflow 0, console errors 0, touch targets ≥44. Соседние экраны одного shell не должны менять page edge/top/back позицию без approved exception. Mobile screens must not compound global screen gap with local vertical margins; repeated vertical rhythm has one owner. Back/cancel/navigation controls must be content-width and never stretch full-width unless that exact full-width pattern is approved as a primary mobile action.
+- **PRD:** §44.2–44.5, §55.
+- **Влияет на:** `apps/web/app/globals.css`, `apps/web/features/**/ui/*.module.css`, `apps/web/features/**/ui/*.tsx`, `docs/design/FRONTEND_REVIEW.md`, `AGENTS.md`, E2-D2-T07 and all future frontend tasks.
+
 ## Открытые решения
 
 ### DEC-006 — Operational thresholds

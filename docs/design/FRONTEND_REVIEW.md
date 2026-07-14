@@ -26,8 +26,29 @@
 - [ ] Все действия с разной семантикой различаются визуально: primary / secondary / neutral / danger.
 - [ ] Нет набора одинаковых кнопок для разных по смыслу действий.
 
-## 3. Layout and spacing
+## 3. App shell, routing and navigation architecture
 
+- [ ] Product screen использует общий route/layout/shell паттерн Next.js, а не standalone page, если это часть приложения.
+- [ ] Нижняя навигация, header/avatar и общий shell не исчезают при переходе между product routes, кроме явно immersive/fullscreen flows.
+- [ ] Навигация не вызывает видимый full reload, re-auth flicker или повторный auth/error/loading screen при обычном переходе внутри app.
+- [ ] AuthGate не должен пересоздаваться на каждом product route, если пользователь уже внутри authenticated shell; session check не должен мигать UI.
+- [ ] Product routes — нормальные paths, не `?screen=...`/`?tab=...`; query params допустимы только для настоящего state (`q`, filters) или временных dev forced states.
+- [ ] Back/cancel placement консистентен внутри раздела: не прыгать между верхом/низом без причины.
+- [ ] Если экран открыт из shared shell, back action не дублирует bottom nav и не нарушает ожидаемый history/back паттерн.
+- [ ] Для Next.js использовать nested `layout.tsx`/route groups там, где это предотвращает remount общего shell, повторную авторизацию и мигание.
+- [ ] Перед сдачей routing/layout changes проверены реальные clicks между разделами, не только прямое открытие URL.
+
+## 4. Layout and spacing
+
+- [ ] Product screen uses approved Flowly primitives/tokens for repeated layout/typography atoms: `.flow-screen`, `.flow-top`, `.flow-back`, `.flow-eyebrow`, `.flow-title`, `.flow-subtitle`, `.flow-section-title`, `.flow-card-title`, `.flow-card`, `.flow-list-row` or equivalent approved shared component.
+- [ ] No arbitrary local values for repeated page padding, back placement, card/list spacing, colors, radii, avatar/icon sizes or semantic action colors.
+- [ ] Sibling screens in one shell have identical page edge/top/back geometry unless an approved exception is documented.
+- [ ] Back/cancel/navigation controls are content-width, not full-width, unless explicitly approved for a primary mobile action pattern.
+- [ ] Global drift audit was run for route-accessible product screens, not only the screen touched by the change.
+- [ ] Ровно один уровень page padding отвечает за внешний край: либо shell, либо screen, но не оба одновременно.
+- [ ] Ровно один уровень vertical rhythm отвечает за расстояния между крупными блоками: не складывать `.flow-screen` gap с локальными `margin-top`/`margin-bottom`.
+- [ ] На мобильном нет больших пустых slabs между content blocks; first meaningful content appears without desktop-like whitespace.
+- [ ] Вложенные экраны не добавляют второй большой horizontal padding поверх shell padding.
 - [ ] Отступы согласованы с соседними экранами того же раздела.
 - [ ] Нет случайных больших пустот.
 - [ ] Нет “карточек ради карточек”. Рамка нужна только если она группирует смысл.
@@ -36,7 +57,7 @@
 - [ ] На 360–430px экран выглядит спроектированным, а не сжатым desktop layout.
 - [ ] На wide viewport layout не разваливается и не становится слишком растянутым.
 
-## 4. Content density
+## 5. Content density
 
 - [ ] На первом экране нет второстепенной информации, которую можно убрать вниз.
 - [ ] Metadata компактна: chips/inline summary вместо больших секций, если это не primary content.
@@ -46,7 +67,7 @@
 - [ ] Списки легко сканируются.
 - [ ] Search/filter input, который запускает API-запрос, имеет debounce/throttle и не отправляет запрос на каждый символ.
 
-## 5. Actions and states
+## 6. Actions and states
 
 - [ ] Primary action один и визуально понятен.
 - [ ] Disabled action используется только если действие действительно должно быть видно сейчас.
@@ -57,7 +78,7 @@
 - [ ] Report / hide / block / delete / revoke не смешаны и не выглядят одинаково.
 - [ ] Success/error outcomes различимы и не скрывают введённые данные без причины.
 
-## 6. Cards and lists
+## 7. Cards and lists
 
 - [ ] Карточка кликабельна только если это ожидаемо для пользователя.
 - [ ] В карточке нет лишних кнопок, дублирующих клик по карточке.
@@ -66,7 +87,7 @@
 - [ ] Card metadata не раздута: title + 2–4 ключевых атрибута максимум.
 - [ ] List item height/spacing consistent; соседние карточки выглядят как один паттерн.
 
-## 7. Forms
+## 8. Forms
 
 - [ ] Required fields явно отмечены смыслом, не только ошибкой после submit.
 - [ ] Validation появляется рядом с полем.
@@ -75,7 +96,7 @@
 - [ ] Submit disabled/validation states понятны.
 - [ ] Cancel/Back явно не сохраняют изменения.
 
-## 8. Empty, loading, error, offline
+## 9. Empty, loading, error, offline
 
 - [ ] Loading использует skeleton/placeholder той же формы, что итоговый контент.
 - [ ] Empty state объясняет, почему пусто и что можно сделать.
@@ -84,7 +105,7 @@
 - [ ] Offline state честно говорит, что доступно без сети.
 - [ ] Restricted/hidden content — error/recovery state, не empty list.
 
-## 9. Accessibility and interaction
+## 10. Accessibility and interaction
 
 - [ ] Все интерактивные элементы доступны с keyboard.
 - [ ] Focus visible и не обрезан.
@@ -94,7 +115,7 @@
 - [ ] Status messages используют `role=status`, `role=alert` или `aria-live`, где нужно.
 - [ ] Не используется один цвет как единственный носитель смысла.
 
-## 10. Responsive/theme checks
+## 11. Responsive/theme checks
 
 Обязательные browser checks:
 
@@ -107,7 +128,7 @@
 - [ ] Min target size ≥44px for `button,a,input,textarea,summary,[role=button]`.
 - [ ] Console errors = 0.
 
-## 11. Copywriting
+## 12. Copywriting
 
 - [ ] Текст для пользователя, не для разработчика.
 - [ ] Нет “появится в следующей задаче”, “slice”, “roadmap”, “stub”, “mock”.
@@ -115,7 +136,7 @@
 - [ ] Safety/medical text нейтральный и не делает персональных рекомендаций.
 - [ ] Error text короткий, без раскрытия внутренних деталей.
 
-## 12. Project consistency
+## 13. Project consistency
 
 - [ ] Используются approved tokens/components из `packages/ui`, если компонент уже есть.
 - [ ] Новый app-local компонент не маскируется под shared UI-kit.
@@ -149,6 +170,14 @@ Residual risks:
 
 - есть horizontal overflow;
 - есть console errors;
+- shell/nav исчезает на product route без approved immersive reason;
+- navigation между product routes вызывает auth flicker/re-auth/loading flash;
+- используются `?screen=` или `?tab=` как product routing;
+- back/cancel placement скачет между экранами одного раздела;
+- sibling screens have different page gutter/top/back geometry or typography hierarchy without approved exception;
+- back/cancel/navigation control stretches full-width without approved exception;
+- repeated UI primitives use arbitrary local spacing/color/radius/font values instead of approved tokens/classes;
+- mobile screen has compounded vertical margins or large empty slabs between main content blocks;
 - touch target <44px;
 - UI содержит служебный/roadmap/dev текст;
 - разные по смыслу actions выглядят одинаково;
