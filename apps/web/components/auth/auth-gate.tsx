@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, type ReactNode } from "react";
-import { Icon, InlineError, Skeleton } from "@flowly/ui";
+import { useSearchParams } from "next/navigation";
+import { Button, Icon, Skeleton } from "@flowly/ui";
 import { useMeQuery, useTelegramAuthMutation } from "@/features/profile/model/me-queries";
 
 /**
@@ -16,7 +17,8 @@ import { useMeQuery, useTelegramAuthMutation } from "@/features/profile/model/me
  * Dev-only forced preview (DEC-024): ?auth=loading | error | ready.
  */
 export function AuthGate({ children }: { children: ReactNode }) {
-  const forced = process.env.NODE_ENV !== "production" && typeof location !== "undefined" ? new URLSearchParams(location.search).get("auth") : null;
+  const searchParams = useSearchParams();
+  const forced = process.env.NODE_ENV !== "production" ? searchParams.get("auth") : null;
   const preview = forced === "loading" || forced === "error" || forced === "ready";
   const me = useMeQuery(!preview);
   const auth = useTelegramAuthMutation();
@@ -38,28 +40,32 @@ export function AuthGate({ children }: { children: ReactNode }) {
   if (ready) return <>{children}</>;
 
   return (
-    <div className="safe-shell mx-auto grid min-h-dvh w-full max-w-[75rem] place-items-center bg-canvas px-4 py-10">
-      <div className="flex w-full max-w-md flex-col items-center gap-6">
-        <Image src="/brand/flowly-icon.svg" alt="Flowly" width={72} height={72} priority />
+    <div className="safe-shell mx-auto grid min-h-dvh w-full max-w-[75rem] place-items-center bg-canvas px-5 py-10">
+      <section className="mx-auto grid w-[calc(100%-2rem)] max-w-[25rem] gap-5 rounded-[2rem] border border-border bg-surface p-5 shadow-[0_1.5rem_4rem_rgba(0,0,0,.16)]" aria-live="polite">
+        <div className="flex items-center gap-4">
+          <Image src="/brand/flowly-icon.svg" alt="" width={56} height={56} priority className="rounded-2xl" />
+          <div className="grid gap-1">
+            <p className="m-0 text-xs font-black uppercase tracking-[.12em] text-text-muted">Flowly</p>
+            <h1 className="m-0 font-display text-3xl font-semibold leading-none">{error ? "Не удалось войти" : "Входим…"}</h1>
+          </div>
+        </div>
+
         {error ? (
-          <InlineError
-            title="Не удалось войти"
-            description="Проверка Telegram не прошла. Повторите вход — личные данные не открываются до успешной проверки."
-            retryLabel="Повторить"
-            onRetry={retry}
-            icon={<Icon name="triangle-alert" />}
-          />
-        ) : (
-          <>
-            <p className="text-text-muted">Проверяем вход…</p>
-            <div className="grid w-full gap-4" aria-label="Загрузка">
-              <Skeleton height="hero" />
-              <Skeleton height="card" />
-              <Skeleton height="card" />
+          <div className="grid gap-4">
+            <div className="flex gap-3 rounded-2xl border border-danger/25 bg-danger/10 p-4 text-text">
+              <Icon name="triangle-alert" className="mt-1 size-5 shrink-0 text-danger" />
+              <p className="m-0 text-sm leading-6 text-text-muted">Откройте Flowly из Telegram или повторите вход. Личные данные не показываем, пока вход не подтверждён.</p>
             </div>
-          </>
+            <Button onClick={retry}>Повторить вход</Button>
+          </div>
+        ) : (
+          <div className="grid gap-4" aria-label="Загрузка">
+            <p className="m-0 text-sm leading-6 text-text-muted">Проверяем сессию и готовим ваши тренировки.</p>
+            <Skeleton height="hero" />
+            <Skeleton height="card" />
+          </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }

@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button, Icon, Select, type SelectOption } from "@flowly/ui";
+import { Icon, Select, type SelectOption } from "@flowly/ui";
 import { usePatchMeMutation } from "../model/me-queries";
 import styles from "./profile-settings-screen.module.css";
 
@@ -23,6 +23,17 @@ const REPORTS = [
 ] as const;
 
 const detectedTimezone = typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "UTC";
+const THEME_STORAGE_KEY = "flowly-theme";
+const initialTheme = () => typeof window === "undefined" ? "system" : ["light", "dark", "system"].includes(localStorage.getItem(THEME_STORAGE_KEY) ?? "") ? localStorage.getItem(THEME_STORAGE_KEY)! : "system";
+const applyTheme = (theme: string) => {
+  if (theme === "light" || theme === "dark") {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+    document.documentElement.dataset.theme = theme;
+  } else {
+    localStorage.setItem(THEME_STORAGE_KEY, "system");
+    document.documentElement.dataset.theme = window.Telegram?.WebApp?.colorScheme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  }
+};
 
 const RU_TZ_KEYWORDS: Record<string, string[]> = {
   "Europe/Moscow": ["москва", "мск", "санкт-петербург", "спб", "петербург"],
@@ -81,32 +92,36 @@ export function ProfileSettingsScreen() {
   const [firstName, setFirstName] = useState("Анна");
   const [timezone, setTimezone] = useState(detectedTimezone);
   const [weekStartsOn, setWeekStartsOn] = useState(1);
-  const [theme, setTheme] = useState("system");
+  const [theme, setTheme] = useState(initialTheme);
   const [reports, setReports] = useState(() => new Set<string>(["weekly"]));
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error" | "offline">("idle");
-  const patchMe = usePatchMeMutation();
+  const { mutateAsync } = usePatchMeMutation();
+  const mounted = useRef(false);
+  const reportsKey = useMemo(() => [...reports].sort().join(","), [reports]);
 
-  const save = async () => {
-    if (!firstName.trim()) {
-      setStatus("error");
-      return;
-    }
+  const saveDraft = useCallback(async () => {
+    const name = firstName.trim();
+    if (!name) return setStatus("error");
     if (forced === "offline") return setStatus("offline");
     if (forced === "error") return setStatus("error");
-    setStatus("saving");
-    if (process.env.NODE_ENV !== "production") {
-      if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
-      setStatus("saved");
-      return;
-    }
     try {
-      await patchMe.mutateAsync({ firstName: firstName.trim(), timezone, weekStartsOn });
-      if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+      applyTheme(theme);
+      if (process.env.NODE_ENV === "production") await mutateAsync({ firstName: name, timezone, weekStartsOn });
       setStatus("saved");
     } catch {
       setStatus("error");
     }
-  };
+  }, [firstName, forced, mutateAsync, theme, timezone, weekStartsOn]);
+
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
+    setStatus("saving");
+    const timer = window.setTimeout(() => void saveDraft(), 550);
+    return () => window.clearTimeout(timer);
+  }, [firstName, timezone, weekStartsOn, theme, reportsKey, saveDraft]);
 
   const toggleReport = (id: string) => setReports((prev) => {
     const next = new Set(prev);
@@ -115,14 +130,13 @@ export function ProfileSettingsScreen() {
   });
 
   return (
-    <div className={`${styles.screen} safe-shell`}>
-      <header className={styles.top}>
-        <button type="button" className={styles.back} onClick={() => router.push("/?screen=profile")}><Icon name="chevron-left" />Профиль</button>
-        <p className={styles.eyebrow}>Настройки</p>
-        <h1 className={styles.title}>Настройки профиля</h1>
+    <div className={`flow-screen ${styles.screen}`}>
+      <header className={`flow-top ${styles.top}`}>
+        <button type="button" className={`flow-back ${styles.back}`} onClick={() => router.push("/profile" as never)}><Icon name="chevron-left" />Профиль</button>
+        <h1 className="flow-title">Настройки</h1>
       </header>
 
-      <section className={styles.card} aria-labelledby="identity-title">
+      <section className={`flow-card ${styles.card}`} aria-labelledby="identity-title">
         <div className={styles.avatarRow}>
           <div className={styles.avatar} aria-hidden="true"><Icon name="user-round" /></div>
           <h2 id="identity-title">Профиль Flowly</h2>
@@ -130,7 +144,7 @@ export function ProfileSettingsScreen() {
         <label className={styles.field}>Имя<input value={firstName} onChange={(e) => setFirstName(e.target.value)} maxLength={64} /></label>
       </section>
 
-      <section className={styles.card} aria-labelledby="time-title">
+      <section className={`flow-card ${styles.card}`} aria-labelledby="time-title">
         <h2 id="time-title">Время и календарь</h2>
         <label className={styles.selectLabel}>Часовой пояс</label>
         <Select options={timezoneOptions} value={timezone} onChange={setTimezone} ariaLabel="Часовой пояс" placeholder="Выбрать часовой пояс" searchPlaceholder="Город, регион или время" />
@@ -139,27 +153,22 @@ export function ProfileSettingsScreen() {
         </div>
       </section>
 
-      <section className={styles.card} aria-labelledby="appearance-title">
+      <section className={`flow-card ${styles.card}`} aria-labelledby="appearance-title">
         <h2 id="appearance-title">Тема</h2>
         <div className={`${styles.segmented} ${styles.themeTabs}`} role="radiogroup" aria-label="Тема интерфейса">
           {THEMES.map((t) => <button key={t.value} type="button" aria-pressed={theme === t.value} onClick={() => setTheme(t.value)}>{t.label}</button>)}
         </div>
       </section>
 
-      <section className={styles.card} aria-labelledby="reports-title">
+      <section className={`flow-card ${styles.card}`} aria-labelledby="reports-title">
         <h2 id="reports-title">Отчёты</h2>
         <div className={styles.switches}>
           {REPORTS.map((r) => <button key={r.id} type="button" className={styles.switchRow} aria-pressed={reports.has(r.id)} onClick={() => toggleReport(r.id)}><span><strong>{r.label}</strong><small>{r.hint}</small></span><i aria-hidden="true" /></button>)}
         </div>
-        <p className={styles.note}>Доставка отчётов и рекомендации закрываются на этапе 6; здесь фиксируем профильную настройку.</p>
       </section>
 
-      <div className={styles.actions}>
-        <Button onClick={save} loading={status === "saving"} leadingIcon={<Icon name="save" />}>Сохранить</Button>
-        <Button variant="ghost" onClick={() => router.push("/?screen=profile")}>Отмена</Button>
-      </div>
-      <p className={`${styles.status} ${status === "error" ? styles.bad : ""}`} role={status === "error" ? "alert" : undefined} aria-live="polite">
-        {status === "saved" ? "Сохранено. Черновик формы не теряется при повторе." : status === "offline" ? "Офлайн: оставили черновик на экране, можно повторить позже." : status === "error" ? "Не удалось сохранить. Проверьте имя и повторите." : ""}
+      <p className={`flow-status ${styles.status} ${status === "error" ? styles.bad : ""}`} role={status === "error" ? "alert" : undefined} aria-live="polite">
+        {status === "saving" ? "Сохраняем…" : status === "saved" ? "Сохранено" : status === "offline" ? "Офлайн: изменения останутся на экране" : status === "error" ? "Не удалось сохранить. Проверьте имя." : ""}
       </p>
     </div>
   );

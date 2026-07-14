@@ -20,8 +20,16 @@ export type TelegramAuthResponse = { ok: true; userId: string; dev?: boolean };
 
 export const meKey = ["me"] as const;
 
+const devUserHeader = (initData: string) => {
+  if (process.env.NODE_ENV === "production" || initData.trim()) return undefined;
+  return encodeURIComponent(JSON.stringify({ id: 777001, first_name: "Анна", last_name: "", username: "anna_flowly", language_code: "ru" }));
+};
+
 export const getMe = (signal?: AbortSignal) => apiJson<MeResponse>("/api/v1/me", { cache: "no-store", signal });
-export const postTelegramAuth = (initData: string) => apiJson<TelegramAuthResponse>("/api/v1/auth/telegram", { method: "POST", body: jsonBody({ initData }) });
+export const postTelegramAuth = (initData: string) => {
+  const devUser = devUserHeader(initData);
+  return apiJson<TelegramAuthResponse>("/api/v1/auth/telegram", { method: "POST", headers: devUser ? { "x-flowly-dev-user": devUser } : undefined, body: jsonBody({ initData }) });
+};
 export const patchMe = (patch: MePatch) => apiJson<MeResponse>("/api/v1/me", { method: "PATCH", body: jsonBody(patch) });
 
 export const useMeQuery = (enabled = true) => useQuery({ queryKey: meKey, queryFn: ({ signal }) => getMe(signal), enabled, staleTime: 30_000, gcTime: 5 * 60_000, retry: false });

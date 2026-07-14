@@ -18,8 +18,10 @@ export const viewport: Viewport = {
 
 const themeBootstrap = `(() => {
   const telegram = window.Telegram?.WebApp;
+  const saved = localStorage.getItem("flowly-theme");
   const forced = ${process.env.NODE_ENV !== "production" ? "new URLSearchParams(location.search).get(\"theme\")" : "null"};
-  const theme = forced === "light" || forced === "dark" ? forced : telegram?.colorScheme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const fallback = forced === "light" || forced === "dark" ? forced : telegram?.colorScheme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const theme = saved === "light" || saved === "dark" ? saved : fallback;
   document.documentElement.dataset.theme = theme;
   if (telegram) document.documentElement.dataset.telegram = "connected";
 })();`;

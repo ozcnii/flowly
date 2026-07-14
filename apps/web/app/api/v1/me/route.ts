@@ -4,15 +4,29 @@ import { schema } from "@flowly/database";
 import { nowIso } from "@flowly/core";
 import { getDb } from "@/lib/cloudflare";
 import { getSessionUserId } from "@/lib/auth/session-user";
-import { getUser, publicUser } from "@/lib/auth/users";
+import { createSession } from "@/lib/auth/session";
+import { setSessionCookie } from "@/lib/auth/cookies";
+import { isDevEmulationEnabled } from "@/lib/auth/dev";
+import { findOrCreateUser, getUser, publicUser } from "@/lib/auth/users";
 import { isSafeOrigin } from "@/lib/auth/csrf";
 import { mePatchSchema } from "@/lib/auth/schemas";
 import { audit, rejectOversizedBody } from "@/lib/auth/http";
 
+const DEV_USER = { id: 777001, first_name: "Анна", last_name: "", username: "anna_flowly", language_code: "ru" };
+
 export async function GET(request: Request) {
+  const db = getDb();
   const userId = await getSessionUserId(request);
-  if (!userId) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  const user = await getUser(getDb(), userId);
+  if (!userId) {
+    if (!isDevEmulationEnabled()) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    const { id } = await findOrCreateUser(db, DEV_USER);
+    const user = await getUser(db, id);
+    if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    const res = NextResponse.json({ user: publicUser(user), dev: true });
+    setSessionCookie(res, await createSession(db, id));
+    return res;
+  }
+  const user = await getUser(db, userId);
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   return NextResponse.json({ user: publicUser(user) });
 }

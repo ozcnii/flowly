@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     const devHeader = request.headers.get("x-flowly-dev-user");
     if (devHeader) {
       try {
-        const devUser = JSON.parse(devHeader) as TelegramInitUser;
+        const devUser = JSON.parse(decodeURIComponent(devHeader)) as TelegramInitUser;
         const db = getDb();
         const { id: userId } = await findOrCreateUser(db, devUser);
         const token = await createSession(db, userId);
