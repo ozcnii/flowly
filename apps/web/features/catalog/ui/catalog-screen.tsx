@@ -67,18 +67,18 @@ export function CatalogScreen({ forced = null }: { forced?: Forced }) {
     <header className={styles.header}>
       <p className={styles.eyebrow}>Каталог</p>
       <h1>Тренировки</h1>
-      <p>Поиск по стартовому каталогу Flowly и нескольким YouTube-практикам для примера.</p>
+      <p>Каталог Flowly и видео-практики YouTube.</p>
     </header>
 
     <section className={styles.searchBox} aria-label="Поиск и фильтры">
-      <label className={styles.search}><Icon name="search" /><input value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Название, описание, категория" /></label>
+      <div className={styles.searchRow}>
+        <label className={styles.search}><Icon name="search" /><input value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Поиск тренировок" /></label>
+        <button type="button" className={styles.filterToggle} aria-expanded={filtersOpen} onClick={() => setFiltersOpen((v) => !v)}><Icon name="settings" />{extraFilterCount ? `Фильтры · ${extraFilterCount}` : "Фильтры"}</button>
+      </div>
       <div className={styles.chips} aria-label="Категории">
         {categories.map((c) => <button key={c.id} type="button" aria-pressed={filters.category === c.slug} onClick={() => update("category", c.slug)}>{c.name}</button>)}
       </div>
-      <div className={styles.filterActions}>
-        <button type="button" className={styles.filterToggle} aria-expanded={filtersOpen} onClick={() => setFiltersOpen((v) => !v)}><Icon name="settings" />Фильтры{extraFilterCount ? ` · ${extraFilterCount}` : ""}</button>
-        {(extraFilterCount > 0 || searchInput || filters.category) && <button type="button" className={styles.resetInline} onClick={reset}>Сбросить</button>}
-      </div>
+      {(extraFilterCount > 0 || searchInput || filters.category) && <button type="button" className={styles.resetInline} onClick={reset}>Сбросить всё</button>}
       {filtersOpen && <div className={styles.filterPanel}>
         <p>Уточнить результаты</p>
         <div className={styles.filterGrid}>

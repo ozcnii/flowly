@@ -2,32 +2,32 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.75rem;
   width: 100%;
   max-width: 42rem;
   min-height: 100dvh;
   margin: auto;
-  padding: 1.25rem 1.25rem 2.5rem;
+  padding: 1rem 1.25rem 2.5rem;
   background: var(--color-canvas);
 }
 
 .header {
   display: grid;
-  gap: 0.45rem;
+  gap: 0.32rem;
 }
 
 .eyebrow {
   margin: 0;
-  color: var(--color-accent);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
 .header h1 {
   margin: 0;
-  font: 600 clamp(2.2rem, 9vw, 3.2rem) / 1 var(--primitive-font-family-display);
+  font: 600 clamp(1.9rem, 8vw, 2.7rem) / 0.95 var(--primitive-font-family-display);
 }
 
 .header p,
@@ -35,11 +35,10 @@
 .offline {
   margin: 0;
   color: var(--color-text-muted);
-  font-size: 0.88rem;
-  line-height: 1.45;
+  font-size: 0.84rem;
+  line-height: 1.35;
 }
 
-.searchBox,
 .card,
 .empty {
   border: 1px solid var(--color-border);
@@ -49,20 +48,26 @@
 
 .searchBox {
   display: grid;
-  gap: 0.75rem;
-  padding: 1rem;
+  gap: 0.55rem;
+}
+
+.searchRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  align-items: center;
 }
 
 .search {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.55rem;
+  gap: 0.5rem;
   align-items: center;
-  min-height: 3rem;
-  padding: 0 0.85rem;
+  min-height: 2.75rem;
+  padding: 0 0.78rem;
   border: 1px solid var(--color-border);
-  border-radius: var(--primitive-radius-md);
-  background: var(--color-canvas);
+  border-radius: 999px;
+  background: var(--color-surface);
 }
 
 .search :global(.fl-icon) {
@@ -84,8 +89,9 @@
 
 .chips {
   display: flex;
-  gap: 0.45rem;
-  padding-bottom: 0.15rem;
+  gap: 0.35rem;
+  margin-inline: -1.25rem;
+  padding: 0 1.25rem 0.1rem;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -94,27 +100,21 @@
   display: none;
 }
 
-.filterActions {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
 .filterToggle,
 .resetInline {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   min-height: 2.75rem;
-  padding: 0 0.95rem;
+  padding: 0 0.78rem;
   border: 1px solid var(--color-border);
   border-radius: 999px;
-  background: var(--color-canvas);
+  background: var(--color-surface);
   color: var(--color-text);
   font: inherit;
-  font-size: 0.86rem;
-  font-weight: 750;
+  font-size: 0.82rem;
+  font-weight: 800;
   cursor: pointer;
 }
 
@@ -124,17 +124,25 @@
 }
 
 .resetInline {
+  width: fit-content;
+  min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: var(--color-text-muted);
-  font-weight: 650;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
 }
 
 .filterPanel {
   display: grid;
   gap: 0.55rem;
-  padding: 0.75rem;
+  padding: 0.7rem;
   border: 1px solid var(--color-border);
   border-radius: var(--primitive-radius-md);
-  background: color-mix(in srgb, var(--color-accent-soft) 22%, transparent);
+  background: var(--color-surface);
 }
 
 .filterPanel p {
@@ -154,14 +162,14 @@
 .filterGrid button {
   flex: 0 0 auto;
   min-height: 2.75rem;
-  padding: 0 0.85rem;
+  padding: 0 0.75rem;
   border: 1px solid var(--color-border);
   border-radius: 999px;
-  background: var(--color-canvas);
+  background: var(--color-surface);
   color: var(--color-text-muted);
   font: inherit;
-  font-size: 0.82rem;
-  font-weight: 650;
+  font-size: 0.8rem;
+  font-weight: 750;
   cursor: pointer;
 }
 
@@ -176,8 +184,9 @@
   display: flex;
   align-items: baseline;
   gap: 0.35rem;
+  margin-top: 0.1rem;
   color: var(--color-text-muted);
-  font-size: 0.86rem;
+  font-size: 0.84rem;
 }
 
 .resultBar strong {

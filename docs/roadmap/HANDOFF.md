@@ -8,7 +8,7 @@
 - **Текущий этап:** 2. Йога
 - **Активная задача:** E2-D2-T04 (YouTube search/cache/save) — следующий кандидат.
 - **Статус:** этап 2 «Йога» продолжается; E2-D2-T03 done; React Query migration done по DEC-029.
-- **Последний завершённый результат:** Catalog search debounce fix — поиск каталога больше не отправляет API-запрос на каждый символ; workout detail polish и React Query migration также done.
+- **Последний завершённый результат:** Catalog search/filter block redesign — верх каталога стал компактнее, без тяжёлой рамочной карточки; search debounce/workout detail polish/React Query migration также done.
 
 ## Что сделано
 
@@ -304,6 +304,7 @@ Roadmap migration / bootstrap verification:
 - **Проверки:** `npm run typecheck --workspace @flowly/web` PASS; `npm run lint --workspace @flowly/web` PASS; raw fetch audit PASS; browser smoke catalog/detail/author/settings 390px PASS (overflow 0, targets >=44, console errors 0); API detail reasons не содержат service text.
 - **Follow-up polish:** после user feedback на `?screen=workout&id=wo-yt-malova-vinyasa-24` `favorite/share` убраны из нижних bulk actions и перенесены в compact disabled overlay icon buttons на обложку; проверка 390 dark PASS: overflow 0, targets >=44px, console errors 0, no service text.
 - **Catalog debounce fix:** после user feedback поиск каталога исправлен: `searchInput` обновляет UI мгновенно, query key получает `debouncedSearch` через 350ms; React Query сохраняет previous data через `placeholderData`. Проверка: быстрый ввод `zz68289` дал `earlyCount=0`, после debounce `lateCount=1` (`/api/v1/workouts?q=...`), typecheck/lint PASS, overflow 0, targets >=44px, console errors 0.
+- **Catalog search/filter redesign:** после user design review верх каталога переработан: убрана тяжёлая outer-card, header compact, copy сокращён, search+filter в одной строке, chips легче, reset secondary text-action. Проверка 390 dark base: first card y≈260 вместо y≈359, overflow 0, targets >=44px, no service text. Проверка 390 light active search: overflow 0, targets >=44px, console errors 0.
 - **Следующее точное действие:** начинать E2-D2-T04 с учётом DEC-029; все search/filter API inputs обязаны иметь debounce/throttle.
 
 ### 2026-07-14 — Frontend quality gate DEC-028
