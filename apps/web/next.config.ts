@@ -4,10 +4,41 @@ import { fileURLToPath } from "node:url";
 
 initOpenNextCloudflareForDev();
 
+// CSP baseline (E1-D1-T09): self + inline (Next App Router без nonce). Telegram Mini App
+// работает в WebView, не в iframe — frame-ancestors 'none' безопасен. В dev React использует
+// eval() для дебага (в prod — нет), поэтому 'unsafe-eval' только в dev. Harden (nonce-based) в этапе 8.
+const isDev = process.env.NODE_ENV !== "production";
+const scriptSrc = `'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`;
+
+const securityHeaders = [
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "X-Frame-Options", value: "SAMEORIGIN" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), interest-cohort=()" },
+  {
+    key: "Content-Security-Policy",
+    value: [
+      "default-src 'self'",
+      `script-src ${scriptSrc}`,
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: blob:",
+      "font-src 'self' data:",
+      "connect-src 'self'",
+      "frame-ancestors 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "object-src 'none'",
+    ].join("; "),
+  },
+];
+
 export default {
   poweredByHeader: false,
   reactStrictMode: true,
   typedRoutes: true,
   transpilePackages: ["@flowly/ui"],
   turbopack: { root: fileURLToPath(new URL("../..", import.meta.url)) },
+  async headers() {
+    return [{ source: "/:path*", headers: securityHeaders }];
+  },
 } satisfies NextConfig;

@@ -7,6 +7,7 @@ import { getSessionUserId } from "@/lib/auth/session-user";
 import { getUser, publicUser } from "@/lib/auth/users";
 import { isSafeOrigin } from "@/lib/auth/csrf";
 import { mePatchSchema } from "@/lib/auth/schemas";
+import { audit, rejectOversizedBody } from "@/lib/auth/http";
 
 export async function GET(request: Request) {
   const userId = await getSessionUserId(request);
@@ -17,6 +18,8 @@ export async function GET(request: Request) {
 }
 
 export async function PATCH(request: Request) {
+  const oversized = rejectOversizedBody(request);
+  if (oversized) return oversized;
   if (!isSafeOrigin(request)) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }

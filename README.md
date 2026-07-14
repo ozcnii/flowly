@@ -172,4 +172,8 @@ npm run typecheck / lint / build / test / test:e2e
 
 Изоляция: `.dev.vars`, `**/.wrangler/` gitignored (см. `.gitignore`); `.dev.vars.example` отслеживается как шаблон; prod-токен — только Cloudflare secret, никогда в репо.
 
+## Безопасность (security gate, E1-D1-T09)
+
+Security headers через `next.config.ts`: `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy`, `Permissions-Policy`, CSP baseline (self + inline; `frame-ancestors 'none'`; `unsafe-eval` только в dev для React dev-mode). Ограничение размера запроса — `lib/auth/http.ts rejectOversizedBody` (64 KiB на foundation JSON-API; >лимита → 413). Минимальный журнал критических действий — `audit()` (auth login/logout). Полный отчёт по §47.1/§55.1: [`docs/roadmap/evidence/T09-dod.md`](docs/roadmap/evidence/T09-dod.md).
+
 Актуальная реализация и следующий шаг указаны в [HANDOFF](docs/roadmap/HANDOFF.md).
