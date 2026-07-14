@@ -8,9 +8,9 @@ import styles from "./help-screen.module.css";
 type Topic = { id: string; icon: string; title: string; text: string; to?: string };
 
 const TOPICS: Topic[] = [
-  { id: "start", icon: "play", title: "Как начать", text: "Выберите тренировку, программу или привычку на Главной.", to: "/?tab=home" },
+  { id: "start", icon: "play", title: "Как начать", text: "Выберите тренировку, программу или привычку на Главной.", to: "/" },
   { id: "bot", icon: "bot", title: "Бот и напоминания", text: "Проверьте связь с ботом, если не приходят сообщения." },
-  { id: "profile", icon: "settings", title: "Профиль", text: "Имя, часовой пояс, тема и отчёты меняются в настройках.", to: "/?screen=settings" },
+  { id: "profile", icon: "settings", title: "Профиль", text: "Имя, часовой пояс, тема и отчёты меняются в настройках.", to: "/settings" },
   { id: "access", icon: "lock", title: "Доступы", text: "Если ссылка не открывается — вернитесь на Главную или попросите доступ заново." },
 ];
 
@@ -34,11 +34,11 @@ export function HelpScreen() {
   };
 
   return (
-    <div className={`${styles.screen} safe-shell`}>
-      <header className={styles.top}>
-        <button type="button" className={styles.back} onClick={() => router.push("/?screen=profile")}><Icon name="chevron-left" />Профиль</button>
-        <p className={styles.eyebrow}>S-MA-096 · Помощь</p>
-        <h1 className={styles.title}>Помощь</h1>
+    <div className={`flow-screen ${styles.screen}`}>
+      <header className={`flow-top ${styles.top}`}>
+        <button type="button" className={`flow-back ${styles.back}`} onClick={() => router.push("/profile" as never)}><Icon name="chevron-left" />Профиль</button>
+        <p className="flow-eyebrow">Помощь</p>
+        <h1 className="flow-title">Помощь</h1>
       </header>
 
       <section className={styles.botCard} aria-labelledby="bot-title">
@@ -51,7 +51,7 @@ export function HelpScreen() {
       </section>
 
       <nav className={styles.list} aria-label="Разделы помощи">
-        {TOPICS.map((topic) => <button key={topic.id} type="button" className={styles.row} onClick={() => openTopic(topic)}>
+        {TOPICS.map((topic) => <button key={topic.id} type="button" className={`flow-list-row ${styles.row}`} onClick={() => openTopic(topic)}>
           <span className={styles.rowIcon} aria-hidden="true"><Icon name={topic.icon} /></span>
           <span><strong>{topic.title}</strong><small>{topic.text}</small></span>
           <Icon name="chevron-right" className={styles.chevron} />
@@ -60,7 +60,7 @@ export function HelpScreen() {
 
       <div className={styles.actions}>
         <Button leadingIcon={<Icon name="external-link" />} onClick={() => setNotice("В Telegram откроется чат с ботом.")}>Открыть бота</Button>
-        <Button variant="ghost" onClick={() => router.push("/?tab=home")}>На Главную</Button>
+        <Button variant="ghost" onClick={() => router.push("/" as never)}>На Главную</Button>
       </div>
       <p className={styles.notice} aria-live="polite">{notice}</p>
     </div>

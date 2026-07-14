@@ -21,13 +21,13 @@ export function OpenViaTelegramScreen() {
     setNotice(isDev ? "В реальном Telegram здесь откроется бот Flowly." : "");
 
   return (
-    <div className={`${styles.screen} safe-shell`}>
+    <div className={`safe-shell flow-screen ${styles.screen}`}>
       <div className={styles.card}>
         <span className={styles.badge} aria-hidden="true">
           <Icon name="external-link" />
         </span>
 
-        <h1 className={styles.title}>Откройте Flowly через Telegram</h1>
+        <h1 className={`flow-title ${styles.title}`}>Откройте Flowly через Telegram</h1>
         <p className={styles.text}>
           Flowly работает внутри Telegram. Откройте приложение из бота Flowly,
           чтобы войти и продолжить — отдельная регистрация не нужна.

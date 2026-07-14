@@ -44,8 +44,8 @@ function Hero({ workout }: { workout: WorkoutDetail }) {
         </div>
         {!image && <QuickActions />}
       </div>
-      <h1>{workout.title}</h1>
-      <p>{workout.description}</p>
+      <h1 className="flow-title">{workout.title}</h1>
+      <p className="flow-subtitle">{workout.description}</p>
     </div>
   </section>;
 }
@@ -87,9 +87,9 @@ function ExerciseList({ workout }: { workout: WorkoutDetail }) {
 
 function Detail({ workout, forced }: { workout: WorkoutDetail; forced: Forced }) {
   const contraindications = workout.contraindications.length ? workout.contraindications : ["Нет специальных противопоказаний в каталоге. Ориентируйтесь на самочувствие."];
-  return <div className={`${styles.screen} safe-shell`}>
+  return <div className={`flow-screen ${styles.screen}`}>
     {forced === "offline" && <OfflineBanner icon={<Icon name="wifi-off" />}>Офлайн: показываем уже загруженное описание. Новые действия временно недоступны.</OfflineBanner>}
-    <Link className={styles.back} href="/?screen=catalog"><Icon name="chevron-left" />Каталог</Link>
+    <Link className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Link>
     <Hero workout={workout} />
 
     {workout.sourceType === "user" && <section className={styles.warning}><Icon name="triangle-alert" /><span>Тренировка создана пользователем и не проверена Flowly.</span></section>}
@@ -112,14 +112,14 @@ function Detail({ workout, forced }: { workout: WorkoutDetail; forced: Forced })
         <ul className={styles.bullets}>{contraindications.map((x) => <li key={x}>{x}</li>)}</ul>
         <p className={styles.muted}>Это справочная информация из описания тренировки, не персональная рекомендация.</p>
         <p className={styles.muted}>Источник: {sourceLabel(workout.sourceType)} · Автор: {workout.author.name}</p>
-        <Link className={styles.authorLink} href={`/?screen=author&source=${encodeURIComponent(workout.sourceType)}`}>Открыть публичный профиль</Link>
+        <Link className={styles.authorLink} href={`/authors/${encodeURIComponent(workout.sourceType)}` as never}>Открыть публичный профиль</Link>
       </div>
     </details>
   </div>;
 }
 
 function Loading() {
-  return <div className={`${styles.screen} safe-shell`} aria-label="Загрузка тренировки"><Skeleton height="hero" /><Skeleton height="card" /><Skeleton height="card" /></div>;
+  return <div className={`flow-screen ${styles.screen}`} aria-label="Загрузка тренировки"><Skeleton height="hero" /><Skeleton height="card" /><Skeleton height="card" /></div>;
 }
 
 export function WorkoutDetailScreen({ id, forced = null }: Props) {
@@ -127,8 +127,8 @@ export function WorkoutDetailScreen({ id, forced = null }: Props) {
   const workout = detail.data?.workout ?? null;
 
   if (forced === "loading") return <Loading />;
-  if (forced === "hidden") return <div className={`${styles.screen} safe-shell`}><Link className={styles.back} href="/?screen=catalog"><Icon name="chevron-left" />Каталог</Link><InlineError icon={<Icon name="eye-off" />} title="Тренировка недоступна" description="Доступ к этой тренировке изменился. Вернитесь в каталог и выберите другую практику." /></div>;
-  if (forced === "error" || detail.isError) return <div className={`${styles.screen} safe-shell`}><Link className={styles.back} href="/?screen=catalog"><Icon name="chevron-left" />Каталог</Link><InlineError icon={<Icon name="triangle-alert" />} title="Не удалось загрузить тренировку" description="Повторите запрос. Если тренировка удалена или скрыта, мы покажем безопасное сообщение вместо пустого экрана." onRetry={() => detail.refetch()} /></div>;
+  if (forced === "hidden") return <div className={`flow-screen ${styles.screen}`}><Link className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Link><InlineError icon={<Icon name="eye-off" />} title="Тренировка недоступна" description="Доступ к этой тренировке изменился. Вернитесь в каталог и выберите другую практику." /></div>;
+  if (forced === "error" || detail.isError) return <div className={`flow-screen ${styles.screen}`}><Link className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Link><InlineError icon={<Icon name="triangle-alert" />} title="Не удалось загрузить тренировку" description="Повторите запрос. Если тренировка удалена или скрыта, мы покажем безопасное сообщение вместо пустого экрана." onRetry={() => detail.refetch()} /></div>;
   if (!workout) return <Loading />;
   return <Detail workout={workout} forced={forced} />;
 }

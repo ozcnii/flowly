@@ -1,15 +1,5 @@
-.screen {
-  display: grid;
-  align-content: start;
-  gap: 0.65rem;
-  width: 100%;
-  max-width: 42rem;
-  min-height: 100dvh;
-  margin: auto;
-  padding: 0.75rem 1.25rem 2rem;
-  background: var(--color-canvas);
-  color: var(--color-text);
-}
+
+.screen {}
 
 .back,
 .secondary,
@@ -26,14 +16,7 @@
   text-decoration: none;
 }
 
-.back {
-  margin-left: -0.25rem;
-}
-
-.back :global(.fl-icon) {
-  width: 1rem;
-  height: 1rem;
-}
+.back {}
 
 .header,
 .card,

@@ -42,13 +42,13 @@ export function BotConnectionScreen() {
   }, [isDev, attempt]);
 
   const retry = () => { setPhase("checking"); setAttempt((n) => n + 1); };
-  const finish = () => router.push("/?tab=home");
+  const finish = () => router.push("/" as never);
 
   return (
-    <div className={`${styles.screen} safe-shell`}>
+    <div className={`safe-shell flow-screen ${styles.screen}`}>
       <header className={styles.header}>
-        <p className={styles.eyebrow}>Шаг 4 · Обязательный шаг</p>
-        <h1 className={styles.title}>Связь с Telegram-ботом</h1>
+        <p className={`flow-eyebrow ${styles.eyebrow}`}>Шаг 4 · Обязательный шаг</p>
+        <h1 className={`flow-title ${styles.title}`}>Связь с Telegram-ботом</h1>
         <p className={styles.text}>
           Без связи с ботом напоминания и уведомления не дойдут. Этот шаг нельзя
           пропустить — остальные шаги знакомства можно было пропустить.

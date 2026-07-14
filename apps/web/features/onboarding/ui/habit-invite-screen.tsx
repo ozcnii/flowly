@@ -39,7 +39,7 @@ export function HabitInviteScreen() {
     setHabitChoice("skip");
     setInviteChoice("skip");
     setNotice("");
-    router.push("/?tab=home");
+    router.push("/" as never);
   };
 
   const next = () => {
@@ -54,14 +54,14 @@ export function HabitInviteScreen() {
     }
 
     setNotice("Сохраняем настройки…");
-    router.push("/?tab=home");
+    router.push("/" as never);
   };
 
   return (
-    <div className={`${styles.screen} safe-shell`}>
+    <div className={`safe-shell flow-screen ${styles.screen}`}>
       <header className={styles.header}>
-        <p className={styles.eyebrow}>Шаг 3 · Быстрый старт</p>
-        <h1 className={styles.title}>Давайте настроим первые шаги</h1>
+        <p className={`flow-eyebrow ${styles.eyebrow}`}>Шаг 3 · Быстрый старт</p>
+        <h1 className={`flow-title ${styles.title}`}>Давайте настроим первые шаги</h1>
         <p className={styles.text}>
           Сначала можно создать одну привычку и сразу пригласить друга, но оба шага
           можно безвредно пропустить.

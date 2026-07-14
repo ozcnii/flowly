@@ -20,13 +20,13 @@ export function UnavailableDeepLinkScreen() {
     setNotice(isDev ? "В реальном Telegram здесь откроется бот Flowly на нужном экране." : "");
 
   return (
-    <div className={`${styles.screen} safe-shell`} role="alert">
+    <div className={`safe-shell flow-screen ${styles.screen}`} role="alert">
       <div className={styles.card}>
         <span className={styles.badge} aria-hidden="true">
           <Icon name="external-link" />
         </span>
 
-        <h1 className={styles.title}>Эта ссылка открывается в Telegram</h1>
+        <h1 className={`flow-title ${styles.title}`}>Эта ссылка открывается в Telegram</h1>
         <p className={styles.reason}>
           Материал по ссылке доступен только внутри Flowly в Telegram. Откройте
           его через бота — содержимое ссылки в браузере не показывается, чтобы

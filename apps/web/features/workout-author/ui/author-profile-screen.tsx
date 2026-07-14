@@ -24,7 +24,7 @@ const cover = (workout: CatalogWorkout) => workout.sourceType === "youtube" && w
 
 function WorkoutMiniCard({ workout }: { workout: CatalogWorkout }) {
   const image = cover(workout);
-  return <Link className={styles.card} href={`/?screen=workout&id=${encodeURIComponent(workout.id)}`}>
+  return <Link className={`flow-card ${styles.card}`} href={`/workouts/${encodeURIComponent(workout.id)}` as never}>
     {image && <span className={styles.cover} style={{ backgroundImage: `${workout.sourceType === "youtube" ? "linear-gradient(135deg, rgba(28,45,39,.08), rgba(28,45,39,.52)), " : ""}url(${image})` }}>{workout.sourceType === "youtube" && <Icon name="play" />}</span>}
     <span className={styles.cardBody}>
       <span className={styles.cardTop}>{minutes(workout.durationSeconds)} · {DIFFICULTY[workout.difficulty as keyof typeof DIFFICULTY] ?? workout.difficulty}</span>
@@ -35,7 +35,7 @@ function WorkoutMiniCard({ workout }: { workout: CatalogWorkout }) {
 }
 
 function Loading() {
-  return <div className={`${styles.screen} safe-shell`} aria-label="Загрузка автора"><Skeleton height="hero" /><Skeleton height="card" /><Skeleton height="card" /></div>;
+  return <div className={`flow-screen ${styles.screen}`} aria-label="Загрузка автора"><Skeleton height="hero" /><Skeleton height="card" /><Skeleton height="card" /></div>;
 }
 
 export function AuthorProfileScreen({ source, forced = null }: Props) {
@@ -45,20 +45,20 @@ export function AuthorProfileScreen({ source, forced = null }: Props) {
   const items = useMemo(() => forced === "empty" || forced === "blocked" ? [] : data?.workouts ?? [], [data, forced]);
 
   if (forced === "loading") return <Loading />;
-  if (forced === "error" || author.isError) return <div className={`${styles.screen} safe-shell`}><Link className={styles.back} href="/?screen=catalog"><Icon name="chevron-left" />Каталог</Link><InlineError icon={<Icon name="triangle-alert" />} title="Не удалось загрузить автора" description="Повторите позже. Доступ к тренировкам не менялся." /></div>;
+  if (forced === "error" || author.isError) return <div className={`flow-screen ${styles.screen}`}><Link className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Link><InlineError icon={<Icon name="triangle-alert" />} title="Не удалось загрузить автора" description="Повторите позже. Доступ к тренировкам не менялся." /></div>;
   if (!data && !forced) return <Loading />;
 
-  return <div className={`${styles.screen} safe-shell`}>
-    <Link className={styles.back} href="/?screen=catalog"><Icon name="chevron-left" />Каталог</Link>
-    <header className={styles.header}>
-      <p>{SOURCE[src] ?? sourceTitle[src]}</p>
-      <h1>{sourceTitle[src]}</h1>
-      <span>{sourceDescription[src]}</span>
+  return <div className={`flow-screen ${styles.screen}`}>
+    <Link className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Link>
+    <header className={`flow-top ${styles.header}`}>
+      <p className="flow-eyebrow">{SOURCE[src] ?? sourceTitle[src]}</p>
+      <h1 className="flow-title">{sourceTitle[src]}</h1>
+      <span className="flow-subtitle">{sourceDescription[src]}</span>
     </header>
 
     <section className={styles.control} aria-label="Доступ к автору">
       {src === "flowly" ? <p>Flowly — системный источник. Его нельзя скрыть или заблокировать.</p> : src === "youtube" ? <p>YouTube-каналы можно будет скрывать после подключения поиска.</p> : forced === "blocked" ? <p>Автор скрыт. Разблокирование будет доступно позже.</p> : <p>Действия для пользовательского контента.</p>}
-      {src === "user" && <div className={styles.safetyLinks}><Link className={styles.reportLink} href="/?screen=ugc-safety&action=report">Пожаловаться</Link><Link className={styles.hideLink} href="/?screen=ugc-safety&action=hide">Скрыть</Link><Link className={styles.blockLink} href="/?screen=ugc-safety&action=block">Заблокировать</Link></div>}
+      {src === "user" && <div className={styles.safetyLinks}><Link className={styles.reportLink} href={"/safety/report" as never}>Пожаловаться</Link><Link className={styles.hideLink} href={"/safety/hide" as never}>Скрыть</Link><Link className={styles.blockLink} href={"/safety/block" as never}>Заблокировать</Link></div>}
     </section>
 
     <section className={styles.content}>

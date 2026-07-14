@@ -1,35 +1,9 @@
-.screen {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 1rem;
-  width: 100%;
-  max-width: 42rem;
-  min-height: 100dvh;
-  margin: auto;
-  padding: 1.25rem 1.25rem 2.5rem;
-  background: var(--color-canvas);
-}
 
-.top {
-  display: grid;
-  gap: 0.45rem;
-}
+.screen {}
 
-.back {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  justify-self: start;
-  min-height: 2.75rem;
-  padding: 0 0.75rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--primitive-radius-md);
-  background: transparent;
-  color: var(--color-text-muted);
-  font: inherit;
-  cursor: pointer;
-}
+.top {}
+
+.back {}
 
 .eyebrow {
   margin: 0.25rem 0 0;

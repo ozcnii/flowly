@@ -12,10 +12,10 @@ import styles from "./welcome-screen.module.css";
  */
 export function WelcomeScreen() {
   const router = useRouter();
-  const goHome = () => router.push("/?tab=home");
+  const goHome = () => router.push("/" as never);
 
   return (
-    <div className={`${styles.screen} safe-shell`}>
+    <div className={`safe-shell flow-screen ${styles.screen}`}>
       <div className={styles.hero}>
         <Image
           src="/media/home-program.webp"
@@ -29,8 +29,8 @@ export function WelcomeScreen() {
       </div>
 
       <section className={styles.body}>
-        <p className={styles.eyebrow}>Добро пожаловать</p>
-        <h1 className={styles.title}>
+        <p className={`flow-eyebrow ${styles.eyebrow}`}>Добро пожаловать</p>
+        <h1 className={`flow-title ${styles.title}`}>
           Мягкий ритм йоги, привычек и спокойного дня
         </h1>
         <p className={styles.text}>

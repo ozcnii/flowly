@@ -10,9 +10,8 @@ import styles from "./profile-hub-screen.module.css";
  * Opened via avatar from Home. Read-only hub: navigates to child surfaces; mutations
  * happen there. Flowly name is edited separately; avatar is refreshed from Telegram.
  *
- * Dev-only preview (DEC-024): `?screen=profile`. Section targets land per stage
- * (friends/challenges→7, favorites→2, reports→6, export/delete→8/F11; settings→S-MA-090,
- * help→S-MA-096).
+ * Product route: `/profile`. Section targets land per stage (friends/challenges→7,
+ * favorites→2, reports→6, export/delete→8/F11; settings→S-MA-090, help→S-MA-096).
  */
 
 type Section = {
@@ -31,11 +30,11 @@ const SECTIONS: Section[] = [
   { id: "challenges", icon: "flag", label: "Челленджи", hint: "Совместные челленджи", stage: "этап 7" },
   { id: "favorites", icon: "heart", label: "Избранное", hint: "Сохранённые тренировки", stage: "этап 2" },
   { id: "reports", icon: "chart-no-axes-column", label: "Отчёты", hint: "Недельные и месячные", stage: "этап 6" },
-  { id: "settings", icon: "settings", label: "Настройки", hint: "Профиль, часовой пояс, тема, отчёты", to: "?screen=settings" },
+  { id: "settings", icon: "settings", label: "Настройки", hint: "Профиль, часовой пояс, тема, отчёты", to: "/settings" },
   { id: "notifications", icon: "bell", label: "Уведомления", hint: "Напоминания и тишина", stage: "этап 5" },
   { id: "export", icon: "download", label: "Экспорт данных", hint: "Скачать архив", stage: "этап 8" },
   { id: "delete", icon: "trash-2", label: "Удалить аккаунт", hint: "Grace 7 дней", stage: "этап 8", danger: true },
-  { id: "help", icon: "circle-help", label: "Справка", hint: "Помощь и диагностика бота", to: "?screen=help" },
+  { id: "help", icon: "circle-help", label: "Справка", hint: "Помощь и диагностика бота", to: "/help" },
 ];
 
 export function ProfileHubScreen() {
@@ -45,21 +44,25 @@ export function ProfileHubScreen() {
   const onSection = (s: Section) => {
     if (s.to) {
       setNotice("");
-      // typedRoutes строг к маршрутам; это dev-preview query-навигация.
-      router.push(`/${s.to}` as never);
+      router.push(s.to as never);
       return;
     }
     setNotice(`«${s.label}» появится на ${s.stage}. Сейчас это preview профиля.`);
   };
 
   return (
-    <div className={`${styles.screen} safe-shell`}>
+    <div className={`flow-screen ${styles.screen}`}>
+      <div className={`flow-top ${styles.top}`}>
+        <button type="button" className={`flow-back ${styles.back}`} onClick={() => router.push("/" as never)}>
+          <Icon name="chevron-left" /> Главная
+        </button>
+      </div>
       <header className={styles.header}>
         <div className={styles.avatar} aria-hidden="true">
           <Icon name="user-round" />
         </div>
         <div className={styles.id}>
-          <h1 className={styles.name}>Анна</h1>
+          <h1 className={`flow-title ${styles.name}`}>Анна</h1>
           <p className={styles.sub}>
             <span className={styles.tgName}>@anna_flowly</span>
           </p>
@@ -78,7 +81,7 @@ export function ProfileHubScreen() {
           <button
             key={s.id}
             type="button"
-            className={`${styles.row} ${s.danger ? styles.rowDanger : ""}`}
+            className={`flow-list-row ${styles.row} ${s.danger ? styles.rowDanger : ""}`}
             onClick={() => onSection(s)}
           >
             <span className={styles.rowIcon} aria-hidden="true">
@@ -93,9 +96,6 @@ export function ProfileHubScreen() {
         ))}
       </nav>
 
-      <button type="button" className={styles.back} onClick={() => router.push("/?tab=home")}>
-        <Icon name="chevron-left" /> На Главную
-      </button>
     </div>
   );
 }

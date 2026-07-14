@@ -182,16 +182,16 @@ export function PreferencesScreen() {
     } catch {
       // best-effort in dev preview; real persistence is verified via curl
     }
-    router.push("/?tab=home");
+    router.push("/" as never);
   };
 
-  const skip = () => router.push("/?tab=home");
+  const skip = () => router.push("/" as never);
 
   return (
-    <div className={`${styles.screen} safe-shell`}>
+    <div className={`safe-shell flow-screen ${styles.screen}`}>
       <header className={styles.header}>
-        <p className={styles.eyebrow}>Шаг 2 · Настройки</p>
-        <h1 className={styles.title}>Подстроим под вас</h1>
+        <p className={`flow-eyebrow ${styles.eyebrow}`}>Шаг 2 · Настройки</p>
+        <h1 className={`flow-title ${styles.title}`}>Подстроим под вас</h1>
         <p className={styles.text}>Часовой пояс и начало недели нужны для точного расписания. Остальное подскажет ваши интересы.</p>
       </header>
 

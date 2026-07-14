@@ -52,14 +52,14 @@ export function DeepLinkRecoveryScreen({ variant = "unavailable" }: { variant?: 
   const [notice, setNotice] = useState("");
   const [reauth, setReauth] = useState(false);
 
-  const goHome = () => router.push("/?tab=home");
+  const goHome = () => router.push("/" as never);
 
   const onPrimary = () => {
     if (variant === "auth") {
       // preview: simulate re-auth, then safe-exit home
       setReauth(true);
       setNotice("Перепроверяем вход…");
-      setTimeout(() => router.push("/?tab=home"), 900);
+      setTimeout(() => router.push("/" as never), 900);
       return;
     }
     goHome();
@@ -71,12 +71,12 @@ export function DeepLinkRecoveryScreen({ variant = "unavailable" }: { variant?: 
   };
 
   return (
-    <div className={`${styles.screen} safe-shell`} role="alert">
+    <div className={`safe-shell flow-screen ${styles.screen}`} role="alert">
       <div className={styles.card}>
         <span className={styles.badge} aria-hidden="true">
           <Icon name={v.icon} />
         </span>
-        <h1 className={styles.title}>{v.title}</h1>
+        <h1 className={`flow-title ${styles.title}`}>{v.title}</h1>
         <p className={styles.reason}>{v.reason}</p>
 
         <div className={styles.actions}>
