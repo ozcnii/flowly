@@ -29,7 +29,7 @@
 | 11 | Идемпотентность callback | ◐ | → этап 5 |
 | 12 | Секреты только в Cloudflare Secrets | ✅ | `.dev.vars` gitignored; prod-токен через Cloudflare secret; secret scan 0 |
 | 13 | Отсутствие токенов в клиентском JS | ✅ | bot-token только server-side (`getBotToken()`); AuthGate использует `fetch`, токен не в браузере |
-| 14 | Журнал критических действий | ◐ (min) | `lib/auth/http.ts audit()` — структурированный лог auth login/login_failed/logout (T09); полный audit-log → этап 8 |
+| 14 | Журнал критических действий | ◐ (min) | `lib/auth/http.ts audit()` — структурированный лог auth login/login_failed/logout + `me.patch` (T09); полный audit-log → этап 8 |
 
 ## §40.3 — Доступность
 
@@ -37,9 +37,9 @@
 
 ## Security headers (T09)
 
-`apps/web/next.config.ts` `headers()`: `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (рестриктивный), `Content-Security-Policy` (baseline: self + inline; `frame-ancestors 'none'`; `unsafe-eval` только в dev для React dev-mode). Проверено: заголовки присутствуют на ответе (curl -I PASS), приложение загружается без CSP-нарушений (browser-verify, 0 console errors).
+`apps/web/next.config.ts` `headers()`: `Strict-Transport-Security` (HSTS, max-age 180д, includeSubDomains), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` (рестриктивный), `Content-Security-Policy` (baseline: self + inline; `frame-ancestors 'none'`; `unsafe-eval` только в dev для React dev-mode). Проверено: заголовки присутствуют на ответе (curl -I PASS), приложение загружается без CSP-нарушений (browser-verify, 0 console errors).
 
-Harden (nonce-based CSP, strict transport) → этап 8.
+Harden (nonce-based CSP) → этап 8. HSTS и базовый headers-набор закрыты в T09.
 
 ## Residual risks (downstream)
 

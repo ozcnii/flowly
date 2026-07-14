@@ -34,6 +34,7 @@ export async function PATCH(request: Request) {
     .update(schema.users)
     .set({ ...parsed.data, updatedAt: nowIso() })
     .where(eq(schema.users.id, userId));
+  audit("me.patch", { userId });
   const user = await getUser(db, userId);
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   return NextResponse.json({ user: publicUser(user) });
