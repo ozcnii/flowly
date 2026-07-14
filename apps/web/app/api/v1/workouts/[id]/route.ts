@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { schema } from "@flowly/database";
+import { getSessionUserId } from "@/lib/auth/session-user";
 import { getDb } from "@/lib/cloudflare";
 import starterCatalog from "../../../../../../../seeds/catalog/starter-catalog.v1.json";
 
@@ -35,10 +36,10 @@ const actionsFor = (sourceType: string): WorkoutDetail["actions"] => ({
   author: { enabled: false, reason: sourceType === "user" ? "Можно открыть профиль автора." : "Для этого источника отдельный профиль не требуется." },
 });
 
-async function loadFromD1(id: string): Promise<WorkoutDetail | null> {
+async function loadFromD1(id: string, userId: string | null): Promise<WorkoutDetail | null> {
   const db = getDb();
   const workout = (await db.select().from(schema.workouts).where(eq(schema.workouts.id, id)).limit(1))[0];
-  if (!workout || workout.status !== "published") return null;
+  if (!workout || workout.status !== "published" || (workout.visibility !== "public" && workout.ownerId !== userId)) return null;
 
   const [categories, links, exerciseLinks, exercises] = await Promise.all([
     db.select().from(schema.workoutCategories),
@@ -107,10 +108,11 @@ function loadDevFallback(id: string): WorkoutDetail | null {
   };
 }
 
-export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const userId = await getSessionUserId(request).catch(() => null);
   let workout: WorkoutDetail | null;
-  try { workout = await loadFromD1(id); }
+  try { workout = await loadFromD1(id, userId); }
   catch (error) {
     if (process.env.NODE_ENV === "production") throw error;
     workout = loadDevFallback(id);

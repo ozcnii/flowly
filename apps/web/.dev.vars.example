@@ -7,11 +7,17 @@ NEXTJS_ENV=development
 TELEGRAM_BOT_TOKEN=
 
 # Optional: enable dev-only Telegram user emulation (PRD §10.3) for `next dev`.
+# When set to 1, local GET /me creates a mock user session without Telegram.
 # NEVER enable in production.
 FLOWLY_DEV_EMULATION=
 
 # Optional: Telegram mode (PRD §49.4): mock | test | production.
-# Empty = auto: local `next dev` -> mock; deployed -> production.
+# Empty = auto: local `next dev` -> mock, deployed -> production.
 # Test environment MUST set TELEGRAM_MODE=test explicitly.
 # In `mock`, outbound messages are written to a local log and never sent.
 TELEGRAM_MODE=
+
+# Optional: Invidious-compatible API base URL for E2-D2-T04 YouTube search.
+# Do not commit a hardcoded public instance as product contract; configure per env.
+# If empty in dev, /api/v1/youtube/search uses controlled fixture/fallback states.
+INVIDIOUS_BASE_URL=

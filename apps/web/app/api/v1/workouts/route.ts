@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { schema } from "@flowly/database";
+import { getSessionUserId } from "@/lib/auth/session-user";
 import { getDb } from "@/lib/cloudflare";
 import starterCatalog from "../../../../../../seeds/catalog/starter-catalog.v1.json";
 
@@ -25,7 +26,7 @@ const FILTERS = ["q", "category", "duration", "difficulty", "format", "source", 
 const parseJsonArray = (value: string) => { try { const parsed = JSON.parse(value) as unknown; return Array.isArray(parsed) ? parsed.map(String) : []; } catch { return []; } };
 const inDuration = (seconds: number, bucket: string) => !bucket || (bucket === "short" ? seconds <= 600 : bucket === "medium" ? seconds > 600 && seconds <= 1200 : bucket === "long" ? seconds > 1200 && seconds <= 2100 : true);
 
-async function loadFromD1(): Promise<{ categories: Category[]; workouts: Workout[] }> {
+async function loadFromD1(userId: string | null): Promise<{ categories: Category[]; workouts: Workout[] }> {
   const db = getDb();
   const [workouts, categories, links] = await Promise.all([
     db.select().from(schema.workouts),
@@ -43,7 +44,7 @@ async function loadFromD1(): Promise<{ categories: Category[]; workouts: Workout
   }
   return {
     categories: categories.map((c) => ({ id: c.id, slug: c.slug, name: c.name, icon: c.icon, sortOrder: c.sortOrder, isActive: c.isActive })),
-    workouts: workouts.filter((w) => w.status === "published").map((w) => ({
+    workouts: workouts.filter((w) => w.status === "published" && (w.visibility === "public" || (userId && w.ownerId === userId))).map((w) => ({
       id: w.id,
       title: w.title,
       description: w.description,
@@ -93,8 +94,9 @@ export async function GET(request: Request) {
   const filters: Record<FilterKey, string> = { q: "", category: "", duration: "", difficulty: "", format: "", source: "", equipment: "", favorite: "" };
   for (const key of FILTERS) filters[key] = url.searchParams.get(key)?.trim() || "";
 
+  const userId = await getSessionUserId(request).catch(() => null);
   let catalog: { categories: Category[]; workouts: Workout[] };
-  try { catalog = await loadFromD1(); }
+  try { catalog = await loadFromD1(userId); }
   catch (error) {
     if (process.env.NODE_ENV === "production") throw error;
     catalog = loadDevFallback();
@@ -118,6 +120,6 @@ export async function GET(request: Request) {
     total: workouts.length,
     categories: catalog.categories.filter((c) => c.isActive).sort((a, b) => a.sortOrder - b.sortOrder),
     workouts: workouts.sort((a, b) => a.title.localeCompare(b.title, "ru")),
-    explanation: filters.favorite ? "Избранное появится после E2-D2-T05. Сейчас фильтр показывает пустое состояние." : filters.source && filters.source !== "flowly" ? "Этот источник появится в следующих задачах этапа 2." : null,
+    explanation: filters.favorite ? "В избранном пока нет тренировок по этим фильтрам." : filters.source && filters.source !== "flowly" ? "По этим фильтрам пока ничего нет." : null,
   });
 }

@@ -1,4 +1,4 @@
-import { integer, primaryKey, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { index, integer, primaryKey, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 /**
  * Schema conventions (E1-D1-T04, approved 2026-07-13):
@@ -150,4 +150,17 @@ export const workoutExercises = sqliteTable(
     customInstruction: text("custom_instruction"),
   },
   (table) => [primaryKey({ columns: [table.workoutId, table.position] })],
+);
+
+// §43.28 youtube_search_cache
+export const youtubeSearchCache = sqliteTable(
+  "youtube_search_cache",
+  {
+    cacheKey: text("cache_key").primaryKey(),
+    queryJson: text("query_json").notNull(),
+    resultsJson: text("results_json").notNull(),
+    expiresAt: text("expires_at").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [index("youtube_search_cache_expires_at_idx").on(table.expiresAt)],
 );
