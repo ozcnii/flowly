@@ -42,7 +42,7 @@
 ## Открытые блокеры
 
 Открыты `DEC-006`, `DEC-007`, `DEC-008`, `DEC-010`, `DEC-011` в [`DECISIONS.md`](DECISIONS.md); DEC-009 и DEC-012 superseded. Они не блокируют E0-D0-T04. Production UI-kit утверждён; сохраняется обязательный per-screen approval по DEC-024.
-- **Deploy secrets:** Cloudflare Worker secrets сейчас пустые. Для runtime Telegram auth нужен `TELEGRAM_BOT_TOKEN`; для live YouTube search нужен `INVIDIOUS_BASE_URL`; для GitHub Actions auto-deploy нужен stable `CLOUDFLARE_API_TOKEN` secret. `CLOUDFLARE_ACCOUNT_ID` secret уже установлен в GitHub.
+- **Deploy secrets:** Cloudflare Worker secret `TELEGRAM_BOT_TOKEN` установлен для production/test. `INVIDIOUS_BASE_URL` вынесен в `wrangler.jsonc` vars для production/test (`https://inv.zoomerville.com`). Live YouTube API всё ещё возвращает `cache: unavailable` — нужно отдельно проверить доступность выбранного Invidious instance из Cloudflare Worker или заменить provider instance. Для GitHub Actions auto-deploy всё ещё нужен stable `CLOUDFLARE_API_TOKEN` secret; `CLOUDFLARE_ACCOUNT_ID` secret уже установлен в GitHub.
 - ~~Внешний blocker по визуалу для S-MA-004 (чек-маркер/расположение)~~ — **resolved**: блокер был по Главной (S-MA-010, галочка `.habitAction`), починен другим агентом в 3 коммитах; S-MA-004 чек-иконок не имел. Evidence оставлен: `docs/roadmap/evidence/check-spacing-blocker-2026-07-14.png`.
 
 ## Изменённые артефакты
@@ -64,7 +64,7 @@
 - `apps/web/features/home/**`, `apps/web/public/media/**` — E0-D0-T04 full state set visual-approved и done
 - `docs/roadmap/evidence/check-spacing-blocker-2026-07-14.png` — blocker proof для текущего UI-issue
 - `packages/ui/**`, `apps/web/app/ui-kit/**` — E1-D1-T11 production UI-kit
-- `apps/web/{open-next.config.ts,wrangler.jsonc,.dev.vars.example,public/_headers}` — OpenNext web deployment; production D1 `flowly-db` and test D1 `flowly-db-test` bound in wrangler; R2 binding removed until Cloudflare R2 is enabled/needed.
+- `apps/web/{open-next.config.ts,wrangler.jsonc,.dev.vars.example,public/_headers}` — OpenNext web deployment; production D1 `flowly-db` and test D1 `flowly-db-test` bound in wrangler; `INVIDIOUS_BASE_URL` configured as env var; R2 binding removed until Cloudflare R2 is enabled/needed.
 - `apps/web/features/profile/ui/profile-hub-screen.{tsx,module.css}`, `apps/web/features/profile/ui/profile-settings-screen.{tsx,module.css}`, `apps/web/features/profile/ui/help-screen.{tsx,module.css}`, `apps/web/components/shell/app-shell.tsx`, `apps/web/lib/auth/{schemas,users}.ts` — E1-D1-T10 slices
 - `apps/web/app/api/v1/workouts/route.ts`, `apps/web/features/catalog/**`, `apps/web/public/media/catalog/covers/*.webp`, `seeds/catalog/starter-catalog.v1.json`, `seeds/0002_starter_catalog.sql`, `scripts/build-starter-catalog-sql.mjs`, `apps/web/next.config.ts` — E2-D2-T02 catalog/search/filters + covers + YouTube seed
 - `apps/web/app/api/v1/workouts/[id]/route.ts`, `apps/web/features/workout-detail/**`, `apps/web/features/workout-author/**`, `apps/web/features/ugc-safety/**`, `apps/web/app/page.tsx`, `docs/design/FRONTEND_REVIEW.md` — E2-D2-T03 detail/author/UGC safety + mandatory frontend review checklist

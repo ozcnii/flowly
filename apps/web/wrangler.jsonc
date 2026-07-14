@@ -20,6 +20,9 @@
   "observability": {
     "enabled": true
   },
+  "vars": {
+    "INVIDIOUS_BASE_URL": "https://inv.zoomerville.com"
+  },
   "d1_databases": [
     {
       "binding": "DB",
@@ -33,6 +36,9 @@
       "name": "flowly-web-test",
       "images": {
         "binding": "IMAGES"
+      },
+      "vars": {
+        "INVIDIOUS_BASE_URL": "https://inv.zoomerville.com"
       },
       "d1_databases": [
         {
