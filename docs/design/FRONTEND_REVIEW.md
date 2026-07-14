@@ -44,6 +44,7 @@
 - [ ] Нет повторяющихся notice у каждого item, если достаточно одного общего notice.
 - [ ] Нет длинных disabled reason в больших кнопках, если можно показать compact explanation.
 - [ ] Списки легко сканируются.
+- [ ] Search/filter input, который запускает API-запрос, имеет debounce/throttle и не отправляет запрос на каждый символ.
 
 ## 5. Actions and states
 

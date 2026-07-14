@@ -21,6 +21,6 @@ export const getWorkouts = (filters: CatalogFilters, signal?: AbortSignal) => ap
 export const getAuthorWorkouts = (source: string, signal?: AbortSignal) => apiJson<CatalogResponse>(`/api/v1/workouts?source=${encodeURIComponent(source)}`, { signal });
 export const getWorkoutDetail = (id: string, signal?: AbortSignal) => apiJson<WorkoutDetailResponse>(`/api/v1/workouts/${encodeURIComponent(id)}`, { signal });
 
-export const useCatalogQuery = (filters: CatalogFilters, enabled = true) => useQuery({ queryKey: catalogKeys.workouts(filters), queryFn: ({ signal }) => getWorkouts(filters, signal), enabled, ...catalogPolicy });
+export const useCatalogQuery = (filters: CatalogFilters, enabled = true) => useQuery({ queryKey: catalogKeys.workouts(filters), queryFn: ({ signal }) => getWorkouts(filters, signal), enabled, placeholderData: (previous) => previous, ...catalogPolicy });
 export const useAuthorWorkoutsQuery = (source: string, enabled = true) => useQuery({ queryKey: catalogKeys.authorWorkouts(source), queryFn: ({ signal }) => getAuthorWorkouts(source, signal), enabled, ...catalogPolicy });
 export const useWorkoutDetailQuery = (id: string, enabled = true) => useQuery({ queryKey: catalogKeys.workout(id), queryFn: ({ signal }) => getWorkoutDetail(id, signal), enabled: enabled && Boolean(id), ...catalogPolicy });

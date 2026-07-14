@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button, Icon } from "@flowly/ui";
 import type { CatalogWorkout } from "../model/catalog";
 import { DIFFICULTY, DURATION, FORMAT, SOURCE, minutes } from "../model/catalog";
@@ -40,12 +40,21 @@ function Skeleton() {
 export function CatalogScreen({ forced = null }: { forced?: Forced }) {
   const router = useRouter();
   const [filters, setFilters] = useState<CatalogFilters>(EMPTY_FILTERS);
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [notice, setNotice] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const catalog = useCatalogQuery(filters, !forced);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedSearch(searchInput.trim()), 350);
+    return () => window.clearTimeout(timer);
+  }, [searchInput]);
+
+  const queryFilters = useMemo<CatalogFilters>(() => ({ ...filters, q: debouncedSearch }), [debouncedSearch, filters]);
+  const catalog = useCatalogQuery(queryFilters, !forced);
   const data = catalog.data ?? null;
 
-  const reset = () => { setFilters(EMPTY_FILTERS); setNotice("Фильтры сброшены"); };
+  const reset = () => { setFilters(EMPTY_FILTERS); setSearchInput(""); setDebouncedSearch(""); setNotice("Фильтры сброшены"); };
   const update = (key: keyof CatalogFilters, value: string) => setFilters((f) => set(f, key, value));
   const onOpen = (id: string) => router.push(`/?screen=workout&id=${encodeURIComponent(id)}`);
   const categories = data?.categories ?? [];
@@ -62,13 +71,13 @@ export function CatalogScreen({ forced = null }: { forced?: Forced }) {
     </header>
 
     <section className={styles.searchBox} aria-label="Поиск и фильтры">
-      <label className={styles.search}><Icon name="search" /><input value={filters.q} onChange={(e) => setFilters((f) => ({ ...f, q: e.target.value }))} placeholder="Название, описание, категория" /></label>
+      <label className={styles.search}><Icon name="search" /><input value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Название, описание, категория" /></label>
       <div className={styles.chips} aria-label="Категории">
         {categories.map((c) => <button key={c.id} type="button" aria-pressed={filters.category === c.slug} onClick={() => update("category", c.slug)}>{c.name}</button>)}
       </div>
       <div className={styles.filterActions}>
         <button type="button" className={styles.filterToggle} aria-expanded={filtersOpen} onClick={() => setFiltersOpen((v) => !v)}><Icon name="settings" />Фильтры{extraFilterCount ? ` · ${extraFilterCount}` : ""}</button>
-        {(extraFilterCount > 0 || filters.q || filters.category) && <button type="button" className={styles.resetInline} onClick={reset}>Сбросить</button>}
+        {(extraFilterCount > 0 || searchInput || filters.category) && <button type="button" className={styles.resetInline} onClick={reset}>Сбросить</button>}
       </div>
       {filtersOpen && <div className={styles.filterPanel}>
         <p>Уточнить результаты</p>
