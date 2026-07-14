@@ -6,9 +6,9 @@
 
 - **Обновлено:** 2026-07-14
 - **Текущий этап:** 1. Основа
-- **Активная задача:** E1-D1-T09 (security/DoD gate) → **review**; последняя foundation-задача — T10 (profile/help).
-- **Статус:** T09 реализован (security headers + size limit + min audit + evidence report), ждёт `review -> done`. Осталась T10.
-- **Последний завершённый результат:** E1-D1-T09 — security gate: headers/CSP (dev-aware), `rejectOversizedBody` (413 verified), `audit()`, `docs/roadmap/evidence/T09-dod.md` (§55.1+§47.1 mapping).
+- **Активная задача:** E1-D1-T10 (profile/help) — последняя foundation-задача.
+- **Статус:** **T09 done** (deep review PASS). Foundation осталось: T10 (profile/help).
+- **Последний завершённый результат:** E1-D1-T09 done — security gate (HSTS + headers/CSP dev-aware + size limit 413 + audit + evidence report §55.1/§47.1).
 
 ## Что сделано
 
@@ -33,8 +33,8 @@
 
 ## Что делать следующим
 
-1. Решить по T09: deep review или `review -> done`.
-2. Последняя foundation-задача: T10 (profile/help) — UI slice S-MA-080/090/096.
+1. E1-D1-T10 (profile/help): deep plan → approval → UI slice S-MA-080/090/096 + contextual states/help; профиль Flowly separately от Telegram (DEC-020).
+2. После T10 — этап 1 закрыт полностью (10/11 + T11 done); переход к этапу 2 «Йога».
 3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
@@ -199,6 +199,12 @@ Roadmap migration / bootstrap verification:
 - **Проверки:** typecheck/lint/build PASS; **headers curl -I PASS**; **PATCH /me >64 KiB → 413** (curl-repro); app loads без CSP-нарушений (browser-verify, 0 console errors); secret scan 0.
 - **Residual risks:** per-object ownership (#5/#6) — этапы 2–7; webhook/cb-idem (#10/#11) — этап 5; prod rate limit + full audit/observability (#7/#14) + nonce-CSP — этап 8.
 - **Следующее точное действие:** решение пользователя по T09 (review→done) → T10 (profile/help).
+
+### 2026-07-14 — E1-D1-T09 done (deep review PASS) / старт E1-D1-T10 (profile/help)
+
+- **От кого / кому:** пользователь + субагент-reviewer → AI agent / следующий агент.
+- **Статус задачи:** T09 `review -> done` (deep review PASS gate, 0 багов; закрыты HSTS/X-Frame-DENY/me.patch-audit; W1 unsafe-inline + nonce-CSP — residual этап 8). Следующая (последняя foundation) — E1-D1-T10 (profile/help).
+- **Следующее точное действие:** deep plan E1-D1-T10.
 
 ### 2026-07-13 — E1-D1-T06 / Slice S-MA-004 preview implemented
 
