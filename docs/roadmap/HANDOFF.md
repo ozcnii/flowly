@@ -6,9 +6,9 @@
 
 - **Обновлено:** 2026-07-14
 - **Текущий этап:** 1. Основа
-- **Активная задача:** E1-D1-T09 (security/DoD gate) — следующая.
-- **Статус:** **T08 done** (без review). Foundation осталось: T09 (security/DoD), T10 (profile/help).
-- **Последний завершённый результат:** E1-D1-T08 done — foundation seed (`seeds/0001_test_users.sql`, 4 test-пользователя + settings, local-only, идемпотентный).
+- **Активная задача:** E1-D1-T09 (security/DoD gate) → **review**; последняя foundation-задача — T10 (profile/help).
+- **Статус:** T09 реализован (security headers + size limit + min audit + evidence report), ждёт `review -> done`. Осталась T10.
+- **Последний завершённый результат:** E1-D1-T09 — security gate: headers/CSP (dev-aware), `rejectOversizedBody` (413 verified), `audit()`, `docs/roadmap/evidence/T09-dod.md` (§55.1+§47.1 mapping).
 
 ## Что сделано
 
@@ -33,8 +33,8 @@
 
 ## Что делать следующим
 
-1. E1-D1-T09 (security/DoD gate): deep plan → approval → реализация (review этапа, ownership defaults, headers/cookies, secret scan, §55.1 evidence, §47.1 меры, residual risks).
-2. Затем T10 (profile/help).
+1. Решить по T09: deep review или `review -> done`.
+2. Последняя foundation-задача: T10 (profile/help) — UI slice S-MA-080/090/096.
 3. Production Cloudflare deploy не выполнять без отдельного подтверждённого scope.
 
 ## Открытые блокеры
@@ -190,6 +190,15 @@ Roadmap migration / bootstrap verification:
 - **От кого / кому:** пользователь → AI agent / следующий агент.
 - **Статус задачи:** T08 `review -> done` (без deep review). Следующая — E1-D1-T09 (security/DoD gate, разблокирована: T02–T08 done).
 - **Следующее точное действие:** deep plan E1-D1-T09.
+
+### 2026-07-14 — E1-D1-T09 (security/DoD gate) реализован, переведён в review
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** T09 `backlog -> in_progress -> review`.
+- **Сделано:** security headers в `apps/web/next.config.ts` (nosniff/frame SAMEORIGIN/referrer/permissions + CSP baseline dev-aware); `apps/web/lib/auth/http.ts` (`rejectOversizedBody` 64 KiB + `audit()`); size-limit+audit в 3 маршрутах (auth/telegram, me, auth/logout); evidence report `docs/roadmap/evidence/T09-dod.md` (§55.1 5/5 + §47.1 mapping); README «Безопасность».
+- **Проверки:** typecheck/lint/build PASS; **headers curl -I PASS**; **PATCH /me >64 KiB → 413** (curl-repro); app loads без CSP-нарушений (browser-verify, 0 console errors); secret scan 0.
+- **Residual risks:** per-object ownership (#5/#6) — этапы 2–7; webhook/cb-idem (#10/#11) — этап 5; prod rate limit + full audit/observability (#7/#14) + nonce-CSP — этап 8.
+- **Следующее точное действие:** решение пользователя по T09 (review→done) → T10 (profile/help).
 
 ### 2026-07-13 — E1-D1-T06 / Slice S-MA-004 preview implemented
 

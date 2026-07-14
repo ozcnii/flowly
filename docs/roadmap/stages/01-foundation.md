@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 2 | 0 | 0 | 0 | 9 |
+| 1 | 0 | 0 | 1 | 9 |
 
 ## Зависимости и границы
 
@@ -134,12 +134,15 @@
 
 ### E1-D1-T09 — Закрыть foundation security и DoD
 
-- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
+- **status:** review · **priority:** high · **owner:** AI agent · **updated:** 2026-07-14
 - **prd_refs:** §40.3, §47.1, §55.1, применимая часть §55.9
 - **depends_on:** E1-D1-T02–T08 · **decisions:** DEC-013, DEC-014, DEC-020, DEC-022
+- **plan:** [`.temp/E1-D1-T09/plan.md`](../../../.temp/E1-D1-T09/plan.md) — audit/gate; gaps: security headers, request size limit, min audit log; остальное downstream. Plan confidence 90%, Implementation confidence 86%; approved 2026-07-14 (baseline CSP / 64 KiB / min-log).
 - **scope:** review этапа, ownership defaults, headers/cookies, secret scan, проверка критериев основы.
-- **acceptance:** [ ] каждый пункт §55.1 имеет evidence; [ ] применимые меры §47.1 закрыты; [ ] остаточные риски записаны.
-- **validation/evidence:** review checklist, команды проверок, screenshots и ссылки на артефакты.
+- **acceptance:** [x] каждый пункт §55.1 имеет evidence (все 5 — см. `docs/roadmap/evidence/T09-dod.md`); [x] применимые меры §47.1 закрыты (✅: initData/HttpOnly/Secure/CSRF/rate(min)/Zod/size-limit/secrets-only/no-client-token; ◐→downstream: per-object ownership #5/#6, webhook #10, callback-idem #11, prod rate #7, full audit #14); [x] остаточные риски записаны.
+- **validation/evidence:** `apps/web/next.config.ts` (security headers + CSP dev-aware); `apps/web/lib/auth/http.ts` (`rejectOversizedBody` 64 KiB + `audit()`); size limit в 3 маршрутах; audit() в auth/login/logout. typecheck/lint/build PASS; **headers curl -I PASS** (nosniff/frame/referrer/permissions/CSP); **PATCH /me >64 KiB → 413** (curl-repro); app loads без CSP-нарушений (browser-verify, 0 console errors); secret scan 0. Evidence report: `docs/roadmap/evidence/T09-dod.md`.
+- **residual risks:** per-object ownership/permission (§47.1 #5/#6) — этапы 2–7; webhook-секрет и callback-идемпотентность (#10/#11) — этап 5; production-grade rate limit (#7, DEC-007) и полный audit-log/observability (#14) — этап 8; nonce-based CSP hardening — этап 8; `content-length` может отсутствовать (chunked).
+- **journal:** 2026-07-14 — `backlog -> in_progress`; deep plan утверждён (baseline CSP/64KiB/min-log). 2026-07-14 — реализовано: security headers (next.config), `rejectOversizedBody`+`audit()` (lib/auth/http.ts) в 3 маршрутах, evidence report; checks + headers + 413 + browser-verify PASS, secret scan 0; `in_progress -> review`. Ждёт решения `review -> done`.
 
 ### E1-D1-T10 — Реализовать профиль, настройки профиля и справку
 
