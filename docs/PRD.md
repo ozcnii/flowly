@@ -1758,7 +1758,6 @@ R2 включает бесплатный месячный объём 10 ГБ, 1 
 - username;
 - first_name;
 - last_name;
-- photo_url;
 - timezone;
 - week_starts_on;
 - locale;

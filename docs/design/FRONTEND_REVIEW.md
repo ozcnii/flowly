@@ -29,7 +29,7 @@
 ## 3. App shell, routing and navigation architecture
 
 - [ ] Product screen использует общий route/layout/shell паттерн Next.js, а не standalone page, если это часть приложения.
-- [ ] Нижняя навигация, header/avatar и общий shell не исчезают при переходе между product routes, кроме явно immersive/fullscreen flows.
+- [ ] Нижняя навигация, header/profile action и общий shell не исчезают при переходе между product routes, кроме явно immersive/fullscreen flows.
 - [ ] Fullscreen shell использует вложенную модель Telegram: system safe inset и content-safe inset складываются; top content не уходит под Telegram chrome.
 - [ ] Floating navbar остаётся 64px при bottom safe area `0/34/48`, меняет только offset, а последний content/action при максимальном scroll остаётся выше navbar.
 - [ ] Навигация не вызывает видимый full reload, re-auth flicker или повторный auth/error/loading screen при обычном переходе внутри app.
@@ -38,6 +38,7 @@
 - [ ] Internal page header — full-width direct Konsta `Navbar` вне page-padding container; title задан через `Navbar.title`, optional right action через Konsta `Link/Icon`.
 - [ ] Back — icon-only `NavbarBackLink` в `left` с `aria-label="Назад"`, без destination text; вызывает history `router.back()`, а не hardcoded route.
 - [ ] Нет outer padding вокруг Navbar, custom header/title/back Button или CSS navbar imitation.
+- [ ] Telegram fullscreen root Navbar следует DEC-047: composed inset owned once, safe-area blur covers the full top inset, title/actions geometry matches approved primary/internal contract at initial and scrolled positions; profile artwork is always `user-round` per DEC-046.
 - [ ] Back/cancel placement консистентен внутри раздела: не прыгать между верхом/низом без причины.
 - [ ] Если экран открыт из shared shell, back action не дублирует bottom nav и не нарушает ожидаемый history/back паттерн.
 - [ ] Для Next.js использовать nested `layout.tsx`/route groups там, где это предотвращает remount общего shell, повторную авторизацию и мигание.

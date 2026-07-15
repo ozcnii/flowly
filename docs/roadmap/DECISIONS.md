@@ -62,7 +62,7 @@
 
 - **Статус:** approved
 - **Дата:** 2026-07-13
-- **Решение:** нижняя навигация содержит ровно пять вкладок PRD; профиль открывается avatar с Главной. Bot links ведут в точную цель, `/app` — на Главную. Недоступная цель показывает безопасную причину, recovery/auth при необходимости и релевантный выход. Прежний `/help` → S-MA-096 contract удалён по DEC-041.
+- **Решение:** нижняя навигация содержит ровно пять вкладок PRD; профиль открывается постоянной `user-round` action из shared Navbar (`DEC-046`). Bot links ведут в точную цель, `/app` — на Главную. Недоступная цель показывает безопасную причину, recovery/auth при необходимости и релевантный выход. Прежний `/help` → S-MA-096 contract удалён по DEC-041.
 - **Основание:** подтверждено пользователем на UX-workshop E0-D0-T01.
 - **PRD:** §9–10, §32, §36.
 - **Влияет на:** E0-D0-T01–T06; E1-D1-T02/T06/T09; E5-D6-T02/T08; E7-D8-T01; E8-D9-T01/T02/T05/T08.
@@ -120,7 +120,7 @@
 
 - **Статус:** approved
 - **Дата:** 2026-07-13
-- **Решение:** выход owner из совместного объекта требует передачи ownership либо завершения объекта. Flowly name редактируется отдельно от Telegram; аватар не редактируется и не загружается в Flowly, а берётся из актуального Telegram-профиля при входе/проверке. Удаление аккаунта имеет 7-дневный grace period и сохраняет обезличенную целостность результатов других участников. «Очистить историю» удаляет occurrences, статусы и отчётные результаты, сохраняя аккаунт, настройки и созданные объекты. Экспорт — скачиваемый архив с bot notification.
+- **Решение:** выход owner из совместного объекта требует передачи ownership либо завершения объекта. Flowly name редактируется отдельно от Telegram; avatar URL/изображение Telegram не сохраняется, не проксируется и не отображается (`DEC-046`), profile entry всегда использует `user-round` icon. Удаление аккаунта имеет 7-дневный grace period и сохраняет обезличенную целостность результатов других участников. «Очистить историю» удаляет occurrences, статусы и отчётные результаты, сохраняя аккаунт, настройки и созданные объекты. Экспорт — скачиваемый архив с bot notification.
 - **PRD:** §20.6, §34, §38, §47.3, §51.2.
 - **Влияет на:** E0-D0-T01–T06; E1-D1-T02/T09/T10; E7-D8-T04/T05; E8-D9-T01–T03/T05/T08.
 
@@ -188,7 +188,7 @@
 - **Статус:** approved
 - **Дата:** 2026-07-13
 - **Решение:** зафиксировать SQL-типы и nullability для foundation-таблиц E1-D1-T04 (`users`, `user_settings`, `auth_sessions`), поскольку PRD §43.1–43.3 задаёт только имена полей. Контракт:
-  - **users** — `id` (text PK, UUIDv7 app-side), `telegram_id` (text NOT NULL UNIQUE), `username` (text nullable), `first_name` (text NOT NULL), `last_name` (text nullable), `photo_url` (text nullable), `timezone` (text NOT NULL), `week_starts_on` (integer NOT NULL, 0–6, 0=Sunday), `locale` (text NOT NULL), `created_at`/`updated_at` (text NOT NULL ISO-8601 UTC), `deleted_at` (text nullable, soft-delete).
+  - **users** — `id` (text PK, UUIDv7 app-side), `telegram_id` (text NOT NULL UNIQUE), `username` (text nullable), `first_name` (text NOT NULL), `last_name` (text nullable), `timezone` (text NOT NULL), `week_starts_on` (integer NOT NULL, 0–6, 0=Sunday), `locale` (text NOT NULL), `created_at`/`updated_at` (text NOT NULL ISO-8601 UTC), `deleted_at` (text nullable, soft-delete).
   - **user_settings** — `user_id` (text PK, FK→`users.id` ON DELETE CASCADE), `quiet_hours_start`/`quiet_hours_end` (text nullable HH:MM), `quiet_hours_behavior` (text nullable), `default_reminder_policy_id` (text nullable; FK добавляется этапом 3), `weekly_report_enabled`/`monthly_report_enabled`/`friend_notifications_enabled`/`partner_reminders_enabled` (integer NOT NULL, bool 0/1), `weekly_report_day` (integer nullable 0–6), `weekly_report_time` (text nullable HH:MM).
   - **auth_sessions** — `id` (text PK, UUIDv7 app-side), `user_id` (text NOT NULL FK→`users.id` ON DELETE CASCADE), `token_hash` (text NOT NULL UNIQUE), `expires_at`/`last_used_at`/`created_at` (text NOT NULL ISO-8601 UTC).
   - Общие типы: id = text UUIDv7 (генерация app-side, D1 не имеет нативной UUID-функции); timestamps = text ISO-8601 UTC; bool = integer 0/1; enums = text + app-side Zod-валидация; FK = `ON DELETE CASCADE` (users использует soft-delete, CASCADE — safety net для hard-DELETE).
@@ -239,7 +239,7 @@
 
 - **Статус:** approved
 - **Дата:** 2026-07-15
-- **Решение:** все product routes Flowly должны использовать устойчивый shared app shell/layout pattern. Bottom navigation/header/avatar не должны пропадать между обычными product screens. Нельзя делать standalone product pages, которые обходят shell, если flow не approved как immersive/fullscreen. Нельзя использовать `?screen=`/`?tab=` как product routing. Навигация внутри приложения не должна показывать re-auth/auth-error/loading flicker при уже установленной сессии. Для Next.js нужно использовать route groups/nested `layout.tsx` там, где это сохраняет shell и предотвращает remount общего layout. Back/cancel placement должен быть консистентным внутри раздела; нельзя прыгать между верхней и нижней кнопкой без UX-основания. Внешний page padding должен иметь один owner: shell или screen, без двойных больших отступов. Fullscreen shell использует официальную вложенную модель Telegram: system inset вычисляется как максимум iOS `env(safe-area-inset-*)`, Telegram safe-area CSS vars и SDK `safeAreaInset`, content inset — как максимум Telegram content-safe CSS vars и SDK `contentSafeAreaInset`, после чего system и content insets складываются; floating glass bottom navigation имеет фиксированную визуальную высоту 64px, смещается выше bottom safe area и не увеличивается вместе с inset, а общий main reserve гарантирует, что последний content/action остаётся выше navbar на всех product routes.
+- **Решение:** все product routes Flowly должны использовать устойчивый shared app shell/layout pattern. Bottom navigation/header/profile action не должны пропадать между обычными product screens. Нельзя делать standalone product pages, которые обходят shell, если flow не approved как immersive/fullscreen. Нельзя использовать `?screen=`/`?tab=` как product routing. Навигация внутри приложения не должна показывать re-auth/auth-error/loading flicker при уже установленной сессии. Для Next.js нужно использовать route groups/nested `layout.tsx` там, где это сохраняет shell и предотвращает remount общего layout. Back/cancel placement должен быть консистентным внутри раздела; нельзя прыгать между верхней и нижней кнопкой без UX-основания. Внешний page padding должен иметь один owner: shell или screen, без двойных больших отступов. Fullscreen shell использует официальную вложенную модель Telegram: system inset вычисляется как максимум iOS `env(safe-area-inset-*)`, Telegram safe-area CSS vars и SDK `safeAreaInset`, content inset — как максимум Telegram content-safe CSS vars и SDK `contentSafeAreaInset`, после чего system и content insets складываются; floating glass bottom navigation имеет фиксированную визуальную высоту 64px, смещается выше bottom safe area и не увеличивается вместе с inset, а общий main reserve гарантирует, что последний content/action остаётся выше navbar на всех product routes.
 - **Основание:** пользователь указал на исчезающий navbar, `?tab=...`, inconsistent back placement, visible navigation flicker/re-auth и двойные padding как системные UX-ошибки, требующие обязательных правил и детального review.
 - **Обязательная проверка:** перед user review любого routing/layout/shell изменения: click navigation matrix, shell/nav persistence, no auth flicker, no `?screen=`/`?tab=`, one-padding-owner check, consistent back placement, console errors 0, overflow 0.
 - **PRD:** §44.2–44.5, §55.
@@ -357,7 +357,7 @@
 
 - **Статус:** approved
 - **Дата:** 2026-07-15
-- **Решение:** exact top-level routes `/`, `/catalog`, `/programs`, `/rhythm`, `/calendar` используют один full-width direct Konsta `Navbar`, который рендерит shared `AppShell` вне page padding. На Home centered title показывает только Flowly name пользователя; прежний greeting/subtitle block удаляется. На остальных основных pages centered title совпадает с bottom tab: `Йога`, `Программы`, `Ритм`, `Календарь`. На всех пяти основных pages слева находится icon-only Settings action в `/settings`, справа — avatar/profile action в `/profile`; обе имеют accessible label и target ≥44px. Bottom Tabbar labels используют единый exact font-size 11px. Root sticky Navbar переопределяет Konsta default `top-0` на `top: var(--component-safe-area-top)`, чтобы в Telegram fullscreen после scroll сохранять status/content safe area; initial parent padding недостаточен после достижения sticky threshold. Back запрещён на top-level pages и остаётся только у вложенных routes по DEC-041. Собственные raw headers и duplicate Chip/page labels на top-level pages удаляются; новые основные pages регистрируются в shared shell mapping.
+- **Решение:** exact top-level routes `/`, `/catalog`, `/programs`, `/rhythm`, `/calendar` используют один full-width direct Konsta `Navbar`, который рендерит shared `AppShell` вне page padding. На Home centered title показывает только Flowly name пользователя; прежний greeting/subtitle block удаляется. На остальных основных pages centered title совпадает с bottom tab: `Йога`, `Программы`, `Ритм`, `Календарь`. На всех пяти основных pages слева находится icon-only Settings action в `/settings`, справа — постоянная icon-only `user-round` profile action в `/profile`; обе имеют accessible label и target ≥44px. Bottom Tabbar labels используют единый exact font-size 9px. Fullscreen root Navbar geometry superseded by DEC-047: primary title/safe-area blur and action row have separate vertical ownership. Back запрещён на top-level pages и остаётся только у вложенных routes по DEC-041. Собственные raw headers и duplicate Chip/page labels на top-level pages удаляются; новые основные pages регистрируются в shared shell mapping.
 - **Основание:** пользователь потребовал унифицировать все верхние панели по Profile/Settings, назвать catalog `Йога`, убрать back с основных страниц, сначала оставить Home profile action, затем явно расширил contract: Settings слева и avatar/profile справа на каждой основной tab page.
 - **PRD:** уточняет shared shell/navigation §38 и production UI contract.
 - **Влияет на:** DEC-032, DEC-041, E0-D0-T05, S-MA-010, S-MA-020 и top-level placeholders Programs/Rhythm/Calendar, `AppShell`, `AppRouteShell`, AGENTS, HANDOFF.
@@ -370,6 +370,24 @@
 - **Основание:** canonical local repro подтвердил, что backend name/timezone работал, но Settings пропускал mutation вне production; report toggles были fake/local-only и противоречили D1. Пользователь выбрал исправить реальные баги, сохранив theme локальной настройкой устройства.
 - **PRD:** реализует §27 и §38.1 report/profile settings persistence без расширения theme contract.
 - **Влияет на:** E0-D0-T05, S-MA-003, S-MA-090, `/api/v1/me`, onboarding-complete response, `user_settings`, React Query `me` contract, HANDOFF.
+
+### DEC-046 — Не хранить Telegram avatar
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** Flowly не сохраняет, не возвращает, не проксирует и не рендерит Telegram `photo_url`. `users.photo_url` физически удаляется migration 0005 вместе с существующими значениями; re-auth игнорирует входной `photo_url`; `/api/v1/me/photo`, Telegram image CSP/allowlist и frontend photo fallback удаляются. Все profile entry/identity surfaces всегда используют approved `user-round` icon. Входной Telegram init-data type может содержать `photo_url`, но application layer его не потребляет.
+- **Основание:** пользователь явно отказался от хранения и отображения Telegram avatar и выбрал физическое удаление D1 column.
+- **PRD:** удаляет `photo_url` из §43.1; supersedes avatar clause DEC-020 и schema field DEC-023.
+- **Влияет на:** E0-D0-T05, E1-D1-T13 historical evidence, S-MA-010, S-MA-080/090, `/api/v1/me`, D1 users schema, CSP/Next image config, shared Navbar/Profile, HANDOFF.
+
+### DEC-047 — Fullscreen primary Navbar внутри composed safe area
+
+- **Статус:** approved exception
+- **Дата:** 2026-07-15
+- **Решение:** primary Navbar starts at viewport top, owns Konsta `--k-safe-area-top: var(--component-safe-area-top)` and compensates parent padding with an equal negative margin. Its title is fixed in the lower centered part of the composed Telegram safe area; Settings/Profile icon controls remain in the standard Konsta row below that inset. Blur is limited to the composed safe-area layer via the only approved `.primary-navbar > :first-child` anatomy selector because Konsta 5.2.0 exposes no blur-element sizing prop. Internal Profile/Settings Navbars use the same official inset ownership but keep title/back in the normal row. Bottom Tabbar labels use exact 9px.
+- **Основание:** real Telegram iOS fullscreen screenshots after commit 300f7d9 confirmed sticky offset was fixed, but scrolling content remained visible through the unblurred safe-area layer. Пользователь явно выбрал title inside safe area + blur and controls below Telegram controls, accepting the Telegram-overlay risk after warning.
+- **Ограничение:** title placement inside Telegram safe area can overlap native controls on another client/device; real-device matrix remains required. The CSS exception may be removed only when Konsta exposes a supported blur sizing hook.
+- **Влияет на:** DEC-032/035/043, E0-D0-T05, AppShell/PrimaryNavbar, Profile/Settings root Navbar, globals.css, FRONTEND_REVIEW/HANDOFF.
 
 ## Открытые решения
 
