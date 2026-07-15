@@ -114,10 +114,18 @@
   --component-nav-width:30rem;
   --component-nav-gap:0.5rem;
   --component-nav-reserve:calc(var(--component-nav-height) + var(--component-nav-gap) + var(--component-safe-area-bottom) + var(--primitive-space-4));
-  --component-safe-area-top:max(env(safe-area-inset-top, 0px),var(--tg-safe-area-inset-top, 0px),var(--tg-content-safe-area-inset-top, 0px),var(--flow-sdk-safe-area-inset-top, 0px),var(--flow-sdk-content-safe-area-inset-top, 0px));
-  --component-safe-area-right:max(env(safe-area-inset-right, 0px),var(--tg-safe-area-inset-right, 0px),var(--tg-content-safe-area-inset-right, 0px),var(--flow-sdk-safe-area-inset-right, 0px),var(--flow-sdk-content-safe-area-inset-right, 0px));
-  --component-safe-area-bottom:max(env(safe-area-inset-bottom, 0px),var(--tg-safe-area-inset-bottom, 0px),var(--tg-content-safe-area-inset-bottom, 0px),var(--flow-sdk-safe-area-inset-bottom, 0px),var(--flow-sdk-content-safe-area-inset-bottom, 0px));
-  --component-safe-area-left:max(env(safe-area-inset-left, 0px),var(--tg-safe-area-inset-left, 0px),var(--tg-content-safe-area-inset-left, 0px),var(--flow-sdk-safe-area-inset-left, 0px),var(--flow-sdk-content-safe-area-inset-left, 0px));
+  --component-system-safe-area-top:max(env(safe-area-inset-top, 0px),var(--tg-safe-area-inset-top, 0px),var(--flow-sdk-safe-area-inset-top, 0px));
+  --component-system-safe-area-right:max(env(safe-area-inset-right, 0px),var(--tg-safe-area-inset-right, 0px),var(--flow-sdk-safe-area-inset-right, 0px));
+  --component-system-safe-area-bottom:max(env(safe-area-inset-bottom, 0px),var(--tg-safe-area-inset-bottom, 0px),var(--flow-sdk-safe-area-inset-bottom, 0px));
+  --component-system-safe-area-left:max(env(safe-area-inset-left, 0px),var(--tg-safe-area-inset-left, 0px),var(--flow-sdk-safe-area-inset-left, 0px));
+  --component-content-safe-area-top:max(var(--tg-content-safe-area-inset-top, 0px),var(--flow-sdk-content-safe-area-inset-top, 0px));
+  --component-content-safe-area-right:max(var(--tg-content-safe-area-inset-right, 0px),var(--flow-sdk-content-safe-area-inset-right, 0px));
+  --component-content-safe-area-bottom:max(var(--tg-content-safe-area-inset-bottom, 0px),var(--flow-sdk-content-safe-area-inset-bottom, 0px));
+  --component-content-safe-area-left:max(var(--tg-content-safe-area-inset-left, 0px),var(--flow-sdk-content-safe-area-inset-left, 0px));
+  --component-safe-area-top:calc(var(--component-system-safe-area-top) + var(--component-content-safe-area-top));
+  --component-safe-area-right:calc(var(--component-system-safe-area-right) + var(--component-content-safe-area-right));
+  --component-safe-area-bottom:calc(var(--component-system-safe-area-bottom) + var(--component-content-safe-area-bottom));
+  --component-safe-area-left:calc(var(--component-system-safe-area-left) + var(--component-content-safe-area-left));
 }
 :root,[data-theme="light"]{
   --color-canvas:#f7f6f2;

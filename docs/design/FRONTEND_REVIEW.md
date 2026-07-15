@@ -30,7 +30,7 @@
 
 - [ ] Product screen использует общий route/layout/shell паттерн Next.js, а не standalone page, если это часть приложения.
 - [ ] Нижняя навигация, header/avatar и общий shell не исчезают при переходе между product routes, кроме явно immersive/fullscreen flows.
-- [ ] Fullscreen shell учитывает max iOS `env()` + Telegram CSS vars + SDK safe/content insets; top content не уходит под Telegram chrome.
+- [ ] Fullscreen shell использует вложенную модель Telegram: system safe inset и content-safe inset складываются; top content не уходит под Telegram chrome.
 - [ ] Floating navbar остаётся 64px при bottom safe area `0/34/48`, меняет только offset, а последний content/action при максимальном scroll остаётся выше navbar.
 - [ ] Навигация не вызывает видимый full reload, re-auth flicker или повторный auth/error/loading screen при обычном переходе внутри app.
 - [ ] AuthGate не должен пересоздаваться на каждом product route, если пользователь уже внутри authenticated shell; session check не должен мигать UI.
