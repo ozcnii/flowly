@@ -8,7 +8,7 @@
 - **Текущий этап:** 2. Йога
 - **Активная задача:** E2-D2-T06 (Routing cleanup product paths) — `review`.
 - **Статус:** этап 2 «Йога» продолжается; E2-D2-T04 `done`; E2-D2-T06 реализована и DEC-032 routing/shell fix проверен, ждёт user review / решение пользователя. Production deploy явно запрошен пользователем и выполнен.
-- **Последний завершённый результат:** Cloudflare production deploy `flowly-web` на `https://flowly-web.getflowly.workers.dev` (version `52d02644-da67-4d48-b770-4babecadb3aa`), remote D1 `flowly-db` создан/мигрирован/засеян каталогом.
+- **Последний завершённый результат:** Cloudflare production deploy `flowly-web` на `https://flowly-web.getflowly.workers.dev`, remote D1 `flowly-db` создан/мигрирован/засеян каталогом. Добавлен минимальный Telegram webhook route для `/start`; после deploy нужно выполнить Bot API `setWebhook` на `/api/v1/telegram/webhook`.
 
 ## Что сделано
 
@@ -65,6 +65,7 @@
 - `docs/roadmap/evidence/check-spacing-blocker-2026-07-14.png` — blocker proof для текущего UI-issue
 - `packages/ui/**`, `apps/web/app/ui-kit/**` — E1-D1-T11 production UI-kit
 - `apps/web/{open-next.config.ts,wrangler.jsonc,.dev.vars.example,public/_headers}` — OpenNext web deployment; production D1 `flowly-db` and test D1 `flowly-db-test` bound in wrangler; `INVIDIOUS_BASE_URL` configured as env var; R2 binding removed until Cloudflare R2 is enabled/needed.
+- `apps/web/app/api/v1/telegram/webhook/route.ts` — минимальный Bot API webhook: `/start` отвечает кнопкой `Открыть Flowly` (`web_app.url` = deployed origin).
 - `apps/web/features/profile/ui/profile-hub-screen.{tsx,module.css}`, `apps/web/features/profile/ui/profile-settings-screen.{tsx,module.css}`, `apps/web/features/profile/ui/help-screen.{tsx,module.css}`, `apps/web/components/shell/app-shell.tsx`, `apps/web/lib/auth/{schemas,users}.ts` — E1-D1-T10 slices
 - `apps/web/app/api/v1/workouts/route.ts`, `apps/web/features/catalog/**`, `apps/web/public/media/catalog/covers/*.webp`, `seeds/catalog/starter-catalog.v1.json`, `seeds/0002_starter_catalog.sql`, `scripts/build-starter-catalog-sql.mjs`, `apps/web/next.config.ts` — E2-D2-T02 catalog/search/filters + covers + YouTube seed
 - `apps/web/app/api/v1/workouts/[id]/route.ts`, `apps/web/features/workout-detail/**`, `apps/web/features/workout-author/**`, `apps/web/features/ugc-safety/**`, `apps/web/app/page.tsx`, `docs/design/FRONTEND_REVIEW.md` — E2-D2-T03 detail/author/UGC safety + mandatory frontend review checklist
