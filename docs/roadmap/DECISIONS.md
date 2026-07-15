@@ -218,7 +218,7 @@
 
 ### DEC-030 — YouTube search provider v1: Invidious + controlled fallback
 
-- **Статус:** approved
+- **Статус:** superseded by DEC-049
 - **Дата:** 2026-07-14
 - **Решение:** E2-D2-T04 реализует YouTube search без `YOUTUBE_API_KEY` через Invidious-compatible API provider. Production/test provider base URL задаётся env `INVIDIOUS_BASE_URL`; hardcoded public instance не используется как contract. Если provider недоступен и есть stale cache — можно использовать stale fallback как внутренний data-source без пользовательского `из кэша`; если cache нет — controlled unavailable/error. Dev без `INVIDIOUS_BASE_URL` не показывает fixture как реальные результаты.
 - **Scope v1:** S-MA-021 использует свободный пользовательский input + фильтры с debounce; `на русском` не добавляется в запрос. `save` создаёт/возвращает idempotent private workout-copy для текущего пользователя (`sourceType=youtube`, `youtubeVideoId`, no video download). `create-workout` полноценным editor-flow не реализуется до downstream own-workout editor и не показывается как disabled CTA в S-MA-021. `Неподходящий результат` убран из S-MA-021 по user UI review; moderation/quality feedback вернётся отдельным scope, если понадобится.
@@ -398,6 +398,26 @@
 - **Основание:** пользователь потребовал удалить web Back из внутренних страниц и использовать native Telegram navigation после изучения документации.
 - **Источник:** official Telegram Mini Apps docs — [`BackButton`](https://core.telegram.org/bots/webapps#backbutton), [`backButtonClicked`](https://core.telegram.org/bots/webapps#events-available-for-mini-apps).
 - **Влияет на:** DEC-032/041/043/047, E0-D0-T05, Profile/Settings, AppRouteShell, Telegram SDK typings, AGENTS/FRONTEND_REVIEW/HANDOFF.
+
+### DEC-049 — Konsta/HIG composition каталога
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** S-MA-020 использует compact horizontal direct Konsta `Card`: фиксированное небольшое изображение слева, source/format/title/difficulty/category справа, duration на cover и UGC text cue для user source; detail открывает вся основная область. Disabled favorite control остаётся видимым по явному выбору пользователя. Filter Sheet использует direct Konsta `Navbar/List/ListItem/Radio/Toggle`: category/duration/difficulty/format являются single-select radio groups с `Любая`, equipment/YouTube/favorite — независимые toggles. Sheet обязан иметь modal focus transfer/trap/restore, inert+aria-hidden background, Escape/backdrop close и один primary `Готово`. Custom catalog Skeleton/CSS recreation запрещены; loading использует direct `Preloader`, offline показывает available data. Единственный Searchbar focus-owner wrapper разрешён как documented workaround: Konsta 5.2.0 принимает, но теряет `className`, поэтому без дополнительного DOM owner невозможно дать keyboard focus cue, не вмешиваясь в internal anatomy.
+- **Основание:** standalone code/browser/Apple HIG review выявил inconsistent custom CSS, color-only toggle chips, вечный offline skeleton, недоступный Sheet и clipping при 200% text. Пользователь явно выбрал `Radio + Toggle`, compact card и сохранение disabled favorite.
+- **PRD:** уточняет presentation/interaction S-MA-020 в рамках §12–13 без изменения API/routes/React Query contracts.
+- **Влияет на:** DEC-028/029/033/035, E0-D0-T05, S-MA-020, catalog UI/state evidence, HANDOFF.
+
+### DEC-049 — Production YouTube search через Piped
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** Invidious provider DEC-030 заменяется server-side Piped API без ключа. Production/test используют env `PIPED_BASE_URL=https://api.piped.private.coffee`; search вызывает `/search?q=...&filter=videos`, metadata fallback — `/streams/:videoId`. API contract возвращает `provider: "piped"`; thumbnails нормализуются к `i.ytimg.com`; D1 cache/stale fallback и TTL ≥24h сохраняются, cache namespace меняется на `piped:v1`. Клиентский raw fetch не добавляется, видео не скачивается.
+- **Основание:** production canonical repro `GET /api/v1/youtube/search?q=йога для спины` стабильно возвращал HTTP 200, `provider=invidious`, `cache=unavailable`, 0 результатов из-за HTML/недоступного Invidious instance. Пользователь ранее выбрал no-key Piped migration; candidate Piped instance подтверждён реальным JSON search.
+- **Verification:** commit `286d597`, Deploy web run 29402655934 PASS. Тот же production запрос после deploy: HTTP 200, `provider=piped`, `cache=miss`, 12 результатов, warning null; immediate repeat `cache=hit`, 12. Edge queries: `йога для начинающих + short` = 12, `растяжка + none` = 10, empty/default yoga = 6; все HTTP 200, warning null.
+- **Риски:** public Piped instance остаётся best-effort внешней зависимостью; stale cache/unavailable contract обязателен. `/streams/:videoId` может не иметь metadata для отдельных видео, но normal save после search использует cached result.
+- **PRD:** §19, §43.28, §44.5, §55.2.
+- **Влияет на:** DEC-030, E2-D2-T04 historical provider contract, `packages/youtube`, `/api/v1/youtube/**`, `youtube_search_cache`, wrangler/env, HANDOFF.
 
 ## Открытые решения
 

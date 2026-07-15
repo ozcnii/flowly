@@ -15,7 +15,7 @@
 | S-MA-010 | Главная | mobile-Telegram-only action-free shared Navbar with Flowly name; content header `Твой план` + constant `user-round` Profile action (DEC-043/046); day progress, nearest action, quick start, current program, habits, resume; no separate greeting/date/categories/«Ещё для вас» (DEC-039/043) | F02 | §11 | owner only | partial: home |
 | S-MA-011 | Today action detail | complete/snooze/skip/rest where allowed | F02,F07,F08 | §11, §25–26 | occurrence owner | gap |
 | S-MA-012 | Open-session conflict | continue / close / cancel new launch | F02,F04 | §14.4 | session owner | gap |
-| S-MA-020 | Йога: catalog | shared Navbar `Йога` + Settings/Profile; search/filter/source/favorite/open (DEC-043) | F03 | §12 | public/entitled content | partial: catalog |
+| S-MA-020 | Йога: catalog | mobile-only shared Navbar `Йога` (web hidden); search/filter/source/favorite/open (DEC-043/047/049) | F03 | §12 | public/entitled content | partial: catalog |
 | S-MA-021 | YouTube results | view/save/create; cache fallback/retry | F03,F05 | §19 | owner saves private copy | gap |
 | S-MA-022 | Workout detail | inspect/start/favorite/share/report/hide/author | F03,F04,F10 | §13 | visibility checked; UGC warning | gap |
 | S-MA-023 | Favorites | workouts/videos/programs; no folders | F03,F06 | §18 | owner only | gap |
@@ -99,6 +99,7 @@ These records make list-valued PRD obligations observable rather than treating a
 
 - Catalog exposes Flowly, YouTube and public-UGC sources and labels the source on every card. Filters are category, duration, workout difficulty, video/steps/mixed format, equipment, author/channel, source and favorite-only; search covers title, description, category, author and channel.
 - Workout cards expose cover, title, duration, categories, format, difficulty, source, author, favorite and UGC marker. Detail exposes the §13.1 fields/actions; UGC adds warning, report, hide and author profile.
+- DEC-049 presentation contract: compact horizontal direct Konsta Card; single-select filter groups use Radio, independent filters use Toggle; modal Sheet owns focus trap/inert/Escape/restore; disabled favorite remains visible by explicit approval; loading uses Preloader and offline keeps available data.
 - YouTube query is generated from every selected filter rather than arbitrary text. Results show cover, title, channel, duration, publication date, description, view, favorite and create-workout actions; Russian preference and language-detection limitation are disclosed.
 - Identical YouTube requests use a cache retained for **at least 24 hours**, whose key contains **all selected filters**. UI distinguishes cache/API results and quota unavailability, with retry/alternative. Flowly stores only video ID, metadata, cover/URL, user categories and last-update date; it never downloads the video.
 
