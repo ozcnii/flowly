@@ -48,7 +48,13 @@ export async function POST(request: Request) {
 
   const parsed = telegramAuthSchema.safeParse(await request.json().catch(() => ({})));
   if (!parsed.success) {
-    audit("auth.login_failed", { ip, reason: "bad_request" });
+    audit("auth.login_failed", {
+      ip,
+      reason: "bad_request",
+      initDataLen: request.headers.get("x-flowly-tg-init-data-len") ?? "missing",
+      webApp: request.headers.get("x-flowly-tg-webapp") ?? "missing",
+      platform: request.headers.get("x-flowly-tg-platform") ?? "missing",
+    });
     return json(400, { error: "bad_request" });
   }
 

@@ -28,7 +28,14 @@ const devUserHeader = (initData: string) => {
 export const getMe = (signal?: AbortSignal) => apiJson<MeResponse>("/api/v1/me", { cache: "no-store", signal });
 export const postTelegramAuth = (initData: string) => {
   const devUser = devUserHeader(initData);
-  return apiJson<TelegramAuthResponse>("/api/v1/auth/telegram", { method: "POST", headers: devUser ? { "x-flowly-dev-user": devUser } : undefined, body: jsonBody({ initData }) });
+  const webApp = globalThis.window?.Telegram?.WebApp;
+  const headers: Record<string, string> = {
+    "x-flowly-tg-init-data-len": String(initData.length),
+    "x-flowly-tg-webapp": webApp ? "1" : "0",
+    "x-flowly-tg-platform": webApp?.platform ?? "unknown",
+  };
+  if (devUser) headers["x-flowly-dev-user"] = devUser;
+  return apiJson<TelegramAuthResponse>("/api/v1/auth/telegram", { method: "POST", headers, body: jsonBody({ initData }) });
 };
 export const patchMe = (patch: MePatch) => apiJson<MeResponse>("/api/v1/me", { method: "PATCH", body: jsonBody(patch) });
 

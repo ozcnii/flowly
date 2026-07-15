@@ -2,6 +2,8 @@
 interface TelegramWebApp {
   initData: string;
   colorScheme?: "light" | "dark";
+  platform?: string;
+  version?: string;
   themeParams?: Record<string, string>;
   ready?: () => void;
   expand?: () => void;
