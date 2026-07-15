@@ -12,7 +12,7 @@
 | S-MA-004 | First habit/invite prompts | production controls disabled without mutation until E4-D5-T02/E7-D8-T01; then create/skip habit and invite/skip | F01 | §10.1 | owner only | partial: DEC-034 |
 | S-MA-005 | Telegram launch gate | validated Mini App launch/session; completion mutation retry; cannot finish without confirmation | F01,F08 | §10.1, §36 | owner only; mandatory gate | covered: DEC-034 |
 | S-MA-006 | Deep-link recovery | reason, auth/recovery, relevant safe exit | F01 | §10, §32, §36 | permission rechecked | gap |
-| S-MA-010 | Главная | shared Navbar: Settings + Flowly name + constant `user-round` Profile action (DEC-046); day progress, nearest action, quick start, current program, habits, resume; no separate greeting/date/categories/«Ещё для вас» (DEC-039/043) | F02 | §11 | owner only | partial: home |
+| S-MA-010 | Главная | action-free shared Navbar with Flowly name; content header `Твой план` + constant `user-round` Profile action (DEC-043/046); day progress, nearest action, quick start, current program, habits, resume; no separate greeting/date/categories/«Ещё для вас» (DEC-039/043) | F02 | §11 | owner only | partial: home |
 | S-MA-011 | Today action detail | complete/snooze/skip/rest where allowed | F02,F07,F08 | §11, §25–26 | occurrence owner | gap |
 | S-MA-012 | Open-session conflict | continue / close / cancel new launch | F02,F04 | §14.4 | session owner | gap |
 | S-MA-020 | Йога: catalog | shared Navbar `Йога` + Settings/Profile; search/filter/source/favorite/open (DEC-043) | F03 | §12 | public/entitled content | partial: catalog |

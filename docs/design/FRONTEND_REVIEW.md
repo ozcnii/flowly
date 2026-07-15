@@ -38,7 +38,7 @@
 - [ ] Internal page header — full-width direct Konsta `Navbar` вне page-padding container; title задан через `Navbar.title`, optional right action через Konsta `Link/Icon`.
 - [ ] Back — icon-only `NavbarBackLink` в `left` с `aria-label="Назад"`, без destination text; вызывает history `router.back()`, а не hardcoded route.
 - [ ] Нет outer padding вокруг Navbar, custom header/title/back Button или CSS navbar imitation.
-- [ ] Telegram fullscreen root Navbar следует DEC-047: composed inset owned once, safe-area blur covers the full top inset, title/actions geometry matches approved primary/internal contract at initial and scrolled positions; profile artwork is always `user-round` per DEC-046.
+- [ ] Telegram fullscreen root Navbar следует DEC-047: composed inset owned once, safe-area blur covers the full top inset, title/action-free primary geometry and internal back/title geometry match their approved contracts at initial and scrolled positions; Home content alone owns the `Твой план` + 44px `user-round` Profile action per DEC-043/046.
 - [ ] Back/cancel placement консистентен внутри раздела: не прыгать между верхом/низом без причины.
 - [ ] Если экран открыт из shared shell, back action не дублирует bottom nav и не нарушает ожидаемый history/back паттерн.
 - [ ] Для Next.js использовать nested `layout.tsx`/route groups там, где это предотвращает remount общего shell, повторную авторизацию и мигание.
