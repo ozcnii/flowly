@@ -1,8 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Icon } from "@flowly/ui";
+import { useMeQuery } from "../model/me-queries";
+import { telegramPhotoUrl } from "@/lib/telegram-photo";
 import styles from "./profile-hub-screen.module.css";
 
 /**
@@ -39,6 +42,9 @@ const SECTIONS: Section[] = [
 
 export function ProfileHubScreen() {
   const router = useRouter();
+  const me = useMeQuery();
+  const user = me.data?.user;
+  const photoUrl = telegramPhotoUrl(user?.photoUrl);
   const [notice, setNotice] = useState("");
 
   const onSection = (s: Section) => {
@@ -57,15 +63,13 @@ export function ProfileHubScreen() {
           <Icon name="chevron-left" /> Главная
         </button>
       </div>
-      <header className={styles.header}>
+      <header className={styles.header} aria-busy={!user}>
         <div className={styles.avatar} aria-hidden="true">
-          <Icon name="user-round" />
+          {photoUrl ? <Image src={photoUrl} alt="" width={56} height={56} unoptimized className={styles.avatarPhoto} /> : <Icon name="user-round" />}
         </div>
         <div className={styles.id}>
-          <h1 className={`flow-title ${styles.name}`}>Анна</h1>
-          <p className={styles.sub}>
-            <span className={styles.tgName}>@anna_flowly</span>
-          </p>
+          <h1 className={`flow-title ${styles.name}`}>{user?.firstName ?? "Профиль"}</h1>
+          {user?.username && <p className={styles.sub}><span className={styles.tgName}>@{user.username}</span></p>}
         </div>
         <button type="button" className={styles.edit} onClick={() => onSection(SECTIONS[4]!)}>
           Изменить

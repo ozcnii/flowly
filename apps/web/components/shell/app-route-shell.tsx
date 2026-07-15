@@ -3,6 +3,7 @@
 import { usePathname, useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 import { AuthGate } from "@/components/auth/auth-gate";
+import { ProductOnboardingGuard } from "@/components/onboarding/onboarding-guards";
 import { AppShell } from "@/components/shell/app-shell";
 import { resolveShellScenario } from "@/lib/scenarios";
 
@@ -14,5 +15,5 @@ export function AppRouteShell({ children }: { children: ReactNode }) {
   const preview = process.env.NODE_ENV !== "production" && (search.has("onboarding") || search.has("recovery") || search.has("web"));
   if (preview) return <>{children}</>;
   const scenario = resolveShellScenario(search.get("scenario") ?? undefined);
-  return <AuthGate><AppShell activeTab={activeTabFor(pathname)} scenario={scenario} showScenario={false}>{children}</AppShell></AuthGate>;
+  return <AuthGate><ProductOnboardingGuard><AppShell activeTab={activeTabFor(pathname)} scenario={scenario} showScenario={false}>{children}</AppShell></ProductOnboardingGuard></AuthGate>;
 }

@@ -29,6 +29,7 @@ export const users = sqliteTable("users", {
   // 0–6, 0 = Sunday (JS Date.getDay() convention); value contract finalized in E1-D1-T10.
   weekStartsOn: integer("week_starts_on").notNull(),
   locale: text("locale").notNull(),
+  onboardingCompletedAt: text("onboarding_completed_at"),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
   deletedAt: text("deleted_at"),

@@ -15,11 +15,11 @@ flowchart TD
   V --> O{Profile/onboarding complete?}
   O -- no --> S[S-MA-002 welcome]
   S --> P[S-MA-003 optional timezone/preferences]
-  P --> I[S-MA-004 optional habit/invite prompts]
-  I --> G[S-MA-005 mandatory bot gate]
-  G -->|failed| D[S-MA-096 diagnostics + retry]
+  P --> I[S-MA-004 disabled deferred habit/invite controls; no fake mutation]
+  I --> G[S-MA-005 mandatory validated Telegram launch + completion save]
+  G -->|save failed| D[S-MA-096 diagnostics + retry]
   D --> G
-  G -->|linked| X{Target accessible?}
+  G -->|completed| X{Target accessible?}
   O -- yes --> X
   X -- yes --> Z[Exact target or Home]
   X -- no --> U[S-MA-006 safe reason + auth/recovery/exit]

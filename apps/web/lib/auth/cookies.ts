@@ -1,10 +1,11 @@
 import { SESSION_TTL_MS } from "@flowly/core";
 
-/** Session cookie. HttpOnly + Secure + SameSite=Lax, Path=/. */
-export const SESSION_COOKIE = "__Host-flowly-session";
+/** Production uses a __Host cookie; local dev uses a separate HTTP-safe cookie. */
+const production = process.env.NODE_ENV === "production";
+export const SESSION_COOKIE = production ? "__Host-flowly-session" : "flowly-dev-session";
 
 const COOKIE_MAX_AGE = Math.floor(SESSION_TTL_MS / 1000);
-const COOKIE_ATTRS = "HttpOnly; Secure; SameSite=Lax; Path=/";
+const COOKIE_ATTRS = `HttpOnly; ${production ? "Secure; " : ""}SameSite=Lax; Path=/`;
 
 export function setSessionCookie(res: Response, token: string): void {
   res.headers.append(

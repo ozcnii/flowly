@@ -12,7 +12,7 @@ import styles from "./welcome-screen.module.css";
  */
 export function WelcomeScreen() {
   const router = useRouter();
-  const goHome = () => router.push("/" as never);
+  const next = () => router.push("/onboarding/preferences" as never);
 
   return (
     <div className={`safe-shell flow-screen ${styles.screen}`}>
@@ -42,11 +42,11 @@ export function WelcomeScreen() {
           <Button
             className={styles.primary}
             leadingIcon={<Icon name="leaf" />}
-            onClick={goHome}
+            onClick={next}
           >
             Начать
           </Button>
-          <Button variant="ghost" onClick={goHome}>
+          <Button variant="ghost" onClick={next}>
             Пропустить
           </Button>
         </div>

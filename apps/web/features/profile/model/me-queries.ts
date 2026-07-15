@@ -13,6 +13,7 @@ export type PublicUser = {
   timezone: string;
   weekStartsOn: number;
   locale: string;
+  onboardingCompleted: boolean;
 };
 export type MePatch = Partial<Pick<PublicUser, "firstName" | "timezone" | "locale" | "weekStartsOn">>;
 export type MeResponse = { user: PublicUser };
@@ -44,6 +45,7 @@ export const postTelegramAuth = async ({ initData, source, launchRaw }: Telegram
   return apiJson<TelegramAuthResponse>("/api/v1/auth/telegram", { method: "POST", headers, body: jsonBody({ initData }) });
 };
 export const patchMe = (patch: MePatch) => apiJson<MeResponse>("/api/v1/me", { method: "PATCH", body: jsonBody(patch) });
+export const completeOnboarding = () => apiJson<MeResponse>("/api/v1/onboarding/complete", { method: "POST" });
 
 export const useMeQuery = (enabled = true) => useQuery({ queryKey: meKey, queryFn: ({ signal }) => getMe(signal), enabled, staleTime: 30_000, gcTime: 5 * 60_000, retry: false });
 
@@ -55,4 +57,9 @@ export function useTelegramAuthMutation() {
 export function usePatchMeMutation() {
   const qc = useQueryClient();
   return useMutation({ mutationFn: patchMe, onSuccess: (data) => qc.setQueryData(meKey, data) });
+}
+
+export function useCompleteOnboardingMutation() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: completeOnboarding, onSuccess: (data) => qc.setQueryData(meKey, data) });
 }

@@ -2,8 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { Button, Icon, Select, type SelectOption } from "@flowly/ui";
-import { usePatchMeMutation } from "@/features/profile/model/me-queries";
+import { Button, Icon, InlineError, Select, type SelectOption } from "@flowly/ui";
+import { useMeQuery, usePatchMeMutation, type PublicUser } from "@/features/profile/model/me-queries";
+import { ApiError } from "@/lib/api/client";
 import styles from "./preferences-screen.module.css";
 
 const WEEK_STARTS = [
@@ -157,15 +158,21 @@ const buildTimezoneOptions = (): SelectOption[] =>
  * retry within the session.
  */
 export function PreferencesScreen() {
+  const me = useMeQuery();
+  return me.data ? <PreferencesForm user={me.data.user} /> : <div className={`safe-shell flow-screen ${styles.screen}`} aria-busy="true"><p className="flow-subtitle">Загружаем настройки…</p></div>;
+}
+
+function PreferencesForm({ user }: { user: PublicUser }) {
   const timezoneOptions = useMemo(() => buildTimezoneOptions(), []);
   const router = useRouter();
-  const [timezone, setTimezone] = useState(detectedTimezone);
-  const [weekStartsOn, setWeekStartsOn] = useState<number>(1);
+  const [timezone, setTimezone] = useState(user.timezone === "UTC" ? detectedTimezone : user.timezone);
+  const [weekStartsOn, setWeekStartsOn] = useState<number>(user.weekStartsOn);
   const [duration, setDuration] = useState<number>(20);
   const [interests, setInterests] = useState<Set<string>>(new Set());
   const [days, setDays] = useState<Set<string>>(new Set());
   const [times, setTimes] = useState<Set<string>>(new Set());
   const [notice, setNotice] = useState("");
+  const [saveError, setSaveError] = useState<{ title: string; description: string; reauth?: boolean } | null>(null);
   const patchMe = usePatchMeMutation();
 
   const toggle = (set: Set<string>, value: string, update: (next: Set<string>) => void) => {
@@ -176,16 +183,20 @@ export function PreferencesScreen() {
   };
 
   const next = async () => {
+    setSaveError(null);
     setNotice("Сохраняем настройки…");
     try {
       await patchMe.mutateAsync({ timezone, weekStartsOn });
-    } catch {
-      // best-effort in dev preview; real persistence is verified via curl
+      router.push("/onboarding/capabilities" as never);
+    } catch (error) {
+      setNotice("");
+      if (error instanceof ApiError && error.status === 401) setSaveError({ title: "Сессия истекла", description: "Перезагрузите Flowly, чтобы снова подтвердить вход через Telegram.", reauth: true });
+      else if (!navigator.onLine) setSaveError({ title: "Нет соединения", description: "Введённые настройки сохранены на экране. Подключитесь к интернету и повторите." });
+      else setSaveError({ title: "Настройки не сохранены", description: error instanceof ApiError && error.status === 400 ? "Проверьте часовой пояс и начало недели, затем повторите." : "Сервер временно не принял изменения. Введённые настройки сохранены на экране." });
     }
-    router.push("/" as never);
   };
 
-  const skip = () => router.push("/" as never);
+  const skip = () => router.push("/onboarding/capabilities" as never);
 
   return (
     <div className={`safe-shell flow-screen ${styles.screen}`}>
@@ -295,15 +306,16 @@ export function PreferencesScreen() {
       </section>
 
       <div className={styles.actions}>
-        <Button className={styles.primary} leadingIcon={<Icon name="leaf" />} onClick={next}>
+        <Button className={styles.primary} leadingIcon={<Icon name="leaf" />} onClick={next} loading={patchMe.isPending}>
           Далее
         </Button>
         <Button variant="ghost" onClick={skip}>
           Пропустить
         </Button>
       </div>
-      <p className={styles.notice} aria-live="polite">{notice}</p>
-      <p className={styles.deferred}>Длительность, интересы и расписание уточнят каталог тренировок и привычек (этапы 2 и 4).</p>
+      {saveError && <InlineError title={saveError.title} description={saveError.description} retryLabel={saveError.reauth ? "Войти снова" : "Повторить сохранение"} onRetry={saveError.reauth ? () => location.reload() : () => void next()} icon={<Icon name="triangle-alert" />} />}
+      {notice && <p className={styles.notice} aria-live="polite">{notice}</p>}
+      <p className={styles.deferred}>Эти настройки можно изменить позже в профиле.</p>
     </div>
   );
 }

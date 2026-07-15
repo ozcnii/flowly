@@ -14,6 +14,7 @@ export interface PublicUser {
   timezone: string;
   weekStartsOn: number;
   locale: string;
+  onboardingCompleted: boolean;
 }
 
 export function publicUser(user: {
@@ -26,6 +27,7 @@ export function publicUser(user: {
   timezone: string;
   weekStartsOn: number;
   locale: string;
+  onboardingCompletedAt: string | null;
 }): PublicUser {
   return {
     id: user.id,
@@ -37,6 +39,7 @@ export function publicUser(user: {
     timezone: user.timezone,
     weekStartsOn: user.weekStartsOn,
     locale: user.locale,
+    onboardingCompleted: user.onboardingCompletedAt !== null,
   };
 }
 
@@ -80,6 +83,7 @@ export async function findOrCreateUser(
     timezone: "UTC",
     weekStartsOn: 1,
     locale: tg.language_code ?? "ru",
+    onboardingCompletedAt: null,
     createdAt: ts,
     updatedAt: ts,
     deletedAt: null,

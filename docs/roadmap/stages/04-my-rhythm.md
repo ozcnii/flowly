@@ -38,11 +38,11 @@
 - **validation/evidence:** screenshots и ownership responses.
 
 ### E4-D5-T02 — Реализовать CRUD привычки, иконки и цвета
-- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §22, §43.16, §44.7, §55.4 · **depends_on:** E4-D5-T01, E1-D1-T04 · **decisions:** DEC-017, DEC-019, DEC-022, DEC-024, DEC-025, DEC-029
-- **ui_slices:** S-MA-061, S-MA-064 — выполнять последовательно; approval каждого ID обязателен до следующего.
-- **scope:** поля создания/редактирования, разрешение пропуска, icon/color choices.
-- **acceptance:** [ ] обязательные поля валидируются; [ ] icon/color сохраняются; [ ] default privacy соблюдена; [ ] sharing до создания отсутствует.
+- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-15
+- **prd_refs:** §10.1, §22, §43.16, §44.7, §55.4 · **depends_on:** E4-D5-T01, E1-D1-T04, E1-D1-T13 · **decisions:** DEC-017, DEC-019, DEC-022, DEC-024, DEC-025, DEC-029, DEC-034
+- **ui_slices:** S-MA-004, S-MA-061, S-MA-064 — production onboarding control S-MA-004 включается только вместе с реальной mutation; остальные выполнять последовательно, approval каждого ID обязателен до следующего.
+- **scope:** поля создания/редактирования, разрешение пропуска, icon/color choices; заменить disabled «первая привычка» в production onboarding E1-D1-T13 на реальное создание без отдельного fake path.
+- **acceptance:** [ ] обязательные поля валидируются; [ ] icon/color сохраняются; [ ] default privacy соблюдена; [ ] sharing до создания отсутствует; [ ] onboarding control создаёт реальную привычку или честно сохраняет skip и больше не disabled.
 - **validation/evidence:** CRUD matrix и UI states.
 
 ### E4-D5-T03 — Реализовать расписание «конкретное время» и дни недели

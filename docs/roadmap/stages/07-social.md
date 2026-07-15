@@ -31,11 +31,11 @@
 ## Deliverable E7-D8 — Социальный контур
 
 ### E7-D8-T01 — Реализовать приглашения и friendships
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §32.1–32.3, §43.4–43.5, §44.11, §55.8 · **depends_on:** E1-D1-T06 · **decisions:** DEC-013, DEC-019, DEC-022, DEC-024, DEC-025, DEC-029
-- **ui_slices:** S-MA-081, S-MA-082, S-BOT-001, S-BOT-007 — выполнять последовательно; approval каждого ID обязателен до следующего.
-- **scope:** create/accept/reject invite, несколько друзей и состояния связи.
-- **acceptance:** [ ] invite уникален/безопасен; [ ] состояния валидны; [ ] нельзя создать связь с нарушением правил; [ ] несколько друзей поддержаны.
+- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-15
+- **prd_refs:** §10.1, §32.1–32.3, §43.4–43.5, §44.11, §55.8 · **depends_on:** E1-D1-T06, E1-D1-T13 · **decisions:** DEC-013, DEC-019, DEC-022, DEC-024, DEC-025, DEC-029, DEC-034
+- **ui_slices:** S-MA-004, S-MA-081, S-MA-082, S-BOT-001, S-BOT-007 — production onboarding control S-MA-004 включается только вместе с реальной invite mutation; остальные выполнять последовательно, approval каждого ID обязателен до следующего.
+- **scope:** create/accept/reject invite, несколько друзей и состояния связи; заменить disabled invite control в production onboarding E1-D1-T13 на реальное приглашение без fake success.
+- **acceptance:** [ ] invite уникален/безопасен; [ ] состояния валидны; [ ] нельзя создать связь с нарушением правил; [ ] несколько друзей поддержаны; [ ] onboarding control создаёт реальное приглашение или честно сохраняет skip и больше не disabled.
 - **validation/evidence:** invitation state matrix и permission failures.
 
 ### E7-D8-T02 — Реализовать удаление друга и отзыв доступа

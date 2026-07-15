@@ -254,6 +254,16 @@
 - **PRD:** §44.2–44.5, §55.
 - **Влияет на:** `apps/web/app/globals.css`, `apps/web/features/**/ui/*.module.css`, `apps/web/features/**/ui/*.tsx`, `docs/design/FRONTEND_REVIEW.md`, `AGENTS.md`, E2-D2-T07 and all future frontend tasks.
 
+### DEC-034 — Durable production onboarding и Telegram launch gate
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** production onboarding использует nullable `users.onboarding_completed_at`; `NULL` означает incomplete для новых и уже существующих пользователей, timestamp ставится только idempotent completion mutation после обязательного финального gate. Incomplete authenticated user не видит product shell и направляется в fullscreen routes `/onboarding/welcome -> preferences -> capabilities -> bot`; completed user больше не видит onboarding. По явному выбору пользователя DEC-014 gate в этой реализации считается подтверждённым фактом ранее валидированного Telegram Mini App launch/session, без отдельного `getChat`. Habit/invite controls на S-MA-004 остаются visible disabled без fake mutation до E4-D5-T02/E7-D8-T01; эти downstream cards обязаны включить controls только вместе с реальными mutations. Home/Profile/Settings используют authenticated `/me`; Flowly name остаётся отдельно редактируемым, Telegram username/photo read-only и обновляются при auth.
+- **API/data contract:** `GET /me` возвращает boolean `onboardingCompleted`; `POST /api/v1/onboarding/complete` требует session + same-origin, idempotently ставит timestamp и возвращает updated public user. Client calls идут через React Query.
+- **Основание:** пользователь после production auth verification выбрал «Профиль + onboarding», onboarding для любого incomplete user, plan `.temp/E1-D1-T13/plan.md`, launch-fact bot gate и disabled habit/invite с downstream TODO; plan approved командой «делай».
+- **PRD:** §10.1–10.2, §38, §43.1–43.2, §44.1, §55.1.
+- **Влияет на:** E1-D1-T13, E4-D5-T02, E7-D8-T01, `users`, `/api/v1/me`, `/api/v1/onboarding/complete`, `apps/web/app/onboarding/**`, Home/Profile/Settings, DEC-014 implementation semantics.
+
 ## Открытые решения
 
 ### DEC-006 — Operational thresholds

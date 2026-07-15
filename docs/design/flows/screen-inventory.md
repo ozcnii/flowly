@@ -9,8 +9,8 @@
 | S-MA-001 | Shell/auth bootstrap | Telegram initData → session → target | F01 | §10.2–10.3 | unauthenticated; server validation | gap |
 | S-MA-002 | Welcome/onboarding | start/skip optional steps | F01 | §10.1 | owner only | gap |
 | S-MA-003 | Timezone/interests/preferences | detect/edit timezone, categories, duration, schedule | F01 | §10.1, §27 | owner only | gap |
-| S-MA-004 | First habit/invite prompts | create/skip habit; invite/skip | F01 | §10.1 | owner only | gap |
-| S-MA-005 | Bot connection gate | diagnose, connect, retry; cannot finish without link | F01,F08 | §10.1, §36 | owner only; mandatory gate | gap |
+| S-MA-004 | First habit/invite prompts | production controls disabled without mutation until E4-D5-T02/E7-D8-T01; then create/skip habit and invite/skip | F01 | §10.1 | owner only | partial: DEC-034 |
+| S-MA-005 | Telegram launch gate | validated Mini App launch/session; completion mutation retry; cannot finish without confirmation | F01,F08 | §10.1, §36 | owner only; mandatory gate | covered: DEC-034 |
 | S-MA-006 | Deep-link recovery | reason, auth/recovery, relevant safe exit | F01 | §10, §32, §36 | permission rechecked | gap |
 | S-MA-010 | Главная | avatar, today modules, quick start, resume | F02 | §11 | owner; shared activity only | partial: home |
 | S-MA-011 | Today action detail | complete/snooze/skip/rest where allowed | F02,F07,F08 | §11, §25–26 | occurrence owner | gap |
@@ -170,8 +170,8 @@ Each ID is assigned to one explicitly defined profile below; this is the canonic
 | S-MA-001 | P-SHELL | auth failure is full-screen; retry revalidates initData |
 | S-MA-002 | P-WIZARD | skipped optional step is not successful-save |
 | S-MA-003 | P-WIZARD | timezone/preferences input survives retry |
-| S-MA-004 | P-WIZARD | both prompts may be skipped without mutation |
-| S-MA-005 | P-GATE | completion disabled until bot connection verifies |
+| S-MA-004 | P-WIZARD | controls stay disabled with no fake mutation until linked downstream cards implement them |
+| S-MA-005 | P-GATE | completion disabled during validation/save; DEC-034 accepts the validated Telegram launch/session as the gate |
 | S-MA-006 | P-DETAIL-READ | unavailable target is ER, with safe recovery/exit |
 | S-MA-010 | P-COLLECTION | modules load independently; empty day has three CTAs |
 | S-MA-011 | P-DETAIL | action set disabled by occurrence type/status |

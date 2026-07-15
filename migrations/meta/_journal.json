@@ -29,6 +29,13 @@
       "when": 1784054417151,
       "tag": "0003_green_firestar",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1784078229502,
+      "tag": "0004_spicy_lady_vermin",
+      "breakpoints": true
     }
   ]
 }

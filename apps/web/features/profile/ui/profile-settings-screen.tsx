@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Icon, Select, type SelectOption } from "@flowly/ui";
-import { usePatchMeMutation } from "../model/me-queries";
+import { useMeQuery, usePatchMeMutation, type PublicUser } from "../model/me-queries";
 import styles from "./profile-settings-screen.module.css";
 
 const WEEK_STARTS = [
@@ -86,18 +86,24 @@ const buildTimezoneOptions = (): SelectOption[] => {
  * Flowly name is editable separately from Telegram. Avatar is read-only from Telegram.
  */
 export function ProfileSettingsScreen() {
+  const me = useMeQuery();
+  return me.data ? <ProfileSettingsForm user={me.data.user} /> : <div className="flow-screen" aria-busy="true"><p className="flow-subtitle">Загружаем профиль…</p></div>;
+}
+
+function ProfileSettingsForm({ user }: { user: PublicUser }) {
   const router = useRouter();
   const forced = useSearchParams().get("settings");
   const timezoneOptions = useMemo(() => buildTimezoneOptions(), []);
-  const [firstName, setFirstName] = useState("Анна");
-  const [timezone, setTimezone] = useState(detectedTimezone);
-  const [weekStartsOn, setWeekStartsOn] = useState(1);
+  const [firstName, setFirstName] = useState(user.firstName);
+  const [timezone, setTimezone] = useState(user.timezone === "UTC" ? detectedTimezone : user.timezone);
+  const [weekStartsOn, setWeekStartsOn] = useState(user.weekStartsOn);
   const [theme, setTheme] = useState(initialTheme);
   const [reports, setReports] = useState(() => new Set<string>(["weekly"]));
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error" | "offline">("idle");
   const { mutateAsync } = usePatchMeMutation();
-  const mounted = useRef(false);
   const reportsKey = useMemo(() => [...reports].sort().join(","), [reports]);
+  const draftKey = `${firstName}\0${timezone}\0${weekStartsOn}\0${theme}\0${reportsKey}`;
+  const lastSaved = useRef(draftKey);
 
   const saveDraft = useCallback(async () => {
     const name = firstName.trim();
@@ -107,21 +113,19 @@ export function ProfileSettingsScreen() {
     try {
       applyTheme(theme);
       if (process.env.NODE_ENV === "production") await mutateAsync({ firstName: name, timezone, weekStartsOn });
+      lastSaved.current = draftKey;
       setStatus("saved");
     } catch {
       setStatus("error");
     }
-  }, [firstName, forced, mutateAsync, theme, timezone, weekStartsOn]);
+  }, [draftKey, firstName, forced, mutateAsync, theme, timezone, weekStartsOn]);
 
   useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true;
-      return;
-    }
+    if (draftKey === lastSaved.current) return;
     setStatus("saving");
     const timer = window.setTimeout(() => void saveDraft(), 550);
     return () => window.clearTimeout(timer);
-  }, [firstName, timezone, weekStartsOn, theme, reportsKey, saveDraft]);
+  }, [draftKey, saveDraft]);
 
   const toggleReport = (id: string) => setReports((prev) => {
     const next = new Set(prev);
