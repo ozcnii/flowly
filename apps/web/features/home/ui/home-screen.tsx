@@ -6,7 +6,6 @@ import { useState, type CSSProperties } from "react";
 import { Badge, Button, Card, Icon, IconButton, InlineError, Progress, Skeleton } from "@flowly/ui";
 import type { HomeScenario } from "../model/home-scenario";
 import { useMeQuery } from "@/features/profile/model/me-queries";
-import { telegramPhotoUrl } from "@/lib/telegram-photo";
 import type { HomeViewModel } from "../model/home-view-model";
 import styles from "./home-screen-v2.module.css";
 
@@ -79,9 +78,10 @@ export function HomeScreen({ data, scenario = "base" }: Props) {
 function HomeIntro({ data }: { data: HomeViewModel }) {
   const me = useMeQuery();
   const user = me.data?.user;
-  const photoUrl = telegramPhotoUrl(user?.photoUrl);
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const photoUrl = user?.photoUrl && !photoFailed ? "/api/v1/me/photo" : null;
   const date = new Intl.DateTimeFormat("ru-RU", { weekday: "long", day: "numeric", month: "long" }).format(new Date()).toUpperCase();
-  return <header className={`flow-top ${styles.intro}`}><div><p className="flow-eyebrow" suppressHydrationWarning>{date}</p><h1 className="flow-title">{user ? `Привет, ${user.firstName}!` : "Привет!"}</h1><span className="flow-subtitle">{data.subtitle}</span></div><Link href="/profile" className={styles.profileLink} aria-label="Открыть профиль">{photoUrl ? <Image src={photoUrl} alt="" width={44} height={44} unoptimized className={styles.profilePhoto} /> : <Icon name="user-round" />}</Link></header>;
+  return <header className={`flow-top ${styles.intro}`}><div><p className="flow-eyebrow" suppressHydrationWarning>{date}</p><h1 className="flow-title">{user ? `Привет, ${user.firstName}!` : "Привет!"}</h1><span className="flow-subtitle">{data.subtitle}</span></div><Link href="/profile" className={styles.profileLink} aria-label="Открыть профиль">{photoUrl ? <Image src={photoUrl} alt="" width={44} height={44} unoptimized className={styles.profilePhoto} onError={() => setPhotoFailed(true)} /> : <Icon name="user-round" />}</Link></header>;
 }
 
 function HomeLoading() { return <div className={`flow-screen flow-screen--wide ${styles.root} ${styles.loading}`} aria-busy="true"><p className="sr-only" role="status">Загружаем Главную</p><div className={styles.loadingIntro}><Skeleton /><Skeleton /></div><Card className={styles.loadingStrip}><Skeleton height="card" /><div><Skeleton /><Skeleton /></div></Card><Card className={styles.loadingProgress}><Skeleton className={styles.loadingCircle} /><div><Skeleton /><Skeleton /><Skeleton /></div></Card><div className={styles.loadingChips}><Skeleton /><Skeleton /><Skeleton /></div><section className={styles.section}><Skeleton /><Skeleton height="hero" /></section><section className={styles.section}><Skeleton /><Card className={styles.loadingHabits}><Skeleton /><Skeleton /><Skeleton /></Card></section></div>; }

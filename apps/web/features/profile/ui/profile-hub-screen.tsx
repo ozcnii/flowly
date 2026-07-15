@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Icon } from "@flowly/ui";
 import { useMeQuery } from "../model/me-queries";
-import { telegramPhotoUrl } from "@/lib/telegram-photo";
 import styles from "./profile-hub-screen.module.css";
 
 /**
@@ -44,7 +43,8 @@ export function ProfileHubScreen() {
   const router = useRouter();
   const me = useMeQuery();
   const user = me.data?.user;
-  const photoUrl = telegramPhotoUrl(user?.photoUrl);
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const photoUrl = user?.photoUrl && !photoFailed ? "/api/v1/me/photo" : null;
   const [notice, setNotice] = useState("");
 
   const onSection = (s: Section) => {
@@ -65,7 +65,7 @@ export function ProfileHubScreen() {
       </div>
       <header className={styles.header} aria-busy={!user}>
         <div className={styles.avatar} aria-hidden="true">
-          {photoUrl ? <Image src={photoUrl} alt="" width={56} height={56} unoptimized className={styles.avatarPhoto} /> : <Icon name="user-round" />}
+          {photoUrl ? <Image src={photoUrl} alt="" width={56} height={56} unoptimized className={styles.avatarPhoto} onError={() => setPhotoFailed(true)} /> : <Icon name="user-round" />}
         </div>
         <div className={styles.id}>
           <h1 className={`flow-title ${styles.name}`}>{user?.firstName ?? "Профиль"}</h1>
