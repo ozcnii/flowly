@@ -18,7 +18,7 @@ export function TelegramBackButton() {
     }
     const back = () => router.back();
     backButton.onClick(back).show();
-    return () => { backButton.offClick(back).hide(); };
+    return () => { backButton.offClick(back); };
   }, [pathname, router]);
 
   return null;
