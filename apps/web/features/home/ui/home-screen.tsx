@@ -19,6 +19,7 @@ export function HomeScreen({ data, scenario = "base" }: Props) {
   if (scenario === "empty") return <HomeEmpty />;
 
   return <div className="flow-screen flow-screen--wide">
+    <HomeHeader />
     {scenario === "offline" && <Card component="aside" outline role="status" header={<Badge>Офлайн</Badge>}><p className="m-0 text-sm text-text-muted">Показываем сохранённые данные. Действия, требующие сети, временно недоступны.</p></Card>}
 
     {scenario === "resume" && <Card component="section" outline header={<Badge>Можно продолжить</Badge>} contentWrapPadding="p-3 grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 items-center">
@@ -30,7 +31,7 @@ export function HomeScreen({ data, scenario = "base" }: Props) {
       </div>
     </Card>}
 
-    <Card component="section" outline className="m-0" header={cardTitle("Твой прогресс на сегодня", "day-progress-title")} contentWrap={false} aria-labelledby="day-progress-title">
+    <Card component="section" outline className="m-0" header={cardTitle("Прогресс на сегодня", "day-progress-title")} contentWrap={false} aria-labelledby="day-progress-title">
       <div className="grid gap-3 px-4 pb-4">
         <div className="grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-4">
           <DayProgressRing value={data.progress.percent} />
@@ -71,6 +72,13 @@ export function HomeScreen({ data, scenario = "base" }: Props) {
   </div>;
 }
 
+function HomeHeader() {
+  return <header className="flex items-center justify-between gap-4">
+    <BlockTitle component="h1" large className="!m-0 !p-0">Твой план</BlockTitle>
+    <Button component={NextLink} href="/profile" clear rounded className="h-11 w-11 min-w-11 p-0" aria-label="Открыть профиль"><Icon name="user-round" /></Button>
+  </header>;
+}
+
 /** DEC-040: approved Home-only circular progress; Konsta 5.2.0 has no circular equivalent. */
 function DayProgressRing({ value }: { value: number }) {
   const progress = Math.max(0, Math.min(100, Math.round(value)));
@@ -84,14 +92,17 @@ function DayProgressRing({ value }: { value: number }) {
 }
 
 function HomeLoading() {
-  return <div className="flow-screen flow-screen--wide" aria-busy="true" role="status" aria-live="polite">
+  return <div className="flow-screen flow-screen--wide" aria-busy="true">
+    <HomeHeader />
+    <div role="status" aria-live="polite" className="grid gap-3">
     <Card component="section" outline header={<Badge>Сегодня</Badge>} contentWrapPadding="min-h-32 p-6 flex items-center justify-center gap-3"><Preloader /><p className="m-0">Собираем план на сегодня</p></Card>
     <Card component="section" outline contentWrapPadding="min-h-24 p-5 flex items-center justify-center gap-3"><Preloader /><p className="m-0 text-sm text-text-muted">Загружаем программу и привычки</p></Card>
+    </div>
   </div>;
 }
 
 function HomeEmpty() {
-  return <div className="flow-screen flow-screen--wide"><Card component="section" outline header={<Badge>Свободный день</Badge>} contentWrapPadding="p-5 grid gap-4" aria-labelledby="empty-title">
+  return <div className="flow-screen flow-screen--wide"><HomeHeader /><Card component="section" outline header={<Badge>Свободный день</Badge>} contentWrapPadding="p-5 grid gap-4" aria-labelledby="empty-title">
     <BlockTitle component="h2" large className="!m-0 !p-0" id="empty-title">На сегодня ничего не запланировано</BlockTitle>
     <p className="m-0 text-sm text-text-muted">Выберите практику сейчас или откройте раздел, который хотите запланировать.</p>
     <Button component={NextLink} href="/catalog" large rounded className="gap-2"><Icon name="play" />Выбрать тренировку</Button>
