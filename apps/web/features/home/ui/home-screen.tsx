@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useState, type CSSProperties } from "react";
 import { Badge, Button, Card, Icon, IconButton, InlineError, Progress, Skeleton } from "@flowly/ui";
 import type { HomeScenario } from "../model/home-scenario";
+import { useMeQuery } from "@/features/profile/model/me-queries";
 import type { HomeViewModel } from "../model/home-view-model";
-import styles from "./home-screen.module.css";
+import styles from "./home-screen-v2.module.css";
 
 type Props = { data: HomeViewModel; scenario?: HomeScenario };
 
@@ -74,7 +75,17 @@ export function HomeScreen({ data, scenario = "base" }: Props) {
   </div>;
 }
 
-function HomeIntro({ data }: { data: HomeViewModel }) { return <header className={`flow-top ${styles.intro}`}><div><p className="flow-eyebrow">{data.date}</p><h1 className="flow-title">{data.greeting}<Icon name="leaf" /></h1><span className="flow-subtitle">{data.subtitle}</span></div><Link href="/profile" className={styles.profileLink} aria-label="Открыть профиль"><Icon name="user-round" /></Link></header>; }
+function HomeIntro({ data }: { data: HomeViewModel }) {
+  const me = useMeQuery();
+  const photoUrl = telegramPhotoUrl(me.data?.user.photoUrl);
+  return <header className={`flow-top ${styles.intro}`}><div><p className="flow-eyebrow">{data.date}</p><h1 className="flow-title">{data.greeting}<Icon name="leaf" /></h1><span className="flow-subtitle">{data.subtitle}</span></div><Link href="/profile" className={styles.profileLink} aria-label="Открыть профиль">{photoUrl ? <Image src={photoUrl} alt="" width={44} height={44} unoptimized className={styles.profilePhoto} /> : <Icon name="user-round" />}</Link></header>;
+}
+
+function telegramPhotoUrl(value?: string | null): string | null {
+  if (!value) return null;
+  try { const url = new URL(value); return url.protocol === "https:" && url.hostname === "t.me" && url.pathname.startsWith("/i/userpic/") ? url.toString() : null; }
+  catch { return null; }
+}
 
 function HomeLoading() { return <div className={`flow-screen flow-screen--wide ${styles.root} ${styles.loading}`} aria-busy="true"><p className="sr-only" role="status">Загружаем Главную</p><div className={styles.loadingIntro}><Skeleton /><Skeleton /></div><Card className={styles.loadingStrip}><Skeleton height="card" /><div><Skeleton /><Skeleton /></div></Card><Card className={styles.loadingProgress}><Skeleton className={styles.loadingCircle} /><div><Skeleton /><Skeleton /><Skeleton /></div></Card><div className={styles.loadingChips}><Skeleton /><Skeleton /><Skeleton /></div><section className={styles.section}><Skeleton /><Skeleton height="hero" /></section><section className={styles.section}><Skeleton /><Card className={styles.loadingHabits}><Skeleton /><Skeleton /><Skeleton /></Card></section></div>; }
 

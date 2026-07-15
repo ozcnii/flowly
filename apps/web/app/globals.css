@@ -53,12 +53,14 @@ button, a { touch-action: manipulation; }
   width: 100%;
   max-width: var(--flow-screen-max);
   min-height: 100dvh;
-  margin: auto;
+  margin: 0 auto;
   padding: var(--flow-screen-pad-top) var(--flow-screen-gutter) var(--flow-screen-pad-bottom);
   background: var(--color-canvas);
 }
 
 .flow-screen.flow-screen--wide { max-width: var(--flow-screen-wide); }
+
+.flow-screen.flow-screen > * { flex-shrink: 0; }
 
 .flow-top.flow-top {
   display: grid;
