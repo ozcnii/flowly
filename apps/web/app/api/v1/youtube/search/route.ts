@@ -4,6 +4,7 @@ import { isoFromNowMs, nowIso } from "@flowly/core";
 import { schema } from "@flowly/database";
 import { buildYogaYoutubeQuery, searchInvidious, type YoutubeFilters, type YoutubeResult } from "@flowly/youtube";
 import { getDb, getInvidiousBaseUrl } from "@/lib/cloudflare";
+import { audit } from "@/lib/auth/http";
 import starterCatalog from "../../../../../../../seeds/catalog/starter-catalog.v1.json";
 
 type CacheState = "hit" | "miss" | "stale" | "unavailable";
@@ -53,7 +54,8 @@ export async function GET(request: Request) {
       // Plain next dev may not have D1; UI can still render provider/fixture results.
     }
     return json({ query, cache: "miss", provider: "invidious", results, warning: null, explanation: null });
-  } catch {
+  } catch (error) {
+    audit("youtube.search_provider_failed", { detail: error instanceof Error ? error.message : "unknown", providerConfigured: Boolean(baseUrl), cacheKey: query.cacheKey });
     if (cached.length) return json({ query, cache: "stale", provider: "invidious", results: cached, warning: "Показываем сохранённые результаты: YouTube-поиск временно недоступен.", explanation: null });
     return json({ query, cache: "unavailable", provider: "invidious", results: [], warning: "YouTube-поиск временно недоступен.", explanation: "Попробуйте позже или вернитесь в каталог Flowly." });
   }
