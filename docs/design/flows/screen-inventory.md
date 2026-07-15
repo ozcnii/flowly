@@ -12,7 +12,7 @@
 | S-MA-004 | First habit/invite prompts | production controls disabled without mutation until E4-D5-T02/E7-D8-T01; then create/skip habit and invite/skip | F01 | §10.1 | owner only | partial: DEC-034 |
 | S-MA-005 | Telegram launch gate | validated Mini App launch/session; completion mutation retry; cannot finish without confirmation | F01,F08 | §10.1, §36 | owner only; mandatory gate | covered: DEC-034 |
 | S-MA-006 | Deep-link recovery | reason, auth/recovery, relevant safe exit | F01 | §10, §32, §36 | permission rechecked | gap |
-| S-MA-010 | Главная | action-free shared Navbar with Flowly name; content header `Твой план` + constant `user-round` Profile action (DEC-043/046); day progress, nearest action, quick start, current program, habits, resume; no separate greeting/date/categories/«Ещё для вас» (DEC-039/043) | F02 | §11 | owner only | partial: home |
+| S-MA-010 | Главная | mobile-Telegram-only action-free shared Navbar with Flowly name; content header `Твой план` + constant `user-round` Profile action (DEC-043/046); day progress, nearest action, quick start, current program, habits, resume; no separate greeting/date/categories/«Ещё для вас» (DEC-039/043) | F02 | §11 | owner only | partial: home |
 | S-MA-011 | Today action detail | complete/snooze/skip/rest where allowed | F02,F07,F08 | §11, §25–26 | occurrence owner | gap |
 | S-MA-012 | Open-session conflict | continue / close / cancel new launch | F02,F04 | §14.4 | session owner | gap |
 | S-MA-020 | Йога: catalog | shared Navbar `Йога` + Settings/Profile; search/filter/source/favorite/open (DEC-043) | F03 | §12 | public/entitled content | partial: catalog |
@@ -49,7 +49,7 @@
 | S-MA-074 | Reports index | weekly/monthly/current partial/history | F09 | §30 | owner | gap |
 | S-MA-075 | Report detail | metrics/comparison/shared-only joint stats | F09 | §30 | owner | gap |
 | S-MA-076 | Share-card consent | choose safe fields/generate/download/share | F09 | §30.5 | owner; privacy filter | gap |
-| S-MA-080 | Profile hub | action-free fixed/blurred title + native Telegram BackButton; profile + extra sections | F10,F11 | §9, §38 | owner | gap |
+| S-MA-080 | Profile hub | mobile-Telegram-only action-free fixed/blurred title + native Telegram BackButton; profile + extra sections | F10,F11 | §9, §38 | owner | gap |
 | S-MA-081 | Friends | list/invite/pending/remove/block | F10 | §32 | owner; confirmed links | gap |
 | S-MA-082 | Invite accept/recovery | accept/reject/expired/already-used | F01,F10 | §32 | unauthenticated→auth; one-use | gap |
 | S-MA-083 | Shared object read-only | recipient: view allowed fields/save copy; friend/participant with current shared object + enabled partner notifications: remind; link-only viewer: remind disabled | F10 | §33, §35 | access rechecked; revoke-aware; link alone grants no partner reminder | gap |
@@ -58,7 +58,7 @@
 | S-MA-086 | Challenge editor/detail | goal/dates/participants/visibility/join/leave | F10 | §34 | owner controls; accept required | gap |
 | S-MA-087 | Joint activity feed | shared progress/reactions/remind | F06,F10 | §20.6, §34–35 | participants; fixed reactions | gap |
 | S-MA-088 | UGC report/hide/block | reason required; local hide; reversible block | F03,F10 | §13.2, §56.6 | authenticated viewer | gap |
-| S-MA-090 | Profile settings | action-free fixed/blurred title + native Telegram BackButton; persisted Flowly name/timezone/weekly+monthly reports; device-local theme; week fixed Monday (DEC-042/044) | F11 | §27, §38.1 | owner | gap |
+| S-MA-090 | Profile settings | mobile-Telegram-only action-free fixed/blurred title + native Telegram BackButton; persisted Flowly name/timezone/weekly+monthly reports; device-local theme; week fixed Monday (DEC-042/044) | F11 | §27, §38.1 | owner | gap |
 | S-MA-091 | Notification settings | quiet hours/default policy/categories/reports | F08,F11 | §37–38 | owner | gap |
 | S-MA-092 | Data settings | export/history clear/account delete/public content | F11 | §38.3 | owner; re-confirm destructive | gap |
 | S-MA-093 | Export status/download | request/progress/download protected JSON archive containing profile, workouts, habits, schedules, history, friends and reports; bot notice | F11 | §38.3, §51.2 | owner; protected archive | gap |

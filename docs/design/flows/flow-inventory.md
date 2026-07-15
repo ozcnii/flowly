@@ -16,7 +16,7 @@
 - Telegram Mini App launch → `S-MA-001`; bot `/app` → `S-MA-010`, `/today` → `S-MA-011`; `/help` removed by DEC-041.
 - Reminder/report/invite/social/export notification → exact target after auth/access recheck; unavailable target → `S-MA-006` or `S-WEB-002`.
 - Outside production Telegram → `S-WEB-001`; local/test emulation is an environment capability, not a v1 user surface.
-- Persistent navigation has exactly five tabs with 9px labels (DEC-043). Native Telegram BackButton is hidden on those exact top-level routes and remains visible without Close/X flicker across internal route transitions; internal Back invokes history `router.back()` (DEC-048). Every exact top-level tab route uses an action-free shared Konsta Navbar; Home title is the Flowly name, other titles use domain names. Home content alone starts with `Твой план` + constant `user-round` Profile action; Settings is reached through Profile (DEC-043/046).
+- Persistent navigation has exactly five tabs with 9px labels (DEC-043). Native Telegram BackButton is hidden on those exact top-level routes and remains visible without Close/X flicker across internal route transitions; internal Back invokes history `router.back()` (DEC-048). On Telegram iOS/Android every exact top-level tab route uses an action-free shared Konsta Navbar; desktop/web renders no safe-area Navbar (DEC-047). Home title is the Flowly name, other titles use domain names. Home content alone starts with `Твой план` + constant `user-round` Profile action; Settings is reached through Profile (DEC-043/046).
 
 ## Families
 
