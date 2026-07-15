@@ -6,6 +6,14 @@ import { useSearchParams } from "next/navigation";
 import { Button, Icon, Skeleton } from "@flowly/ui";
 import { useMeQuery, useTelegramAuthMutation } from "@/features/profile/model/me-queries";
 
+function telegramInitData(): string {
+  const fromSdk = window.Telegram?.WebApp?.initData?.trim();
+  if (fromSdk) return fromSdk;
+  const fromHash = new URLSearchParams(location.hash.replace(/^#/, "")).get("tgWebAppData")?.trim();
+  if (fromHash) return fromHash;
+  return new URLSearchParams(location.search).get("tgWebAppData")?.trim() ?? "";
+}
+
 /**
  * S-MA-001 — Shell/auth bootstrap (F01, DEC-022).
  *
@@ -26,7 +34,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (preview || !me.isError || status !== "idle") return;
-    mutate(window.Telegram?.WebApp?.initData ?? "");
+    mutate(telegramInitData());
   }, [me.isError, mutate, preview, status]);
 
   const retry = useCallback(() => {

@@ -54,6 +54,8 @@ export async function POST(request: Request) {
       initDataLen: request.headers.get("x-flowly-tg-init-data-len") ?? "missing",
       webApp: request.headers.get("x-flowly-tg-webapp") ?? "missing",
       platform: request.headers.get("x-flowly-tg-platform") ?? "missing",
+      hashData: request.headers.get("x-flowly-tg-hash-data") ?? "missing",
+      searchData: request.headers.get("x-flowly-tg-search-data") ?? "missing",
     });
     return json(400, { error: "bad_request" });
   }

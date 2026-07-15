@@ -4,7 +4,12 @@ import { getBotToken } from "@/lib/cloudflare";
 type TelegramUpdate = { message?: { chat?: { id?: number | string }; text?: string } };
 
 const ok = (extra: Record<string, unknown> = {}) => NextResponse.json({ ok: true, ...extra });
-const appUrl = (request: Request) => new URL("/", request.url).toString();
+const appUrl = (request: Request) => {
+  const url = new URL("/", request.url);
+  url.searchParams.set("tg", "1");
+  url.searchParams.set("v", Date.now().toString(36));
+  return url.toString();
+};
 
 async function sendStartMessage(token: string, chatId: number | string, url: string) {
   const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {

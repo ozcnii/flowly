@@ -33,6 +33,8 @@ export const postTelegramAuth = (initData: string) => {
     "x-flowly-tg-init-data-len": String(initData.length),
     "x-flowly-tg-webapp": webApp ? "1" : "0",
     "x-flowly-tg-platform": webApp?.platform ?? "unknown",
+    "x-flowly-tg-hash-data": globalThis.location?.hash.includes("tgWebAppData") ? "1" : "0",
+    "x-flowly-tg-search-data": globalThis.location?.search.includes("tgWebAppData") ? "1" : "0",
   };
   if (devUser) headers["x-flowly-dev-user"] = devUser;
   return apiJson<TelegramAuthResponse>("/api/v1/auth/telegram", { method: "POST", headers, body: jsonBody({ initData }) });
