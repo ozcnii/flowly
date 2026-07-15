@@ -98,8 +98,10 @@ export async function getInvidiousVideo(baseUrl: string, videoId: string, signal
 }
 
 async function fetchJson<T>(url: URL, signal?: AbortSignal): Promise<T> {
-  const res = await fetch(url, { signal, headers: { accept: "application/json" } });
+  const res = await fetch(url, { signal, headers: { accept: "application/json", "accept-language": "ru-RU,ru;q=0.9,en;q=0.5", "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36" } });
   if (!res.ok) throw new Error(`invidious_${res.status}`);
+  const contentType = res.headers.get("content-type") ?? "";
+  if (!contentType.toLowerCase().includes("application/json")) throw new Error(`invidious_non_json_${res.status}_${contentType.split(";")[0] || "unknown"}`);
   return await res.json() as T;
 }
 
