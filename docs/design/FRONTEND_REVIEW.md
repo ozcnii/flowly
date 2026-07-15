@@ -36,9 +36,9 @@
 - [ ] AuthGate не должен пересоздаваться на каждом product route, если пользователь уже внутри authenticated shell; session check не должен мигать UI.
 - [ ] Product routes — нормальные paths, не `?screen=...`/`?tab=...`; query params допустимы только для настоящего state (`q`, filters) или временных dev forced states.
 - [ ] Internal page header — full-width direct Konsta `Navbar` вне page-padding container; title задан через `Navbar.title`, optional right action через Konsta `Link/Icon`.
-- [ ] Back — icon-only `NavbarBackLink` в `left` с `aria-label="Назад"`, без destination text; вызывает history `router.back()`, а не hardcoded route.
+- [ ] Internal route не содержит web Back control; official Telegram `BackButton` visible only off the five exact top-level routes, click invokes `router.back()`, `onClick/offClick` cleanup is symmetric and does not hide between internal routes; only top-level effect hides it, so Close/X never flashes during internal Back; native Close/X is never treated as interceptable (DEC-048).
 - [ ] Нет outer padding вокруг Navbar, custom header/title/back Button или CSS navbar imitation.
-- [ ] Telegram fullscreen root Navbar следует DEC-047: composed inset owned once, safe-area blur covers the full top inset, title/action-free primary geometry and internal back/title geometry match their approved contracts at initial and scrolled positions; Home content alone owns the `Твой план` + 44px `user-round` Profile action per DEC-043/046.
+- [ ] Telegram fullscreen root Navbar следует DEC-047: effective inset `max(22px, composed top)` owned once so title remains visible at runtime inset 0, safe-area blur covers the full top inset, title/action-free primary geometry and action-free internal title geometry match their approved contracts at initial and scrolled positions; Home content alone owns the `Твой план` + 44px `user-round` Profile action per DEC-043/046.
 - [ ] Back/cancel placement консистентен внутри раздела: не прыгать между верхом/низом без причины.
 - [ ] Если экран открыт из shared shell, back action не дублирует bottom nav и не нарушает ожидаемый history/back паттерн.
 - [ ] Для Next.js использовать nested `layout.tsx`/route groups там, где это предотвращает remount общего shell, повторную авторизацию и мигание.

@@ -49,7 +49,7 @@
 | S-MA-074 | Reports index | weekly/monthly/current partial/history | F09 | §30 | owner | gap |
 | S-MA-075 | Report detail | metrics/comparison/shared-only joint stats | F09 | §30 | owner | gap |
 | S-MA-076 | Share-card consent | choose safe fields/generate/download/share | F09 | §30.5 | owner; privacy filter | gap |
-| S-MA-080 | Profile hub | profile + extra sections | F10,F11 | §9, §38 | owner | gap |
+| S-MA-080 | Profile hub | action-free fixed/blurred title + native Telegram BackButton; profile + extra sections | F10,F11 | §9, §38 | owner | gap |
 | S-MA-081 | Friends | list/invite/pending/remove/block | F10 | §32 | owner; confirmed links | gap |
 | S-MA-082 | Invite accept/recovery | accept/reject/expired/already-used | F01,F10 | §32 | unauthenticated→auth; one-use | gap |
 | S-MA-083 | Shared object read-only | recipient: view allowed fields/save copy; friend/participant with current shared object + enabled partner notifications: remind; link-only viewer: remind disabled | F10 | §33, §35 | access rechecked; revoke-aware; link alone grants no partner reminder | gap |
@@ -58,7 +58,7 @@
 | S-MA-086 | Challenge editor/detail | goal/dates/participants/visibility/join/leave | F10 | §34 | owner controls; accept required | gap |
 | S-MA-087 | Joint activity feed | shared progress/reactions/remind | F06,F10 | §20.6, §34–35 | participants; fixed reactions | gap |
 | S-MA-088 | UGC report/hide/block | reason required; local hide; reversible block | F03,F10 | §13.2, §56.6 | authenticated viewer | gap |
-| S-MA-090 | Profile settings | persisted Flowly name/timezone/weekly+monthly reports; device-local theme; week fixed Monday (DEC-042/044) | F11 | §27, §38.1 | owner | gap |
+| S-MA-090 | Profile settings | action-free fixed/blurred title + native Telegram BackButton; persisted Flowly name/timezone/weekly+monthly reports; device-local theme; week fixed Monday (DEC-042/044) | F11 | §27, §38.1 | owner | gap |
 | S-MA-091 | Notification settings | quiet hours/default policy/categories/reports | F08,F11 | §37–38 | owner | gap |
 | S-MA-092 | Data settings | export/history clear/account delete/public content | F11 | §38.3 | owner; re-confirm destructive | gap |
 | S-MA-093 | Export status/download | request/progress/download protected JSON archive containing profile, workouts, habits, schedules, history, friends and reports; bot notice | F11 | §38.3, §51.2 | owner; protected archive | gap |
