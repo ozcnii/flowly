@@ -142,7 +142,7 @@
 
 ### DEC-023 — Visual foundation и формат UI-kit
 
-- **Статус:** approved
+- **Статус:** superseded by DEC-035
 - **Дата:** 2026-07-13
 - **Решение:** UI-kit развивает wellness-направление Concept A без признания самого концепта финальным дизайном; основной UI-шрифт — локально хранимый Inter, display-шрифт — локально хранимый Cormorant Garamond с кириллицей; иконки — локально закреплённый Lucide. Артефакт включает переносимый HTML-каталог, CSS custom properties, machine-readable JSON tokens и versioned PNG snapshots; все внешние runtime-зависимости исключены.
 - **Основание:** явный выбор пользователя при старте E0-D0-T03.
@@ -159,11 +159,12 @@
 - **Approval contract:** применимая карточка содержит `ui_slices`; route/component, base и contextual states, интеракции, responsive/theme/accessibility evidence и дословный approval пользователя фиксируются до перехода к следующему screen slice.
 - **PRD:** §9–40, §41.1, §41.3, §54–55.
 - **Влияет на:** E0-D0-T04; E1-D1-T01/T02/T06/T09; все downstream UI cards этапов 2–8; `AGENTS.md`, roadmap, handoff и `apps/web/**`.
+- **Исключение:** DEC-035 разрешает E0-D0-T05 мигрировать все текущие frontend surfaces одним batch без промежуточного user approval каждого screen; future feature slices после миграции продолжают обычный DEC-024 workflow.
 - **Заменяет:** DEC-012.
 
 ### DEC-025 — Production UI-kit до продолжения screen slices
 
-- **Статус:** approved
+- **Статус:** superseded by DEC-035
 - **Дата:** 2026-07-13
 - **Решение:** до продолжения Главной создать production UI-kit в `packages/ui` и отдельный интерактивный route `/ui-kit`. UI-kit включает canonical tokens/themes/typography, Button/IconButton, Card, Badge, Progress, AppHeader, BottomNavigation, Skeleton, EmptyState, InlineError и OfflineBanner с focus/touch/reduced-motion contracts. Product screen использует только утверждённые production components; app-local компонент допускается лишь как кандидат и не считается shared до явного решения. Главная остаётся blocked до visual approval `/ui-kit`.
 - **Основание:** пользователь обнаружил, что `packages/ui` пуст, а Главная собрана напрямую на app-local CSS; пользователь явно потребовал сначала production UI-kit.
@@ -263,6 +264,20 @@
 - **Основание:** пользователь после production auth verification выбрал «Профиль + onboarding», onboarding для любого incomplete user, plan `.temp/E1-D1-T13/plan.md`, launch-fact bot gate и disabled habit/invite с downstream TODO; plan approved командой «делай».
 - **PRD:** §10.1–10.2, §38, §43.1–43.2, §44.1, §55.1.
 - **Влияет на:** E1-D1-T13, E4-D5-T02, E7-D8-T01, `users`, `/api/v1/me`, `/api/v1/onboarding/complete`, `apps/web/app/onboarding/**`, Home/Profile/Settings, DEC-014 implementation semantics.
+
+### DEC-035 — Konsta UI как обязательная production UI foundation
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** весь текущий и будущий production frontend Flowly обязан использовать pinned `konsta@5.2.0` (`konsta/react`) как базовую component/design library. Активная тема всегда `ios`; typography переводится на системный iOS font stack; Flowly sage/sand semantic colors сохраняются через Tailwind v4 `@theme` и Konsta color contract. Прямые Konsta imports в `apps/web` являются default. Если Konsta предоставляет подходящий component/primitive, его нельзя дублировать raw HTML + локальным CSS или wrapper-компонентом.
+- **`packages/ui` contract:** package допустим только для действительно Flowly-specific wrappers/composites или обязательного контракта, отсутствующего в Konsta. После полного migration audit неиспользуемые legacy exports удаляются. Если package становится пустым, удалить `packages/ui`, workspace/dependency references и `/ui-kit`; если wrappers остаются, `/ui-kit` сохраняется только как их интерактивная gallery.
+- **Migration contract:** E0-D0-T05 обновляет все текущие route-accessible product screens, onboarding/auth/recovery/web-fallback states, overlays, shell и navigation одним implementation pass непосредственно в production code — без отдельного spike и без промежуточного user approval каждого screen. User review проводится один раз после полного browser/behavior/accessibility verification pass. Это явное исключение из per-screen approval DEC-024 только для E0-D0-T05; дальнейшие feature slices снова следуют DEC-024.
+- **Сохраняемые инварианты:** product behavior, routes, React Query/API contracts, Telegram auth/onboarding, persistent shell и официальная additive safe-area model DEC-032 не меняются; DEC-028 quality gate остаётся обязательным. DEC-033 geometry/consistency constraints сохраняются, но Konsta становится first source для repeated UI atoms, а legacy `.flow-*`/custom tokens остаются только там, где после audit доказана необходимость app-specific shell/domain layout.
+- **Основание:** пользователь отклонил отдельный prototype и явно выбрал прямую полную миграцию проекта на Konsta, wrappers только при необходимости, удаление пустого `packages/ui` и `/ui-kit`, batch implementation, системную iOS-типографику и обязательное правило в `AGENTS.md` использовать эту библиотеку всегда.
+- **Plan:** `.temp/E0-D0-T05/plan.md`.
+- **PRD:** §9–40, §41.3, §55.
+- **Влияет на:** E0-D0-T05; все current/future UI-bearing cards; `apps/web/**`; `packages/ui/**`; `apps/web/app/ui-kit/**`; `AGENTS.md`; `docs/design/FRONTEND_REVIEW.md`; roadmap/HANDOFF.
+- **Заменяет:** DEC-023 как active visual/typography foundation и DEC-025 как mandatory custom `packages/ui`/`/ui-kit` gate.
 
 ## Открытые решения
 
