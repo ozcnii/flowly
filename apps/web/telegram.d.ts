@@ -1,6 +1,14 @@
 /** Minimal Telegram Mini App SDK types (injected by the Telegram WebView). */
 type TelegramSafeAreaInset = { top: number; right: number; bottom: number; left: number };
-type TelegramWebAppEvent = "safeAreaChanged" | "contentSafeAreaChanged" | "fullscreenChanged" | "viewportChanged" | "themeChanged" | "activated";
+type TelegramWebAppEvent = "safeAreaChanged" | "contentSafeAreaChanged" | "fullscreenChanged" | "viewportChanged" | "themeChanged" | "activated" | "backButtonClicked";
+
+interface TelegramBackButton {
+  isVisible: boolean;
+  show: () => TelegramBackButton;
+  hide: () => TelegramBackButton;
+  onClick: (handler: () => void) => TelegramBackButton;
+  offClick: (handler: () => void) => TelegramBackButton;
+}
 
 interface TelegramWebApp {
   initData: string;
@@ -11,6 +19,7 @@ interface TelegramWebApp {
   safeAreaInset?: TelegramSafeAreaInset;
   contentSafeAreaInset?: TelegramSafeAreaInset;
   isFullscreen?: boolean;
+  BackButton?: TelegramBackButton;
   isVersionAtLeast?: (version: string) => boolean;
   requestFullscreen?: () => void;
   ready?: () => void;

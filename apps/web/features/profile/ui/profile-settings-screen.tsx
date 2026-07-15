@@ -1,10 +1,10 @@
 "use client";
 
-import { BlockFooter, BlockTitle, List, ListInput, ListItem, Navbar, NavbarBackLink, Preloader, Segmented, SegmentedButton, Toggle } from "konsta/react";
+import { BlockFooter, BlockTitle, List, ListInput, ListItem, Preloader, Segmented, SegmentedButton, Toggle } from "konsta/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useMeQuery, usePatchMeMutation, type PublicUser, type ReportSettings } from "../model/me-queries";
-import { rootNavbarClassName, rootNavbarStyle } from "@/components/shell/primary-navbar";
+import { PrimaryNavbar } from "@/components/shell/primary-navbar";
 import { buildTimezoneOptions, detectedTimezone, TimezonePicker } from "@/components/timezone-picker";
 
 const THEMES = [
@@ -33,13 +33,11 @@ const applyTheme = (theme: string) => {
  * Flowly name is editable separately from Telegram. Avatar is read-only from Telegram.
  */
 export function ProfileSettingsScreen() {
-  const router = useRouter();
   const me = useMeQuery();
-  return me.data ? <ProfileSettingsForm user={me.data.user} reportSettings={me.data.settings} /> : <div className="min-h-dvh"><Navbar className={rootNavbarClassName} style={rootNavbarStyle} title="Настройки" left={<NavbarBackLink aria-label="Назад" onClick={() => router.back()} />} /><main className="grid min-h-[70dvh] place-items-center" role="status" aria-live="polite"><Preloader /><span className="sr-only">Загружаем настройки</span></main></div>;
+  return me.data ? <ProfileSettingsForm user={me.data.user} reportSettings={me.data.settings} /> : <div className="min-h-dvh"><PrimaryNavbar title="Настройки" /><main className="grid min-h-[70dvh] place-items-center" role="status" aria-live="polite"><Preloader /><span className="sr-only">Загружаем настройки</span></main></div>;
 }
 
 function ProfileSettingsForm({ user, reportSettings }: { user: PublicUser; reportSettings: ReportSettings }) {
-  const router = useRouter();
   const forced = useSearchParams().get("settings");
   const timezoneOptions = useMemo(() => buildTimezoneOptions(), []);
   const [firstName, setFirstName] = useState(user.firstName);
@@ -82,7 +80,7 @@ function ProfileSettingsForm({ user, reportSettings }: { user: PublicUser; repor
 
   return (
     <div className="min-h-dvh">
-      <Navbar className={rootNavbarClassName} style={rootNavbarStyle} title="Настройки" left={<NavbarBackLink aria-label="Назад" onClick={() => router.back()} />} />
+      <PrimaryNavbar title="Настройки" />
       <main>
         <BlockTitle>Имя в Flowly</BlockTitle>
         <List className="mt-8 mb-2">

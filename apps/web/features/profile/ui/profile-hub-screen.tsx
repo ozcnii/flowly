@@ -1,9 +1,9 @@
 "use client";
 
-import { Badge, List, ListItem, Navbar, NavbarBackLink, Preloader } from "konsta/react";
+import { Badge, List, ListItem, Preloader } from "konsta/react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@flowly/ui";
-import { rootNavbarClassName, rootNavbarStyle } from "@/components/shell/primary-navbar";
+import { PrimaryNavbar } from "@/components/shell/primary-navbar";
 import { useMeQuery } from "../model/me-queries";
 
 const sections = [
@@ -22,7 +22,7 @@ export function ProfileHubScreen() {
   const me = useMeQuery();
   const user = me.data?.user;
   return <div className="min-h-dvh">
-    <Navbar className={rootNavbarClassName} style={rootNavbarStyle} title="Профиль" left={<NavbarBackLink aria-label="Назад" onClick={() => router.back()} />} />
+    <PrimaryNavbar title="Профиль" />
     <main className="pb-safe-4">
     <List strong inset dividers aria-label="Профиль пользователя" aria-busy={!user}>
       <ListItem
