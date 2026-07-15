@@ -26,7 +26,7 @@ export function ProfileHubScreen() {
   const photoUrl = user?.photoUrl && !photoFailed ? "/api/v1/me/photo" : null;
 
   return <div className="min-h-dvh">
-    <Navbar title="Профиль" left={<NavbarBackLink aria-label="Назад" onClick={() => router.back()} />} />
+    <Navbar className="!top-[var(--component-safe-area-top)]" title="Профиль" left={<NavbarBackLink aria-label="Назад" onClick={() => router.back()} />} />
     <main className="pb-safe-4">
     <List strong inset dividers aria-label="Профиль пользователя" aria-busy={!user}>
       <ListItem

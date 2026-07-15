@@ -34,7 +34,7 @@ const applyTheme = (theme: string) => {
 export function ProfileSettingsScreen() {
   const router = useRouter();
   const me = useMeQuery();
-  return me.data ? <ProfileSettingsForm user={me.data.user} reportSettings={me.data.settings} /> : <div className="min-h-dvh"><Navbar title="Настройки" left={<NavbarBackLink aria-label="Назад" onClick={() => router.back()} />} /><main className="grid min-h-[70dvh] place-items-center" role="status" aria-live="polite"><Preloader /><span className="sr-only">Загружаем настройки</span></main></div>;
+  return me.data ? <ProfileSettingsForm user={me.data.user} reportSettings={me.data.settings} /> : <div className="min-h-dvh"><Navbar className="!top-[var(--component-safe-area-top)]" title="Настройки" left={<NavbarBackLink aria-label="Назад" onClick={() => router.back()} />} /><main className="grid min-h-[70dvh] place-items-center" role="status" aria-live="polite"><Preloader /><span className="sr-only">Загружаем настройки</span></main></div>;
 }
 
 function ProfileSettingsForm({ user, reportSettings }: { user: PublicUser; reportSettings: ReportSettings }) {
@@ -81,7 +81,7 @@ function ProfileSettingsForm({ user, reportSettings }: { user: PublicUser; repor
 
   return (
     <div className="min-h-dvh">
-      <Navbar title="Настройки" left={<NavbarBackLink aria-label="Назад" onClick={() => router.back()} />} />
+      <Navbar className="!top-[var(--component-safe-area-top)]" title="Настройки" left={<NavbarBackLink aria-label="Назад" onClick={() => router.back()} />} />
       <main>
         <BlockTitle>Имя в Flowly</BlockTitle>
         <List className="mt-8 mb-2">
