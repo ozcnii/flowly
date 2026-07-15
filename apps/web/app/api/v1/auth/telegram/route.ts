@@ -71,7 +71,16 @@ export async function POST(request: Request) {
     return res;
   } catch (error) {
     if (error instanceof InitDataValidationError) {
-      audit("auth.login_failed", { ip, reason: "invalid_init_data" });
+      audit("auth.login_failed", {
+        ip,
+        reason: "invalid_init_data",
+        detail: error.message,
+        initDataLen: request.headers.get("x-flowly-tg-init-data-len") ?? "missing",
+        webApp: request.headers.get("x-flowly-tg-webapp") ?? "missing",
+        platform: request.headers.get("x-flowly-tg-platform") ?? "missing",
+        hashData: request.headers.get("x-flowly-tg-hash-data") ?? "missing",
+        searchData: request.headers.get("x-flowly-tg-search-data") ?? "missing",
+      });
       return json(401, { error: "unauthorized" });
     }
     throw error;

@@ -9,9 +9,14 @@ import { useMeQuery, useTelegramAuthMutation } from "@/features/profile/model/me
 function telegramInitData(): string {
   const fromSdk = window.Telegram?.WebApp?.initData?.trim();
   if (fromSdk) return fromSdk;
-  const fromHash = new URLSearchParams(location.hash.replace(/^#/, "")).get("tgWebAppData")?.trim();
-  if (fromHash) return fromHash;
-  return new URLSearchParams(location.search).get("tgWebAppData")?.trim() ?? "";
+  return launchParam("tgWebAppData", location.hash.replace(/^#/, "")) || launchParam("tgWebAppData", location.search.replace(/^\?/, ""));
+}
+
+function launchParam(name: string, source: string): string {
+  const raw = source.split("&").find((part) => part.startsWith(`${name}=`))?.slice(name.length + 1);
+  if (!raw) return "";
+  try { return decodeURIComponent(raw).trim(); }
+  catch { return raw.trim(); }
 }
 
 /**
