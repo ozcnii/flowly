@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import type { ReactNode } from "react";
 import { QueryProvider } from "@/components/providers/query-provider";
 import "@flowly/ui/styles.css";
@@ -29,7 +30,10 @@ const themeBootstrap = `(() => {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="ru" suppressHydrationWarning>
-      <head><script dangerouslySetInnerHTML={{ __html: themeBootstrap }} /></head>
+      <head>
+        <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive" />
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+      </head>
       <body><QueryProvider>{children}</QueryProvider></body>
     </html>
   );
