@@ -3,8 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Button, Icon } from "@flowly/ui";
+import { DisabledFavoriteButton } from "@/components/workouts/disabled-favorite-button";
 import type { CatalogWorkout } from "../model/catalog";
-import { DIFFICULTY, DURATION, FORMAT, SOURCE, minutes } from "../model/catalog";
+import { DIFFICULTY, DURATION, FORMAT, minutes } from "../model/catalog";
 import { useCatalogQuery, type CatalogFilters } from "../model/catalog-queries";
 import styles from "./catalog-screen.module.css";
 
@@ -19,20 +20,21 @@ const workoutCountLabel = (count: number) => {
 
 function WorkoutCard({ workout, onOpen }: { workout: CatalogWorkout; onOpen: (id: string) => void }) {
   const thumb = workout.sourceType === "youtube" && workout.youtubeVideoId ? `https://i.ytimg.com/vi/${workout.youtubeVideoId}/hqdefault.jpg` : workout.coverObjectKey ? `/media/${workout.coverObjectKey}` : "";
-  const tags = [DIFFICULTY[workout.difficulty as keyof typeof DIFFICULTY] ?? workout.difficulty, workout.equipment.length === 0 ? "Без инвентаря" : workout.equipment[0], workout.categories[0]?.name].filter(Boolean).slice(0, 3);
-  return <article className={`${styles.card} ${thumb ? "" : styles.cardTextOnly}`} role="button" tabIndex={0} onClick={() => onOpen(workout.id)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(workout.id); } }} aria-label={`Открыть ${workout.title}`}>
-    {thumb && <div className={styles.cover} data-source={workout.sourceType} style={{ backgroundImage: `${workout.sourceType === "youtube" ? "linear-gradient(135deg, rgba(28, 45, 39, 0.1), rgba(28, 45, 39, 0.55)), " : ""}url(${thumb})` }} aria-hidden="true">{workout.sourceType === "youtube" && <Icon name="play" />}</div>}
+  const difficulty = DIFFICULTY[workout.difficulty as keyof typeof DIFFICULTY] ?? workout.difficulty;
+  return <article className={`${styles.card} ${thumb ? "" : styles.cardTextOnly}`}>
+    <button type="button" className={styles.cardOpen} onClick={() => onOpen(workout.id)} aria-label={`Открыть ${workout.title}`} />
+    {thumb && <div className={styles.cover} data-source={workout.sourceType} style={{ backgroundImage: `${workout.sourceType === "youtube" ? "linear-gradient(135deg, rgba(28, 45, 39, 0.1), rgba(28, 45, 39, 0.55)), " : ""}url(${thumb})` }} aria-hidden="true"><span className={styles.duration}>{minutes(workout.durationSeconds)}</span>{workout.sourceType === "youtube" && <Icon name="play" />}</div>}
     <div className={styles.cardBody}>
-      <div className={styles.cardTop}><span className={styles.source}>{SOURCE[workout.sourceType as keyof typeof SOURCE] ?? workout.sourceType}</span><span>{minutes(workout.durationSeconds)}</span></div>
+      <div className={styles.cardTop}><span>{difficulty}</span>{!thumb && <span>{minutes(workout.durationSeconds)}</span>}</div>
       <h2 className="flow-card-title">{workout.title}</h2>
       <p>{workout.description}</p>
     </div>
-    <div className={styles.meta}>{tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+    <DisabledFavoriteButton title={workout.title} className={styles.favoriteButton} />
   </article>;
 }
 
 function Skeleton() {
-  return <div className={styles.list} aria-label="Загрузка каталога">{[0, 1, 2].map((i) => <div key={i} className={`${styles.card} ${styles.skeleton}`}><i /><span /><b /></div>)}</div>;
+  return <div className={styles.list} aria-label="Загрузка каталога">{[0, 1, 2].map((i) => <div key={i} className={`${styles.card} ${styles.skeleton}`}><i /><div><span /><b /></div></div>)}</div>;
 }
 
 function FilterGroup({ title, children }: { title: string; children: ReactNode }) {
@@ -75,20 +77,18 @@ export function CatalogScreen({ forced = null }: { forced?: Forced }) {
 
   return <div className={`flow-screen ${styles.screen}`}>
     <header className={`flow-top ${styles.header}`}>
-      <p className="flow-eyebrow">Каталог</p>
       <h1 className="flow-title">Тренировки</h1>
-
     </header>
 
     <section className={styles.searchBox} aria-label="Поиск и фильтры">
       <div className={styles.searchRow}>
         <label className={styles.search}><Icon name="search" /><input value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder="Поиск тренировок" /></label>
-        <button type="button" className={styles.filterToggle} aria-haspopup="dialog" aria-expanded={filtersOpen} onClick={openFilters}><Icon name="settings" />{extraFilterCount ? `Фильтры · ${extraFilterCount}` : "Фильтры"}</button>
+        <button type="button" className={styles.filterToggle} aria-label={extraFilterCount ? `Открыть фильтры, выбрано: ${extraFilterCount}` : "Открыть фильтры"} aria-haspopup="dialog" aria-expanded={filtersOpen} onClick={openFilters}><Icon name="funnel" />{extraFilterCount > 0 && <span className={styles.filterCount}>{extraFilterCount}</span>}</button>
       </div>
 
       {filtersOpen && <div className={styles.sheetBackdrop} role="presentation" onClick={() => setFiltersOpen(false)}>
         <section className={styles.filterSheet} role="dialog" aria-modal="true" aria-labelledby="catalog-filter-title" onClick={(event) => event.stopPropagation()}>
-          <div className={styles.sheetTop}><div><p className="flow-eyebrow">Фильтры</p><h2 id="catalog-filter-title">Уточнить каталог</h2></div><button type="button" aria-label="Закрыть фильтры" onClick={() => setFiltersOpen(false)}><Icon name="x" /></button></div>
+          <div className={styles.sheetTop}><h2 id="catalog-filter-title">Уточнить каталог</h2><button type="button" aria-label="Закрыть фильтры" onClick={() => setFiltersOpen(false)}><Icon name="x" /></button></div>
           <div className={styles.sheetBody}>
             <FilterGroup title="Категория">{categories.map((c) => <button key={c.id} type="button" aria-pressed={draftFilters.category === c.slug} onClick={() => updateDraft("category", c.slug)}>{c.name}</button>)}</FilterGroup>
             <FilterGroup title="Длительность">{Object.entries(DURATION).map(([k, v]) => <button key={k} type="button" aria-pressed={draftFilters.duration === k} onClick={() => updateDraft("duration", k)}>{v}</button>)}</FilterGroup>

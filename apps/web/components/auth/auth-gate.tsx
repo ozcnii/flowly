@@ -38,7 +38,11 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const { mutate, reset, status, isError: authError, isSuccess: authSuccess } = auth;
 
   useEffect(() => {
-    window.Telegram?.WebApp?.ready?.();
+    const webApp = window.Telegram?.WebApp;
+    webApp?.ready?.();
+    webApp?.expand?.();
+    const canFullscreen = webApp?.isVersionAtLeast?.("8.0") ?? Number.parseFloat(webApp?.version ?? "0") >= 8;
+    if (webApp && canFullscreen && !webApp.isFullscreen) try { webApp.requestFullscreen?.(); } catch { /* Unsupported clients stay expanded. */ }
   }, []);
 
   useEffect(() => {

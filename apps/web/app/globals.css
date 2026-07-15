@@ -18,7 +18,7 @@
 }
 
 * { box-sizing: border-box; }
-html { min-width: 20rem; background: var(--color-canvas); color: var(--color-text); }
+html { min-width: 20rem; scroll-padding-bottom: var(--component-nav-reserve); background: var(--color-canvas); color: var(--color-text); }
 body { min-height: 100dvh; margin: 0; background: var(--color-canvas); color: var(--color-text); font-family: var(--primitive-font-family-sans); }
 button, a { touch-action: manipulation; }
 :focus-visible { outline: var(--primitive-border-focus) solid var(--color-focus); outline-offset: 3px; }
@@ -172,11 +172,31 @@ button, a { touch-action: manipulation; }
 }
 
 .safe-shell {
-  min-height: 100dvh;
+  min-height: var(--tg-viewport-stable-height, 100dvh);
   padding-top: var(--component-safe-area-top);
   padding-right: var(--component-safe-area-right);
   padding-bottom: var(--component-safe-area-bottom);
   padding-left: var(--component-safe-area-left);
+}
+
+.app-shell.safe-shell {
+  padding-bottom: 0;
+}
+
+.safe-shell:not(.app-shell):not(.flow-screen) {
+  padding-right: max(var(--component-safe-area-right), var(--primitive-space-5));
+  padding-left: max(var(--component-safe-area-left), var(--primitive-space-5));
+}
+
+.safe-shell.flow-screen.flow-screen {
+  padding-top: calc(var(--component-safe-area-top) + var(--flow-screen-pad-top));
+  padding-right: calc(var(--component-safe-area-right) + var(--flow-screen-gutter));
+  padding-bottom: calc(var(--component-safe-area-bottom) + var(--flow-screen-pad-bottom));
+  padding-left: calc(var(--component-safe-area-left) + var(--flow-screen-gutter));
+}
+
+.app-shell__main {
+  padding-bottom: var(--component-nav-reserve);
 }
 
 .safe-shell .flow-screen.flow-screen {

@@ -35,6 +35,7 @@ const securityHeaders = [
 
 export default {
   poweredByHeader: false,
+  devIndicators: false,
   reactStrictMode: true,
   typedRoutes: true,
   transpilePackages: ["@flowly/ui"],

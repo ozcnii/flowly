@@ -82,7 +82,35 @@
   cursor: pointer;
 }
 
-.filterToggle :global(.fl-icon),
+.filterToggle {
+  position: relative;
+  width: var(--component-touch-min);
+  min-width: var(--component-touch-min);
+  padding: 0;
+}
+
+.filterToggle :global(.fl-icon) {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.filterCount {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.2rem;
+  display: grid;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  place-items: center;
+  padding: 0 0.2rem;
+  border: 2px solid var(--color-canvas);
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: 0.62rem;
+  line-height: 1;
+}
+
 .youtubeSearch :global(.fl-icon) {
   width: 1rem;
   height: 1rem;
@@ -132,7 +160,8 @@
 
 .sheetTop {
   display: flex;
-  align-items: start;
+  min-height: var(--component-touch-min);
+  align-items: center;
   justify-content: space-between;
   gap: var(--primitive-space-3);
 }
@@ -284,20 +313,54 @@
 .card {
   position: relative;
   display: grid;
-  gap: 0.75rem;
-  align-items: start;
-  padding: 1rem;
+  grid-template-columns: minmax(7.5rem, 42%) minmax(0, 1fr);
+  min-height: 8.75rem;
+  overflow: hidden;
+  align-items: stretch;
+  padding: 0;
   cursor: pointer;
 }
 
-.cardTextOnly {}
+.cardTextOnly { grid-template-columns: 1fr; }
+
+.cardOpen {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.favoriteButton {
+  position: absolute;
+  z-index: 2;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: grid;
+  width: var(--component-touch-min);
+  height: var(--component-touch-min);
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  opacity: 0.62;
+}
+
+.favoriteButton :global(.fl-icon) {
+  width: 1.25rem;
+  height: 1.25rem;
+}
 
 .cover {
+  position: relative;
   display: grid;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  min-height: 8.75rem;
   place-items: center;
-  border-radius: var(--primitive-radius-md);
+  border-radius: calc(var(--primitive-radius-lg) - 1px) 0 0 calc(var(--primitive-radius-lg) - 1px);
   background: var(--color-accent-soft);
   background-position: center;
   background-size: cover;
@@ -314,36 +377,38 @@
   height: 1.35rem;
 }
 
+.duration {
+  position: absolute;
+  top: 0.65rem;
+  left: 0.65rem;
+  padding: 0.24rem 0.5rem;
+  border-radius: var(--primitive-radius-md);
+  background: color-mix(in srgb, white 90%, transparent);
+  color: #24322e;
+  font-size: 0.68rem;
+  font-weight: var(--primitive-font-weight-bold);
+  box-shadow: var(--primitive-shadow-sm);
+}
+
 .cardBody {
   display: grid;
-  align-content: start;
-  gap: 0.45rem;
   min-width: 0;
+  align-content: center;
+  gap: 0.5rem;
+  padding: 1rem 3.25rem 1rem 1rem;
 }
 
-.cardTop,
-.meta {
+.cardTop {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.28rem;
   align-items: center;
+  gap: 0.35rem;
 }
 
-.cardTop span,
-.meta span,
-.source {
-  border-radius: 999px;
-  padding: 0.08rem 0.4rem;
-  background: var(--color-accent-soft);
-  color: var(--color-accent);
-  font-size: 0.68rem;
-  font-weight: 800;
-}
-
-.cardTop span:not(.source),
-.meta span {
-  background: var(--color-canvas);
+.cardTop span {
   color: var(--color-text-muted);
+  font-size: 0.72rem;
+  font-weight: var(--primitive-font-weight-semibold);
 }
 
 .card h2,
@@ -364,9 +429,9 @@
   overflow: hidden;
   color: var(--color-text-muted);
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
+  -webkit-line-clamp: 2;
   font-size: 0.82rem;
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 .empty {
@@ -410,24 +475,33 @@
 }
 
 .skeleton {
-  min-height: 7rem;
+  min-height: 8.75rem;
   overflow: hidden;
 }
 
-.skeleton i,
+.skeleton > i,
 .skeleton span,
 .skeleton b {
   display: block;
-  border-radius: 999px;
   background: linear-gradient(90deg, var(--color-surface) 0%, var(--color-accent-soft) 45%, var(--color-surface) 90%);
   animation: shimmer 1.4s infinite linear;
 }
 
-.skeleton i {
-  width: 6.25rem;
+.skeleton > i {
+  width: 100%;
   height: 100%;
-  min-height: 6.5rem;
+  min-height: 8.75rem;
 }
+
+.skeleton > div {
+  display: grid;
+  align-content: center;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.skeleton span,
+.skeleton b { border-radius: 999px; }
 
 .skeleton span {
   width: 55%;
@@ -460,7 +534,7 @@
 .filterToggle:focus-visible,
 .resetInline:focus-visible,
 .youtubeSearch:focus-visible,
-.card:focus-visible {
+.cardOpen:focus-visible {
   outline: 3px solid var(--color-accent);
   outline-offset: 2px;
 }

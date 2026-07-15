@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { Badge, Icon, IconButton, InlineError, OfflineBanner, Skeleton } from "@flowly/ui";
+import { DisabledFavoriteButton } from "@/components/workouts/disabled-favorite-button";
 import type { WorkoutDetail } from "@/features/catalog/model/catalog";
 import { DIFFICULTY, FORMAT, SOURCE, minutes } from "@/features/catalog/model/catalog";
 import { useWorkoutDetailQuery } from "@/features/catalog/model/catalog-queries";
@@ -24,9 +25,9 @@ const userSafeReason: Record<keyof WorkoutDetail["actions"], string> = {
   author: "Профиль автора появится для пользовательских тренировок.",
 };
 
-function QuickActions() {
+function QuickActions({ title }: { title: string }) {
   return <div className={styles.quickActions} aria-label="Быстрые действия">
-    <IconButton className={styles.quickButton} disabled label="Сохранить в избранное — будет доступно позже" icon={<Icon name="heart" />} />
+    <DisabledFavoriteButton title={title} className={styles.quickButton} />
     <IconButton className={styles.quickButton} disabled label="Поделиться — будет доступно позже" icon={<Icon name="share-2" />} />
   </div>;
 }
@@ -34,7 +35,7 @@ function QuickActions() {
 function Hero({ workout }: { workout: WorkoutDetail }) {
   const image = coverUrl(workout);
   return <section className={styles.hero}>
-    {image && <div className={styles.cover} data-source={workout.sourceType} style={{ backgroundImage: `${workout.sourceType === "youtube" ? "linear-gradient(135deg, rgba(28, 45, 39, 0.08), rgba(28, 45, 39, 0.58)), " : ""}url(${image})` }}><QuickActions />{workout.sourceType === "youtube" && <Icon name="play" />}</div>}
+    {image && <div className={styles.cover} data-source={workout.sourceType} style={{ backgroundImage: `${workout.sourceType === "youtube" ? "linear-gradient(135deg, rgba(28, 45, 39, 0.08), rgba(28, 45, 39, 0.58)), " : ""}url(${image})` }}><QuickActions title={workout.title} />{workout.sourceType === "youtube" && <Icon name="play" />}</div>}
     <div className={styles.heroBody}>
       <div className={styles.heroTop}>
         <div className={styles.badges}>
@@ -42,7 +43,7 @@ function Hero({ workout }: { workout: WorkoutDetail }) {
           <Badge>{minutes(workout.durationSeconds)}</Badge>
           <Badge>{DIFFICULTY[workout.difficulty as keyof typeof DIFFICULTY] ?? workout.difficulty}</Badge>
         </div>
-        {!image && <QuickActions />}
+        {!image && <QuickActions title={workout.title} />}
       </div>
       <h1 className="flow-title">{workout.title}</h1>
       <p className="flow-subtitle">{workout.description}</p>

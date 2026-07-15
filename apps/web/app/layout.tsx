@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import type { ReactNode } from "react";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { TelegramSafeArea } from "@/components/providers/telegram-safe-area";
 import "@flowly/ui/styles.css";
 import "./globals.css";
 
@@ -34,7 +35,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <Script src="https://telegram.org/js/telegram-web-app.js?63" strategy="beforeInteractive" />
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
       </head>
-      <body><QueryProvider>{children}</QueryProvider></body>
+      <body><TelegramSafeArea /><QueryProvider>{children}</QueryProvider></body>
     </html>
   );
 }

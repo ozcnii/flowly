@@ -7,9 +7,9 @@ import type { ShellScenario } from "@/lib/scenarios";
 
 const tabs = [
   ["home", "house", "Главная", "/"],
-  ["workouts", "dumbbell", "Тренировки", "/catalog"],
+  ["workouts", "dumbbell", "Йога", "/catalog"],
   ["programs", "sparkles", "Программы", "/programs"],
-  ["rhythm", "leaf", "Мой ритм", "/rhythm"],
+  ["rhythm", "leaf", "Ритм", "/rhythm"],
   ["calendar", "calendar-days", "Календарь", "/calendar"],
 ] as const;
 
@@ -25,10 +25,10 @@ export function AppShell({ activeTab, scenario, showScenario, stateLabel, childr
   const router = useRouter();
   const hrefById = Object.fromEntries(tabs.map(([id, , , href]) => [id, href]));
   return (
-    <div className="safe-shell mx-auto flex min-h-dvh w-full max-w-[75rem] flex-col bg-canvas">
+    <div className="safe-shell app-shell mx-auto flex min-h-dvh w-full max-w-[75rem] flex-col bg-canvas">
       {scenario === "offline" && <OfflineBanner icon={<Icon name="wifi-off" />}>Офлайн: серверные изменения пока недоступны</OfflineBanner>}
 
-      <main id="content" className="flex flex-1 flex-col">{children}</main>
+      <main id="content" className="app-shell__main flex flex-1 flex-col" style={{ paddingBottom: "calc(var(--component-nav-height) + var(--component-nav-gap) + var(--component-safe-area-bottom) + var(--primitive-space-4))" }}>{children}</main>
 
       {showScenario && (
         <aside aria-label="Development scenarios" className="mx-4 mb-3 rounded-xl border border-dashed border-border bg-surface px-3 py-2 text-xs text-text-muted">
@@ -36,7 +36,7 @@ export function AppShell({ activeTab, scenario, showScenario, stateLabel, childr
         </aside>
       )}
 
-      <BottomNavigation className="sticky bottom-0 z-10" activeId={activeTab} onNavigate={id => router.push(hrefById[id] ?? "/")} items={tabs.map(([id, icon, label, href]) => ({ id, href: href as never, label, icon: <Icon name={icon} /> }))} />
+      <BottomNavigation activeId={activeTab} onNavigate={id => router.push(hrefById[id] ?? "/")} items={tabs.map(([id, icon, label, href]) => ({ id, href: href as never, label, icon: <Icon name={icon} /> }))} />
     </div>
   );
 }
