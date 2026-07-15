@@ -15,6 +15,34 @@ function json(status: number, body: unknown, init?: ResponseInit) {
   return NextResponse.json(body, { status, ...init });
 }
 
+const fingerprint = async (value: string) => Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value))).slice(0, 8), (byte) => byte.toString(16).padStart(2, "0")).join("");
+const header = (request: Request, name: string) => (request.headers.get(name) ?? "missing").slice(0, 32);
+const clientDiagnostics = (request: Request) => ({
+  source: header(request, "x-flowly-tg-source"),
+  webApp: header(request, "x-flowly-tg-webapp"),
+  platform: header(request, "x-flowly-tg-platform"),
+  version: header(request, "x-flowly-tg-version"),
+  launchFp: header(request, "x-flowly-tg-launch-fp"),
+});
+
+async function initDataDiagnostics(request: Request, initData: string) {
+  const params = new URLSearchParams(initData);
+  const initDataFp = await fingerprint(initData);
+  return {
+    ...clientDiagnostics(request),
+    initDataLen: new TextEncoder().encode(initData).byteLength,
+    initDataFp,
+    clientFpMatches: header(request, "x-flowly-tg-init-fp") === initDataFp,
+    fieldCount: [...params].length,
+    hasHash: params.has("hash"),
+    hasAuthDate: params.has("auth_date"),
+    hasUser: params.has("user"),
+    hasSignature: params.has("signature"),
+    hasQueryId: params.has("query_id"),
+    hashFormatValid: /^[0-9a-f]{64}$/.test(params.get("hash") ?? ""),
+  };
+}
+
 export async function POST(request: Request) {
   const oversized = rejectOversizedBody(request);
   if (oversized) return oversized;
@@ -48,17 +76,12 @@ export async function POST(request: Request) {
 
   const parsed = telegramAuthSchema.safeParse(await request.json().catch(() => ({})));
   if (!parsed.success) {
-    audit("auth.login_failed", {
-      ip,
-      reason: "bad_request",
-      initDataLen: request.headers.get("x-flowly-tg-init-data-len") ?? "missing",
-      webApp: request.headers.get("x-flowly-tg-webapp") ?? "missing",
-      platform: request.headers.get("x-flowly-tg-platform") ?? "missing",
-      hashData: request.headers.get("x-flowly-tg-hash-data") ?? "missing",
-      searchData: request.headers.get("x-flowly-tg-search-data") ?? "missing",
-    });
+    audit("auth.login_failed", { ip, reason: "bad_request", ...clientDiagnostics(request) });
     return json(400, { error: "bad_request" });
   }
+
+  const diagnostics = await initDataDiagnostics(request, parsed.data.initData);
+  audit("auth.telegram_init_data", { ip, ...diagnostics });
 
   try {
     const verified = await verifyInitData(parsed.data.initData, getBotToken(), INIT_DATA_FRESHNESS_MS);
@@ -71,16 +94,7 @@ export async function POST(request: Request) {
     return res;
   } catch (error) {
     if (error instanceof InitDataValidationError) {
-      audit("auth.login_failed", {
-        ip,
-        reason: "invalid_init_data",
-        detail: error.message,
-        initDataLen: request.headers.get("x-flowly-tg-init-data-len") ?? "missing",
-        webApp: request.headers.get("x-flowly-tg-webapp") ?? "missing",
-        platform: request.headers.get("x-flowly-tg-platform") ?? "missing",
-        hashData: request.headers.get("x-flowly-tg-hash-data") ?? "missing",
-        searchData: request.headers.get("x-flowly-tg-search-data") ?? "missing",
-      });
+      audit("auth.login_failed", { ip, reason: "invalid_init_data", detail: error.message, ...diagnostics });
       return json(401, { error: "unauthorized" });
     }
     throw error;

@@ -4,19 +4,19 @@ import Image from "next/image";
 import { useCallback, useEffect, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button, Icon, Skeleton } from "@flowly/ui";
-import { useMeQuery, useTelegramAuthMutation } from "@/features/profile/model/me-queries";
+import { useMeQuery, useTelegramAuthMutation, type TelegramAuthInput } from "@/features/profile/model/me-queries";
 
-function telegramInitData(): string {
+function telegramInitData(): TelegramAuthInput {
   const fromSdk = window.Telegram?.WebApp?.initData?.trim();
-  if (fromSdk) return fromSdk;
-  return launchParam("tgWebAppData", location.hash.replace(/^#/, "")) || launchParam("tgWebAppData", location.search.replace(/^\?/, ""));
+  if (fromSdk) return { initData: fromSdk, source: "sdk" };
+  return launchParam(location.hash.replace(/^#/, ""), "hash") ?? launchParam(location.search.replace(/^\?/, ""), "search") ?? { initData: "", source: "missing" };
 }
 
-function launchParam(name: string, source: string): string {
-  const raw = source.split("&").find((part) => part.startsWith(`${name}=`))?.slice(name.length + 1);
-  if (!raw) return "";
-  try { return decodeURIComponent(raw).trim(); }
-  catch { return raw.trim(); }
+function launchParam(source: string, origin: "hash" | "search"): TelegramAuthInput | null {
+  const raw = source.split("&").find((part) => part.startsWith("tgWebAppData="))?.slice("tgWebAppData=".length);
+  if (!raw) return null;
+  try { return { initData: decodeURIComponent(raw).trim(), source: origin, launchRaw: raw }; }
+  catch { return { initData: raw.trim(), source: origin, launchRaw: raw }; }
 }
 
 /**

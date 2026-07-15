@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 0 | 0 | 0 | 0 | 11 |
+| 0 | 1 | 0 | 0 | 11 |
 
 ## Зависимости и границы
 
@@ -163,6 +163,16 @@
 - **validation/evidence:** `packages/ui/src/**`, `apps/web/app/ui-kit/**`; root `typecheck`, `lint`, `build` PASS, `/ui-kit` static route; browser 360/430/1280, light/dark, no horizontal overflow, package target audit ≥44px, keyboard focus 3px, loading/disabled/live status, reduced-motion `animation-name:none` PASS; screenshots `.temp/E1-D1-T11/ui-kit-{360-light,430-dark,1280-light}.png`; дословный approval пользователя 2026-07-13: «утверждаю ui kit».
 - **residual risks:** реальный Telegram WebView/safe-area не проверен; этот риск переносится в device validation применимых product screens.
 - **journal:** 2026-07-13 — создана после выявления пустого `packages/ui`; `backlog -> in_progress`, E0-D0-T04 blocked до approval. 2026-07-13 — production package и интерактивный `/ui-kit` реализованы и механически проверены; остановка на обязательном visual approval. 2026-07-13 — пользователь явно подтвердил «утверждаю ui kit»; `in_progress -> review -> done`, E0-D0-T04 разблокирована.
+
+### E1-D1-T12 — Исправить production Telegram Mini App auth
+
+- **status:** in_progress · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-15
+- **prd_refs:** §10.2, §47.1, §55.1, §55.9 · **depends_on:** E1-D1-T06, E1-D1-T09 · **decisions:** DEC-022, DEC-027
+- **scope:** воспроизвести и устранить production auth failure при запуске Flowly из Telegram Desktop; проверить загрузку Telegram SDK, извлечение неизменённого `initData`, HMAC/freshness validation, безопасную диагностику и повторный вход; не ослаблять validation и не добавлять production fake/dev auth.
+- **acceptance:** [ ] production CSP разрешает официальный Telegram SDK без расширения лишних origins; [ ] клиент отправляет канонический `Telegram.WebApp.initData` после инициализации SDK, fallback не искажает nested query string; [ ] server diagnostics различают missing fields/hash mismatch/expired data без утечки `initData`, user data или token; [ ] Telegram Desktop `/start` → `Открыть Flowly` создаёт сессию, auth POST возвращает 200 и приложение открывается; [ ] раскрытый ранее bot token отозван/перегенерирован после проверки и Cloudflare secret/webhook синхронизированы.
+- **validation/evidence:** user-confirmed production repro: `/start` → inline `web_app` button → auth error; initial logs `bad_request/initDataLen=0/webApp=0`, after fallback `invalid_init_data/401`. Independent HTTP check: production CSP `script-src 'self' 'unsafe-inline'` blocks `https://telegram.org/js/telegram-web-app.js`; exact Telegram Desktop WebView repro unavailable outside user's Telegram session. Planned evidence: safe fingerprints/field-presence logs, Cloudflare tail, exact `/start` rerun, POST status, final visible app state.
+- **residual risks:** Telegram Desktop WebView/cache and actual launch payload can only be verified in the user's Telegram session; bot token must never be copied into logs/chat and must be rotated after verification.
+- **journal:** 2026-07-15 — user chose a new bug card and no separate plan file; card created `in_progress`. Code/docs analysis started; production response confirms CSP blocks external Telegram SDK, explaining `webApp=0`. Deep plan approved: «делай». Phase 1 diagnostic patch added safe source/SDK metadata, field-presence flags, exact validation error and truncated SHA-256 fingerprints without logging payload/token/user values. Synthetic fake-token repro confirms current verifier rejects correctly signed initData containing `signature` with `invalid hash`. Web typecheck and changed-file lint PASS; full local lint is polluted only by generated ignored `apps/web/apps/web/.wrangler/dry-run-prod/worker.js`, absent in clean CI.
 
 ## Риски этапа
 

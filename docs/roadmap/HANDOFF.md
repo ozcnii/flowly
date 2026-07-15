@@ -4,13 +4,15 @@
 
 ## Текущее состояние
 
-- **Обновлено:** 2026-07-14
-- **Текущий этап:** 2. Йога
-- **Активная задача:** E2-D2-T06 (Routing cleanup product paths) — `review`.
-- **Статус:** этап 2 «Йога» продолжается; E2-D2-T04 `done`; E2-D2-T06 реализована и DEC-032 routing/shell fix проверен, ждёт user review / решение пользователя. Production deploy явно запрошен пользователем и выполнен.
-- **Последний завершённый результат:** Cloudflare production deploy `flowly-web` на `https://flowly-web.getflowly.workers.dev`, remote D1 `flowly-db` создан/мигрирован/засеян каталогом. Добавлен минимальный Telegram webhook route для `/start`; после deploy нужно выполнить Bot API `setWebhook` на `/api/v1/telegram/webhook`.
+- **Обновлено:** 2026-07-15
+- **Текущий этап:** 1. Основа (production auth bugfix)
+- **Активная задача:** E1-D1-T12 (Production Telegram Mini App auth) — `in_progress`.
+- **Статус:** пользователь подтвердил production repro в Telegram Desktop: `/start` → inline `web_app` button → auth error; новый bug-card создан отдельно от закрытого E1-D1-T06. E2-D2-T06 и E2-D2-T07 остаются в `review`.
+- **Последний подтверждённый результат:** production HTTP inspection показал CSP `script-src 'self' 'unsafe-inline'`, поэтому официальный `https://telegram.org/js/telegram-web-app.js` блокируется и `window.Telegram.WebApp` отсутствует; это объясняет diagnostics `webApp=0/platform=unknown`, но `invalid hash` fallback требует безопасного field/fingerprint logging перед окончательным выводом.
 
 ## Что сделано
+
+- Для E1-D1-T12 прочитаны auth client/server flow, verifier, request helper, CSP и webhook; сверены официальные Telegram Mini Apps docs. Подтверждено: HMAC key derivation в `verifyInitData` соответствует документации; production CSP не разрешает Telegram SDK; код запускает auth после failed `/me` без отдельного ожидания SDK; текущий fallback вручную декодирует `tgWebAppData` один раз. Пользователь выбрал план только в чате, отдельную roadmap bug-card и утвердил deep plan («делай»). Phase 1 diagnostic patch готов: source/SDK metadata, field-presence flags, exact validation error, client/server truncated SHA-256 fingerprints; raw initData/token/user/hash/signature не логируются. Synthetic fake-token repro: подписанный payload с `signature` на текущем verifier → `invalid hash`. Следующее действие — diagnostic production deploy и точный Telegram Desktop `/start` rerun до code fix.
 
 - Проанализирован `docs/PRD.md`.
 - Зафиксированы восемь этапов разработки из §54.
