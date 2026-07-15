@@ -22,30 +22,30 @@ export type YoutubeResult = {
   languageWarning: string | null;
 };
 
-export type YoutubeSearchPayload = {
-  text: string;
-  filters: YoutubeFilters;
-  cacheKey: string;
-};
+export type YoutubeSearchPayload = { text: string; filters: YoutubeFilters; cacheKey: string };
 
-type InvidiousThumb = { url?: unknown; width?: unknown; height?: unknown; quality?: unknown };
-type InvidiousSearchItem = {
+type PipedSearchItem = {
   type?: unknown;
+  url?: unknown;
   title?: unknown;
-  videoId?: unknown;
-  author?: unknown;
-  videoThumbnails?: unknown;
-  description?: unknown;
-  published?: unknown;
-  publishedText?: unknown;
-  viewCount?: unknown;
-  viewCountText?: unknown;
-  lengthSeconds?: unknown;
-  liveNow?: unknown;
-  paid?: unknown;
-  premium?: unknown;
+  uploaderName?: unknown;
+  uploadedDate?: unknown;
+  uploaded?: unknown;
+  shortDescription?: unknown;
+  duration?: unknown;
+  views?: unknown;
+  isShort?: unknown;
 };
-type InvidiousVideo = InvidiousSearchItem & { description?: unknown };
+type PipedSearchResponse = { items?: unknown };
+type PipedVideo = {
+  title?: unknown;
+  description?: unknown;
+  uploadDate?: unknown;
+  uploader?: unknown;
+  duration?: unknown;
+  views?: unknown;
+  livestream?: unknown;
+};
 
 const DURATION_TEXT: Record<string, string> = { short: "до 10 минут", medium: "20 минут", long: "30 минут" };
 const DIFFICULTY_TEXT: Record<string, string> = { beginner: "для начинающих", intermediate: "средний уровень", advanced: "сложная практика" };
@@ -67,102 +67,73 @@ export function buildYogaYoutubeQuery(filters: YoutubeFilters): YoutubeSearchPay
   if (normalized.duration) push(DURATION_TEXT[normalized.duration] ?? normalized.duration);
   if (normalized.difficulty) push(DIFFICULTY_TEXT[normalized.difficulty] ?? normalized.difficulty);
   if (normalized.equipment === "none") push("без инвентаря");
-  const text = parts.join(" ");
-  return { text, filters: normalized, cacheKey: youtubeCacheKey(normalized) };
+  return { text: parts.join(" "), filters: normalized, cacheKey: youtubeCacheKey(normalized) };
 }
 
 export function youtubeCacheKey(filters: YoutubeFilters): string {
-  const stable = stableJson(normalizeYoutubeFilters(filters));
-  return `invidious:v2:${fnv1a(stable)}`;
+  return `piped:v1:${fnv1a(stableJson(normalizeYoutubeFilters(filters)))}`;
 }
 
-export async function searchInvidious(baseUrl: string, query: string, filters: YoutubeFilters, signal?: AbortSignal): Promise<YoutubeResult[]> {
-  const url = new URL(`${baseUrl.replace(/\/+$/, "")}/api/v1/search`);
+export async function searchPiped(baseUrl: string, query: string, signal?: AbortSignal): Promise<YoutubeResult[]> {
+  const url = new URL(`${baseUrl.replace(/\/+$/, "")}/search`);
   url.searchParams.set("q", query);
-  url.searchParams.set("type", "video");
-  url.searchParams.set("hl", "ru");
-  url.searchParams.set("region", "RU");
-  if (filters.duration === "short" || filters.duration === "medium" || filters.duration === "long") url.searchParams.set("duration", filters.duration);
-  const data = await fetchJson<unknown>(url, signal);
-  return (Array.isArray(data) ? data : []).map(normalizeSearchItem).filter((x): x is YoutubeResult => Boolean(x)).filter(isSuitableRussianYoga).slice(0, 12);
+  url.searchParams.set("filter", "videos");
+  const data = await fetchJson<PipedSearchResponse>(url, signal);
+  const items = Array.isArray(data.items) ? data.items : [];
+  return items.map(normalizeSearchItem).filter((item): item is YoutubeResult => Boolean(item)).filter(isSuitableRussianYoga).slice(0, 12);
 }
 
-export async function getInvidiousVideo(baseUrl: string, videoId: string, signal?: AbortSignal): Promise<YoutubeResult> {
-  const url = new URL(`${baseUrl.replace(/\/+$/, "")}/api/v1/videos/${encodeURIComponent(videoId)}`);
-  url.searchParams.set("hl", "ru");
-  url.searchParams.set("region", "RU");
-  const item = await fetchJson<InvidiousVideo>(url, signal);
-  const result = normalizeSearchItem({ ...item, type: "video", videoId });
-  if (!result) throw new Error("invalid_invidious_video");
-  return result;
+export async function getPipedVideo(baseUrl: string, videoId: string, signal?: AbortSignal): Promise<YoutubeResult> {
+  const item = await fetchJson<PipedVideo>(new URL(`${baseUrl.replace(/\/+$/, "")}/streams/${encodeURIComponent(videoId)}`), signal);
+  if (item.livestream || typeof item.title !== "string") throw new Error("invalid_piped_video");
+  const durationSeconds = number(item.duration), publishedAt = date(item.uploadDate);
+  if (!durationSeconds || durationSeconds <= 0) throw new Error("invalid_piped_video");
+  return result({ videoId, title: item.title, channel: item.uploader, durationSeconds, publishedAt, publishedText: item.uploadDate, description: item.description, views: item.views });
 }
 
 async function fetchJson<T>(url: URL, signal?: AbortSignal): Promise<T> {
-  const timeout = AbortSignal.timeout(6_000);
-  const res = await fetch(url, { signal: signal ? AbortSignal.any([signal, timeout]) : timeout, headers: { accept: "application/json" } });
-  if (!res.ok) throw new Error(`invidious_${res.status}`);
-  const contentType = res.headers.get("content-type") ?? "";
-  if (!contentType.toLowerCase().includes("application/json")) throw new Error(`invidious_non_json_${res.status}_${contentType.split(";")[0] || "unknown"}`);
-  return await res.json() as T;
+  const timeout = AbortSignal.timeout(8_000);
+  const response = await fetch(url, { signal: signal ? AbortSignal.any([signal, timeout]) : timeout, headers: { accept: "application/json" } });
+  if (!response.ok) throw new Error(`piped_${response.status}`);
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.toLowerCase().includes("application/json")) throw new Error(`piped_non_json_${response.status}_${contentType.split(";")[0] || "unknown"}`);
+  return await response.json() as T;
 }
 
-function normalizeSearchItem(item: InvidiousSearchItem): YoutubeResult | null {
-  if (item.type !== "video" || typeof item.videoId !== "string" || typeof item.title !== "string") return null;
-  const durationSeconds = typeof item.lengthSeconds === "number" ? item.lengthSeconds : Number(item.lengthSeconds);
-  if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) return null;
-  if (item.liveNow || item.paid || item.premium) return null;
-  const description = typeof item.description === "string" ? item.description : "";
-  const publishedAt = typeof item.published === "number" ? new Date(item.published * 1000).toISOString() : null;
+function normalizeSearchItem(value: unknown): YoutubeResult | null {
+  if (!value || typeof value !== "object") return null;
+  const item = value as PipedSearchItem;
+  if (item.type !== "stream" || item.isShort || typeof item.title !== "string" || typeof item.url !== "string") return null;
+  const videoId = new URL(item.url, "https://www.youtube.com").searchParams.get("v"), durationSeconds = number(item.duration);
+  if (!videoId || !durationSeconds || durationSeconds <= 0) return null;
+  const uploaded = number(item.uploaded), publishedAt = uploaded ? new Date(uploaded).toISOString() : null;
+  return result({ videoId, title: item.title, channel: item.uploaderName, durationSeconds, publishedAt, publishedText: item.uploadedDate, description: item.shortDescription, views: item.views });
+}
+
+function result({ videoId, title, channel, durationSeconds, publishedAt, publishedText, description, views }: { videoId: string; title: string; channel: unknown; durationSeconds: number; publishedAt: string | null; publishedText: unknown; description: unknown; views: unknown }): YoutubeResult {
   return {
-    videoId: item.videoId,
-    title: item.title.trim(),
-    channelTitle: typeof item.author === "string" ? item.author.trim() : "YouTube",
+    videoId,
+    title: title.trim(),
+    channelTitle: typeof channel === "string" && channel.trim() ? channel.trim() : "YouTube",
     durationSeconds: Math.round(durationSeconds),
     publishedAt,
-    publishedText: typeof item.publishedText === "string" ? item.publishedText : null,
-    description: description.trim(),
-    thumbnailUrl: normalizeYoutubeThumb(pickThumb(item.videoThumbnails), item.videoId),
-    watchUrl: `https://www.youtube.com/watch?v=${encodeURIComponent(item.videoId)}`,
-    viewCount: typeof item.viewCount === "number" ? item.viewCount : Number.isFinite(Number(item.viewCount)) ? Number(item.viewCount) : null,
-    viewCountText: typeof item.viewCountText === "string" ? item.viewCountText : null,
+    publishedText: typeof publishedText === "string" ? publishedText : null,
+    description: typeof description === "string" ? description.trim() : "",
+    thumbnailUrl: `https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg`,
+    watchUrl: `https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`,
+    viewCount: number(views),
+    viewCountText: null,
     languageWarning: "YouTube не гарантирует язык речи в каждом видео.",
   };
 }
 
-function normalizeYoutubeThumb(url: string | null, videoId: string): string | null {
-  if (!url) return `https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg`;
-  try {
-    const parsed = new URL(url, "https://i.ytimg.com");
-    const match = parsed.pathname.match(/\/vi\/([^/]+)\//);
-    return `https://i.ytimg.com/vi/${encodeURIComponent(match?.[1] ?? videoId)}/hqdefault.jpg`;
-  } catch {
-    return `https://i.ytimg.com/vi/${encodeURIComponent(videoId)}/hqdefault.jpg`;
-  }
-}
-
-function pickThumb(value: unknown): string | null {
-  if (!Array.isArray(value)) return null;
-  const thumbs = value.filter((x): x is InvidiousThumb => Boolean(x) && typeof x === "object");
-  const scored = thumbs.map((thumb) => ({ url: typeof thumb.url === "string" ? thumb.url : "", width: Number(thumb.width) || 0 })).filter((x) => x.url);
-  return scored.sort((a, b) => b.width - a.width)[0]?.url ?? null;
-}
-
-function isSuitableRussianYoga(result: YoutubeResult): boolean {
-  const text = `${result.title} ${result.description} ${result.channelTitle}`.toLowerCase();
+function isSuitableRussianYoga(item: YoutubeResult): boolean {
+  const text = `${item.title} ${item.description} ${item.channelTitle}`.toLowerCase();
   if (!/(йога|yoga|виньяса|растяж|спин|медитац|пилатес|asana|vinyasa)/i.test(text)) return false;
-  if (/[\u0400-\u04ff]/.test(text)) return true;
-  return /(russian|русск|для начинающих)/i.test(text);
+  return /[\u0400-\u04ff]/.test(text) || /(russian|русск|для начинающих)/i.test(text);
 }
 
-function stableJson(value: Record<string, unknown>): string {
-  return JSON.stringify(Object.keys(value).sort().reduce<Record<string, unknown>>((acc, key) => ({ ...acc, [key]: value[key] }), {}));
-}
-
-function fnv1a(input: string): string {
-  let hash = 0x811c9dc5;
-  for (let i = 0; i < input.length; i++) {
-    hash ^= input.charCodeAt(i);
-    hash = Math.imul(hash, 0x01000193) >>> 0;
-  }
-  return hash.toString(16).padStart(8, "0");
-}
+const number = (value: unknown): number | null => typeof value === "number" && Number.isFinite(value) ? value : Number.isFinite(Number(value)) ? Number(value) : null;
+const date = (value: unknown): string | null => { if (typeof value !== "string" && typeof value !== "number") return null; const parsed = new Date(value); return Number.isNaN(parsed.valueOf()) ? null : parsed.toISOString(); };
+const stableJson = (value: Record<string, unknown>) => JSON.stringify(Object.keys(value).sort().reduce<Record<string, unknown>>((acc, key) => ({ ...acc, [key]: value[key] }), {}));
+function fnv1a(input: string): string { let hash = 0x811c9dc5; for (let i = 0; i < input.length; i++) { hash ^= input.charCodeAt(i); hash = Math.imul(hash, 0x01000193) >>> 0; } return hash.toString(16).padStart(8, "0"); }

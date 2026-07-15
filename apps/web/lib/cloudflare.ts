@@ -16,7 +16,7 @@ interface WebEnv {
   STORAGE?: R2Bucket;
   TELEGRAM_BOT_TOKEN?: string;
   TELEGRAM_MODE?: string;
-  INVIDIOUS_BASE_URL?: string;
+  PIPED_BASE_URL?: string;
   NODE_ENV?: string;
 }
 
@@ -36,8 +36,8 @@ export function getBotToken(): string {
   return token;
 }
 
-export function getInvidiousBaseUrl(): string | null {
-  const value = webEnv().INVIDIOUS_BASE_URL?.trim().replace(/\/+$/, "");
+export function getPipedBaseUrl(): string | null {
+  const value = webEnv().PIPED_BASE_URL?.trim().replace(/\/+$/, "");
   return value || null;
 }
 

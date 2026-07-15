@@ -21,7 +21,7 @@
     "enabled": true
   },
   "vars": {
-    "INVIDIOUS_BASE_URL": "https://inv.zoomerville.com"
+    "PIPED_BASE_URL": "https://api.piped.private.coffee"
   },
   "d1_databases": [
     {
@@ -38,7 +38,7 @@
         "binding": "IMAGES"
       },
       "vars": {
-        "INVIDIOUS_BASE_URL": "https://inv.zoomerville.com"
+        "PIPED_BASE_URL": "https://api.piped.private.coffee"
       },
       "d1_databases": [
         {

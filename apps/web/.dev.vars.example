@@ -17,7 +17,6 @@ FLOWLY_DEV_EMULATION=
 # In `mock`, outbound messages are written to a local log and never sent.
 TELEGRAM_MODE=
 
-# Optional: Invidious-compatible API base URL for E2-D2-T04 YouTube search.
-# Do not commit a hardcoded public instance as product contract; configure per env.
-# If empty in dev, /api/v1/youtube/search uses controlled fixture/fallback states.
-INVIDIOUS_BASE_URL=
+# Optional: Piped API base URL for no-key YouTube search (DEC-049).
+# If empty, /api/v1/youtube/search returns the controlled unavailable/stale state.
+PIPED_BASE_URL=https://api.piped.private.coffee

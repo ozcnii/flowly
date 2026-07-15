@@ -24,7 +24,7 @@ export type YoutubeResult = {
 export type YoutubeSearchResponse = {
   query: { text: string; filters: YoutubeFilters; cacheKey: string };
   cache: "hit" | "miss" | "stale" | "unavailable";
-  provider: "invidious";
+  provider: "piped";
   results: YoutubeResult[];
   warning: string | null;
   explanation: string | null;

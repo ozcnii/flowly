@@ -2,11 +2,11 @@ import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { generateId, nowIso } from "@flowly/core";
 import { schema } from "@flowly/database";
-import { getInvidiousVideo, type YoutubeFilters, type YoutubeResult } from "@flowly/youtube";
+import { getPipedVideo, type YoutubeFilters, type YoutubeResult } from "@flowly/youtube";
 import { audit, rejectOversizedBody } from "@/lib/auth/http";
 import { isSafeOrigin } from "@/lib/auth/csrf";
 import { getSessionUserId } from "@/lib/auth/session-user";
-import { getDb, getInvidiousBaseUrl } from "@/lib/cloudflare";
+import { getDb, getPipedBaseUrl } from "@/lib/cloudflare";
 
 type Body = { result?: YoutubeResult; filters?: YoutubeFilters };
 const jsonArray = (values: string[]) => JSON.stringify(values);
@@ -29,8 +29,8 @@ async function cachedResult(videoId: string): Promise<YoutubeResult | null> {
 async function resolveResult(videoId: string, body: Body): Promise<YoutubeResult | null> {
   const cached = await cachedResult(videoId).catch(() => null);
   if (cached) return cached;
-  const baseUrl = getInvidiousBaseUrl();
-  if (baseUrl) return await getInvidiousVideo(baseUrl, videoId);
+  const baseUrl = getPipedBaseUrl();
+  if (baseUrl) return await getPipedVideo(baseUrl, videoId);
   if (process.env.NODE_ENV !== "production" && body.result?.videoId === videoId) return body.result;
   return null;
 }
