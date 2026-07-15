@@ -13,10 +13,10 @@ function telegramInitData(): TelegramAuthInput {
 }
 
 function launchParam(source: string, origin: "hash" | "search"): TelegramAuthInput | null {
-  const raw = source.split("&").find((part) => part.startsWith("tgWebAppData="))?.slice("tgWebAppData=".length);
-  if (!raw) return null;
-  try { return { initData: decodeURIComponent(raw).trim(), source: origin, launchRaw: raw }; }
-  catch { return { initData: raw.trim(), source: origin, launchRaw: raw }; }
+  const query = source.includes("?") ? source.slice(source.indexOf("?") + 1) : source;
+  const raw = query.split("&").find((part) => part.startsWith("tgWebAppData="))?.slice("tgWebAppData=".length);
+  const initData = new URLSearchParams(query).get("tgWebAppData")?.trim();
+  return raw && initData ? { initData, source: origin, launchRaw: raw } : null;
 }
 
 /**
@@ -36,6 +36,10 @@ export function AuthGate({ children }: { children: ReactNode }) {
   const me = useMeQuery(!preview);
   const auth = useTelegramAuthMutation();
   const { mutate, reset, status, isError: authError, isSuccess: authSuccess } = auth;
+
+  useEffect(() => {
+    window.Telegram?.WebApp?.ready?.();
+  }, []);
 
   useEffect(() => {
     if (preview || !me.isError || status !== "idle") return;

@@ -63,10 +63,9 @@ export async function verifyInitData(
   const hash = params.get("hash");
   if (!hash) throw new InitDataValidationError("missing hash");
   params.delete("hash");
-  params.delete("signature");
 
-  const entries = [...params.entries()].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
-  const dataCheckString = entries.map(([k, v]) => `${k}=${v}`).join("\n");
+  const entries = [...params.entries()];
+  const dataCheckString = entries.map(([k, v]) => `${k}=${v}`).sort().join("\n");
 
   const secret = await hmacSha256(encoder.encode("WebAppData"), encoder.encode(botToken));
   const calculated = toHex(await hmacSha256(secret, encoder.encode(dataCheckString)));

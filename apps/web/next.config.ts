@@ -8,7 +8,7 @@ initOpenNextCloudflareForDev();
 // работает в WebView, не в iframe — frame-ancestors 'none' безопасен. В dev React использует
 // eval() для дебага (в prod — нет), поэтому 'unsafe-eval' только в dev. Harden (nonce-based) в этапе 8.
 const isDev = process.env.NODE_ENV !== "production";
-const scriptSrc = `'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`;
+const scriptSrc = `'self' 'unsafe-inline' https://telegram.org${isDev ? " 'unsafe-eval'" : ""}`;
 
 const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=15552000; includeSubDomains" },
@@ -22,7 +22,7 @@ const securityHeaders = [
       "default-src 'self'",
       `script-src ${scriptSrc}`,
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://i.ytimg.com",
+      "img-src 'self' data: blob: https://i.ytimg.com https://t.me",
       "font-src 'self' data:",
       "connect-src 'self'",
       "frame-ancestors 'none'",
@@ -38,6 +38,7 @@ export default {
   reactStrictMode: true,
   typedRoutes: true,
   transpilePackages: ["@flowly/ui"],
+  images: { remotePatterns: [{ protocol: "https", hostname: "t.me", pathname: "/i/userpic/**" }] },
   turbopack: { root: fileURLToPath(new URL("../..", import.meta.url)) },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
