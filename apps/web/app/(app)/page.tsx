@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { homeBase } from "@/features/home/fixtures/base";
 import { resolveHomeScenario } from "@/features/home/model/home-scenario";
 import { HomeScreen } from "@/features/home/ui/home-screen";
@@ -10,6 +9,7 @@ import { DeepLinkRecoveryScreen } from "@/features/recovery/ui/deep-link-recover
 import { OpenViaTelegramScreen } from "@/features/web-fallback/ui/open-via-telegram-screen";
 import { UnavailableDeepLinkScreen } from "@/features/web-fallback/ui/unavailable-deep-link-screen";
 import { resolveShellScenario } from "@/lib/scenarios";
+import { ShellErrorState } from "@/components/shell/shell-error-state";
 
 type PageProps = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
@@ -40,10 +40,6 @@ export default async function Page({ searchParams }: PageProps) {
   return scenario === "loading" ? (
     <div aria-label="Загрузка оболочки" className="grid gap-4"><div className="shell-skeleton h-9 w-2/3 rounded-full" /><div className="shell-skeleton h-40 rounded-3xl" /><div className="shell-skeleton h-24 rounded-2xl" /></div>
   ) : scenario === "error" ? (
-    <section role="alert" className="flow-card m-auto max-w-md text-center"><h1 className="flow-title">Не удалось открыть Flowly</h1><p className="flow-subtitle">Повторите загрузку оболочки. Личные данные не отображаются до успешной проверки.</p><LinkButton /></section>
+    <ShellErrorState />
   ) : <HomeScreen key={homeScenario} data={homeBase} scenario={homeScenario} />;
-}
-
-function LinkButton() {
-  return <Link href="/?scenario=ready" className="mx-auto inline-flex min-h-11 items-center rounded-full bg-accent px-5 font-semibold text-on-accent no-underline">Повторить</Link>;
 }

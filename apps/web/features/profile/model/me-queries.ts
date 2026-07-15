@@ -11,12 +11,12 @@ export type PublicUser = {
   lastName: string | null;
   photoUrl: string | null;
   timezone: string;
-  weekStartsOn: number;
   locale: string;
   onboardingCompleted: boolean;
 };
-export type MePatch = Partial<Pick<PublicUser, "firstName" | "timezone" | "locale" | "weekStartsOn">>;
-export type MeResponse = { user: PublicUser };
+export type ReportSettings = { weeklyReportEnabled: boolean; monthlyReportEnabled: boolean };
+export type MePatch = Partial<Pick<PublicUser, "firstName" | "timezone" | "locale"> & ReportSettings>;
+export type MeResponse = { user: PublicUser; settings: ReportSettings };
 export type TelegramAuthResponse = { ok: true; userId: string; dev?: boolean };
 export type TelegramAuthInput = { initData: string; source: "sdk" | "hash" | "search" | "missing"; launchRaw?: string };
 

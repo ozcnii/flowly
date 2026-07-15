@@ -12,7 +12,6 @@ export interface PublicUser {
   lastName: string | null;
   photoUrl: string | null;
   timezone: string;
-  weekStartsOn: number;
   locale: string;
   onboardingCompleted: boolean;
 }
@@ -37,7 +36,6 @@ export function publicUser(user: {
     lastName: user.lastName,
     photoUrl: user.photoUrl,
     timezone: user.timezone,
-    weekStartsOn: user.weekStartsOn,
     locale: user.locale,
     onboardingCompleted: user.onboardingCompletedAt !== null,
   };
@@ -48,11 +46,16 @@ export async function getUser(db: Database, userId: string) {
   return rows[0] ?? null;
 }
 
+export async function getReportSettings(db: Database, userId: string) {
+  const rows = await db.select({ weeklyReportEnabled: schema.userSettings.weeklyReportEnabled, monthlyReportEnabled: schema.userSettings.monthlyReportEnabled }).from(schema.userSettings).where(eq(schema.userSettings.userId, userId)).limit(1);
+  return rows[0] ?? { weeklyReportEnabled: false, monthlyReportEnabled: false };
+}
+
 /**
  * Find an existing user by Telegram id, or create user + default settings.
  * Per DEC-020, Flowly name is edited separately from Telegram, so we do not
  * overwrite existing name fields on re-auth. Telegram username/avatar URL are refreshed;
- * onboarding (S-MA-003) lets the user refine timezone/locale/week start.
+ * onboarding (S-MA-003) lets the user refine timezone/locale; week starts Monday (DEC-042).
  */
 export async function findOrCreateUser(
   db: Database,
@@ -66,7 +69,7 @@ export async function findOrCreateUser(
   if (existing[0]) {
     await db
       .update(schema.users)
-      .set({ username: tg.username ?? null, photoUrl: tg.photo_url ?? null, updatedAt: nowIso() })
+      .set({ username: tg.username ?? null, photoUrl: tg.photo_url ?? null, weekStartsOn: 1, updatedAt: nowIso() })
       .where(eq(schema.users.id, existing[0].id));
     return { id: existing[0].id, isNew: false };
   }

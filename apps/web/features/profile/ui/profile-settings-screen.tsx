@@ -1,15 +1,10 @@
 "use client";
 
+import { BlockFooter, BlockTitle, List, ListInput, ListItem, Navbar, NavbarBackLink, Preloader, Segmented, SegmentedButton, Toggle } from "konsta/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Icon, Select, type SelectOption } from "@flowly/ui";
-import { useMeQuery, usePatchMeMutation, type PublicUser } from "../model/me-queries";
-import styles from "./profile-settings-screen.module.css";
-
-const WEEK_STARTS = [
-  { value: 1, label: "Понедельник" },
-  { value: 0, label: "Воскресенье" },
-] as const;
+import { useMeQuery, usePatchMeMutation, type PublicUser, type ReportSettings } from "../model/me-queries";
+import { buildTimezoneOptions, detectedTimezone, TimezonePicker } from "@/components/timezone-picker";
 
 const THEMES = [
   { value: "system", label: "Авто" },
@@ -22,63 +17,14 @@ const REPORTS = [
   { id: "monthly", label: "Месячный отчёт", hint: "Длинная динамика без лишних уведомлений" },
 ] as const;
 
-const detectedTimezone = typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "UTC";
 const THEME_STORAGE_KEY = "flowly-theme";
 const initialTheme = () => typeof window === "undefined" ? "system" : ["light", "dark", "system"].includes(localStorage.getItem(THEME_STORAGE_KEY) ?? "") ? localStorage.getItem(THEME_STORAGE_KEY)! : "system";
 const applyTheme = (theme: string) => {
-  if (theme === "light" || theme === "dark") {
-    localStorage.setItem(THEME_STORAGE_KEY, theme);
-    document.documentElement.dataset.theme = theme;
-  } else {
-    localStorage.setItem(THEME_STORAGE_KEY, "system");
-    document.documentElement.dataset.theme = window.Telegram?.WebApp?.colorScheme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-  }
-};
-
-const RU_TZ_KEYWORDS: Record<string, string[]> = {
-  "Europe/Moscow": ["москва", "мск", "санкт-петербург", "спб", "петербург"],
-  "Europe/Kaliningrad": ["калининград"],
-  "Europe/Samara": ["самара"],
-  "Europe/Volgograd": ["волгоград"],
-  "Europe/Saratov": ["саратов"],
-  "Europe/Astrakhan": ["астрахань"],
-  "Europe/Ulyanovsk": ["ульяновск"],
-  "Europe/Kirov": ["киров"],
-  "Asia/Yekaterinburg": ["екатеринбург", "екб"],
-  "Asia/Omsk": ["омск"],
-  "Asia/Novosibirsk": ["новосибирск"],
-  "Asia/Barnaul": ["барнаул"],
-  "Asia/Tomsk": ["томск"],
-  "Asia/Krasnoyarsk": ["красноярск"],
-  "Asia/Irkutsk": ["иркутск"],
-  "Asia/Chita": ["чита"],
-  "Asia/Yakutsk": ["якутск"],
-  "Asia/Vladivostok": ["владивосток"],
-  "Asia/Sakhalin": ["сахалин", "южно-сахалинск"],
-  "Asia/Magadan": ["магадан"],
-  "Asia/Kamchatka": ["камчатка", "петропавловск-камчатский"],
-  "Asia/Anadyr": ["анадырь"],
-  "Asia/Chelyabinsk": ["челябинск"],
-  "Asia/Tyumen": ["тюмень"],
-  "Europe/Minsk": ["минск"],
-  "Europe/Kyiv": ["киев", "київ"],
-  "Europe/Berlin": ["берлин"],
-  "Europe/London": ["лондон"],
-  "Europe/Paris": ["париж"],
-  "America/New_York": ["нью-йорк"],
-  "America/Los_Angeles": ["лос-анджелес"],
-};
-
-const buildTimezoneOptions = (): SelectOption[] => {
-  const intl = Intl as unknown as { supportedValuesOf?: (key: string) => string[] };
-  const zones = (intl.supportedValuesOf?.("timeZone") ?? [detectedTimezone]).filter((tz, i, a) => tz.includes("/") && a.indexOf(tz) === i);
-  return zones.map((tz) => ({
-    value: tz,
-    label: tz.slice(tz.indexOf("/") + 1).replace(/_/g, " "),
-    group: tz.split("/")[0],
-    meta: new Intl.DateTimeFormat("ru-RU", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: tz }).format(new Date()),
-    keywords: RU_TZ_KEYWORDS[tz],
-  }));
+  localStorage.setItem(THEME_STORAGE_KEY, theme);
+  const resolved = theme === "light" || theme === "dark" ? theme : window.Telegram?.WebApp?.colorScheme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  document.documentElement.dataset.theme = resolved;
+  document.documentElement.classList.toggle("dark", resolved === "dark");
+  window.dispatchEvent(new Event("flowly-theme-change"));
 };
 
 /**
@@ -86,23 +32,23 @@ const buildTimezoneOptions = (): SelectOption[] => {
  * Flowly name is editable separately from Telegram. Avatar is read-only from Telegram.
  */
 export function ProfileSettingsScreen() {
+  const router = useRouter();
   const me = useMeQuery();
-  return me.data ? <ProfileSettingsForm user={me.data.user} /> : <div className="flow-screen" aria-busy="true"><p className="flow-subtitle">Загружаем профиль…</p></div>;
+  return me.data ? <ProfileSettingsForm user={me.data.user} reportSettings={me.data.settings} /> : <div className="min-h-dvh"><Navbar title="Настройки" left={<NavbarBackLink aria-label="Назад" onClick={() => router.back()} />} /><main className="grid min-h-[70dvh] place-items-center" role="status" aria-live="polite"><Preloader /><span className="sr-only">Загружаем настройки</span></main></div>;
 }
 
-function ProfileSettingsForm({ user }: { user: PublicUser }) {
+function ProfileSettingsForm({ user, reportSettings }: { user: PublicUser; reportSettings: ReportSettings }) {
   const router = useRouter();
   const forced = useSearchParams().get("settings");
   const timezoneOptions = useMemo(() => buildTimezoneOptions(), []);
   const [firstName, setFirstName] = useState(user.firstName);
   const [timezone, setTimezone] = useState(user.timezone === "UTC" ? detectedTimezone : user.timezone);
-  const [weekStartsOn, setWeekStartsOn] = useState(user.weekStartsOn);
   const [theme, setTheme] = useState(initialTheme);
-  const [reports, setReports] = useState(() => new Set<string>(["weekly"]));
+  const [reports, setReports] = useState(() => new Set<string>([...(reportSettings.weeklyReportEnabled ? ["weekly"] : []), ...(reportSettings.monthlyReportEnabled ? ["monthly"] : [])]));
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error" | "offline">("idle");
   const { mutateAsync } = usePatchMeMutation();
   const reportsKey = useMemo(() => [...reports].sort().join(","), [reports]);
-  const draftKey = `${firstName}\0${timezone}\0${weekStartsOn}\0${theme}\0${reportsKey}`;
+  const draftKey = `${firstName}\0${timezone}\0${theme}\0${reportsKey}`;
   const lastSaved = useRef(draftKey);
 
   const saveDraft = useCallback(async () => {
@@ -112,13 +58,13 @@ function ProfileSettingsForm({ user }: { user: PublicUser }) {
     if (forced === "error") return setStatus("error");
     try {
       applyTheme(theme);
-      if (process.env.NODE_ENV === "production") await mutateAsync({ firstName: name, timezone, weekStartsOn });
+      await mutateAsync({ firstName: name, timezone, weeklyReportEnabled: reports.has("weekly"), monthlyReportEnabled: reports.has("monthly") });
       lastSaved.current = draftKey;
       setStatus("saved");
     } catch {
       setStatus("error");
     }
-  }, [draftKey, firstName, forced, mutateAsync, theme, timezone, weekStartsOn]);
+  }, [draftKey, firstName, forced, mutateAsync, reports, theme, timezone]);
 
   useEffect(() => {
     if (draftKey === lastSaved.current) return;
@@ -134,46 +80,30 @@ function ProfileSettingsForm({ user }: { user: PublicUser }) {
   });
 
   return (
-    <div className={`flow-screen ${styles.screen}`}>
-      <header className={`flow-top ${styles.top}`}>
-        <button type="button" className={`flow-back ${styles.back}`} onClick={() => router.push("/profile" as never)}><Icon name="chevron-left" />Профиль</button>
-        <h1 className="flow-title">Настройки</h1>
-      </header>
+    <div className="min-h-dvh">
+      <Navbar title="Настройки" left={<NavbarBackLink aria-label="Назад" onClick={() => router.back()} />} />
+      <main>
+        <BlockTitle>Имя в Flowly</BlockTitle>
+        <List className="mt-8 mb-2">
+          {/* Konsta 5.2.0 ListInput forwards title=null into cls(); empty HTML title avoids its null-constructor crash. */}
+          <ListInput title="" outline type="text" value={firstName} placeholder="Введите имя" onInput={(event) => setFirstName(event.currentTarget.value)} maxLength={64} />
+        </List>
 
-      <section className={`flow-card ${styles.card}`} aria-labelledby="identity-title">
-        <div className={styles.avatarRow}>
-          <div className={styles.avatar} aria-hidden="true"><Icon name="user-round" /></div>
-          <h2 id="identity-title">Профиль Flowly</h2>
-        </div>
-        <label className={styles.field}>Имя<input value={firstName} onChange={(e) => setFirstName(e.target.value)} maxLength={64} /></label>
-      </section>
+        <BlockTitle>Часовой пояс</BlockTitle>
+        <TimezonePicker options={timezoneOptions} value={timezone} onChange={setTimezone} />
 
-      <section className={`flow-card ${styles.card}`} aria-labelledby="time-title">
-        <h2 id="time-title">Время и календарь</h2>
-        <label className={styles.selectLabel}>Часовой пояс</label>
-        <Select options={timezoneOptions} value={timezone} onChange={setTimezone} ariaLabel="Часовой пояс" placeholder="Выбрать часовой пояс" searchPlaceholder="Город, регион или время" />
-        <div className={styles.segmented} role="radiogroup" aria-label="Первый день недели">
-          {WEEK_STARTS.map((d) => <button key={d.value} type="button" aria-pressed={weekStartsOn === d.value} onClick={() => setWeekStartsOn(d.value)}>{d.label}</button>)}
-        </div>
-      </section>
+        <BlockTitle>Тема оформления</BlockTitle>
+        <List strong inset>
+          <ListItem innerChildren={<Segmented strong rounded role="radiogroup" aria-label="Тема интерфейса">{THEMES.map((item) => <SegmentedButton key={item.value} active={theme === item.value} aria-pressed={theme === item.value} onClick={() => setTheme(item.value)}>{item.label}</SegmentedButton>)}</Segmented>} />
+        </List>
 
-      <section className={`flow-card ${styles.card}`} aria-labelledby="appearance-title">
-        <h2 id="appearance-title">Тема</h2>
-        <div className={`${styles.segmented} ${styles.themeTabs}`} role="radiogroup" aria-label="Тема интерфейса">
-          {THEMES.map((t) => <button key={t.value} type="button" aria-pressed={theme === t.value} onClick={() => setTheme(t.value)}>{t.label}</button>)}
-        </div>
-      </section>
+        <BlockTitle>Отчёты</BlockTitle>
+        <List strong inset dividers className="!mb-0">
+          {REPORTS.map((report) => <ListItem key={report.id} title={report.label} subtitle={report.hint} after={<Toggle checked={reports.has(report.id)} onChange={() => toggleReport(report.id)} aria-label={report.label} />} />)}
+        </List>
 
-      <section className={`flow-card ${styles.card}`} aria-labelledby="reports-title">
-        <h2 id="reports-title">Отчёты</h2>
-        <div className={styles.switches}>
-          {REPORTS.map((r) => <button key={r.id} type="button" className={styles.switchRow} aria-pressed={reports.has(r.id)} onClick={() => toggleReport(r.id)}><span><strong>{r.label}</strong><small>{r.hint}</small></span><i aria-hidden="true" /></button>)}
-        </div>
-      </section>
-
-      <p className={`flow-status ${styles.status} ${status === "error" ? styles.bad : ""}`} role={status === "error" ? "alert" : undefined} aria-live="polite">
-        {status === "saving" ? "Сохраняем…" : status === "saved" ? "Сохранено" : status === "offline" ? "Офлайн: изменения останутся на экране" : status === "error" ? "Не удалось сохранить. Проверьте имя." : ""}
-      </p>
+        {(status === "offline" || status === "error") && <BlockFooter role={status === "error" ? "alert" : "status"} aria-live="polite">{status === "offline" ? "Офлайн: изменения останутся на экране" : "Не удалось сохранить. Проверьте имя."}</BlockFooter>}
+      </main>
     </div>
   );
 }

@@ -10,7 +10,8 @@ export const mePatchSchema = z
     firstName: z.string().trim().min(1).max(64).optional(),
     timezone: z.string().min(1).optional(),
     locale: z.string().min(1).optional(),
-    weekStartsOn: z.number().int().min(0).max(6).optional(),
+    weeklyReportEnabled: z.boolean().optional(),
+    monthlyReportEnabled: z.boolean().optional(),
   })
   .refine((data) => Object.keys(data).length > 0, { message: "no updatable fields" });
 

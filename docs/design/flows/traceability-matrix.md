@@ -23,31 +23,28 @@
 | PRD atomic requirement | Screen / flow / state / decision | Status |
 |---|---|---|
 | §11.1 greeting | S-MA-010 Home contract; F02 | covered |
-| §11.1 overall day progress | S-MA-010 Home contract; F02 | covered |
+| §11.1 overall day progress | S-MA-010 Home circular progress; F02; DEC-040 | covered |
 | §11.1 nearest planned action | S-MA-010 Home contract; F02 | covered |
 | §11.1 quick workout start | S-MA-010 Home contract; F02,F04 | covered |
 | §11.1 current program | S-MA-010 Home contract; F02,F06 | covered |
-| §11.1 data-driven yoga categories | S-MA-010 Home contract; F02,F03 | covered |
 | §11.1 today's habits | S-MA-010 Home contract; F02,F07 | covered |
-| §11.1 weekly progress | S-MA-010 Home contract; F02 | covered |
-| §11.1 simple recommendations with reason | S-MA-010 Home contract; F02 | covered |
-| §11.1 friend activity only for shared objects | S-MA-010 Home contract; F02,F10 | covered |
+| §11.1 no separate categories/weekly/recommendations/friend modules | S-MA-010; DEC-039 | intentionally removed from Home |
 | §11.2 planned count | S-MA-010 Home contract; F02 | covered |
 | §11.2 completed count | S-MA-010 Home contract; F02 | covered |
 | §11.2 partially completed count | S-MA-010 Home contract; F02 | covered |
 | §11.2 remaining count | S-MA-010 Home contract; F02 | covered |
 | §11.2 no-response presence | S-MA-010 Home contract; F02 | covered |
-| §11.3 initial category: для спины | S-MA-010 Home contract; F02,F03 | covered |
-| §11.3 initial category: перед сном | S-MA-010 Home contract; F02,F03 | covered |
-| §11.3 initial category: растяжка | S-MA-010 Home contract; F02,F03 | covered |
-| §11.3 initial category: расслабление | S-MA-010 Home contract; F02,F03 | covered |
-| §11.3 initial category: энергия | S-MA-010 Home contract; F02,F03 | covered |
-| §11.3 initial category: утренняя практика | S-MA-010 Home contract; F02,F03 | covered |
-| §11.3 initial category: шея и плечи | S-MA-010 Home contract; F02,F03 | covered |
-| §11.3 initial category: всё тело | S-MA-010 Home contract; F02,F03 | covered |
-| §11.3 initial category: короткая практика | S-MA-010 Home contract; F02,F03 | covered |
-| §11.3 initial category: дыхание без аудиоинструкций | S-MA-010 Home contract; F02,F03 | covered |
-| §11.3 categories expand from catalog data without UI-code changes | S-MA-010 Home contract; S-MA-020; F02,F03 | covered; catalog volume blocked downstream: DEC-010 |
+| §11.3 initial category: для спины | S-MA-020 catalog contract; F03 | covered |
+| §11.3 initial category: перед сном | S-MA-020 catalog contract; F03 | covered |
+| §11.3 initial category: растяжка | S-MA-020 catalog contract; F03 | covered |
+| §11.3 initial category: расслабление | S-MA-020 catalog contract; F03 | covered |
+| §11.3 initial category: энергия | S-MA-020 catalog contract; F03 | covered |
+| §11.3 initial category: утренняя практика | S-MA-020 catalog contract; F03 | covered |
+| §11.3 initial category: шея и плечи | S-MA-020 catalog contract; F03 | covered |
+| §11.3 initial category: всё тело | S-MA-020 catalog contract; F03 | covered |
+| §11.3 initial category: короткая практика | S-MA-020 catalog contract; F03 | covered |
+| §11.3 initial category: дыхание без аудиоинструкций | S-MA-020 catalog contract; F03 | covered |
+| §11.3 categories expand from catalog data without UI-code changes | S-MA-020; F03 | covered; catalog volume blocked downstream: DEC-010 |
 | §12.1 three catalog sources visibly labelled | S-MA-020; F03 | covered |
 | §12.2 category/duration/difficulty/format/equipment/author-or-channel/source/favorite-only filters | S-MA-020–024 contract; F03, empty/reset state | covered |
 | §12.3 search separately covers title/description/category/author/channel | S-MA-020–024 contract; F03 | covered |
@@ -147,7 +144,7 @@
 | §22.3 user color never sole status cue | S-MA-061,S-MA-070,S-MA-075; §40 shared state | covered |
 | §23.1 exact times create separate occurrences | S-MA-062,S-MA-064; F07 | covered |
 | §23.2 weekdays support several times per day | S-MA-062; F07 | covered |
-| §23.3 weekly goal/allowed days/time/week start/remaining and mandatory-day rule without hidden assignment | S-MA-062,S-MA-064; F07; DEC-017 | covered |
+| §23.3 weekly goal/allowed days/time/fixed Monday week start/remaining and mandatory-day rule without hidden assignment | S-MA-062,S-MA-064; F07; DEC-017,DEC-042 | covered |
 | §23.4 interval with anchor | S-MA-062; F07 | covered |
 | §23.5 separate configured slots and full/partial/skipped/no-response daily result | S-MA-062,S-MA-064,S-MA-073; F07,F09 | covered |
 | §24.1 gentle preset: main + one repeat after 90m | S-MA-063; F07,F08 | covered |
@@ -243,7 +240,7 @@
 | PRD atomic requirement | Screen / flow / state / decision | Status |
 |---|---|---|
 | §36.1 bot welcome/launch/reminders/callback/reports/invites/friends/reactions/deep links | S-BOT-001–008; F01,F08–F11 | covered |
-| §36.2 `/start /app /today /help`, no product setup | S-BOT-001–002,S-MA-096; F01,F02 | covered |
+| §36.2 `/start /app /today`, no product setup; `/help` removed by DEC-041 | S-BOT-001–002; F01,F02 | covered |
 | §36.3 webhook secret | no user screen; F08 trust boundary | N/A: technical implementation requirement |
 | §36.4 idempotent update/callback | S-BOT-005; F08; DEC-015 | covered |
 | §37.1 primary reminder | S-MA-091 notification-type contract; S-BOT-003–004; F08 | covered |
@@ -260,7 +257,7 @@
 | §37.1 technical error requiring user action | S-MA-091 notification-type contract; S-BOT-008; F11 | covered |
 | §37.2 independent repeat/report/friend/reaction/recommendation controls + habit main notification | S-MA-063,S-MA-091; F07,F11 | covered |
 | §37.3 quiet start/end and delay/skip behavior | S-MA-091,S-BOT-003–005; F08; DEC-015 | covered |
-| §38.1 Telegram-origin identity/timezone/week/theme/time/reports | S-MA-090; F11; DEC-020 | covered |
+| §38.1 Telegram-origin identity/timezone/fixed Monday/theme/time/persisted reports | S-MA-090; F11; DEC-020,DEC-042,DEC-044 | covered |
 | §38.2 quiet/default/quick intervals/partner/weekly/monthly | S-MA-091; F11 | covered |
 | §38.3 export/delete/clear-history/public-workout/friend management are separate data actions | S-MA-092–095,S-MA-040,S-MA-081; F11 | covered |
 | §51.2 user export is protected downloadable JSON | S-MA-093 export contract; F11 | covered |

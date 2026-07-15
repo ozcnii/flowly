@@ -1,8 +1,8 @@
 # F01 — onboarding, auth and recovery
 
 > Trace: §10, §32, §36; DEC-013–014.
-> Canonical screen IDs: `S-MA-001`, `S-MA-002`, `S-MA-003`, `S-MA-004`, `S-MA-005`, `S-MA-006`, `S-MA-082`, `S-MA-096`, `S-BOT-001`, `S-BOT-002`, `S-WEB-001`, `S-WEB-002`.
-> Rendered node IDs: `S-BOT-001`, `S-BOT-002`, `S-MA-001`, `S-MA-002`, `S-MA-003`, `S-MA-004`, `S-MA-005`, `S-MA-006`, `S-MA-082`, `S-MA-096`, `S-WEB-001`, `S-WEB-002`.
+> Canonical screen IDs: `S-MA-001`, `S-MA-002`, `S-MA-003`, `S-MA-004`, `S-MA-005`, `S-MA-006`, `S-MA-082`, `S-BOT-001`, `S-BOT-002`, `S-WEB-001`, `S-WEB-002`.
+> Rendered node IDs: `S-BOT-001`, `S-BOT-002`, `S-MA-001`, `S-MA-002`, `S-MA-003`, `S-MA-004`, `S-MA-005`, `S-MA-006`, `S-MA-082`, `S-WEB-001`, `S-WEB-002`.
 
 ```mermaid
 flowchart TD
@@ -17,8 +17,7 @@ flowchart TD
   S --> P[S-MA-003 optional timezone/preferences]
   P --> I[S-MA-004 disabled deferred habit/invite controls; no fake mutation]
   I --> G[S-MA-005 mandatory validated Telegram launch + completion save]
-  G -->|save failed| D[S-MA-096 diagnostics + retry]
-  D --> G
+  G -->|save failed / retry| G
   G -->|completed| X{Target accessible?}
   O -- yes --> X
   X -- yes --> Z[Exact target or Home]

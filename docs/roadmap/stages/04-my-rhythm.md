@@ -21,7 +21,7 @@
 ## Обязательные подтверждённые contracts
 
 - По `DEC-024` каждый указанный `ui_slices` screen slice выполняется строго по одному ID в реальном `apps/web`; все states/интеракции и явный approval обязательны до следующего ID.
-- По `DEC-025` production UI-kit из `packages/ui` и его public API обязательны для всех screen slices; app-local дубли shared primitives запрещены.
+- По `DEC-035` Konsta UI 5.2.0 (`konsta/react`, `ios` theme) обязательна для current/future production UI; direct imports — default, `packages/ui` допустим только для Flowly-specific contracts, отсутствующих в Konsta.
 - Weekly target явно показывает «обязательный сегодня»; multiple completions считаются отдельными настроенными slots (`DEC-017`).
 - Pause/schedule/timezone changes действуют только на future occurrences; history immutable; delete архивирует (`DEC-017`).
 - No response остаётся `no_response`; correction ограничена activity context и audit history (`DEC-015`).

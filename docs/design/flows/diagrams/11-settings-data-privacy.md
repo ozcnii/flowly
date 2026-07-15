@@ -1,15 +1,14 @@
 # F11 — settings, data and privacy
 
 > Trace: §27, §38, §47, §51.2; DEC-020, DEC-022.
-> Canonical screen IDs: `S-MA-080`, `S-MA-090`, `S-MA-091`, `S-MA-092`, `S-MA-093`, `S-MA-094`, `S-MA-095`, `S-MA-096`, `S-BOT-008`.
-> Rendered node IDs: `S-BOT-008`, `S-MA-080`, `S-MA-090`, `S-MA-091`, `S-MA-092`, `S-MA-093`, `S-MA-094`, `S-MA-095`, `S-MA-096`.
+> Canonical screen IDs: `S-MA-080`, `S-MA-090`, `S-MA-091`, `S-MA-092`, `S-MA-093`, `S-MA-094`, `S-MA-095`, `S-BOT-008`.
+> Rendered node IDs: `S-BOT-008`, `S-MA-080`, `S-MA-090`, `S-MA-091`, `S-MA-092`, `S-MA-093`, `S-MA-094`, `S-MA-095`.
 
 ```mermaid
 flowchart TD
   A[S-MA-080 Profile] --> P[S-MA-090 profile settings]
   A --> N[S-MA-091 notifications]
   A --> D[S-MA-092 data]
-  A --> HELP[S-MA-096 help/diagnostics]
   P -->|timezone change| F[Future occurrences only]
   D --> E[S-MA-093 protected JSON archive: profile, workouts, habits, schedules, history, friends, reports]
   E --> BOT[S-BOT-008 export ready/error notification]

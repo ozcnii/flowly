@@ -1,4 +1,4 @@
-export const homeScenarios = ["base", "loading", "empty", "module-error", "offline", "resume"] as const;
+export const homeScenarios = ["base", "loading", "empty", "offline", "resume"] as const;
 export type HomeScenario = (typeof homeScenarios)[number];
 
 export function resolveHomeScenario(value?: string): HomeScenario {

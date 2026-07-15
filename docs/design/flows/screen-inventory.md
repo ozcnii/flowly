@@ -12,10 +12,10 @@
 | S-MA-004 | First habit/invite prompts | production controls disabled without mutation until E4-D5-T02/E7-D8-T01; then create/skip habit and invite/skip | F01 | §10.1 | owner only | partial: DEC-034 |
 | S-MA-005 | Telegram launch gate | validated Mini App launch/session; completion mutation retry; cannot finish without confirmation | F01,F08 | §10.1, §36 | owner only; mandatory gate | covered: DEC-034 |
 | S-MA-006 | Deep-link recovery | reason, auth/recovery, relevant safe exit | F01 | §10, §32, §36 | permission rechecked | gap |
-| S-MA-010 | Главная | avatar, today modules, quick start, resume | F02 | §11 | owner; shared activity only | partial: home |
+| S-MA-010 | Главная | shared Navbar: Settings + Flowly name + avatar/Profile; day progress, nearest action, quick start, current program, habits, resume; no separate greeting/date/categories/«Ещё для вас» (DEC-039/043) | F02 | §11 | owner only | partial: home |
 | S-MA-011 | Today action detail | complete/snooze/skip/rest where allowed | F02,F07,F08 | §11, §25–26 | occurrence owner | gap |
 | S-MA-012 | Open-session conflict | continue / close / cancel new launch | F02,F04 | §14.4 | session owner | gap |
-| S-MA-020 | Тренировки: catalog | search/filter/source/favorite/open | F03 | §12 | public/entitled content | partial: catalog |
+| S-MA-020 | Йога: catalog | shared Navbar `Йога` + Settings/Profile; search/filter/source/favorite/open (DEC-043) | F03 | §12 | public/entitled content | partial: catalog |
 | S-MA-021 | YouTube results | view/save/create; cache fallback/retry | F03,F05 | §19 | owner saves private copy | gap |
 | S-MA-022 | Workout detail | inspect/start/favorite/share/report/hide/author | F03,F04,F10 | §13 | visibility checked; UGC warning | gap |
 | S-MA-023 | Favorites | workouts/videos/programs; no folders | F03,F06 | §18 | owner only | gap |
@@ -58,20 +58,19 @@
 | S-MA-086 | Challenge editor/detail | goal/dates/participants/visibility/join/leave | F10 | §34 | owner controls; accept required | gap |
 | S-MA-087 | Joint activity feed | shared progress/reactions/remind | F06,F10 | §20.6, §34–35 | participants; fixed reactions | gap |
 | S-MA-088 | UGC report/hide/block | reason required; local hide; reversible block | F03,F10 | §13.2, §56.6 | authenticated viewer | gap |
-| S-MA-090 | Profile settings | Flowly name/photo, timezone/week/theme/time/report | F11 | §27, §38.1 | owner | gap |
+| S-MA-090 | Profile settings | persisted Flowly name/timezone/weekly+monthly reports; device-local theme; week fixed Monday (DEC-042/044) | F11 | §27, §38.1 | owner | gap |
 | S-MA-091 | Notification settings | quiet hours/default policy/categories/reports | F08,F11 | §37–38 | owner | gap |
 | S-MA-092 | Data settings | export/history clear/account delete/public content | F11 | §38.3 | owner; re-confirm destructive | gap |
 | S-MA-093 | Export status/download | request/progress/download protected JSON archive containing profile, workouts, habits, schedules, history, friends and reports; bot notice | F11 | §38.3, §51.2 | owner; protected archive | gap |
 | S-MA-094 | Clear-history confirmation | explain scope/confirm/result | F11 | §38.3 | owner; objects/settings retained | gap |
 | S-MA-095 | Account deletion/grace | explain, confirm, 7-day grace/cancel | F11 | §38.3, §47.3 | owner; sessions/reminders revoked | gap |
-| S-MA-096 | Help | product help/bot diagnostics/open target | F01,F11 | §36.2 | authenticated where personal | gap |
 
 ## Telegram bot and browser fallback
 
 | ID | Surface | Actions / outcomes | Flow | PRD | Access |
 |---|---|---|---|---|---|
 | S-BOT-001 | `/start` / welcome | open Mini App; consume invite context | F01,F10 | §32, §36 | Telegram user |
-| S-BOT-002 | `/app`, `/today`, `/help` | deep link Home/Today/Help | F01,F02 | §36.2 | Telegram user |
+| S-BOT-002 | `/app`, `/today` | deep link Home/Today | F01,F02 | §36.2 | Telegram user |
 | S-BOT-003 | Habit reminder | done/snooze/custom/skip/open | F08 | §25.1, §25.3–25.6 | occurrence owner |
 | S-BOT-004 | Yoga reminder | start/already done/snooze/rest/open | F08 | §25.2–25.7 | occurrence owner |
 | S-BOT-005 | Callback result/stale | idempotent confirmation or current state/deep link | F08 | §25–26, §36.4 | callback user validated |
@@ -225,7 +224,6 @@ Each ID is assigned to one explicitly defined profile below; this is the canonic
 | S-MA-093 | P-REPORT | request/progress/failure/protected download/expiry |
 | S-MA-094 | P-CONFIRM | success states exact removed/retained scope |
 | S-MA-095 | P-CONFIRM | grace, re-auth cancellation and expiry are distinct |
-| S-MA-096 | P-DETAIL-READ | diagnostics failure retries; help itself is never empty |
 | S-BOT-001 | P-COMMAND | invite context may be unavailable without leaking target |
 | S-BOT-002 | P-COMMAND | exact target is access-checked |
 | S-BOT-003 | P-MESSAGE | terminal, snooze and stale outcomes are distinct |

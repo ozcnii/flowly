@@ -1,134 +1,82 @@
 "use client";
 
-import Image from "next/image";
+import { Badge, Button, Card, Chip, List, ListItem, Preloader, Progressbar, Searchbar, Segmented, SegmentedButton, Sheet, Tabbar, TabbarLink, Toggle } from "konsta/react";
 import { useState } from "react";
-import { AppHeader, Badge, BottomNavigation, Button, Card, EmptyState, Icon, IconButton, InlineError, OfflineBanner, Progress, Skeleton, type NavigationItem } from "@flowly/ui";
+import { EmptyState, Icon, InlineError, OfflineBanner, Select, Skeleton } from "@flowly/ui";
 import styles from "./ui-kit.module.css";
 
-const navItems: NavigationItem[] = [
-  { id: "home", href: "#home", label: "Главная", icon: <Icon name="house" /> },
-  { id: "workouts", href: "#workouts", label: "Тренировки", icon: <Icon name="dumbbell" /> },
-  { id: "programs", href: "#programs", label: "Программы", icon: <Icon name="sparkles" />, badge: "2" },
-  { id: "rhythm", href: "#rhythm", label: "Мой ритм", icon: <Icon name="leaf" /> },
-  { id: "calendar", href: "#calendar", label: "Календарь", icon: <Icon name="calendar-days" /> },
+const zones = [
+  { value: "Europe/Moscow", label: "Москва", group: "Европа", meta: "UTC+3" },
+  { value: "Europe/Samara", label: "Самара", group: "Европа", meta: "UTC+4" },
+  { value: "Asia/Yekaterinburg", label: "Екатеринбург", group: "Азия", meta: "UTC+5" },
 ];
-
-const swatches = [
-  ["Canvas", "var(--color-canvas)"], ["Surface", "var(--color-surface)"], ["Accent", "var(--color-accent)"],
-  ["Accent soft", "var(--color-accent-soft)"], ["Success", "var(--color-success)"], ["Warning", "var(--color-warning)"],
-  ["Danger", "var(--color-danger)"], ["Info", "var(--color-info)"],
-] as const;
 
 export function UIKitClient() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(64);
-  const [activeNav, setActiveNav] = useState("home");
-  const [message, setMessage] = useState("Компоненты готовы к проверке");
+  const [progress, setProgress] = useState(.64);
+  const [active, setActive] = useState("home");
+  const [zone, setZone] = useState("Europe/Moscow");
+  const [sheet, setSheet] = useState(false);
+  const [toggle, setToggle] = useState(true);
+  const [segment, setSegment] = useState("week");
 
-  const simulateLoading = () => {
-    setLoading(true);
-    setMessage("Показываем loading-состояние кнопки");
-    window.setTimeout(() => { setLoading(false); setMessage("Действие завершено"); }, 1200);
+  const switchTheme = () => {
+    const next = theme === "light" ? "dark" : "light";
+    setTheme(next);
+    document.documentElement.dataset.theme = next;
+    document.documentElement.classList.toggle("dark", next === "dark");
   };
 
-  return <div className={styles.page} data-theme={theme}>
-    <header className={styles.topbar}>
-      <a href="#content" className={styles.skip}>К компонентам</a>
-      <a href="/ui-kit" className={styles.brand} aria-label="Flowly UI Kit — начало страницы">
-        <Image src="/brand/flowly-icon.svg" alt="" width={44} height={44} priority />
-        <span><strong>Flowly</strong><small>Production UI Kit</small></span>
-      </a>
-      <div className={styles.themeControl} role="group" aria-label="Тема интерфейса">
-        <button type="button" aria-pressed={theme === "light"} onClick={() => setTheme("light")}><Icon name="sun" />Светлая</button>
-        <button type="button" aria-pressed={theme === "dark"} onClick={() => setTheme("dark")}><Icon name="moon" />Тёмная</button>
-      </div>
+  const simulate = () => {
+    setLoading(true);
+    window.setTimeout(() => setLoading(false), 900);
+  };
+
+  return <main className={styles.page}>
+    <header className={styles.hero}>
+      <span className={styles.kicker}>Flowly × Konsta UI</span>
+      <h1>iOS foundation</h1>
+      <p>Живая галерея production-компонентов, Flowly palette и обязательных состояний.</p>
+      <div className={styles.heroActions}><Button large rounded onClick={simulate}>{loading ? <Preloader /> : <Icon name="sparkles" />}Проверить loading</Button><Button large rounded tonal onClick={switchTheme}><Icon name={theme === "light" ? "moon" : "sun"} />{theme === "light" ? "Тёмная тема" : "Светлая тема"}</Button></div>
     </header>
 
-    <main id="content" className={styles.main}>
-      <section className={styles.hero}>
-        <Badge tone="success" icon={<Icon name="check" />}>Production foundation</Badge>
-        <h1>Компоненты Flowly,<br />готовые к реальным экранам</h1>
-        <p>Единые токены, доступные состояния и адаптивное поведение. Переключайте тему и проверяйте интеракции прямо на странице.</p>
-        <div className={styles.heroActions}>
-          <Button size="lg" leadingIcon={<Icon name="arrow-down" />} onClick={() => document.querySelector("#actions")?.scrollIntoView({ behavior: "smooth" })}>Смотреть компоненты</Button>
-          <Button size="lg" variant="ghost" onClick={() => setTheme(theme === "light" ? "dark" : "light")}>Сменить тему</Button>
-        </div>
-      </section>
+    <section className={styles.section}>
+      <h2>Actions</h2>
+      <Card contentWrap={false} outline className={styles.card}>
+        <div className={styles.row}><Button inline rounded><Icon name="play" />Начать</Button><Button inline rounded tonal><Icon name="bookmark" />Сохранить</Button><Button inline rounded outline>Подробнее</Button><Button inline rounded clear>Отмена</Button></div>
+        <div className={styles.row}><Badge>3</Badge><Chip>Растяжка</Chip><Chip outline>15 минут</Chip><Button inline small rounded disabled>Недоступно</Button></div>
+      </Card>
+    </section>
 
-      <div className={styles.status} aria-live="polite"><Icon name="info" />{message}</div>
+    <section className={styles.section}>
+      <h2>Forms</h2>
+      <Card contentWrap={false} outline className={styles.card}>
+        <Searchbar placeholder="Найти практику" />
+        <List strong dividers><ListItem title="Недельный отчёт" subtitle="Итоги без лишних уведомлений" after={<Toggle checked={toggle} onChange={() => setToggle((v) => !v)} />} /></List>
+        <Segmented strong rounded>{["day", "week", "month"].map((id) => <SegmentedButton key={id} active={segment === id} onClick={() => setSegment(id)}>{id === "day" ? "День" : id === "week" ? "Неделя" : "Месяц"}</SegmentedButton>)}</Segmented>
+        <Select options={zones} value={zone} onChange={setZone} ariaLabel="Часовой пояс" searchPlaceholder="Город или регион" />
+        <Button inline rounded tonal onClick={() => setSheet(true)}>Открыть sheet</Button>
+      </Card>
+    </section>
 
-      <section className={styles.section} aria-labelledby="foundations-title">
-        <div className={styles.sectionHeading}><span>01</span><div><h2 id="foundations-title">Основы</h2><p>Семантические цвета и типографическая иерархия автоматически адаптируются к теме.</p></div></div>
-        <div className={styles.swatches}>{swatches.map(([name, color]) => <div key={name} className={styles.swatch}><i style={{ background: color }} /><strong>{name}</strong><code>{color.replace("var(--color-", "").replace(")", "")}</code></div>)}</div>
-        <Card className={styles.typeSpecimen}>
-          <p className={styles.display}>Двигайся в своём ритме</p>
-          <h3>Заголовок помогает быстро понять главное</h3>
-          <p>Основной текст остаётся спокойным и хорошо читаемым. Вторичный текст сообщает дополнительные детали без визуального шума.</p>
-          <small>Подпись · Inter 14</small>
-        </Card>
-      </section>
+    <section className={styles.section}>
+      <h2>Progress & states</h2>
+      <Card contentWrap={false} outline className={styles.card}>
+        <Progressbar progress={progress} aria-label="Прогресс программы" />
+        <div className={styles.row}><Button inline small rounded tonal onClick={() => setProgress(Math.max(0, progress - .1))}>−10%</Button><strong>{Math.round(progress * 100)}%</strong><Button inline small rounded tonal onClick={() => setProgress(Math.min(1, progress + .1))}>+10%</Button></div>
+        <div className={styles.skeletons}><Skeleton height="hero" /><Skeleton /><Skeleton /></div>
+      </Card>
+      <InlineError icon={<Icon name="triangle-alert" />} description="Проверьте соединение и повторите запрос." onRetry={() => undefined} />
+      <OfflineBanner icon={<Icon name="wifi-off" />}>Нет сети. Доступные данные остаются на экране.</OfflineBanner>
+      <EmptyState icon={<Icon name="calendar-plus" />} title="Пока ничего не запланировано" description="Добавьте первую практику — она появится здесь." actionLabel="Добавить" onAction={() => undefined} />
+    </section>
 
-      <section id="actions" className={styles.section} aria-labelledby="actions-title">
-        <div className={styles.sectionHeading}><span>02</span><div><h2 id="actions-title">Действия</h2><p>Primary, secondary, ghost, danger, размеры и обязательные состояния.</p></div></div>
-        <Card className={styles.demoCard}>
-          <div className={styles.row}>
-            <Button leadingIcon={<Icon name="play" />}>Начать тренировку</Button>
-            <Button variant="secondary" leadingIcon={<Icon name="bookmark" />}>Сохранить</Button>
-            <Button variant="ghost">Подробнее</Button>
-            <Button variant="danger" leadingIcon={<Icon name="trash-2" />}>Удалить</Button>
-          </div>
-          <div className={styles.row}>
-            <Button size="sm">Small</Button><Button size="md">Medium</Button><Button size="lg">Large</Button>
-          </div>
-          <div className={styles.row}>
-            <Button loading={loading} onClick={simulateLoading}>Сохранить изменения</Button>
-            <Button disabled>Недоступно</Button>
-            <IconButton label="Добавить в избранное" icon={<Icon name="heart" />} onClick={() => setMessage("Добавлено в избранное")} />
-            <IconButton label="Удалить элемент" variant="danger" icon={<Icon name="trash-2" />} onClick={() => setMessage("Нажата destructive icon action")} />
-          </div>
-        </Card>
-      </section>
+    <section className={styles.section}>
+      <h2>Navigation</h2>
+      <Tabbar top labels icons className={styles.tabbar}>{[["home", "house", "Главная"], ["workouts", "dumbbell", "Йога"], ["rhythm", "leaf", "Ритм"]].map(([id, icon, label]) => <TabbarLink key={id} active={active === id} component="button" linkProps={{ type: "button" }} icon={<Icon name={icon!} />} label={label} onClick={() => setActive(id!)} />)}</Tabbar>
+    </section>
 
-      <section className={styles.section} aria-labelledby="surfaces-title">
-        <div className={styles.sectionHeading}><span>03</span><div><h2 id="surfaces-title">Поверхности и данные</h2><p>Карточки, статусы и прогресс для контента разной плотности.</p></div></div>
-        <div className={styles.cardGrid}>
-          <Card><Badge>Базовая</Badge><h3>Мягкая поверхность</h3><p>Основной контейнер для связанного контента.</p></Card>
-          <Card tone="subtle"><Badge tone="info">Новая</Badge><h3>Спокойный акцент</h3><p>Выделяет блок, не конкурируя с главным действием.</p></Card>
-          <Card tone="accent"><Badge tone="neutral">Сегодня</Badge><h3>Йога для спины</h3><p>24 минуты · лёгкая интенсивность</p></Card>
-        </div>
-        <Card className={styles.demoCard}>
-          <div className={styles.badges}><Badge>Черновик</Badge><Badge tone="success">Готово</Badge><Badge tone="warning">Нужна пауза</Badge><Badge tone="danger">Ошибка</Badge><Badge tone="info">Информация</Badge></div>
-          <Progress value={progress} label="Недельная цель" showValue />
-          <div className={styles.row}><Button size="sm" variant="secondary" onClick={() => setProgress(Math.max(0, progress - 10))}>− 10%</Button><Button size="sm" variant="secondary" onClick={() => setProgress(Math.min(100, progress + 10))}>+ 10%</Button></div>
-        </Card>
-      </section>
-
-      <section className={styles.section} aria-labelledby="navigation-title">
-        <div className={styles.sectionHeading}><span>04</span><div><h2 id="navigation-title">Навигация</h2><p>App header и нижняя навигация в контексте мобильного экрана.</p></div></div>
-        <div className={styles.phone}>
-          <AppHeader eyebrow="Добрый вечер" title="Ваш ритм" subtitle="Понедельник, 13 июля" leading={<Image src="/brand/flowly-icon.svg" alt="" width={44} height={44} />} trailing={<IconButton label="Открыть профиль" icon={<Icon name="user" />} />} />
-          <div className={styles.phoneBody}>
-            <Badge tone="success">План на сегодня</Badge><h3>{navItems.find(item => item.id === activeNav)?.label}</h3><p>Выберите другой раздел в нижней навигации.</p>
-            <Card tone="subtle"><Progress value={3} max={5} label="Тренировки на неделе" showValue /></Card>
-          </div>
-          <BottomNavigation items={navItems} activeId={activeNav} onNavigate={id => { setActiveNav(id); setMessage(`Открыт раздел «${navItems.find(item => item.id === id)?.label}»`); }} />
-        </div>
-      </section>
-
-      <section className={styles.section} aria-labelledby="feedback-title">
-        <div className={styles.sectionHeading}><span>05</span><div><h2 id="feedback-title">Состояния и обратная связь</h2><p>Loading, empty, error и offline не проектируются заново на каждом экране.</p></div></div>
-        <div className={styles.feedbackGrid}>
-          <Card className={styles.skeletonDemo}><Badge>Loading</Badge><Skeleton height="hero" /><Skeleton /><Skeleton /></Card>
-          <EmptyState icon={<Icon name="calendar-plus" />} title="Пока ничего не запланировано" description="Добавьте первую тренировку — она появится здесь." actionLabel="Добавить тренировку" onAction={() => setMessage("Empty state action нажата")} />
-        </div>
-        <div className={styles.feedbackStack}>
-          <InlineError icon={<Icon name="triangle-alert" />} description="Проверьте соединение и попробуйте ещё раз." onRetry={() => setMessage("Повторная загрузка запущена")} />
-          <OfflineBanner icon={<Icon name="wifi-off" />} actionLabel="Подробнее" onAction={() => setMessage("Открыта информация об offline-режиме")}>Нет сети. Изменения сохранятся на устройстве.</OfflineBanner>
-        </div>
-      </section>
-    </main>
-
-    <footer className={styles.footer}><Image src="/brand/flowly-icon.svg" alt="" width={36} height={36} /><span><strong>Flowly UI Kit</strong><small>Foundation for approved product screens</small></span></footer>
-  </div>;
+    <Sheet opened={sheet} onBackdropClick={() => setSheet(false)} className={styles.sheet}><div className={styles.sheetHandle} /><h2>Фильтры</h2><p>Konsta Sheet сохраняет iOS-геометрию, Flowly отвечает только за содержимое.</p><div className={styles.row}><Chip>Для спины</Chip><Chip outline>Вечер</Chip></div><Button large rounded onClick={() => setSheet(false)}>Готово</Button></Sheet>
+  </main>;
 }

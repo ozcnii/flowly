@@ -1,8 +1,9 @@
 "use client";
 
+import { Button, Card, Preloader } from "konsta/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button, Icon } from "@flowly/ui";
+import { Icon } from "@flowly/ui";
 import styles from "./deep-link-recovery-screen.module.css";
 
 /**
@@ -72,7 +73,7 @@ export function DeepLinkRecoveryScreen({ variant = "unavailable" }: { variant?: 
 
   return (
     <div className={`safe-shell flow-screen ${styles.screen}`} role="alert">
-      <div className={styles.card}>
+      <Card contentWrap={false} outline className={styles.card}>
         <span className={styles.badge} aria-hidden="true">
           <Icon name={v.icon} />
         </span>
@@ -80,23 +81,14 @@ export function DeepLinkRecoveryScreen({ variant = "unavailable" }: { variant?: 
         <p className={styles.reason}>{v.reason}</p>
 
         <div className={styles.actions}>
-          <Button
-            className={styles.primary}
-            leadingIcon={<Icon name={v.primary.icon} />}
-            loading={reauth}
-            onClick={onPrimary}
-          >
-            {v.primary.label}
-          </Button>
-          <Button variant="ghost" leadingIcon={<Icon name={v.secondary.icon} />} onClick={onSecondary}>
-            {v.secondary.label}
-          </Button>
+          <Button large rounded className={styles.primary} disabled={reauth} aria-busy={reauth || undefined} onClick={onPrimary}>{reauth ? <Preloader /> : <Icon name={v.primary.icon} />}{v.primary.label}</Button>
+          <Button large rounded clear onClick={onSecondary}><Icon name={v.secondary.icon} />{v.secondary.label}</Button>
         </div>
 
         <p className={styles.notice} aria-live="polite">
           {notice || "Личные данные открываются только после успешной проверки доступа."}
         </p>
-      </div>
+      </Card>
     </div>
   );
 }

@@ -62,7 +62,7 @@
 
 - **Статус:** approved
 - **Дата:** 2026-07-13
-- **Решение:** нижняя навигация содержит ровно пять вкладок PRD; профиль открывается avatar с Главной. Bot links ведут в точную цель, `/app` — на Главную, `/help` — в справку. Недоступная цель показывает безопасную причину, recovery/auth при необходимости и релевантный выход.
+- **Решение:** нижняя навигация содержит ровно пять вкладок PRD; профиль открывается avatar с Главной. Bot links ведут в точную цель, `/app` — на Главную. Недоступная цель показывает безопасную причину, recovery/auth при необходимости и релевантный выход. Прежний `/help` → S-MA-096 contract удалён по DEC-041.
 - **Основание:** подтверждено пользователем на UX-workshop E0-D0-T01.
 - **PRD:** §9–10, §32, §36.
 - **Влияет на:** E0-D0-T01–T06; E1-D1-T02/T06/T09; E5-D6-T02/T08; E7-D8-T01; E8-D9-T01/T02/T05/T08.
@@ -269,15 +269,107 @@
 
 - **Статус:** approved
 - **Дата:** 2026-07-15
-- **Решение:** весь текущий и будущий production frontend Flowly обязан использовать pinned `konsta@5.2.0` (`konsta/react`) как базовую component/design library. Активная тема всегда `ios`; typography переводится на системный iOS font stack; Flowly sage/sand semantic colors сохраняются через Tailwind v4 `@theme` и Konsta color contract. Прямые Konsta imports в `apps/web` являются default. Если Konsta предоставляет подходящий component/primitive, его нельзя дублировать raw HTML + локальным CSS или wrapper-компонентом.
-- **`packages/ui` contract:** package допустим только для действительно Flowly-specific wrappers/composites или обязательного контракта, отсутствующего в Konsta. После полного migration audit неиспользуемые legacy exports удаляются. Если package становится пустым, удалить `packages/ui`, workspace/dependency references и `/ui-kit`; если wrappers остаются, `/ui-kit` сохраняется только как их интерактивная gallery.
-- **Migration contract:** E0-D0-T05 обновляет все текущие route-accessible product screens, onboarding/auth/recovery/web-fallback states, overlays, shell и navigation одним implementation pass непосредственно в production code — без отдельного spike и без промежуточного user approval каждого screen. User review проводится один раз после полного browser/behavior/accessibility verification pass. Это явное исключение из per-screen approval DEC-024 только для E0-D0-T05; дальнейшие feature slices снова следуют DEC-024.
-- **Сохраняемые инварианты:** product behavior, routes, React Query/API contracts, Telegram auth/onboarding, persistent shell и официальная additive safe-area model DEC-032 не меняются; DEC-028 quality gate остаётся обязательным. DEC-033 geometry/consistency constraints сохраняются, но Konsta становится first source для repeated UI atoms, а legacy `.flow-*`/custom tokens остаются только там, где после audit доказана необходимость app-specific shell/domain layout.
-- **Основание:** пользователь отклонил отдельный prototype и явно выбрал прямую полную миграцию проекта на Konsta, wrappers только при необходимости, удаление пустого `packages/ui` и `/ui-kit`, batch implementation, системную iOS-типографику и обязательное правило в `AGENTS.md` использовать эту библиотеку всегда.
+- **Решение:** весь текущий и будущий production frontend Flowly обязан использовать pinned `konsta@5.2.0` (`konsta/react`) как единственную базовую component/design library. Активная тема всегда `ios`; typography переводится на системный iOS font stack; Flowly sage/sand semantic colors сохраняются через Tailwind v4 `@theme` и Konsta color contract. Каждый standard visual/interactive element (controls, fields, cards/surfaces, lists, feedback, navigation, titles/group labels) использует прямой Konsta component, если он существует. Raw interactive HTML и visual `<div>`/`<span>` + CSS аналоги запрещены; structural semantic/layout HTML допускается только без дублирования visual contract.
+- **`packages/ui`/legacy contract:** migration удаляет все usages и implementations `packages/ui`, app-local wrappers, `.flow-*`/custom CSS, которые дублируют Konsta; запрещено сохранять их временно, оборачивать legacy API или имитировать Konsta CSS-ом. Любой Flowly-specific composite либо отсутствующий icon/control contract требует до реализации явного user approval, отдельной DEC-записи, code comment с DEC-ID и evidence отсутствия Konsta equivalent. Если package становится пустым, удалить `packages/ui`, workspace/dependency references и `/ui-kit`; approved composites, если останутся, представлены только в их gallery.
+- **Migration contract:** E0-D0-T05 обновляет все текущие route-accessible product screens, onboarding/auth/recovery/web-fallback states, overlays, shell и navigation одним implementation pass непосредственно в production code — без отдельного spike и без промежуточного user approval каждого screen. Любой user signal о лишнем CSS/wrapper или отличии от documented Konsta behavior запускает полный code-first audit затронутого component family: exact official composition восстанавливается, а дублирующие CSS Modules/global selectors/local visual wrappers/decorative layers удаляются целиком вместо точечного patch. User review проводится один раз после полного browser/behavior/accessibility verification pass. Это явное исключение из per-screen approval DEC-024 только для E0-D0-T05; дальнейшие feature slices снова следуют DEC-024.
+- **Сохраняемые инварианты:** product behavior, routes, React Query/API contracts, Telegram auth/onboarding, persistent shell и официальная additive safe-area model DEC-032 не меняются; DEC-028 quality gate остаётся обязательным. DEC-033 geometry/consistency constraints сохраняются, но Konsta становится first/final source для repeated UI atoms, а legacy CSS остаётся только как доказанный minimum app-specific shell/domain layout.
+- **Apple HIG contract:** каждый screen/control проходит explicit iOS review: один primary action, семантически правильный single/multiple selection control, targets ≥44×44pt, safe-area, system typography/text scaling, contrast, non-color state cues, predictable Back/Cancel/Done, concise labels и density без CTA-like option rows. Любой control с icon + label явно задаёт consistent 8pt gap через component utility/API; Konsta 5.2.0 не добавляет такой gap автоматически, соприкосновение icon/text запрещено. Evidence содержит raw HTML/packages-ui/CSS audits, per-control enabled/pressed/selected/focus/disabled/loading/error matrix и browser 360/390/430 light/dark. User review запрещён при любом standard element вне Konsta или необоснованном visual wrapper/CSS.
+- **Основание:** пользователь отклонил отдельный prototype и явно выбрал прямую полную миграцию проекта на Konsta, wrappers только при необходимости, удаление пустого `packages/ui` и `/ui-kit`, batch implementation, системную iOS-типографику и обязательное правило в `AGENTS.md` использовать эту библиотеку всегда. Затем пользователь ужесточил contract: абсолютно все available visual elements брать из Konsta, legacy/package UI удалять, DOM/CSS сводить к minimum, любые исключения согласовывать заранее и каждый element проверять по Apple standards.
 - **Plan:** `.temp/E0-D0-T05/plan.md`.
 - **PRD:** §9–40, §41.3, §55.
 - **Влияет на:** E0-D0-T05; все current/future UI-bearing cards; `apps/web/**`; `packages/ui/**`; `apps/web/app/ui-kit/**`; `AGENTS.md`; `docs/design/FRONTEND_REVIEW.md`; roadmap/HANDOFF.
 - **Заменяет:** DEC-023 как active visual/typography foundation и DEC-025 как mandatory custom `packages/ui`/`/ui-kit` gate.
+
+### DEC-036 — Compact Konsta-first onboarding review внутри E0-D0-T05
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** onboarding S-MA-002–005 ревьюится и улучшается точечно внутри активной E0-D0-T05 до продолжения broad migration; отдельная E1-D1-T14 и отдельный plan file не используются. Standalone Flowly icon overlay удаляется с hero S-MA-002. `Начать` ведёт в preferences, clear-action `Пропустить` сразу ведёт к обязательному Telegram gate. S-MA-003 остаётся одним compact scroll-screen: timezone — Konsta Sheet + Searchbar + grouped List; week start — 2-option Segmented; duration — 4-option Segmented; interests — compact multi-select options с non-color selected cue; weekdays — compact 7-day grid с target ≥44px и accessibility labels; convenient time — три equal options с icon+label, explicit 8pt gap и `aria-pressed`; safe-area-aware footer находится в document flow, содержит primary `Далее` и clear `Пропустить` и не перекрывает controls. S-MA-004 сохраняет обе видимые disabled capabilities по явному решению пользователя, но layout можно радикально менять под HIG. S-MA-005 сохраняет mandatory Telegram gate; technical copy удаляется.
+- **UX/HIG основание:** один primary visual/action focus; correct single/multiple selection semantics; minimum 44×44pt targets; selected state не кодируется только цветом; predictable skip/gate behavior; меньше scroll и CTA-like option rows; disabled controls явно объясняют будущую доступность и не имитируют mutation.
+- **Основание:** пользователь сначала выбрал compact preferences follow-up, затем остановил broad migration и явно решил выполнить onboarding-review сейчас внутри E0-D0-T05 без отдельного plan file; дополнительно утвердил `Пропустить к gate`, сохранение disabled capabilities и разрешил радикально менять композицию ради Apple HIG.
+- **PRD:** §10.1, §40, §55.1.
+- **Влияет на:** E0-D0-T05, S-MA-002–005, `apps/web/features/onboarding/ui/**`, roadmap/HANDOFF.
+
+### DEC-037 — Lucide artwork для Konsta Icon contract
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** Konsta UI предоставляет `Icon` layout/container, но не поставляет icon artwork. Разрешён существующий локальный versioned Lucide SVG sprite `/icons/lucide.svg` через единственный минимальный `packages/ui/Icon` composite. Другие icon sources и app-local icon wrappers запрещены без нового approval. Composite не меняет Konsta control anatomy, SVG всегда decorative (`aria-hidden`, `focusable=false`), accessible name принадлежит control.
+- **Основание:** source audit Konsta 5.2.0 подтвердил отсутствие bundled icon artwork; пользователь явно выбрал «Разрешить Lucide» после обязательного вопроса по AGENTS.md.
+- **PRD:** §40, §55.1.
+- **Влияет на:** E0-D0-T05, `packages/ui/src/icon.tsx`, `/icons/lucide.svg`, все Konsta controls с icon artwork, `/ui-kit`.
+
+### DEC-038 — Konsta Preloader для loading state Главной
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** в S-MA-010 loading state использовать прямой Konsta `Preloader`, не сохранять и не создавать custom `Skeleton`. Это явное точечное отклонение от DEC-022 requirement «loading использует skeleton» для Главной ради strict DEC-035 Konsta-only contract; другие screen slices не наследуют исключение автоматически.
+- **Основание:** source/export audit подтвердил, что Konsta UI 5.2.0 не содержит Skeleton. На обязательном вопросе пользователь явно выбрал «Использовать Preloader», отклонив approved custom Skeleton exception.
+- **PRD:** §11, §40.2, §55.1.
+- **Влияет на:** E0-D0-T05, S-MA-010, `apps/web/features/home/ui/home-screen.tsx`, DEC-022 implementation semantics только для Главной.
+
+### DEC-039 — Сокращённый состав Главной
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** S-MA-010 не показывает дату над приветствием, отдельный модуль «Категории йоги» и секцию «Ещё для вас» целиком. Вместе с «Ещё для вас» с Главной удаляются недельный прогресс, простые рекомендации, friend activity и отдельный recommendation module-error state. Главная сохраняет приветствие, прогресс дня, ближайшее действие, быстрый запуск, текущую программу, привычки, contextual offline/resume/loading/empty states и persistent navigation. Категории остаются данными/фильтром каталога S-MA-020, но не Home-модулем.
+- **Основание:** пользователь явно указал, что дата, категории и «Ещё для вас» на Главной не нужны, и поручил удалить их без замены.
+- **PRD:** supersedes состав Home в §11.1 для categories/weekly progress/recommendations/friend activity и Home-placement §11.3; catalog taxonomy сохраняется.
+- **Влияет на:** E0-D0-T05, S-MA-010, F02/F03 traceability, `apps/web/features/home/**`, `docs/PRD.md`, design flows/roadmap/HANDOFF.
+
+### DEC-040 — Круговой прогресс дня на Главной
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** S-MA-010 использует Home-only круговой индикатор прогресса дня с видимым процентом и accessible label. Это явное исключение из strict direct-Konsta contract DEC-035: Konsta UI 5.2.0 предоставляет только линейный `Progressbar` и не имеет circular progress. Реализация ограничена минимальным inline SVG `DayProgressRing` без CSS Module, external dependency или shared wrapper; цвет берётся только из Flowly semantic variables, значение clamp 0–100, процент является non-color cue. Остальной Home остаётся direct Konsta.
+- **Основание:** после показа двух вариантов пользователь явно выбрал «Custom круговой», понимая необходимость approved SVG/CSS exception.
+- **PRD:** §11.2, §40, §55.1.
+- **Влияет на:** E0-D0-T05, S-MA-010, `apps/web/features/home/ui/home-screen.tsx`, DEC-035 exception registry, roadmap/HANDOFF.
+
+### DEC-041 — Удалить Help и оставить будущие разделы профиля disabled
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** production route `/help`, S-MA-096, `HelpScreen` и весь profile entry/help-specific UI удаляются. `/help` исключается из минимальных bot commands и больше не имеет app target. Profile hub сохраняет только реальный переход в `/settings`; будущие Friends/Challenges/Favorites/Reports/Notifications/Export/Delete rows остаются видимыми, но не интерактивными, с явным non-color cue `Скоро`. Технические stage/preview notices запрещены. Profile header/identity/sections строятся direct Konsta `Navbar/List/ListItem/BlockTitle/Badge`, custom CSS module и отдельный oversized Edit CTA удаляются. Profile, Settings и все будущие internal child pages используют единый header contract: full-width `Navbar` вне page padding + icon-only `NavbarBackLink` с `aria-label="Назад"` в `left` + `Navbar.title`; back вызывает только `router.back()`, не содержит destination text и не ведёт на hardcoded route. Optional right action — только Konsta `Link/Icon`. `ListItem` с `linkComponent="button"` получает `contentClassName="w-full"` и `innerClassName="text-left"`, чтобы вся строка/chevron занимали доступную ширину без съезда subtitle; `linkProps.className` запрещён, поскольку перезаписывает Konsta anatomy. Settings UI использует direct Konsta grouped `List/ListInput/Segmented/Toggle/BlockFooter`; timezone picker вынесен в единый shared `@/components/timezone-picker` и переиспользуется onboarding/settings, дублирующие реализации и legacy `packages/ui` Select/TextField удаляются. Для pinned Konsta 5.2.0 `ListInput` используется `title=""`: upstream component иначе передаёт `title:null` в `cls()` и падает на `null.constructor`; workaround удаляется только после подтверждённого upstream fix.
+- **Основание:** пользователь явно поручил удалить `/help` и всё связанное, вернуть прежние неработающие разделы disabled и указал на визуальные проблемы native hierarchy/spacing текущего Profile.
+- **PRD:** supersedes `/help` в §36.2 и удаляет S-MA-096; §9 profile sections сохраняются как будущие disabled destinations до реальных mutations/routes.
+- **Влияет на:** DEC-013, E0-D0-T05, historical E1-D1-T10/E2-D2-T06/T07 evidence, S-MA-080, S-MA-096 (removed), F01/F11, stage 5 Telegram command scope, `apps/web/app/(app)/help/**`, `apps/web/features/profile/ui/**`, design flows/traceability, roadmap/HANDOFF.
+
+### DEC-042 — Неделя Flowly всегда начинается в понедельник
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** Flowly ориентирован на РФ; начало недели является фиксированным продуктовым инвариантом Monday (`weekStartsOn=1`). Пользовательский выбор начала недели удаляется из onboarding и Settings. Public `/api/v1/me` больше не экспонирует и не принимает `weekStartsOn`; новые и повторно авторизованные пользователи нормализуются к `1`. Колонка D1 временно сохраняется для совместимости схемы, но не является пользовательской настройкой.
+- **Основание:** пользователь явно указал, что для РФ выбор между понедельником и воскресеньем не имеет смысла и неделя должна всегда начинаться в понедельник.
+- **PRD:** уточняет locale/calendar contract §10.1 и profile settings §27.
+- **Влияет на:** E0-D0-T05, S-MA-003, S-MA-090, `/api/v1/me`, `users.week_starts_on`, onboarding/settings flow documentation, HANDOFF.
+
+### DEC-045 — Короткие display labels для Tabbar
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** persistent Tabbar показывает `Треки` для conceptual section/route «Программы» (`/programs`) и `Дневник` для conceptual section/route «Календарь» (`/calendar`). Routes, shared Navbar screen titles (`Программы`/`Календарь`), PRD domain names и semantics не меняются; это только compact mobile navigation labels и явное исключение из требования DEC-043 о буквальном совпадении Navbar title с Tabbar label. Остальные labels остаются `Главная / Йога / Ритм`. Custom width/padding fixes запрещены и удалены; active state полностью принадлежит documented Konsta `ToolbarPane/TabbarLink`.
+- **Основание:** полные labels выходили за native active highlight при пяти tabs; пользователь отклонил custom layout fixes и после раздельного выбора явно утвердил `Треки` и `Дневник`.
+- **PRD:** уточняет display labels основной навигации §9 без переименования разделов §20/§28.
+- **Влияет на:** E0-D0-T05, DEC-013/032/035, `apps/web/components/shell/app-shell.tsx`, roadmap/HANDOFF.
+
+### DEC-043 — Единая верхняя панель основных tab pages
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** exact top-level routes `/`, `/catalog`, `/programs`, `/rhythm`, `/calendar` используют один full-width direct Konsta `Navbar`, который рендерит shared `AppShell` вне page padding. На Home centered title показывает только Flowly name пользователя; прежний greeting/subtitle block удаляется. На остальных основных pages centered title совпадает с bottom tab: `Йога`, `Программы`, `Ритм`, `Календарь`. На всех пяти основных pages слева находится icon-only Settings action в `/settings`, справа — avatar/profile action в `/profile`; обе имеют accessible label и target ≥44px. Bottom Tabbar labels используют единый exact font-size 11px. Back запрещён на top-level pages и остаётся только у вложенных routes по DEC-041. Собственные raw headers и duplicate Chip/page labels на top-level pages удаляются; новые основные pages регистрируются в shared shell mapping.
+- **Основание:** пользователь потребовал унифицировать все верхние панели по Profile/Settings, назвать catalog `Йога`, убрать back с основных страниц, сначала оставить Home profile action, затем явно расширил contract: Settings слева и avatar/profile справа на каждой основной tab page.
+- **PRD:** уточняет shared shell/navigation §38 и production UI contract.
+- **Влияет на:** DEC-032, DEC-041, E0-D0-T05, S-MA-010, S-MA-020 и top-level placeholders Programs/Rhythm/Calendar, `AppShell`, `AppRouteShell`, AGENTS, HANDOFF.
+
+### DEC-044 — Persistence настроек профиля
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** autosave имени и timezone обязан вызывать typed `PATCH /api/v1/me` одинаково в local/dev и production. Weekly/monthly report toggles читаются из существующих `user_settings.weekly_report_enabled/monthly_report_enabled`, принимаются тем же PATCH и возвращаются в GET/PATCH/onboarding-complete response; локальный optimistic-only state запрещён. Theme остаётся device-local в `localStorage` и не расширяет backend schema/API.
+- **Основание:** canonical local repro подтвердил, что backend name/timezone работал, но Settings пропускал mutation вне production; report toggles были fake/local-only и противоречили D1. Пользователь выбрал исправить реальные баги, сохранив theme локальной настройкой устройства.
+- **PRD:** реализует §27 и §38.1 report/profile settings persistence без расширения theme contract.
+- **Влияет на:** E0-D0-T05, S-MA-003, S-MA-090, `/api/v1/me`, onboarding-complete response, `user_settings`, React Query `me` contract, HANDOFF.
 
 ## Открытые решения
 

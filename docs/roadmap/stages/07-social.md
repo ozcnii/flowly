@@ -21,7 +21,7 @@
 ## Обязательные подтверждённые contracts
 
 - По `DEC-024` каждый указанный `ui_slices` screen slice выполняется строго по одному ID в реальном `apps/web`; все states/интеракции и явный approval обязательны до следующего ID.
-- По `DEC-025` production UI-kit из `packages/ui` и его public API обязательны для всех screen slices; app-local дубли shared primitives запрещены.
+- По `DEC-035` Konsta UI 5.2.0 (`konsta/react`, `ios` theme) обязательна для current/future production UI; direct imports — default, `packages/ui` допустим только для Flowly-specific contracts, отсутствующих в Konsta.
 - Friend invite одноразовый/7 дней; reciprocal invite uses one pending relation; reject ≠ block; block reversible (`DEC-019`).
 - Shared object — read-only original; copy only explicit; progress/streak toggles; revoke immediate (`DEC-019`).
 - Joint participation requires acceptance; owner controls visibility/removal and must transfer ownership or end object before leaving (`DEC-019`, `DEC-020`).

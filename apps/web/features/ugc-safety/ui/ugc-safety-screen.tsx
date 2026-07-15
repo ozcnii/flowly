@@ -1,8 +1,9 @@
 "use client";
 
+import { Button, Card } from "konsta/react";
 import Link from "next/link";
 import { useState } from "react";
-import { Button, Icon } from "@flowly/ui";
+import { Icon, TextField } from "@flowly/ui";
 import styles from "./ugc-safety-screen.module.css";
 
 type Action = "report" | "hide" | "block";
@@ -45,14 +46,14 @@ export function UgcSafetyScreen({ action, forced = null }: Props) {
     {forced === "error" && <section className={styles.error} role="alert"><Icon name="triangle-alert" /><div><strong>Не удалось выполнить действие</strong><p>Проверьте соединение и попробуйте ещё раз. Введённая причина сохранена на экране.</p></div></section>}
     {done && <section className={styles.success} role="status"><Icon name="circle-check" /><div><strong>Готово</strong><p>{success[done]}</p></div></section>}
 
-    {!done && <section className={`flow-card ${styles.card}`}>
-      {mode === "report" ? <label className={styles.reason}>Причина жалобы<textarea value={reason} onBlur={() => setTouched(true)} onChange={(e) => setReason(e.target.value)} placeholder="Например: опасная инструкция, спам или неподходящий контент" aria-invalid={invalid || undefined} /></label> : <p>{mode === "hide" ? "Контент автора больше не будет попадаться в вашем каталоге." : "Автор не сможет взаимодействовать с вами через публичный контент Flowly."}</p>}
+    {!done && <Card contentWrap={false} outline className={styles.card}>
+      {mode === "report" ? <TextField multiline label="Причина жалобы" value={reason} onBlur={() => setTouched(true)} onChange={(e) => setReason(e.target.value)} placeholder="Например: опасная инструкция, спам или неподходящий контент" aria-invalid={invalid || undefined} /> : <p>{mode === "hide" ? "Контент автора больше не будет попадаться в вашем каталоге." : "Автор не сможет взаимодействовать с вами через публичный контент Flowly."}</p>}
       {invalid && <p className={styles.validation}>Добавьте причину минимум из 8 символов.</p>}
       <div className={styles.actions}>
-        <Button onClick={submit}>{mode === "report" ? "Отправить жалобу" : mode === "hide" ? "Скрыть" : "Заблокировать"}</Button>
+        <Button large rounded onClick={submit}>{mode === "report" ? "Отправить жалобу" : mode === "hide" ? "Скрыть" : "Заблокировать"}</Button>
         <Link className={styles.secondary} href={"/authors/user" as never}>Отмена</Link>
       </div>
-    </section>}
+    </Card>}
 
     <nav className={styles.switcher} aria-label="Другие действия">
       {(["report", "hide", "block"] as const).filter((x) => x !== mode).map((x) => <Link key={x} className={styles[`${x}Link`]} href={`/safety/${x}` as never}>{title[x]}</Link>)}

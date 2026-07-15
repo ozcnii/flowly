@@ -6,7 +6,7 @@ import { getDb } from "@/lib/cloudflare";
 import { isSafeOrigin } from "@/lib/auth/csrf";
 import { audit } from "@/lib/auth/http";
 import { getSessionUserId } from "@/lib/auth/session-user";
-import { getUser, publicUser } from "@/lib/auth/users";
+import { getReportSettings, getUser, publicUser } from "@/lib/auth/users";
 
 export async function POST(request: Request) {
   if (!isSafeOrigin(request)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
@@ -21,5 +21,5 @@ export async function POST(request: Request) {
     user = await getUser(db, userId);
   }
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  return NextResponse.json({ user: publicUser(user) });
+  return NextResponse.json({ user: publicUser(user), settings: await getReportSettings(db, userId) });
 }

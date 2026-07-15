@@ -1,49 +1,38 @@
 "use client";
 
+import { Badge, BlockTitle, Button, List, ListItem, Preloader } from "konsta/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button, Icon } from "@flowly/ui";
+import { Icon } from "@flowly/ui";
 import { useCompleteOnboardingMutation } from "@/features/profile/model/me-queries";
-import styles from "./bot-connection-screen.module.css";
 
 type BotPhase = "checking" | "linked" | "error";
 
-/** S-MA-005 — mandatory final gate backed by the validated Telegram session. */
+/** S-MA-005 — mandatory Telegram gate, Apple HIG/Konsta-first (DEC-036/037). */
 export function BotConnectionScreen() {
   const router = useRouter();
   const search = useSearchParams();
   const forced = process.env.NODE_ENV !== "production" ? search.get("bot") : null;
   const complete = useCompleteOnboardingMutation();
   const phase: BotPhase = forced === "checking" ? "checking" : forced === "error" || complete.isError ? "error" : "linked";
+  const finish = async () => { try { await complete.mutateAsync(); router.replace("/" as never); } catch { /* Mutation state keeps the retry action visible. */ } };
+  const copy = phase === "linked"
+    ? { title: "Telegram подключён", subtitle: "Вход подтверждён. Можно открыть Flowly.", icon: "check", badge: "Готово" }
+    : phase === "error"
+      ? { title: "Не удалось завершить", subtitle: "Настройки сохранены на экране. Попробуйте ещё раз.", icon: "triangle-alert", badge: "Ошибка" }
+      : { title: "Проверяем подключение", subtitle: "Это займёт несколько секунд.", icon: "loader-circle", badge: "Проверка" };
 
-  const finish = async () => {
-    try {
-      await complete.mutateAsync();
-      router.replace("/" as never);
-    } catch {
-      // Mutation state renders the retry UI and preserves this screen.
-    }
-  };
+  return <main className="safe-shell flow-screen gap-4">
+    <header className="grid gap-2">
+      <BlockTitle component="h1" large className="!m-0 !p-0">Связь с Telegram</BlockTitle>
+      <p className="m-0 leading-6 text-text-muted">Telegram нужен для безопасного входа и будущих напоминаний.</p>
+    </header>
 
-  return (
-    <div className={`safe-shell flow-screen ${styles.screen}`}>
-      <header className={styles.header}>
-        <p className={`flow-eyebrow ${styles.eyebrow}`}>Шаг 4 · Обязательный шаг</p>
-        <h1 className={`flow-title ${styles.title}`}>Telegram подтверждён</h1>
-        <p className={styles.text}>Flowly получил и проверил защищённые данные запуска Telegram. После завершения настройки откроется Главная.</p>
-      </header>
+    <List strong inset>
+      <ListItem media={phase === "checking" ? <Preloader /> : <Icon name={copy.icon} className={phase === "error" ? "text-danger" : undefined} />} title={copy.title} subtitle={copy.subtitle} after={<Badge colors={phase === "error" ? { bg: "bg-danger", text: "text-white" } : undefined}>{copy.badge}</Badge>} />
+    </List>
 
-      <section className={`${styles.card} ${styles[`card_${phase}`]}`} aria-live="polite">
-        <span className={styles.badge} aria-hidden="true"><Icon name={phase === "linked" ? "circle-check" : phase === "error" ? "triangle-alert" : "bot"} className={phase === "checking" ? styles.spin : undefined} /></span>
-        <div className={styles.body} role={phase === "error" ? "alert" : undefined}>
-          <h2 className={styles.status}>{phase === "linked" ? "Вход через Telegram подтверждён" : phase === "error" ? "Не удалось завершить настройку" : "Проверяем запуск…"}</h2>
-          <p className={styles.hint}>{phase === "linked" ? "Можно завершить знакомство с Flowly." : phase === "error" ? "Данные не потеряны. Повторите сохранение." : "Не закрывайте Flowly."}</p>
-        </div>
-      </section>
-
-      <div className={styles.actions}>
-        {phase === "checking" ? <Button className={styles.primary} loading disabled>Завершить</Button> : <Button className={styles.primary} leadingIcon={<Icon name={phase === "error" ? "refresh-cw" : "check"} />} onClick={finish} loading={complete.isPending}>{phase === "error" ? "Повторить" : "Завершить"}</Button>}
-      </div>
-      <p className={styles.notice}>{phase === "error" ? "Завершение ещё не сохранено." : "Этот шаг завершает onboarding и открывает приложение."}</p>
-    </div>
-  );
+    <footer className="mt-1 grid">
+      {phase === "checking" ? <Button large rounded disabled aria-busy><Preloader />Проверяем</Button> : <Button large rounded disabled={complete.isPending} aria-busy={complete.isPending || undefined} onClick={finish}>{complete.isPending && <Preloader />}{phase === "error" ? "Повторить" : "Открыть Flowly"}</Button>}
+    </footer>
+  </main>;
 }

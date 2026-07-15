@@ -1,6 +1,6 @@
 /** Minimal Telegram Mini App SDK types (injected by the Telegram WebView). */
 type TelegramSafeAreaInset = { top: number; right: number; bottom: number; left: number };
-type TelegramWebAppEvent = "safeAreaChanged" | "contentSafeAreaChanged" | "fullscreenChanged" | "viewportChanged" | "activated";
+type TelegramWebAppEvent = "safeAreaChanged" | "contentSafeAreaChanged" | "fullscreenChanged" | "viewportChanged" | "themeChanged" | "activated";
 
 interface TelegramWebApp {
   initData: string;

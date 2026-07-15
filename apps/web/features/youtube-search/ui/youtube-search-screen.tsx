@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { Button, Card, Link, Preloader, Searchbar } from "konsta/react";
+import NextLink from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Button, Icon, InlineError, Skeleton } from "@flowly/ui";
+import { Icon, InlineError, Skeleton } from "@flowly/ui";
 import type { YoutubeFilters, YoutubeResult } from "../model/youtube";
 import { useSaveYoutubeVideoMutation, useYoutubeSearchQuery } from "../model/youtube-queries";
 import styles from "./youtube-search-screen.module.css";
@@ -33,20 +34,20 @@ function ResultCard({ result, filters }: { result: YoutubeResult; filters: Youtu
     await save.mutateAsync({ result, filters });
     setSaved(true);
   };
-  return <article className={`flow-card ${styles.card}`}>
-    {result.thumbnailUrl && <a className={styles.thumb} href={result.watchUrl} target="_blank" rel="noreferrer" style={{ backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,.55)), url(${result.thumbnailUrl})` }} aria-label={`Открыть ${result.title} на YouTube`}><Icon name="play" /><span>{timecode(result.durationSeconds)}</span></a>}
+  return <Card component="article" contentWrap={false} outline className={styles.card}>
+    {result.thumbnailUrl && <Link className={styles.thumb} href={result.watchUrl} target="_blank" rel="noreferrer" style={{ backgroundImage: `linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,.55)), url(${result.thumbnailUrl})` }} aria-label={`Открыть ${result.title} на YouTube`}><Icon name="play" /><span>{timecode(result.durationSeconds)}</span></Link>}
     <div className={styles.details}>
       <div className={styles.cardTop}><span>YouTube</span><span>{minutes(result.durationSeconds)}</span></div>
       <h2>{result.title}</h2>
       <p className={styles.channel}>{result.channelTitle}</p>
       <p className={styles.videoMeta}>{[result.viewCountText, result.publishedText].filter(Boolean).join(" · ") || minutes(result.durationSeconds)}</p>
       <div className={styles.actions}>
-        <Button size="sm" variant={saved ? "secondary" : "primary"} loading={save.isPending} onClick={submit}>{saved ? "Сохранено" : "Сохранить"}</Button>
-        <a href={result.watchUrl} target="_blank" rel="noreferrer"><Icon name="external-link" />Смотреть</a>
+        <Button inline small rounded tonal={saved} disabled={save.isPending} aria-busy={save.isPending || undefined} onClick={submit}>{save.isPending && <Preloader />}{saved ? "Сохранено" : "Сохранить"}</Button>
+        <Link href={result.watchUrl} target="_blank" rel="noreferrer"><Icon name="external-link" />Смотреть</Link>
       </div>
       {save.isError && <p className={styles.error} role="alert">Не удалось сохранить. Повторите позже.</p>}
     </div>
-  </article>;
+  </Card>;
 }
 
 export function YoutubeSearchScreen({ filters = {}, forced = null }: Props) {
@@ -68,21 +69,18 @@ export function YoutubeSearchScreen({ filters = {}, forced = null }: Props) {
   const isError = forced === "error" || (!forcedMode && (query.isError || query.data?.cache === "unavailable"));
   const headline = labels.length ? labels.join(" · ") : "";
   return <div className={`flow-screen ${styles.screen}`}>
-    <Link className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Link>
+    <Button component={NextLink} inline clear small rounded className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Button>
     <header className={`flow-top ${styles.header}`}>
       <p className="flow-eyebrow">Поиск YouTube</p>
       <h1 className="flow-title">Видео-практики</h1>
     </header>
 
     <section className={styles.summary} aria-label="Параметры поиска">
-      <label className={styles.searchBox} aria-label="Что найти на YouTube">
-        <Icon name="search" />
-        <input value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="Например, йога для спины" autoCapitalize="sentences" />
-      </label>
+      <Searchbar className={styles.searchBox} value={searchInput} onInput={(event) => setSearchInput(event.target.value)} onClear={() => setSearchInput("")} placeholder="Например, йога для спины" aria-label="Что найти на YouTube" />
       {headline && <strong>{headline}</strong>}
       {warning && <p className={styles.warning}>{warning}</p>}
     </section>
 
-    {isLoading ? <Loading /> : isError ? <InlineError icon={<Icon name="triangle-alert" />} title="YouTube-поиск недоступен" description="Попробуйте позже или вернитесь в каталог Flowly. Введённые фильтры не сброшены." retryLabel="Повторить" onRetry={() => query.refetch()} /> : results.length === 0 ? <section className={styles.empty}><Icon name="search-x" /><h2 className="flow-section-title">Видео не найдены</h2><p>Попробуйте изменить категорию, длительность или сложность.</p><Link href={"/catalog" as never}>Вернуться в каталог</Link></section> : <div className={styles.list}>{results.map((result) => <ResultCard key={result.videoId} result={result} filters={searchFilters} />)}</div>}
+    {isLoading ? <Loading /> : isError ? <InlineError icon={<Icon name="triangle-alert" />} title="YouTube-поиск недоступен" description="Попробуйте позже или вернитесь в каталог Flowly. Введённые фильтры не сброшены." retryLabel="Повторить" onRetry={() => query.refetch()} /> : results.length === 0 ? <section className={styles.empty}><Icon name="search-x" /><h2 className="flow-section-title">Видео не найдены</h2><p>Попробуйте изменить категорию, длительность или сложность.</p><Button component={NextLink} tonal rounded href={"/catalog" as never}>Вернуться в каталог</Button></section> : <div className={styles.list}>{results.map((result) => <ResultCard key={result.videoId} result={result} filters={searchFilters} />)}</div>}
   </div>;
 }

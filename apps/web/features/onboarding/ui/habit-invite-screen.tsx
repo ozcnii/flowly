@@ -1,37 +1,28 @@
 "use client";
 
+import { Badge, BlockTitle, Button, List, ListItem } from "konsta/react";
 import { useRouter } from "next/navigation";
-import { Button, Icon } from "@flowly/ui";
-import styles from "./habit-invite-screen.module.css";
+import { Icon } from "@flowly/ui";
 
-/** S-MA-004 — deferred onboarding capabilities without fake mutations. */
+/** S-MA-004 — approved visible disabled capabilities, redesigned to Apple HIG/Konsta (DEC-036/037). */
 export function HabitInviteScreen() {
   const router = useRouter();
-  return (
-    <div className={`safe-shell flow-screen ${styles.screen}`}>
-      <header className={styles.header}>
-        <p className={`flow-eyebrow ${styles.eyebrow}`}>Шаг 3 · Возможности</p>
-        <h1 className={`flow-title ${styles.title}`}>Продолжим в вашем ритме</h1>
-        <p className={styles.text}>Привычки и приглашения появятся здесь вместе с полноценным сохранением. Сейчас ничего не создаём автоматически.</p>
-      </header>
+  return <main className="safe-shell flow-screen gap-4">
+    <header className="grid gap-2">
+      <BlockTitle component="h1" large className="!m-0 !p-0">Ещё больше в вашем ритме</BlockTitle>
+      <p className="m-0 leading-6 text-text-muted">Эти возможности появятся после обновления. Flowly ничего не создаст без вашего действия.</p>
+    </header>
 
-      <section className={styles.group} aria-labelledby="habit-onboarding-title">
-        <h2 id="habit-onboarding-title" className={styles.label}>Первая привычка</h2>
-        <p className={styles.hint}>Скоро можно будет создать расписание и напоминания прямо во время знакомства.</p>
-        {/* TODO(E4-D5-T02): enable only with the real habit create mutation. */}
-        <Button variant="secondary" leadingIcon={<Icon name="leaf" />} disabled>Создать привычку</Button>
-      </section>
+    <List strong inset dividers>
+      <ListItem media={<Icon name="leaf" />} title="Первая привычка" subtitle="Расписание и мягкие напоминания" after={<Badge>Скоро</Badge>} />
+      <ListItem innerChildren={<Button large rounded tonal disabled className="gap-2"><Icon name="leaf" />Создать привычку</Button>} />
+    </List>
 
-      <section className={styles.group} aria-labelledby="invite-onboarding-title">
-        <h2 id="invite-onboarding-title" className={styles.label}>Пригласить друга</h2>
-        <p className={styles.hint}>Приглашение станет доступно вместе с безопасной одноразовой ссылкой.</p>
-        {/* TODO(E7-D8-T01): enable only with the real invite mutation. */}
-        <Button variant="secondary" leadingIcon={<Icon name="users" />} disabled>Пригласить друга</Button>
-      </section>
+    <List strong inset dividers>
+      <ListItem media={<Icon name="users" />} title="Пригласить друга" subtitle="Безопасная одноразовая ссылка" after={<Badge>Скоро</Badge>} />
+      <ListItem innerChildren={<Button large rounded tonal disabled className="gap-2"><Icon name="users" />Пригласить друга</Button>} />
+    </List>
 
-      <div className={styles.actions}>
-        <Button className={styles.primary} onClick={() => router.push("/onboarding/bot" as never)}>Продолжить</Button>
-      </div>
-    </div>
-  );
+    <footer className="mt-1 grid"><Button large rounded onClick={() => router.push("/onboarding/bot" as never)}>Продолжить</Button></footer>
+  </main>;
 }

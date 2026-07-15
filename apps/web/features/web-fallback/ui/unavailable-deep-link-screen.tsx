@@ -1,7 +1,8 @@
 "use client";
 
+import { Button, Card } from "konsta/react";
 import { useState } from "react";
-import { Button, Icon } from "@flowly/ui";
+import { Icon } from "@flowly/ui";
 import styles from "./unavailable-deep-link-screen.module.css";
 
 /**
@@ -21,7 +22,7 @@ export function UnavailableDeepLinkScreen() {
 
   return (
     <div className={`safe-shell flow-screen ${styles.screen}`} role="alert">
-      <div className={styles.card}>
+      <Card contentWrap={false} outline className={styles.card}>
         <span className={styles.badge} aria-hidden="true">
           <Icon name="external-link" />
         </span>
@@ -34,18 +35,14 @@ export function UnavailableDeepLinkScreen() {
         </p>
 
         <div className={styles.actions}>
-          <Button className={styles.primary} leadingIcon={<Icon name="external-link" />} onClick={openTelegram}>
-            Открыть в Telegram
-          </Button>
-          <Button variant="ghost" leadingIcon={<Icon name="circle-help" />} onClick={openTelegram}>
-            Справка
-          </Button>
+          <Button large rounded className={styles.primary} onClick={openTelegram}><Icon name="external-link" />Открыть в Telegram</Button>
+          <Button large rounded clear onClick={openTelegram}><Icon name="circle-help" />Справка</Button>
         </div>
 
         <p className={styles.notice} aria-live="polite">
           {notice || "Если ссылка не открывается, попросите отправить её заново или начните с Главной в Telegram."}
         </p>
-      </div>
+      </Card>
     </div>
   );
 }

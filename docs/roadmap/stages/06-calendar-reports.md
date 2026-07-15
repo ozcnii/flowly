@@ -21,7 +21,7 @@
 ## Обязательные подтверждённые contracts
 
 - По `DEC-024` каждый указанный `ui_slices` screen slice выполняется строго по одному ID в реальном `apps/web`; все states/интеракции и явный approval обязательны до следующего ID.
-- По `DEC-025` production UI-kit из `packages/ui` и его public API обязательны для всех screen slices; app-local дубли shared primitives запрещены.
+- По `DEC-035` Konsta UI 5.2.0 (`konsta/react`, `ios` theme) обязательна для current/future production UI; direct imports — default, `packages/ui` допустим только для Flowly-specific contracts, отсутствующих в Konsta.
 - Calendar correction предлагает только допустимые activity statuses, требует confirmation и сохраняет history (`DEC-015`, `DEC-017`).
 - Weekly report: Monday 09:00; monthly: first day 09:00; timezone пользователя; current period marked partial (`DEC-018`).
 - Share-card retention — 30 дней (`DEC-018`, supersedes `DEC-009`); bot links открывают exact report target (`DEC-013`).

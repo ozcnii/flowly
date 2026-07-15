@@ -1,92 +1,97 @@
 "use client";
 
+import { Badge, BlockTitle, Button, Card, List, ListItem, Preloader, Progressbar } from "konsta/react";
 import Image from "next/image";
-import Link from "next/link";
-import { useState, type CSSProperties } from "react";
-import { Badge, Button, Card, Icon, IconButton, InlineError, Progress, Skeleton } from "@flowly/ui";
+import NextLink from "next/link";
+import { useRouter } from "next/navigation";
+import { Icon } from "@flowly/ui";
 import type { HomeScenario } from "../model/home-scenario";
-import { useMeQuery } from "@/features/profile/model/me-queries";
 import type { HomeViewModel } from "../model/home-view-model";
-import styles from "./home-screen-v2.module.css";
 
 type Props = { data: HomeViewModel; scenario?: HomeScenario };
+const secondaryColors = { textIos: "text-accent dark:text-white", outlineBorderIos: "border-accent/40 dark:border-white/40", clearBgIos: "bg-transparent active:bg-accent/10 dark:active:bg-white/10" };
+const groupTitleColors = { groupTitleBgIos: "bg-surface-subtle", secondaryTextIos: "text-text-muted" };
 
 export function HomeScreen({ data, scenario = "base" }: Props) {
-  const [completedHabits, setCompletedHabits] = useState(() => new Set(data.habits.filter(item => item.done).map(item => item.id)));
-  const [recommendationState, setRecommendationState] = useState<"error" | "loading" | "ready">(scenario === "module-error" ? "error" : "ready");
-  const [notice, setNotice] = useState("");
-  const nextAction = data.plan.find(item => item.status === "current") ?? data.plan[0];
-  const offline = scenario === "offline";
-
+  const router = useRouter();
+  const nextAction = data.plan.find((item) => item.status === "current") ?? data.plan.find((item) => item.status === "upcoming");
   if (scenario === "loading") return <HomeLoading />;
-  if (scenario === "empty") return <HomeEmpty data={data} />;
+  if (scenario === "empty") return <HomeEmpty />;
 
-  const toggleHabit = (id: string, title: string) => setCompletedHabits(current => {
-    const next = new Set(current);
-    if (next.has(id)) next.delete(id); else next.add(id);
-    setNotice(`${title}: ${next.has(id) ? "выполнено" : "снова в плане"}${offline ? " · сохранено на устройстве" : ""}`);
-    return next;
-  });
+  return <div className="flow-screen flow-screen--wide">
+    {scenario === "offline" && <Card component="aside" outline role="status" header={<Badge>Офлайн</Badge>}><p className="m-0 text-sm text-text-muted">Показываем сохранённые данные. Действия, требующие сети, временно недоступны.</p></Card>}
 
-  const retryRecommendation = () => {
-    setRecommendationState("loading");
-    setNotice("Повторно загружаем рекомендации");
-    window.setTimeout(() => { setRecommendationState("ready"); setNotice("Рекомендации загружены"); }, 900);
-  };
-
-  return <div className={`flow-screen flow-screen--wide ${styles.root}`}>
-    <HomeIntro data={data} />
-
-    <Card as="section" tone={scenario === "resume" ? "accent" : "subtle"} className={`${styles.resumeStrip} ${scenario === "resume" ? styles.resumeActive : ""}`} aria-labelledby="resume-title">
-      <Image src={data.resume.image} alt="Мягкая практика для спины" width={120} height={90} priority />
-      <div><Badge tone="success">{scenario === "resume" ? "Можно продолжить" : "Checkpoint"}</Badge><h2 id="resume-title">Продолжить «{data.resume.title}»</h2><p>{scenario === "resume" ? "Сессия приостановлена · прогресс синхронизирован" : data.resume.meta}</p></div>
-      <IconButton label="Продолжить сохранённую тренировку" variant="secondary" icon={<Icon name="play" />} onClick={() => setNotice("Открываем сохранённую тренировку")} />
-    </Card>
-
-    <Card as="section" className={styles.progressCard} aria-labelledby="day-progress-title">
-      <div className={styles.progressRing} style={{ "--progress": `${data.progress.percent * 3.6}deg` } as CSSProperties}><span><strong>{data.progress.percent}%</strong><small>{data.progress.completed} из {data.progress.total}</small></span></div>
-      <div><p className={styles.eyebrow}>Сегодня</p><h2 id="day-progress-title" className="flow-section-title">Отличная работа!</h2><p>Ты на пути к гармонии</p>{nextAction && <small><Icon name={nextAction.icon} />Дальше: {nextAction.title} · {nextAction.meta.split(" · ")[0]}</small>}</div>
-    </Card>
-
-    <Button size="lg" className={styles.primaryAction} leadingIcon={<Icon name="play" />} onClick={() => setNotice(offline ? "Открываем сохранённую тренировку" : "Открываем быстрый старт тренировки")}>Начать тренировку</Button>
-
-    <section className={styles.section} aria-labelledby="habits-title">
-      <div className={styles.sectionHeading}><div><p className={styles.eyebrow}>Сегодня</p><h2 id="habits-title" className="flow-section-title">Привычки</h2></div>{offline ? <Badge tone="warning">Сохранится локально</Badge> : <Badge tone="success">{completedHabits.size}/{data.habits.length}</Badge>}</div>
-      <Card className={styles.habits}>{data.habits.map(item => {
-        const done = completedHabits.has(item.id);
-        return <div key={item.id}><span className={styles.habitIcon}><Icon name={item.id === "water" ? "heart" : item.id === "mindfulness" ? "leaf" : "sun"} /></span><span><strong>{item.title}</strong><small>{done ? "Выполнено" : item.meta}</small></span><IconButton className={styles.habitAction} label={`${done ? "Вернуть" : "Выполнить"}: ${item.title}`} variant={done ? "secondary" : "ghost"} icon={<Icon name={done ? "check" : "square"} />} onClick={() => toggleHabit(item.id, item.title)} /></div>;
-      })}</Card>
-    </section>
-
-    <section className={styles.section} aria-labelledby="program-title">
-      <div className={styles.sectionHeading}><div><p className={styles.eyebrow}>Текущая программа</p><h2 id="program-title" className="flow-section-title">{data.program.title}</h2></div><span>{data.program.meta}</span></div>
-      <Card className={styles.programCompact}><Badge tone="info">{data.program.percent}% пройдено</Badge><p>7 дней · 15–20 минут в день</p><Progress value={data.program.percent} label="Прогресс программы" /><Button size="sm" variant="secondary" onClick={() => setNotice("Открываем текущую программу")}>Открыть программу</Button></Card>
-    </section>
-
-    <section className={styles.more} aria-labelledby="more-title">
-      <div className={styles.sectionHeading}><div><p className={styles.eyebrow}>В своём ритме</p><h2 id="more-title" className="flow-section-title">Ещё для тебя</h2></div></div>
-      <div className={styles.moreGrid}>
-        <Card as="section" tone="subtle" className={styles.compactCard} aria-labelledby="week-title"><Badge>Эта неделя</Badge><h3 id="week-title">{data.week.completed} практики из {data.week.total}</h3><Progress value={data.week.completed} max={data.week.total} label="Практики за неделю" showValue /><p>Уверенный темп без перегрузки.</p></Card>
-        {recommendationState === "error" ? <InlineError title="Рекомендации временно недоступны" description="Остальная Главная продолжает работать." onRetry={retryRecommendation} icon={<Icon name="triangle-alert" />} /> : recommendationState === "loading" ? <Card className={styles.moduleLoading} aria-label="Загрузка рекомендаций"><Skeleton /><Skeleton height="card" /></Card> : <Card as="section" className={styles.compactCard} aria-labelledby="recommendation-title"><Badge tone="warning" icon={<Icon name="sparkles" />}>Рекомендация</Badge><h3 id="recommendation-title">{data.recommendation.title}</h3><p>{data.recommendation.meta}</p><small><Icon name="sun" />{data.recommendation.reason}</small><Button size="sm" variant="secondary" onClick={() => setNotice(`Открываем рекомендацию «${data.recommendation.title}»`)}>Посмотреть</Button></Card>}
+    {scenario === "resume" && <Card component="section" outline header={<Badge>Можно продолжить</Badge>} contentWrapPadding="p-3 grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 items-center">
+      <Image src={data.resume.image} alt="Мягкая практика для спины" width={72} height={72} priority className="h-[4.5rem] w-[4.5rem] rounded-xl object-cover" />
+      <div className="grid min-w-0 gap-2">
+        <BlockTitle component="h2" medium className="!m-0 !p-0">{data.resume.title}</BlockTitle>
+        <p className="m-0 text-sm text-text-muted">{data.resume.meta}</p>
+        <Button component={NextLink} href="/workouts/wo-back-soft-15" inline rounded outline colors={secondaryColors}>Открыть тренировку</Button>
       </div>
+    </Card>}
+
+    <Card component="section" outline contentWrap={false} aria-labelledby="day-progress-title">
+      <div className="grid gap-3 p-4">
+        <BlockTitle component="h2" className="!m-0 !p-0" id="day-progress-title">Твой прогресс на сегодня</BlockTitle>
+        <div className="grid grid-cols-[6rem_minmax(0,1fr)] items-center gap-4">
+          <DayProgressRing value={data.progress.percent} />
+          <div className="grid gap-1">
+            <strong className="text-lg">Хороший темп</strong>
+            <p className="m-0 text-sm leading-5 text-text-muted">{data.progress.completed} из {data.progress.total} выполнено · {data.progress.remaining} осталось</p>
+            <p className="m-0 text-xs leading-5 text-text-muted">{data.progress.partial} частично · {data.progress.noResponse ? `${data.progress.noResponse} без ответа` : "без ответа нет"}</p>
+          </div>
+        </div>
+      </div>
+      {nextAction && <List dividers className="m-0">
+        <ListItem link linkComponent="button" contentClassName="w-full text-left" linkProps={{ type: "button", onClick: () => router.push(nextAction.href as never) }} header="Ближайшее действие" title={nextAction.title} subtitle={nextAction.meta.split(" · ")[0]} after={<Badge>{nextAction.status === "current" ? "Сейчас" : "Далее"}</Badge>} />
+      </List>}
+    </Card>
+
+    <NextLink href="/programs" aria-label={`Открыть программу ${data.program.title}`} className="block text-inherit no-underline">
+      <Card outline header={<h2 className="m-0">Текущая программа</h2>} contentWrapPadding="p-4 grid gap-3">
+        <Image src={data.program.image} alt={`Практика программы «${data.program.title}»`} width={640} height={360} priority className="aspect-video w-full rounded-xl object-cover" />
+        <BlockTitle component="h3" medium className="!m-0 !p-0">{data.program.title}</BlockTitle>
+        <p className="m-0 text-sm text-text-muted">{data.program.meta} · 15–20 минут</p>
+        <Progressbar progress={data.program.percent / 100} aria-label={`Прогресс программы: ${data.program.percent}%`} />
+      </Card>
+    </NextLink>
+
+    <section aria-label="Привычки на сегодня">
+      <List strong inset dividers className="m-0">
+        <ListItem groupTitle colors={groupTitleColors} title={`Сегодняшние привычки · ${data.habits.filter((item) => item.done).length} из ${data.habits.length}`} />
+        {data.habits.map((item) => <ListItem key={item.id} media={<Icon name={item.icon} />} title={item.title} subtitle={item.meta} after={<><span className="sr-only">{item.done ? "Готово" : "Осталось"}</span><Icon name={item.done ? "circle-check" : "circle"} className={item.done ? "text-accent" : "text-text-muted"} /></>} />)}
+      </List>
     </section>
 
-    {notice && <p className={styles.notice} aria-live="polite">{notice}</p>}
+    <Button component={NextLink} href="/catalog" large rounded className="gap-2"><Icon name="play" />Начать тренировку</Button>
   </div>;
 }
 
-function HomeIntro({ data }: { data: HomeViewModel }) {
-  const me = useMeQuery();
-  const user = me.data?.user;
-  const [photoFailed, setPhotoFailed] = useState(false);
-  const photoUrl = user?.photoUrl && !photoFailed ? "/api/v1/me/photo" : null;
-  const date = new Intl.DateTimeFormat("ru-RU", { weekday: "long", day: "numeric", month: "long" }).format(new Date()).toUpperCase();
-  return <header className={`flow-top ${styles.intro}`}><div><p className="flow-eyebrow" suppressHydrationWarning>{date}</p><h1 className="flow-title">{user ? `Привет, ${user.firstName}!` : "Привет!"}</h1><span className="flow-subtitle">{data.subtitle}</span></div><Link href="/profile" className={styles.profileLink} aria-label="Открыть профиль">{photoUrl ? <Image src={photoUrl} alt="" width={44} height={44} unoptimized className={styles.profilePhoto} onError={() => setPhotoFailed(true)} /> : <Icon name="user-round" />}</Link></header>;
+/** DEC-040: approved Home-only circular progress; Konsta 5.2.0 has no circular equivalent. */
+function DayProgressRing({ value }: { value: number }) {
+  const progress = Math.max(0, Math.min(100, Math.round(value)));
+  return <div className="relative grid size-24 shrink-0 place-items-center" role="img" aria-label={`Прогресс дня: ${progress}%`}>
+    <svg viewBox="0 0 96 96" className="size-24 -rotate-90" aria-hidden="true" focusable="false">
+      <circle cx="48" cy="48" r="38" pathLength="100" fill="none" stroke="var(--color-surface-subtle)" strokeWidth="8" />
+      <circle cx="48" cy="48" r="38" pathLength="100" fill="none" stroke="var(--color-accent)" strokeWidth="8" strokeLinecap="round" strokeDasharray="100" strokeDashoffset={100 - progress} />
+    </svg>
+    <strong className="absolute text-xl">{progress}%</strong>
+  </div>;
 }
 
-function HomeLoading() { return <div className={`flow-screen flow-screen--wide ${styles.root} ${styles.loading}`} aria-busy="true"><p className="sr-only" role="status">Загружаем Главную</p><div className={styles.loadingIntro}><Skeleton /><Skeleton /></div><Card className={styles.loadingStrip}><Skeleton height="card" /><div><Skeleton /><Skeleton /></div></Card><Card className={styles.loadingProgress}><Skeleton className={styles.loadingCircle} /><div><Skeleton /><Skeleton /><Skeleton /></div></Card><div className={styles.loadingChips}><Skeleton /><Skeleton /><Skeleton /></div><section className={styles.section}><Skeleton /><Skeleton height="hero" /></section><section className={styles.section}><Skeleton /><Card className={styles.loadingHabits}><Skeleton /><Skeleton /><Skeleton /></Card></section></div>; }
+function HomeLoading() {
+  return <div className="flow-screen flow-screen--wide" aria-busy="true" role="status" aria-live="polite">
+    <Card component="section" outline header={<Badge>Сегодня</Badge>} contentWrapPadding="min-h-32 p-6 flex items-center justify-center gap-3"><Preloader /><p className="m-0">Собираем план на сегодня</p></Card>
+    <Card component="section" outline contentWrapPadding="min-h-24 p-5 flex items-center justify-center gap-3"><Preloader /><p className="m-0 text-sm text-text-muted">Загружаем программу и привычки</p></Card>
+  </div>;
+}
 
-function HomeEmpty({ data }: { data: HomeViewModel }) {
-  const [notice, setNotice] = useState("");
-  return <div className={`flow-screen flow-screen--wide ${styles.root}`}><HomeIntro data={data} /><Card as="section" tone="subtle" className={styles.emptyDay} aria-labelledby="empty-title"><span className={styles.emptyIcon}><Icon name="calendar-days" /></span><Badge>Свободный день</Badge><h2 id="empty-title">На сегодня ничего не запланировано</h2><p>Можно выбрать мягкую практику сейчас или добавить план на удобное время.</p><div className={styles.emptyActions}><Button leadingIcon={<Icon name="play" />} onClick={() => setNotice("Открываем каталог тренировок")}>Выбрать тренировку</Button><Button variant="secondary" leadingIcon={<Icon name="sparkles" />} onClick={() => setNotice("Открываем программы")}>Выбрать программу</Button><Button variant="ghost" leadingIcon={<Icon name="plus" />} onClick={() => setNotice("Создаём новую привычку")}>Добавить привычку</Button></div></Card>{notice && <p className={styles.notice} aria-live="polite">{notice}</p>}</div>;
+function HomeEmpty() {
+  return <div className="flow-screen flow-screen--wide"><Card component="section" outline header={<Badge>Свободный день</Badge>} contentWrapPadding="p-5 grid gap-4" aria-labelledby="empty-title">
+    <BlockTitle component="h2" large className="!m-0 !p-0" id="empty-title">На сегодня ничего не запланировано</BlockTitle>
+    <p className="m-0 text-sm text-text-muted">Выберите практику сейчас или откройте раздел, который хотите запланировать.</p>
+    <Button component={NextLink} href="/catalog" large rounded className="gap-2"><Icon name="play" />Выбрать тренировку</Button>
+    <Button component={NextLink} href="/programs" large rounded outline colors={secondaryColors}>Открыть программы</Button>
+    <Button component={NextLink} href="/rhythm" large rounded clear colors={secondaryColors}>Открыть Мой ритм</Button>
+  </Card></div>;
 }

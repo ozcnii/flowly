@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { Button, Card } from "konsta/react";
+import NextLink from "next/link";
 import { useMemo } from "react";
 import { Icon, InlineError, Skeleton } from "@flowly/ui";
 import type { CatalogWorkout } from "@/features/catalog/model/catalog";
@@ -24,14 +25,14 @@ const cover = (workout: CatalogWorkout) => workout.sourceType === "youtube" && w
 
 function WorkoutMiniCard({ workout }: { workout: CatalogWorkout }) {
   const image = cover(workout);
-  return <Link className={`flow-card ${styles.card}`} href={`/workouts/${encodeURIComponent(workout.id)}` as never}>
+  return <NextLink className={styles.cardLink} href={`/workouts/${encodeURIComponent(workout.id)}` as never}><Card contentWrap={false} outline className={styles.card}>
     {image && <span className={styles.cover} style={{ backgroundImage: `${workout.sourceType === "youtube" ? "linear-gradient(135deg, rgba(28,45,39,.08), rgba(28,45,39,.52)), " : ""}url(${image})` }}>{workout.sourceType === "youtube" && <Icon name="play" />}</span>}
     <span className={styles.cardBody}>
       <span className={styles.cardTop}>{minutes(workout.durationSeconds)} · {DIFFICULTY[workout.difficulty as keyof typeof DIFFICULTY] ?? workout.difficulty}</span>
       <strong>{workout.title}</strong>
       <small>{workout.categories.map((c) => c.name).slice(0, 2).join(" · ")}</small>
     </span>
-  </Link>;
+  </Card></NextLink>;
 }
 
 function Loading() {
@@ -45,21 +46,21 @@ export function AuthorProfileScreen({ source, forced = null }: Props) {
   const items = useMemo(() => forced === "empty" || forced === "blocked" ? [] : data?.workouts ?? [], [data, forced]);
 
   if (forced === "loading") return <Loading />;
-  if (forced === "error" || author.isError) return <div className={`flow-screen ${styles.screen}`}><Link className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Link><InlineError icon={<Icon name="triangle-alert" />} title="Не удалось загрузить автора" description="Повторите позже. Доступ к тренировкам не менялся." /></div>;
+  if (forced === "error" || author.isError) return <div className={`flow-screen ${styles.screen}`}><Button component={NextLink} inline clear small rounded className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Button><InlineError icon={<Icon name="triangle-alert" />} title="Не удалось загрузить автора" description="Повторите позже. Доступ к тренировкам не менялся." /></div>;
   if (!data && !forced) return <Loading />;
 
   return <div className={`flow-screen ${styles.screen}`}>
-    <Link className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Link>
+    <Button component={NextLink} inline clear small rounded className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Button>
     <header className={`flow-top ${styles.header}`}>
       <p className="flow-eyebrow">{SOURCE[src] ?? sourceTitle[src]}</p>
       <h1 className="flow-title">{sourceTitle[src]}</h1>
       <span className="flow-subtitle">{sourceDescription[src]}</span>
     </header>
 
-    <section className={styles.control} aria-label="Доступ к автору">
+    <Card component="section" contentWrap={false} outline className={styles.control} aria-label="Доступ к автору">
       {src === "flowly" ? <p>Flowly — системный источник. Его нельзя скрыть или заблокировать.</p> : src === "youtube" ? <p>YouTube-каналы можно будет скрывать после подключения поиска.</p> : forced === "blocked" ? <p>Автор скрыт. Разблокирование будет доступно позже.</p> : <p>Действия для пользовательского контента.</p>}
-      {src === "user" && <div className={styles.safetyLinks}><Link className={styles.reportLink} href={"/safety/report" as never}>Пожаловаться</Link><Link className={styles.hideLink} href={"/safety/hide" as never}>Скрыть</Link><Link className={styles.blockLink} href={"/safety/block" as never}>Заблокировать</Link></div>}
-    </section>
+      {src === "user" && <div className={styles.safetyLinks}><Button component={NextLink} clear rounded className={styles.reportLink} href={"/safety/report" as never}>Пожаловаться</Button><Button component={NextLink} tonal rounded className={styles.hideLink} href={"/safety/hide" as never}>Скрыть</Button><Button component={NextLink} outline rounded className={styles.blockLink} href={"/safety/block" as never}>Заблокировать</Button></div>}
+    </Card>
 
     <section className={styles.content}>
       <h2>Тренировки</h2>

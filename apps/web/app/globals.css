@@ -1,9 +1,9 @@
 @import "tailwindcss";
-@import "./fonts.css";
+@import "konsta/react/theme.css";
 
 @theme inline {
-  --font-sans: var(--primitive-font-family-sans);
-  --font-display: var(--primitive-font-family-display);
+  --color-brand-primary: #36584a;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
   --color-canvas: var(--color-canvas);
   --color-surface: var(--color-surface);
   --color-surface-raised: var(--color-surface-raised);
@@ -18,12 +18,19 @@
 }
 
 * { box-sizing: border-box; }
-html { min-width: 20rem; scroll-padding-bottom: var(--component-nav-reserve); background: var(--color-canvas); color: var(--color-text); }
+html { min-width: 320px; scroll-padding-bottom: var(--component-nav-reserve); background: var(--color-canvas); color: var(--color-text); }
 body { min-height: 100dvh; margin: 0; background: var(--color-canvas); color: var(--color-text); font-family: var(--primitive-font-family-sans); }
 button, a { touch-action: manipulation; }
-:focus-visible { outline: var(--primitive-border-focus) solid var(--color-focus); outline-offset: 3px; }
+.k-button.bg-primary,.k-badge.bg-primary { color: var(--color-on-accent); }
 
 :root {
+  --k-color-primary: var(--color-accent);
+  --color-ios-light-surface: #f7f6f2;
+  --color-ios-light-surface-1: #fffdf9;
+  --color-ios-light-surface-1-shade: #f0ede6;
+  --color-ios-light-surface-1-tint: #ffffff;
+  --color-ios-light-surface-2: #f0ede6;
+  --color-ios-light-surface-3: #ffffff;
   --flow-screen-max: 42rem;
   --flow-screen-wide: 52rem;
   --flow-screen-gutter: var(--primitive-space-5);
@@ -35,15 +42,24 @@ button, a { touch-action: manipulation; }
   --flow-top-min: var(--component-touch-min);
   --flow-card-gap: var(--primitive-space-3);
   --flow-card-pad: var(--primitive-space-4);
-  --flow-row-gap: var(--primitive-space-3);
-  --flow-row-pad-y: var(--primitive-space-3);
-  --flow-row-pad-x: var(--primitive-space-4);
-  --flow-row-min: 3.5rem;
   --flow-back-gap: var(--primitive-space-2);
   --flow-back-pad-x: var(--primitive-space-3);
-  --flow-avatar-md: 3.25rem;
-  --flow-avatar-lg: 3.5rem;
 }
+
+.dark {
+  --color-ios-dark-surface: #101713;
+  --color-ios-dark-surface-1: #18231e;
+  --color-ios-dark-surface-1-shade: #101713;
+  --color-ios-dark-surface-1-tint: #25372f;
+  --color-ios-dark-surface-2: #213029;
+  --color-ios-dark-surface-3: #25372f;
+}
+
+.k-card { margin: 0; }
+.k-button { min-height: var(--component-touch-min); font-family: inherit; }
+.k-button[aria-label]:has(> .fl-icon:only-child) { width: var(--component-touch-min); min-width: var(--component-touch-min); padding-inline: 0; }
+.flow-screen .k-list { margin: 0; }
+
 
 .flow-screen.flow-screen {
   display: flex;
@@ -78,10 +94,10 @@ button, a { touch-action: manipulation; }
   gap: var(--flow-back-gap);
   margin: 0;
   padding: 0 var(--flow-back-pad-x);
-  border: var(--primitive-border-thin) solid var(--color-border);
-  border-radius: var(--primitive-radius-md);
+  border: 0;
+  border-radius: var(--primitive-radius-full);
   background: transparent;
-  color: var(--color-text-muted);
+  color: var(--color-accent);
   font: inherit;
   font-size: var(--primitive-font-size-sm);
   cursor: pointer;
@@ -97,21 +113,6 @@ button, a { touch-action: manipulation; }
   display: grid;
   gap: var(--flow-card-gap);
   padding: var(--flow-card-pad);
-  border: var(--primitive-border-thin) solid var(--color-border);
-  border-radius: var(--primitive-radius-lg);
-  background: var(--color-surface);
-}
-
-.flow-list-row.flow-list-row {
-  display: grid;
-  align-items: center;
-  gap: var(--flow-row-gap);
-  min-height: var(--flow-row-min);
-  padding: var(--flow-row-pad-y) var(--flow-row-pad-x);
-  border: var(--primitive-border-thin) solid var(--color-border);
-  border-radius: var(--primitive-radius-md);
-  background: var(--color-surface);
-  color: var(--color-text);
 }
 
 .flow-eyebrow.flow-eyebrow {
@@ -125,8 +126,8 @@ button, a { touch-action: manipulation; }
 
 .flow-title.flow-title {
   margin: 0;
-  font: var(--primitive-font-weight-semibold) clamp(var(--primitive-font-size-3xl), 8vw, var(--primitive-font-size-4xl)) / var(--primitive-font-line-height-tight) var(--primitive-font-family-display);
-  letter-spacing: -0.025em;
+  font: var(--primitive-font-weight-bold) clamp(2rem, 8vw, 2.4rem) / 1.08 var(--primitive-font-family-sans);
+  letter-spacing: -0.035em;
 }
 
 .flow-subtitle.flow-subtitle,
@@ -139,8 +140,8 @@ button, a { touch-action: manipulation; }
 
 .flow-section-title.flow-section-title {
   margin: 0;
-  font: var(--primitive-font-weight-semibold) var(--primitive-font-size-2xl) / var(--primitive-font-line-height-tight) var(--primitive-font-family-display);
-  letter-spacing: -0.015em;
+  font: var(--primitive-font-weight-bold) 1.4rem / 1.15 var(--primitive-font-family-sans);
+  letter-spacing: -0.025em;
 }
 
 .flow-card-title.flow-card-title {
@@ -156,6 +157,7 @@ button, a { touch-action: manipulation; }
   font-size: var(--primitive-font-size-xs);
   line-height: var(--primitive-font-line-height-body);
 }
+
 
 .flow-status.flow-status {
   min-height: var(--primitive-space-5);
@@ -193,10 +195,6 @@ button, a { touch-action: manipulation; }
   padding-right: calc(var(--component-safe-area-right) + var(--flow-screen-gutter));
   padding-bottom: calc(var(--component-safe-area-bottom) + var(--flow-screen-pad-bottom));
   padding-left: calc(var(--component-safe-area-left) + var(--flow-screen-gutter));
-}
-
-.app-shell__main {
-  padding-bottom: var(--component-nav-reserve);
 }
 
 .safe-shell .flow-screen.flow-screen {

@@ -1,6 +1,6 @@
 # Frontend UI/UX review checklist
 
-Этот чеклист обязателен для каждого production frontend screen slice Flowly до показа пользователю. Он дополняет `DEC-028`, `DEC-024`, `DEC-025` и applies to any UI surface: экран, overlay, форма, карточка, список, состояние ошибки, empty state, runtime screen.
+Этот чеклист обязателен для каждого production frontend screen slice Flowly до показа пользователю. Он дополняет `DEC-028`, `DEC-024`, `DEC-033`, `DEC-035` и applies to any UI surface: экран, overlay, форма, карточка, список, состояние ошибки, empty state, runtime screen.
 
 ## Правило
 
@@ -35,6 +35,9 @@
 - [ ] Навигация не вызывает видимый full reload, re-auth flicker или повторный auth/error/loading screen при обычном переходе внутри app.
 - [ ] AuthGate не должен пересоздаваться на каждом product route, если пользователь уже внутри authenticated shell; session check не должен мигать UI.
 - [ ] Product routes — нормальные paths, не `?screen=...`/`?tab=...`; query params допустимы только для настоящего state (`q`, filters) или временных dev forced states.
+- [ ] Internal page header — full-width direct Konsta `Navbar` вне page-padding container; title задан через `Navbar.title`, optional right action через Konsta `Link/Icon`.
+- [ ] Back — icon-only `NavbarBackLink` в `left` с `aria-label="Назад"`, без destination text; вызывает history `router.back()`, а не hardcoded route.
+- [ ] Нет outer padding вокруг Navbar, custom header/title/back Button или CSS navbar imitation.
 - [ ] Back/cancel placement консистентен внутри раздела: не прыгать между верхом/низом без причины.
 - [ ] Если экран открыт из shared shell, back action не дублирует bottom nav и не нарушает ожидаемый history/back паттерн.
 - [ ] Для Next.js использовать nested `layout.tsx`/route groups там, где это предотвращает remount общего shell, повторную авторизацию и мигание.
@@ -42,7 +45,13 @@
 
 ## 4. Layout and spacing
 
-- [ ] Product screen uses approved Flowly primitives/tokens for repeated layout/typography atoms: `.flow-screen`, `.flow-top`, `.flow-back`, `.flow-eyebrow`, `.flow-title`, `.flow-subtitle`, `.flow-section-title`, `.flow-card-title`, `.flow-card`, `.flow-list-row` or equivalent approved shared component.
+- [ ] Каждый standard visual/interactive element использует прямой Konsta UI 5.2.0 (`konsta/react`) component с `ios` theme: controls, fields, cards, lists, feedback, navigation, titles/group labels; raw analog отсутствует.
+- [ ] Raw `<button>`, `<input>`, `<select>`, `<textarea>` = 0, кроме заранее approved DEC exceptions.
+- [ ] Нет visual `<div>`/`<span>` + CSS, имитирующих Konsta component; каждый оставшийся structural wrapper нужен для semantics/domain layout и не задаёт component anatomy.
+- [ ] Product screen использует Konsta как first/final source; shared Flowly CSS ограничен shell/safe-area/page geometry, brand bridge и domain layout, отсутствующими в Konsta.
+- [ ] DOM минимален: нет лишних wrapper layers, decorative spans и контейнеров без layout/semantic необходимости.
+- [ ] CSS не переопределяет Konsta anatomy/states/padding/radius/typography/colors/shadows/control sizing.
+- [ ] После user cleanup signal весь затронутый component family проверен code-first: official Konsta composition восстановлена, а неиспользуемые CSS Modules/global selectors/local visual wrappers/decorative layers удалены полностью, не точечно.
 - [ ] No arbitrary local values for repeated page padding, back placement, card/list spacing, colors, radii, avatar/icon sizes or semantic action colors.
 - [ ] Sibling screens in one shell have identical page edge/top/back geometry unless an approved exception is documented.
 - [ ] Back/cancel/navigation controls are content-width, not full-width, unless explicitly approved for a primary mobile action pattern.
@@ -87,6 +96,7 @@
 - [ ] Картинка есть только если это реальный asset/thumbnail, не fake icon pretending to be image.
 - [ ] Если картинки нет — layout не оставляет странную пустоту.
 - [ ] Card metadata не раздута: title + 2–4 ключевых атрибута максимум.
+- [ ] `ListItem` с `linkComponent="button"` сохраняет Konsta anatomy, занимает всю строку через `contentClassName="w-full"` и выравнивает title/subtitle через `innerClassName="text-left"`; `linkProps.className` не используется.
 - [ ] List item height/spacing consistent; соседние карточки выглядят как один паттерн.
 
 ## 8. Forms
@@ -111,11 +121,15 @@
 
 - [ ] Все интерактивные элементы доступны с keyboard.
 - [ ] Focus visible и не обрезан.
-- [ ] Touch targets ≥44px.
-- [ ] Иконки имеют label или являются decorative с `aria-hidden`.
-- [ ] Form fields имеют label.
+- [ ] Touch targets ≥44×44px/pt.
+- [ ] Каждая кнопка/control проверена в применимых enabled/pressed/selected/focus/disabled/loading/error states.
+- [ ] Single-select и multi-select используют правильный control/ARIA contract; option не выглядит как primary CTA.
+- [ ] Иконки имеют label или являются decorative с `aria-hidden`; icon source approved, если Konsta не предоставляет нужный contract.
+- [ ] Каждый control с icon + label явно задаёт consistent 8pt gap (`gap-2` или эквивалент component API); иконка не соприкасается с текстом ни в одном state/viewport.
+- [ ] Form fields имеют visible label, понятную value/error/help hierarchy и не теряют draft при retry.
 - [ ] Status messages используют `role=status`, `role=alert` или `aria-live`, где нужно.
-- [ ] Не используется один цвет как единственный носитель смысла.
+- [ ] Не используется один цвет как единственный носитель смысла; selected/error/success имеют shape/icon/text cue.
+- [ ] Apple HIG pass выполнен: один primary action, predictable Back/Cancel/Done, system typography/text scaling, readable contrast, safe-area и concise copy.
 
 ## 11. Responsive/theme checks
 
@@ -140,8 +154,12 @@
 
 ## 13. Project consistency
 
-- [ ] Используются approved tokens/components из `packages/ui`, если компонент уже есть.
-- [ ] Новый app-local компонент не маскируется под shared UI-kit.
+- [ ] Используются Konsta components напрямую; каждый `packages/ui`/local wrapper usage удалён либо связан с заранее approved DEC exception и code comment.
+- [ ] Нет local/custom wrapper, дублирующего существующий Konsta component; «временные» compatibility wrappers запрещены.
+- [ ] Legacy `packages/ui` implementations/usages и duplicate CSS удалены вместе, а не скрыты новым wrapper layer.
+- [ ] Если `packages/ui` пуст после audit, package/dependencies и `/ui-kit` удалены; если approved composites остались, `/ui-kit` проверяет только их.
+- [ ] Onboarding/Settings используют один shared `@/components/timezone-picker`; duplicate timezone Select/Sheet implementations и legacy `packages/ui` Select/TextField отсутствуют.
+- [ ] Для каждого исключения зафиксированы: отсутствующий Konsta equivalent, user approval, DEC-ID, минимальный DOM/CSS и отдельная verification evidence.
 - [ ] Визуальный язык совпадает с уже approved соседними экранами.
 - [ ] Route/dev forced states задокументированы в карточке/HANDOFF.
 - [ ] Evidence записан: URL, состояния, проверки, residual risks.
@@ -162,6 +180,13 @@ Browser:
 Commands:
 - npm run typecheck --workspace @flowly/web
 - npm run lint --workspace @flowly/web
+- raw interactive HTML audit: expected 0 or approved DEC exceptions
+- packages/ui usage/export audit: expected 0 or approved DEC exceptions
+- CSS/visual wrapper audit: every remainder justified by shell/safe-area/domain layout
+Control matrix:
+- button/icon/field/selection: enabled / pressed / selected / focus / disabled / loading / error as applicable
+Apple HIG:
+- hierarchy / primary action / 44pt / safe-area / system typography / contrast / non-color cues / Back-Cancel-Done
 Residual risks:
 - ...
 ```
@@ -178,7 +203,8 @@ Residual risks:
 - back/cancel placement скачет между экранами одного раздела;
 - sibling screens have different page gutter/top/back geometry or typography hierarchy without approved exception;
 - back/cancel/navigation control stretches full-width without approved exception;
-- repeated UI primitives use arbitrary local spacing/color/radius/font values instead of approved tokens/classes;
+- standard UI control/surface реализован без Konsta при наличии подходящего Konsta component;
+- repeated UI primitives use arbitrary local spacing/color/radius/font values instead of approved Konsta/theme/layout contracts;
 - mobile screen has compounded vertical margins or large empty slabs between main content blocks;
 - touch target <44px;
 - UI содержит служебный/roadmap/dev текст;

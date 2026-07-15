@@ -21,8 +21,8 @@
 ## Обязательные подтверждённые contracts
 
 - По `DEC-024` каждый указанный `ui_slices` screen slice выполняется строго по одному ID в реальном `apps/web`; все states/интеракции и явный approval обязательны до следующего ID.
-- По `DEC-025` production UI-kit из `packages/ui` и его public API обязательны для всех screen slices; app-local дубли shared primitives запрещены.
-- Bot/deep links открывают exact target с auth/access recovery; `/app` → Главная, `/help` → справка (`DEC-013`).
+- По `DEC-035` Konsta UI 5.2.0 (`konsta/react`, `ios` theme) обязательна для current/future production UI; direct imports — default, `packages/ui` допустим только для Flowly-specific contracts, отсутствующих в Konsta.
+- Bot/deep links открывают exact target с auth/access recovery; `/app` → Главная. `/help` command и S-MA-096 удалены по `DEC-041`.
 - Onboarding bot gate обязателен (`DEC-014`). Done/already-done/skip/rest terminal; snooze only defers current occurrence; Start hands off to workout without terminal mutation (`DEC-015`).
 - Quiet-hours delivery выполняется только пока актуальна; stale callbacks idempotently return current state; no response becomes only `no_response` (`DEC-015`).
 - Сообщения и Mini App states следуют [`docs/design/flows/`](../../design/flows/) и `DEC-022`.

@@ -13,10 +13,10 @@
 
 ## Entry points
 
-- Telegram Mini App launch → `S-MA-001`; bot `/app` → `S-MA-010`, `/today` → `S-MA-011`, `/help` → `S-MA-096`.
+- Telegram Mini App launch → `S-MA-001`; bot `/app` → `S-MA-010`, `/today` → `S-MA-011`; `/help` removed by DEC-041.
 - Reminder/report/invite/social/export notification → exact target after auth/access recheck; unavailable target → `S-MA-006` or `S-WEB-002`.
 - Outside production Telegram → `S-WEB-001`; local/test emulation is an environment capability, not a v1 user surface.
-- Persistent navigation has exactly five tabs; avatar on Home opens `S-MA-080`.
+- Persistent navigation has exactly five tabs with 11px labels (DEC-043). On every exact top-level tab route shared Konsta Navbar shows Settings on the left and avatar/Profile on the right; Home title is the Flowly name, other titles match tab labels (DEC-043).
 
 ## Families
 
@@ -25,7 +25,7 @@ The `Screens` cell is the canonical membership set for each family. The same pai
 
 | ID | Goal / preconditions / trigger | Happy path and mutation | Alternate, error, cancellation and terminal outcomes | Screens | Diagram |
 |---|---|---|---|---|---|
-| F01 | Enter/auth/onboard/deep-link. Telegram context or browser URL. | validate initData → real profile/timezone/preferences → disabled deferred habit/invite capabilities → mandatory validated-launch completion gate → target/Home; create session/profile/settings and durable completion marker | optional steps skipped; completion save retry; invalid auth/outside Telegram; inaccessible target gives safe reason/recovery/exit | S-MA-001–006,S-MA-082,S-MA-096,S-BOT-001–002,S-WEB-001–002 | [01](diagrams/01-onboarding-auth.md) |
+| F01 | Enter/auth/onboard/deep-link. Telegram context or browser URL. | validate initData → real profile/timezone/preferences → disabled deferred habit/invite capabilities → mandatory validated-launch completion gate → target/Home; create session/profile/settings and durable completion marker | optional steps skipped; completion save retry; invalid auth/outside Telegram; inaccessible target gives safe reason/recovery/exit | S-MA-001–006,S-MA-082,S-BOT-001–002,S-WEB-001–002 | [01](diagrams/01-onboarding-auth.md) |
 | F02 | Answer “what today?” after auth. | Home loads independent modules → open/complete/start/resume relevant action; occurrence/session changes reflected | module-level loading/error/retry; offline; completely empty day offers workout/program/habit; conflict routes to F04 | S-MA-010–012,S-MA-060,S-MA-070,S-BOT-002 | [02](diagrams/02-home-today.md) |
 | F03 | Find and inspect yoga content. | catalog/search/filter → workout/YouTube → favorite/open/create basis | empty filters; cache fallback; unavailable YouTube with retry/alternative; UGC report/hide/block; restricted detail recovery | S-MA-020–024,S-MA-088 | [03](diagrams/03-yoga-discovery.md) |
 | F04 | Explicitly execute and record workout. Detail is accessible; max one active session. | start → video/step/mixed → pause/resume → finish → explicit status → calendar | active conflict branches separately: continue current; close current only after explicit “не завершено”, then optionally start new; cancel new launch without mutation; app close saves open session; offline checkpoint/sync; real conflict shown; never more than one active session | S-MA-012,S-MA-022,S-MA-030–034,S-MA-072–073 | [04](diagrams/04-workout-execution.md) |

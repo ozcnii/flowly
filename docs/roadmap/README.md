@@ -6,10 +6,10 @@
 
 ## Текущий фокус
 
-- **Активный этап:** 2. Йога
-- **Активная задача:** нет задачи `in_progress`; E2-D2-T06 и E2-D2-T07 находятся в `review`.
-- **Следующее действие:** выбрать review/done для E2-D2-T06/E2-D2-T07 либо продолжить Piped provider work по явной команде пользователя. Этап 1 полностью `done`: E1-D1-T12 token rotation/webhook/auth recheck и E1-D1-T13 production onboarding подтверждены.
-- **UI workflow:** один screen slice + все применимые states/интеракции + обязательный frontend UI/UX quality pass по [`docs/design/FRONTEND_REVIEW.md`](../design/FRONTEND_REVIEW.md) до user review + явный approval (`DEC-024`, `DEC-028`); client API calls только через `@tanstack/react-query` (`DEC-029`)
+- **Активный этап:** 0. UX/UI-контракты (полная Konsta UI migration)
+- **Активная задача:** E0-D0-T05 (Перевести весь production frontend на Konsta UI) — `in_progress`.
+- **Следующее действие:** продолжить оставшиеся E0-D0-T05 surfaces и затем выполнить общий browser/state/safe-area matrix. Home review findings исправлены code-first; Tabbar использует official `Tabbar → ToolbarPane → TabbarLink` без custom visual CSS; onboarding S-MA-002–005 использует direct Konsta components, включая `Searchbar`, и больше не содержит CSS Modules/local visual wrappers. Home loading сохраняет approved Preloader-only DEC-038; DEC-039 удаляет с Home дату, categories и «Ещё для вас», не затрагивая catalog taxonomy; DEC-040 утверждает минимальный Home-only circular day progress exception и compact hierarchy из референса. Browser rerun последней cleanup-итерации отложен по явному указанию пользователя; static checks PASS.
+- **UI workflow:** Konsta UI 5.2.0 + `ios` theme обязательны всегда (`DEC-035`); E0-D0-T05 — approved one-batch exception к per-screen approval `DEC-024`; обязательный frontend UI/UX quality pass по [`docs/design/FRONTEND_REVIEW.md`](../design/FRONTEND_REVIEW.md) сохраняется (`DEC-028`); client API calls только через `@tanstack/react-query` (`DEC-029`)
 - **Блокеры:** открытые решения перечислены в [`DECISIONS.md`](DECISIONS.md)
 - **Контекст продолжения:** [`HANDOFF.md`](HANDOFF.md)
 
@@ -17,9 +17,9 @@
 
 | Этап | Статус | Backlog | In progress | Blocked | Review | Done | Файл |
 |---|---|---:|---:|---:|---:|---:|---|
-| 0. UX/UI-контракты | done | 0 | 0 | 0 | 0 | 5 | [`00-design.md`](stages/00-design.md) |
+| 0. UX/UI-контракты | in progress | 0 | 1 | 0 | 0 | 5 | [`00-design.md`](stages/00-design.md) |
 | 1. Основа | done | 0 | 0 | 0 | 0 | 13 | [`01-foundation.md`](stages/01-foundation.md) |
-| 2. Йога | in progress | 6 | 0 | 0 | 2 | 4 | [`02-yoga.md`](stages/02-yoga.md) |
+| 2. Йога | backlog | 6 | 0 | 0 | 0 | 6 | [`02-yoga.md`](stages/02-yoga.md) |
 | 3. Программы | backlog | 7 | 0 | 0 | 0 | 0 | [`03-programs.md`](stages/03-programs.md) |
 | 4. Мой ритм | backlog | 8 | 0 | 0 | 0 | 0 | [`04-my-rhythm.md`](stages/04-my-rhythm.md) |
 | 5. Telegram | backlog | 8 | 0 | 0 | 0 | 0 | [`05-telegram.md`](stages/05-telegram.md) |
@@ -27,7 +27,7 @@
 | 7. Социальные функции | backlog | 7 | 0 | 0 | 0 | 0 | [`07-social.md`](stages/07-social.md) |
 | 8. Стабилизация | backlog | 8 | 0 | 0 | 0 | 0 | [`08-stabilization.md`](stages/08-stabilization.md) |
 
-**Итого:** 52 backlog / 0 in progress / 0 blocked / 2 review / 22 done.
+**Итого:** 52 backlog / 1 in progress / 0 blocked / 0 review / 24 done.
 
 ## Зависимости этапов
 
@@ -35,9 +35,9 @@
 T00–T03: flows + wireframes + UI-kit requirements/reference
 E1-D1-T01: npm workspaces
   └── E1-D1-T02: Next.js shell
-        └── E1-D1-T11: approved production UI-kit
+        └── E1-D1-T11: historical custom production UI-kit
               └── E0-D0-T04: Главная S-MA-010 + states + approval
-              └── следующие screen slices внутри применимых feature cards
+                    └── E0-D0-T05: full Konsta UI migration of current frontend
 Этап 2: каталог + тренировки ── Этап 3: программы + program jobs
 Этап 4: привычки + occurrences ── Этап 5: Telegram ── Этап 6: calendar/reports
 Этапы 2–4 + permissions ── Этап 7: sharing/social
@@ -49,7 +49,7 @@ E1-D1-T01: npm workspaces
 - `DEC-012` superseded решением `DEC-024`: общего generated design package и единого pre-development approval больше нет.
 - T00–T03 сохраняются как нормативные references; production UI создаётся вручную в `apps/web` по одному screen slice.
 - Каждый screen slice включает применимые states/интеракции и требует явного approval до начала следующего; bootstrap E1-D1-T01/T02 разрешён заранее.
-- `DEC-025`: production UI-kit `packages/ui` утверждён пользователем через `/ui-kit` 2026-07-13; product screens используют его public API.
+- Исторический `DEC-025` custom production UI-kit superseded решением `DEC-035`: весь current/future frontend использует Konsta UI 5.2.0; `packages/ui` остаётся только для необходимых Flowly-specific wrappers и удаляется вместе с `/ui-kit`, если пуст.
 - Этап 3 создаёт модель программных напоминаний и jobs; end-to-end Telegram delivery закрывает этап 5.
 - Одиночные программы закрываются этапом 3; совместные программы — этапом 7.
 - Backend lifecycle `activity_occurrences` создаётся на этапах 3–4; calendar UI и агрегация — этапом 6.
@@ -59,9 +59,9 @@ E1-D1-T01: npm workspaces
 
 - Поле `decisions` каждой карточки содержит обязательные решения и открытые блокеры именно для этой работы.
 - Перед стартом карточки агент обязан прочитать связанные `DEC-*`; superseded-решение заменяется указанным successor.
-- Для UI/UX-карточек обязательны stage-level «Обязательные подтверждённые contracts» и [`docs/design/flows/`](../design/flows/): 69 surfaces, F01–F11, state profiles и PRD traceability.
-- `DEC-013`–`DEC-023` сохраняют продуктовые/визуальные contracts; `DEC-024` задаёт iterative production UI workflow; `DEC-025` — обязательный production UI-kit gate.
-- Применимые UI-карточки содержат `ui_slices`, DEC-025 и используют public API `packages/ui`; следующий slice не начинается до явного approval текущего.
+- Для UI/UX-карточек обязательны stage-level «Обязательные подтверждённые contracts» и [`docs/design/flows/`](../design/flows/): 68 surfaces, F01–F11, state profiles и PRD traceability.
+- `DEC-013`–`DEC-022` сохраняют product/state contracts; visual foundation `DEC-023` и custom UI-kit gate `DEC-025` superseded решением `DEC-035`; `DEC-024` сохраняет iterative workflow, кроме явно approved one-batch migration E0-D0-T05.
+- Current/future UI-карточки обязаны применять DEC-035 и Konsta-first; после E0-D0-T05 обычные feature slices снова требуют отдельного approval по DEC-024.
 
 ## Правила доски
 

@@ -1,57 +1,24 @@
 "use client";
 
+import { BlockTitle, Button, Card } from "konsta/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Button, Icon } from "@flowly/ui";
-import styles from "./welcome-screen.module.css";
 
-/**
- * S-MA-002 — Welcome/onboarding intro (F01, §10.1 step 1, DEC-022 P-WIZARD).
- * First onboarding screen: a calm introduction with a start action and an
- * explicit skip (skipping an optional step is not a successful save).
- */
+/** S-MA-002 — Apple HIG / Konsta-first welcome (DEC-036, DEC-037). */
 export function WelcomeScreen() {
   const router = useRouter();
-  const next = () => router.push("/onboarding/preferences" as never);
+  return <main className="safe-shell flow-screen gap-5 md:grid md:grid-cols-[minmax(16rem,1fr)_minmax(18rem,1fr)] md:items-center">
+    <Card contentWrap={false} className="relative min-h-72 overflow-hidden md:min-h-[31rem]">
+      <Image src="/media/home-program.webp" alt="Спокойная практика йоги" fill priority sizes="100vw" className="object-cover object-[center_35%]" />
+    </Card>
 
-  return (
-    <div className={`safe-shell flow-screen ${styles.screen}`}>
-      <div className={styles.hero}>
-        <Image
-          src="/media/home-program.webp"
-          alt="Спокойная практика йоги"
-          fill
-          priority
-          sizes="100vw"
-        />
-        <span className={styles.shade} />
-        <Image src="/brand/flowly-icon.svg" alt="Flowly" width={64} height={64} className={styles.mark} />
+    <section className="grid gap-3 md:content-center">
+      <BlockTitle component="h1" large className="!m-0 !p-0">Мягкий ритм для каждого дня</BlockTitle>
+      <p className="m-0 text-base leading-6 text-text-muted">Flowly объединяет практики, привычки и напоминания. Настройка займёт меньше минуты.</p>
+      <div className="mt-2 grid gap-2">
+        <Button large rounded onClick={() => router.push("/onboarding/preferences" as never)}>Начать настройку</Button>
+        <Button large rounded clear onClick={() => router.push("/onboarding/bot" as never)}>Пропустить настройку</Button>
       </div>
-
-      <section className={styles.body}>
-        <p className={`flow-eyebrow ${styles.eyebrow}`}>Добро пожаловать</p>
-        <h1 className={`flow-title ${styles.title}`}>
-          Мягкий ритм йоги, привычек и спокойного дня
-        </h1>
-        <p className={styles.text}>
-          Flowly собирает практики, привычки и напоминания в одном спокойном
-          пространстве. Настроим всё за пару шагов — или начните прямо сейчас.
-        </p>
-
-        <div className={styles.actions}>
-          <Button
-            className={styles.primary}
-            leadingIcon={<Icon name="leaf" />}
-            onClick={next}
-          >
-            Начать
-          </Button>
-          <Button variant="ghost" onClick={next}>
-            Пропустить
-          </Button>
-        </div>
-        <p className={styles.hint}>Шаги знакомства можно пропустить — кроме связи с ботом.</p>
-      </section>
-    </div>
-  );
+    </section>
+  </main>;
 }

@@ -21,7 +21,7 @@
 
 ## Общие инварианты
 
-- Основная навигация строго: **Главная / Тренировки / Программы / Мой ритм / Календарь**; профиль открывается avatar с Главной ([DEC-013](../../roadmap/DECISIONS.md#dec-013--ia-навигация-и-deep-links)).
+- Основная навигация строго: **Главная / Йога / Треки / Ритм / Дневник** (domain sections: Тренировки / Программы / Мой ритм / Календарь; DEC-045); профиль открывается avatar с Главной ([DEC-013](../../roadmap/DECISIONS.md#dec-013--ia-навигация-и-deep-links)).
 - Shell/auth failures — full-screen; ошибки модулей — inline; mutation сохраняет ввод и даёт retry; offline сохраняет draft; loading использует skeleton ([DEC-022](../../roadmap/DECISIONS.md#dec-022--контекстная-модель-ui-состояний)).
 - Все экраны проектируются mobile-first 360–430 px, без horizontal scroll, с wide-screen adaptation, safe-area, light/dark, keyboard access, text scaling, labelled icons, non-color status cues, stoppable GIF и reduced motion (§40).
 - Privacy by default, явное подтверждение результата, отсутствие скрытых автокоррекций (§8); каждый restricted deep link проверяет auth и доступ заново.

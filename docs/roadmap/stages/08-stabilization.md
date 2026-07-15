@@ -21,7 +21,7 @@
 ## Обязательные подтверждённые contracts
 
 - По `DEC-024` каждый указанный `ui_slices` screen slice выполняется строго по одному ID в реальном `apps/web`; все states/интеракции и явный approval обязательны до следующего ID.
-- По `DEC-025` production UI-kit из `packages/ui` и его public API обязательны для всех screen slices; app-local дубли shared primitives запрещены.
+- По `DEC-035` Konsta UI 5.2.0 (`konsta/react`, `ios` theme) обязательна для current/future production UI; direct imports — default, `packages/ui` допустим только для Flowly-specific contracts, отсутствующих в Konsta.
 - Verification обязана проверять все linked `DEC-*` карточек и 69 screen / 11 flow contracts из [`docs/design/flows/`](../../design/flows/).
 - Account deletion: 7-day grace + re-auth cancellation; joint results preserve anonymized integrity. Clear history сохраняет account/settings/objects; export — protected JSON + bot notice (`DEC-020`).
 - Share-card retention 30 дней (`DEC-018`); open operational decisions `DEC-006`–`DEC-008`, `DEC-010`, `DEC-011` должны быть закрыты либо оставить соответствующую карточку blocked.

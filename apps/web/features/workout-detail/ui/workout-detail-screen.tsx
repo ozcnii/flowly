@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { Badge, Button, Card, Chip, Link } from "konsta/react";
+import NextLink from "next/link";
 
-import { Badge, Icon, IconButton, InlineError, OfflineBanner, Skeleton } from "@flowly/ui";
+import { Icon, InlineError, OfflineBanner, Skeleton } from "@flowly/ui";
 import { DisabledFavoriteButton } from "@/components/workouts/disabled-favorite-button";
 import type { WorkoutDetail } from "@/features/catalog/model/catalog";
 import { DIFFICULTY, FORMAT, SOURCE, minutes } from "@/features/catalog/model/catalog";
@@ -28,7 +29,7 @@ const userSafeReason: Record<keyof WorkoutDetail["actions"], string> = {
 function QuickActions({ title }: { title: string }) {
   return <div className={styles.quickActions} aria-label="Быстрые действия">
     <DisabledFavoriteButton title={title} className={styles.quickButton} />
-    <IconButton className={styles.quickButton} disabled label="Поделиться — будет доступно позже" icon={<Icon name="share-2" />} />
+    <Button inline clear rounded className={styles.quickButton} disabled aria-label="Поделиться — будет доступно позже" title="Поделиться — будет доступно позже"><Icon name="share-2" /></Button>
   </div>;
 }
 
@@ -39,7 +40,7 @@ function Hero({ workout }: { workout: WorkoutDetail }) {
     <div className={styles.heroBody}>
       <div className={styles.heroTop}>
         <div className={styles.badges}>
-          <Badge tone="info">{sourceLabel(workout.sourceType)}</Badge>
+          <Badge colors={{ bg: "bg-primary", text: "text-white" }}>{sourceLabel(workout.sourceType)}</Badge>
           <Badge>{minutes(workout.durationSeconds)}</Badge>
           <Badge>{DIFFICULTY[workout.difficulty as keyof typeof DIFFICULTY] ?? workout.difficulty}</Badge>
         </div>
@@ -52,7 +53,7 @@ function Hero({ workout }: { workout: WorkoutDetail }) {
 }
 
 function DisabledAction({ name, compact = false }: { name: keyof WorkoutDetail["actions"]; compact?: boolean }) {
-  return <button type="button" className={`${styles.action} ${compact ? styles.actionCompact : ""}`} disabled aria-describedby={`reason-${name}`}><span>{reasonTitle[name]}</span><small id={`reason-${name}`}>{userSafeReason[name]}</small></button>;
+  return <Button large rounded tonal className={`${styles.action} ${compact ? styles.actionCompact : ""}`} disabled aria-describedby={`reason-${name}`}><span>{reasonTitle[name]}</span><small id={`reason-${name}`}>{userSafeReason[name]}</small></Button>;
 }
 
 function ActionPanel({ workout }: { workout: WorkoutDetail }) {
@@ -90,18 +91,18 @@ function Detail({ workout, forced }: { workout: WorkoutDetail; forced: Forced })
   const contraindications = workout.contraindications.length ? workout.contraindications : ["Нет специальных противопоказаний в каталоге. Ориентируйтесь на самочувствие."];
   return <div className={`flow-screen ${styles.screen}`}>
     {forced === "offline" && <OfflineBanner icon={<Icon name="wifi-off" />}>Офлайн: показываем уже загруженное описание. Новые действия временно недоступны.</OfflineBanner>}
-    <Link className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Link>
+    <Button component={NextLink} inline clear small rounded className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Button>
     <Hero workout={workout} />
 
-    {workout.sourceType === "user" && <section className={styles.warning}><Icon name="triangle-alert" /><span>Тренировка создана пользователем и не проверена Flowly.</span></section>}
+    {workout.sourceType === "user" && <Card component="section" contentWrap={false} outline className={styles.warning}><Icon name="triangle-alert" /><span>Тренировка создана пользователем и не проверена Flowly.</span></Card>}
 
     <section className={styles.summary} aria-label="Кратко о тренировке">
-      <span>{FORMAT[workout.format as keyof typeof FORMAT] ?? workout.format}</span>
-      <span>{workout.equipment.length ? workout.equipment.join(", ") : "Без инвентаря"}</span>
-      {workout.categories.map((c) => <span key={c.id}>{c.name}</span>)}
+      <Chip>{FORMAT[workout.format as keyof typeof FORMAT] ?? workout.format}</Chip>
+      <Chip>{workout.equipment.length ? workout.equipment.join(", ") : "Без инвентаря"}</Chip>
+      {workout.categories.map((c) => <Chip key={c.id}>{c.name}</Chip>)}
     </section>
 
-    {workout.youtubeVideoId && <a className={styles.youtube} href={`https://www.youtube.com/watch?v=${workout.youtubeVideoId}`} target="_blank" rel="noreferrer"><Icon name="external-link" />Открыть видео на YouTube</a>}
+    {workout.youtubeVideoId && <Link className={styles.youtube} href={`https://www.youtube.com/watch?v=${workout.youtubeVideoId}`} target="_blank" rel="noreferrer"><Icon name="external-link" />Открыть видео на YouTube</Link>}
 
     <ExerciseList workout={workout} />
     <ActionPanel workout={workout} />
@@ -113,7 +114,7 @@ function Detail({ workout, forced }: { workout: WorkoutDetail; forced: Forced })
         <ul className={styles.bullets}>{contraindications.map((x) => <li key={x}>{x}</li>)}</ul>
         <p className={styles.muted}>Это справочная информация из описания тренировки, не персональная рекомендация.</p>
         <p className={styles.muted}>Источник: {sourceLabel(workout.sourceType)} · Автор: {workout.author.name}</p>
-        <Link className={styles.authorLink} href={`/authors/${encodeURIComponent(workout.sourceType)}` as never}>Открыть публичный профиль</Link>
+        <Button component={NextLink} inline clear rounded className={styles.authorLink} href={`/authors/${encodeURIComponent(workout.sourceType)}` as never}>Открыть публичный профиль</Button>
       </div>
     </details>
   </div>;
@@ -128,8 +129,8 @@ export function WorkoutDetailScreen({ id, forced = null }: Props) {
   const workout = detail.data?.workout ?? null;
 
   if (forced === "loading") return <Loading />;
-  if (forced === "hidden") return <div className={`flow-screen ${styles.screen}`}><Link className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Link><InlineError icon={<Icon name="eye-off" />} title="Тренировка недоступна" description="Доступ к этой тренировке изменился. Вернитесь в каталог и выберите другую практику." /></div>;
-  if (forced === "error" || detail.isError) return <div className={`flow-screen ${styles.screen}`}><Link className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Link><InlineError icon={<Icon name="triangle-alert" />} title="Не удалось загрузить тренировку" description="Повторите запрос. Если тренировка удалена или скрыта, мы покажем безопасное сообщение вместо пустого экрана." onRetry={() => detail.refetch()} /></div>;
+  if (forced === "hidden") return <div className={`flow-screen ${styles.screen}`}><Button component={NextLink} inline clear small rounded className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Button><InlineError icon={<Icon name="eye-off" />} title="Тренировка недоступна" description="Доступ к этой тренировке изменился. Вернитесь в каталог и выберите другую практику." /></div>;
+  if (forced === "error" || detail.isError) return <div className={`flow-screen ${styles.screen}`}><Button component={NextLink} inline clear small rounded className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Button><InlineError icon={<Icon name="triangle-alert" />} title="Не удалось загрузить тренировку" description="Повторите запрос. Если тренировка удалена или скрыта, мы покажем безопасное сообщение вместо пустого экрана." onRetry={() => detail.refetch()} /></div>;
   if (!workout) return <Loading />;
   return <Detail workout={workout} forced={forced} />;
 }
