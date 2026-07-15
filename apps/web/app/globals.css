@@ -187,7 +187,7 @@ button, a { touch-action: manipulation; }
 
 /* DEC-047: Konsta has no API to limit Navbar blur to Telegram's composed top inset. */
 .primary-navbar > :first-child {
-  height: var(--component-safe-area-top);
+  height: max(22px, var(--component-safe-area-top));
   mask-image: none;
   -webkit-mask-image: none;
 }
