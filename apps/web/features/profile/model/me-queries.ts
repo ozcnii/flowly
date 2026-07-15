@@ -9,7 +9,6 @@ export type PublicUser = {
   username: string | null;
   firstName: string;
   lastName: string | null;
-  photoUrl: string | null;
   timezone: string;
   locale: string;
   onboardingCompleted: boolean;

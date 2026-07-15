@@ -22,7 +22,7 @@ const securityHeaders = [
       "default-src 'self'",
       `script-src ${scriptSrc}`,
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://i.ytimg.com https://t.me",
+      "img-src 'self' data: blob: https://i.ytimg.com",
       "font-src 'self' data:",
       "connect-src 'self'",
       "frame-ancestors 'none'",
@@ -39,7 +39,6 @@ export default {
   reactStrictMode: true,
   typedRoutes: true,
   transpilePackages: ["@flowly/ui"],
-  images: { remotePatterns: [{ protocol: "https", hostname: "t.me", pathname: "/i/userpic/**" }] },
   turbopack: { root: fileURLToPath(new URL("../..", import.meta.url)) },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

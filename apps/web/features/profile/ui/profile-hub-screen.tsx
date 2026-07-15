@@ -1,10 +1,9 @@
 "use client";
 
 import { Badge, List, ListItem, Navbar, NavbarBackLink, Preloader } from "konsta/react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { Icon } from "@flowly/ui";
+import { rootNavbarClassName, rootNavbarStyle } from "@/components/shell/primary-navbar";
 import { useMeQuery } from "../model/me-queries";
 
 const sections = [
@@ -22,15 +21,12 @@ export function ProfileHubScreen() {
   const router = useRouter();
   const me = useMeQuery();
   const user = me.data?.user;
-  const [photoFailed, setPhotoFailed] = useState(false);
-  const photoUrl = user?.photoUrl && !photoFailed ? "/api/v1/me/photo" : null;
-
   return <div className="min-h-dvh">
-    <Navbar className="!top-[var(--component-safe-area-top)]" title="Профиль" left={<NavbarBackLink aria-label="Назад" onClick={() => router.back()} />} />
+    <Navbar className={rootNavbarClassName} style={rootNavbarStyle} title="Профиль" left={<NavbarBackLink aria-label="Назад" onClick={() => router.back()} />} />
     <main className="pb-safe-4">
     <List strong inset dividers aria-label="Профиль пользователя" aria-busy={!user}>
       <ListItem
-        media={photoUrl ? <Image src={photoUrl} alt="" width={48} height={48} unoptimized className="size-12 rounded-full object-cover" onError={() => setPhotoFailed(true)} /> : <Icon name="user-round" className="size-10 text-accent" />}
+        media={<Icon name="user-round" className="size-10 text-accent" />}
         mediaClassName="!me-3"
         innerClassName="text-left"
         title={user?.firstName ?? "Загружаем профиль"}

@@ -24,7 +24,6 @@ export const users = sqliteTable("users", {
   username: text("username"),
   firstName: text("first_name").notNull(),
   lastName: text("last_name"),
-  photoUrl: text("photo_url"),
   timezone: text("timezone").notNull(),
   // Fixed product invariant: Monday (1, JS Date.getDay() convention), DEC-042.
   weekStartsOn: integer("week_starts_on").notNull(),

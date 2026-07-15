@@ -4,6 +4,7 @@ import { BlockFooter, BlockTitle, List, ListInput, ListItem, Navbar, NavbarBackL
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMeQuery, usePatchMeMutation, type PublicUser, type ReportSettings } from "../model/me-queries";
+import { rootNavbarClassName, rootNavbarStyle } from "@/components/shell/primary-navbar";
 import { buildTimezoneOptions, detectedTimezone, TimezonePicker } from "@/components/timezone-picker";
 
 const THEMES = [
@@ -34,7 +35,7 @@ const applyTheme = (theme: string) => {
 export function ProfileSettingsScreen() {
   const router = useRouter();
   const me = useMeQuery();
-  return me.data ? <ProfileSettingsForm user={me.data.user} reportSettings={me.data.settings} /> : <div className="min-h-dvh"><Navbar className="!top-[var(--component-safe-area-top)]" title="Настройки" left={<NavbarBackLink aria-label="Назад" onClick={() => router.back()} />} /><main className="grid min-h-[70dvh] place-items-center" role="status" aria-live="polite"><Preloader /><span className="sr-only">Загружаем настройки</span></main></div>;
+  return me.data ? <ProfileSettingsForm user={me.data.user} reportSettings={me.data.settings} /> : <div className="min-h-dvh"><Navbar className={rootNavbarClassName} style={rootNavbarStyle} title="Настройки" left={<NavbarBackLink aria-label="Назад" onClick={() => router.back()} />} /><main className="grid min-h-[70dvh] place-items-center" role="status" aria-live="polite"><Preloader /><span className="sr-only">Загружаем настройки</span></main></div>;
 }
 
 function ProfileSettingsForm({ user, reportSettings }: { user: PublicUser; reportSettings: ReportSettings }) {
@@ -81,7 +82,7 @@ function ProfileSettingsForm({ user, reportSettings }: { user: PublicUser; repor
 
   return (
     <div className="min-h-dvh">
-      <Navbar className="!top-[var(--component-safe-area-top)]" title="Настройки" left={<NavbarBackLink aria-label="Назад" onClick={() => router.back()} />} />
+      <Navbar className={rootNavbarClassName} style={rootNavbarStyle} title="Настройки" left={<NavbarBackLink aria-label="Назад" onClick={() => router.back()} />} />
       <main>
         <BlockTitle>Имя в Flowly</BlockTitle>
         <List className="mt-8 mb-2">

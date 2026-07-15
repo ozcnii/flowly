@@ -10,7 +10,6 @@ export interface PublicUser {
   username: string | null;
   firstName: string;
   lastName: string | null;
-  photoUrl: string | null;
   timezone: string;
   locale: string;
   onboardingCompleted: boolean;
@@ -22,7 +21,6 @@ export function publicUser(user: {
   username: string | null;
   firstName: string;
   lastName: string | null;
-  photoUrl: string | null;
   timezone: string;
   weekStartsOn: number;
   locale: string;
@@ -34,7 +32,6 @@ export function publicUser(user: {
     username: user.username,
     firstName: user.firstName,
     lastName: user.lastName,
-    photoUrl: user.photoUrl,
     timezone: user.timezone,
     locale: user.locale,
     onboardingCompleted: user.onboardingCompletedAt !== null,
@@ -54,7 +51,7 @@ export async function getReportSettings(db: Database, userId: string) {
 /**
  * Find an existing user by Telegram id, or create user + default settings.
  * Per DEC-020, Flowly name is edited separately from Telegram, so we do not
- * overwrite existing name fields on re-auth. Telegram username/avatar URL are refreshed;
+ * overwrite existing name fields on re-auth. Telegram username is refreshed; avatar data is ignored (DEC-046);
  * onboarding (S-MA-003) lets the user refine timezone/locale; week starts Monday (DEC-042).
  */
 export async function findOrCreateUser(
@@ -69,7 +66,7 @@ export async function findOrCreateUser(
   if (existing[0]) {
     await db
       .update(schema.users)
-      .set({ username: tg.username ?? null, photoUrl: tg.photo_url ?? null, weekStartsOn: 1, updatedAt: nowIso() })
+      .set({ username: tg.username ?? null, weekStartsOn: 1, updatedAt: nowIso() })
       .where(eq(schema.users.id, existing[0].id));
     return { id: existing[0].id, isNew: false };
   }
@@ -82,7 +79,6 @@ export async function findOrCreateUser(
     username: tg.username ?? null,
     firstName: tg.first_name,
     lastName: tg.last_name ?? null,
-    photoUrl: tg.photo_url ?? null,
     timezone: "UTC",
     weekStartsOn: 1,
     locale: tg.language_code ?? "ru",
