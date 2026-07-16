@@ -1,17 +1,17 @@
 # Flowly v1.0 — roadmap и kanban index
 
-> Обновлено: 2026-07-15 · Источник требований: [`../PRD.md`](../PRD.md)
+> Обновлено: 2026-07-16 · Источник требований: [`../PRD.md`](../PRD.md)
 
 Этот каталог — переносимая project board. Подробный статус хранится в карточках этапов; данный файл содержит только общий обзор и ссылки.
 
 ## Текущий фокус
 
-- **Активный этап:** 0. UX/UI-контракты (полная Konsta UI migration)
-- **Активная задача:** E0-D0-T05 (Перевести весь production frontend на Konsta UI) — `in_progress`.
-- **Следующее действие:** deploy и real-iPhone review DEC-061 internal-route Tabbar hierarchy вместе с DEC-058/059/060; затем проверить remaining DEC-055/047/052/053/054 и провести общий E0-D0-T05 review. DEC-052 app-owned history реализована: tab transitions входят в session history, active-tab no-op, contextual direct-entry fallback, rapid Back lock и root closing confirmation; browser/mock history matrix PASS. Home/onboarding findings исправлены code-first; Tabbar использует official `Tabbar → ToolbarPane → TabbarLink`. Catalog S-MA-020 прошёл Konsta/Apple HIG correction; DEC-053 объединяет Catalog/YouTube через shared YouTube-like 16:9 `WorkoutMediaCard` с two-line titles, compact metadata и icon actions, а YouTube Search/Detail используют fullscreen in-app player вместо external Watch. S-MA-021 cards/player matrix PASS; DEC-054 media-first S-MA-022 redesign approved: shared adaptive detail, compact disabled future states and explicit `Сведения` disclosure pass responsive/state/player checks. DEC-057 replaces legacy `/authors/flowly|youtube` with one `/sources` S-MA-025 (3+3 shared previews + real filtered Catalog links); old routes are removed without redirects. DEC-060 removes route-level external icon sprite revalidation and applies the user-approved Next-native preload/eager/lazy+blur/sync image policy; browser filmstrip/network gate PASS, real Telegram WebView rerun pending.
+- **Активный этап:** не выбран; этап 0 завершён.
+- **Активная задача:** отсутствует; E0-D0-T05 закрыта `done` по явному user approval.
+- **Следующее действие:** согласовать с пользователем следующую backlog-карточку. E0-D0-T05 завершила full Konsta migration, DEC-052/053/054/057/060/061 corrections и финальный legacy cleanup; raw interactive/legacy UI/legacy visual class/CSS Module audits = 0, typecheck/lint/build PASS.
 - **Latest real-device scope:** DEC-046 removes Telegram avatar storage/proxy/rendering and D1 `photo_url`; DEC-047 owns fullscreen composed safe-area blur/title/actions geometry; Tabbar labels are 9px. Runtime commit `ce35676` deployed successfully in run 29395082940; follow-up `239ae28` removes all fixed primary Navbar actions, collapses its empty row, adds Home content header `Твой план` + Profile action and renames card title to `Прогресс на сегодня`; Deploy web run 29395715390 PASS. DEC-048 runtime `8633c9c` removes Profile/Settings web Back and uses official route-aware Telegram BackButton; `031de99` prevents internal-to-internal Close/X flicker by preserving native visibility during cleanup. Deploy runs 29396177091 and 29396563266 PASS; `045e0a2` inset-0 half-position was rejected after iPhone notch overlap; `429beb9` supersedes it: safe-area Navbar hidden on desktop/web, shown only on Telegram iOS/Android, mobile min inset 44px with title centered in its final 44px. Deploy web run 29398306357 PASS. DEC-052 supersedes fixed top-level hide: native Back follows session history on tab и child routes, direct entries use contextual parent replace, Home boundary enables closing confirmation; browser mock PASS, real-device Back/Close/X rerun pending.
 - **Latest production API fix:** DEC-049 replaced unavailable Invidious with no-key Piped. Runtime `286d597`, Deploy web 29402655934 PASS; canonical production search miss/hit returns 12 results, edge queries 12/10/6, warning null.
-- **UI workflow:** Konsta UI 5.2.0 + `ios` theme обязательны всегда (`DEC-035`); E0-D0-T05 — approved one-batch exception к per-screen approval `DEC-024`; обязательный frontend UI/UX quality pass по [`docs/design/FRONTEND_REVIEW.md`](../design/FRONTEND_REVIEW.md) сохраняется (`DEC-028`); client API calls только через `@tanstack/react-query` (`DEC-029`)
+- **UI workflow:** Konsta UI 5.2.0 + `ios` theme обязательны всегда (`DEC-035`); завершённая E0-D0-T05 была approved one-batch exception к per-screen approval `DEC-024`; обязательный frontend UI/UX quality pass по [`docs/design/FRONTEND_REVIEW.md`](../design/FRONTEND_REVIEW.md) сохраняется (`DEC-028`); client API calls только через `@tanstack/react-query` (`DEC-029`)
 - **Блокеры:** открытые решения перечислены в [`DECISIONS.md`](DECISIONS.md)
 - **Контекст продолжения:** [`HANDOFF.md`](HANDOFF.md)
 
@@ -19,7 +19,7 @@
 
 | Этап | Статус | Backlog | In progress | Blocked | Review | Done | Файл |
 |---|---|---:|---:|---:|---:|---:|---|
-| 0. UX/UI-контракты | in progress | 0 | 1 | 0 | 0 | 5 | [`00-design.md`](stages/00-design.md) |
+| 0. UX/UI-контракты | done | 0 | 0 | 0 | 0 | 6 | [`00-design.md`](stages/00-design.md) |
 | 1. Основа | done | 0 | 0 | 0 | 0 | 13 | [`01-foundation.md`](stages/01-foundation.md) |
 | 2. Йога | backlog | 6 | 0 | 0 | 0 | 6 | [`02-yoga.md`](stages/02-yoga.md) |
 | 3. Программы | backlog | 7 | 0 | 0 | 0 | 0 | [`03-programs.md`](stages/03-programs.md) |
@@ -29,7 +29,7 @@
 | 7. Социальные функции | backlog | 7 | 0 | 0 | 0 | 0 | [`07-social.md`](stages/07-social.md) |
 | 8. Стабилизация | backlog | 8 | 0 | 0 | 0 | 0 | [`08-stabilization.md`](stages/08-stabilization.md) |
 
-**Итого:** 52 backlog / 1 in progress / 0 blocked / 0 review / 24 done.
+**Итого:** 52 backlog / 0 in progress / 0 blocked / 0 review / 25 done.
 
 ## Зависимости этапов
 

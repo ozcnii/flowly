@@ -1,10 +1,11 @@
 "use client";
 
-import { Button, Card } from "konsta/react";
-import Link from "next/link";
+import { Button, Card, List, ListInput, ListItem } from "konsta/react";
+import NextLink from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Icon, TextField } from "@flowly/ui";
-import styles from "./ugc-safety-screen.module.css";
+import { Icon } from "@flowly/ui";
+import { PrimaryNavbar } from "@/components/shell/primary-navbar";
 
 type Action = "report" | "hide" | "block";
 type Forced = "error" | "success" | null;
@@ -24,39 +25,28 @@ const success: Record<Action, string> = {
 };
 
 export function UgcSafetyScreen({ action, forced = null }: Props) {
-  const mode = safeAction(action);
-  const [reason, setReason] = useState("");
-  const [touched, setTouched] = useState(false);
-  const [done, setDone] = useState<Action | null>(forced === "success" ? mode : null);
+  const router = useRouter(), mode = safeAction(action), [reason, setReason] = useState(""), [touched, setTouched] = useState(false), [done, setDone] = useState<Action | null>(forced === "success" ? mode : null);
   const invalid = mode === "report" && touched && reason.trim().length < 8;
-  const submit = () => {
-    setTouched(true);
-    if (mode === "report" && reason.trim().length < 8) return;
-    setDone(mode);
-  };
+  const submit = () => { setTouched(true); if (mode !== "report" || reason.trim().length >= 8) setDone(mode); };
 
-  return <div className={`flow-screen ${styles.screen}`}>
-    <Link className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Link>
-    <header className={`flow-top ${styles.header}`}>
-      <p className="flow-eyebrow">Безопасность</p>
-      <h1 className="flow-title">{title[mode]}</h1>
-      <span className="flow-subtitle">{description[mode]}</span>
-    </header>
+  return <div className="min-h-dvh">
+    <PrimaryNavbar title={title[mode]} />
+    <main className="flow-screen">
+      <h1 className="sr-only">{title[mode]}</h1>
+      <p className="m-0 text-sm leading-relaxed text-text-muted">{description[mode]}</p>
 
-    {forced === "error" && <section className={styles.error} role="alert"><Icon name="triangle-alert" /><div><strong>Не удалось выполнить действие</strong><p>Проверьте соединение и попробуйте ещё раз. Введённая причина сохранена на экране.</p></div></section>}
-    {done && <section className={styles.success} role="status"><Icon name="circle-check" /><div><strong>Готово</strong><p>{success[done]}</p></div></section>}
+      {forced === "error" && <Card component="section" outline className="m-0" role="alert" contentWrapPadding="p-4 flex items-start gap-3"><Icon name="triangle-alert" className="text-danger" /><p className="m-0 text-sm"><strong className="block">Не удалось выполнить действие</strong>Проверьте соединение и попробуйте ещё раз. Введённая причина сохранена на экране.</p></Card>}
+      {done && <Card component="section" outline className="m-0" role="status" contentWrapPadding="p-4 flex items-start gap-3"><Icon name="circle-check" className="text-accent" /><p className="m-0 text-sm"><strong className="block">Готово</strong>{success[done]}</p></Card>}
 
-    {!done && <Card contentWrap={false} outline className={styles.card}>
-      {mode === "report" ? <TextField multiline label="Причина жалобы" value={reason} onBlur={() => setTouched(true)} onChange={(e) => setReason(e.target.value)} placeholder="Например: опасная инструкция, спам или неподходящий контент" aria-invalid={invalid || undefined} /> : <p>{mode === "hide" ? "Контент автора больше не будет попадаться в вашем каталоге." : "Автор не сможет взаимодействовать с вами через публичный контент Flowly."}</p>}
-      {invalid && <p className={styles.validation}>Добавьте причину минимум из 8 символов.</p>}
-      <div className={styles.actions}>
-        <Button large rounded onClick={submit}>{mode === "report" ? "Отправить жалобу" : mode === "hide" ? "Скрыть" : "Заблокировать"}</Button>
-        <Link className={styles.secondary} href={"/catalog" as never}>Отмена</Link>
-      </div>
-    </Card>}
+      {!done && <Card component="section" contentWrap={false} outline className="m-0">
+        {mode === "report" ? <List strong inset className="m-0 py-2"><ListInput title="" outline type="textarea" inputClassName="min-h-24" label="Причина жалобы" value={reason} minLength={8} placeholder="Например: опасная инструкция, спам или неподходящий контент" error={invalid ? "Добавьте причину минимум из 8 символов." : undefined} onBlur={() => setTouched(true)} onInput={(event) => setReason(event.currentTarget.value)} /></List> : <p className="m-0 p-4 text-sm leading-relaxed">{mode === "hide" ? "Контент автора больше не будет попадаться в вашем каталоге." : "Автор не сможет взаимодействовать с вами через публичный контент Flowly."}</p>}
+        <div className="grid gap-2 p-4 pt-2">
+          <Button large rounded onClick={submit}>{mode === "report" ? "Отправить жалобу" : mode === "hide" ? "Скрыть" : "Заблокировать"}</Button>
+          <Button component={NextLink} href="/catalog" large rounded clear>Отмена</Button>
+        </div>
+      </Card>}
 
-    <nav className={styles.switcher} aria-label="Другие действия">
-      {(["report", "hide", "block"] as const).filter((x) => x !== mode).map((x) => <Link key={x} className={styles[`${x}Link`]} href={`/safety/${x}` as never}>{title[x]}</Link>)}
-    </nav>
+      <nav aria-label="Другие действия"><List strong inset dividers className="m-0"><ListItem groupTitle title="Другие действия" />{(["report", "hide", "block"] as const).filter((item) => item !== mode).map((item) => <ListItem key={item} link linkComponent="button" contentClassName="w-full" innerClassName="text-left" linkProps={{ type: "button", onClick: () => router.push(`/safety/${item}` as never) }} title={title[item]} />)}</List></nav>
+    </main>
   </div>;
 }
