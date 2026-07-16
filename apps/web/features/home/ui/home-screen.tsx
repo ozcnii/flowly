@@ -5,6 +5,7 @@ import Image from "next/image";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { Icon } from "@flowly/ui";
+import { GlassIconButton } from "@/components/glass-icon-button";
 import type { HomeScenario } from "../model/home-scenario";
 import type { HomeViewModel } from "../model/home-view-model";
 
@@ -23,7 +24,7 @@ export function HomeScreen({ data, scenario = "base" }: Props) {
     {scenario === "offline" && <Card component="aside" outline role="status" header={<Badge>Офлайн</Badge>}><p className="m-0 text-sm text-text-muted">Показываем сохранённые данные. Действия, требующие сети, временно недоступны.</p></Card>}
 
     {scenario === "resume" && <Card component="section" outline header={<Badge>Можно продолжить</Badge>} contentWrapPadding="p-3 grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 items-center">
-      <Image src={data.resume.image} alt="Мягкая практика для спины" width={72} height={72} priority className="h-[4.5rem] w-[4.5rem] rounded-xl object-cover" />
+      <Image src={data.resume.image} alt="Мягкая практика для спины" width={72} height={72} priority decoding="sync" className="h-[4.5rem] w-[4.5rem] rounded-xl object-cover" />
       <div className="grid min-w-0 gap-2">
         <BlockTitle component="h2" medium className="!m-0 !p-0">{data.resume.title}</BlockTitle>
         <p className="m-0 text-sm text-text-muted">{data.resume.meta}</p>
@@ -50,7 +51,7 @@ export function HomeScreen({ data, scenario = "base" }: Props) {
     <NextLink href="/programs" aria-label={`Открыть программу ${data.program.title}`} className="block text-inherit no-underline">
       <Card outline className="m-0" header={cardTitle("Текущая программа")} contentWrap={false}>
         <div className="relative">
-          <Image src={data.program.image} alt={`Практика программы «${data.program.title}»`} width={640} height={360} priority className="aspect-video w-full object-cover" />
+          <Image src={data.program.image} alt={`Практика программы «${data.program.title}»`} width={640} height={360} priority decoding="sync" className="aspect-video w-full object-cover" />
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pt-10">
             <h3 className="m-0 text-xl font-semibold text-white">{data.program.title}</h3>
           </div>
@@ -75,7 +76,7 @@ export function HomeScreen({ data, scenario = "base" }: Props) {
 function HomeHeader() {
   return <header className="flex items-center justify-between gap-4">
     <BlockTitle component="h1" large className="!m-0 !p-0">Твой план</BlockTitle>
-    <Button component={NextLink} href="/profile" clear rounded className="h-11 w-11 min-w-11 p-0" aria-label="Открыть профиль"><Icon name="user-round" /></Button>
+    <GlassIconButton component={NextLink} href="/profile" icon="user-round" aria-label="Открыть профиль" />
   </header>;
 }
 

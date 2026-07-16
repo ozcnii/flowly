@@ -4,6 +4,7 @@ import { Badge, BlockTitle, Button, Card, List, ListItem, Navbar, Preloader, Rad
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "@flowly/ui";
+import { GlassIconButton } from "@/components/glass-icon-button";
 import { DisabledFavoriteButton } from "@/components/workouts/disabled-favorite-button";
 import { WorkoutMediaCard } from "@/components/workouts/workout-media-card";
 import type { CatalogWorkout } from "../model/catalog";
@@ -127,7 +128,7 @@ export function CatalogScreen({ forced = null, initialSource = "" }: { forced?: 
           <div className="min-w-0 flex-1 rounded-3xl focus-within:ring-2 focus-within:ring-inset focus-within:ring-accent"><Searchbar inputId="catalog-search" value={searchInput} onInput={(event) => setSearchInput(event.target.value)} clearButton={false} placeholder="Поиск" /></div>
           {searchInput && <Button inline clear rounded className={`h-11 w-11 min-w-11 p-0 ${focusRing}`} aria-label="Очистить поиск" onClick={() => setSearchInput("")}><Icon name="x" /></Button>}
           <span className="relative inline-flex shrink-0">
-            <Button ref={filterButtonRef} inline clear rounded className={`h-11 w-11 min-w-11 p-0 ${focusRing}`} aria-label={extraFilterCount ? `Открыть фильтры, выбрано: ${extraFilterCount}` : "Открыть фильтры"} aria-haspopup="dialog" aria-expanded={filtersOpen} onClick={openFilters}><Icon name="funnel" /></Button>
+            <GlassIconButton ref={filterButtonRef} icon="funnel" className={focusRing} aria-label={extraFilterCount ? `Открыть фильтры, выбрано: ${extraFilterCount}` : "Открыть фильтры"} aria-haspopup="dialog" aria-expanded={filtersOpen} onClick={openFilters} />
             {extraFilterCount > 0 && <Badge aria-hidden="true" className="pointer-events-none absolute -right-1 -top-1 z-20 min-w-5">{extraFilterCount}</Badge>}
           </span>
         </div>

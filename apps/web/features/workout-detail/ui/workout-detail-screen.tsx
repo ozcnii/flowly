@@ -6,6 +6,7 @@ import NextLink from "next/link";
 import { useCallback, useRef, useState } from "react";
 import { Icon } from "@flowly/ui";
 import { PrimaryNavbar } from "@/components/shell/primary-navbar";
+import { YoutubePlayButton } from "@/components/youtube/youtube-play-button";
 import { YoutubePlayerPopup, type YoutubePlayerVideo } from "@/components/youtube/youtube-player-popup";
 import type { WorkoutDetail } from "@/features/catalog/model/catalog";
 import { DIFFICULTY, FORMAT, SOURCE, minutes } from "@/features/catalog/model/catalog";
@@ -24,8 +25,8 @@ function Hero({ workout, onPlay }: { workout: WorkoutDetail; onPlay: (video: You
   const description = /^Видео канала\s+/i.test(workout.description.trim()) ? "" : workout.description.trim();
   return <Card component="section" contentWrap={false} outline className="m-0">
     {image && <div className="relative aspect-video bg-accent-soft">
-      <Image src={image} alt={`Практика «${workout.title}»`} fill sizes="(max-width: 430px) calc(100vw - 40px), 640px" priority unoptimized={workout.sourceType === "youtube"} className="object-cover" />
-      {workout.youtubeVideoId && <Button clear className={`absolute inset-0 !h-auto !w-auto rounded-none p-0 ${focusRing}`} onClick={(event) => onPlay({ videoId: workout.youtubeVideoId!, title: workout.title, trigger: event.currentTarget })} aria-label={`Воспроизвести «${workout.title}»`}><Icon name="play" className="size-10 text-white drop-shadow-lg" /></Button>}
+      <Image src={image} alt={`Практика «${workout.title}»`} fill sizes="(max-width: 430px) calc(100vw - 40px), 640px" priority decoding="sync" unoptimized={workout.sourceType === "youtube"} className="object-cover" />
+      {workout.youtubeVideoId && <YoutubePlayButton title={workout.title} onClick={(event) => onPlay({ videoId: workout.youtubeVideoId!, title: workout.title, trigger: event.currentTarget })} />}
     </div>}
     <div className="grid min-w-0 gap-2 p-4 [&>*]:min-w-0">
       <h1 className="m-0 line-clamp-3 break-words text-xl font-semibold leading-tight" title={workout.title}>{workout.title}</h1>

@@ -144,7 +144,7 @@ export function TimezonePicker({ options, value, onChange, children }: { options
     <List strong inset dividers><ListItem link linkComponent="button" contentClassName="w-full" innerClassName="text-left" linkProps={{ type: "button", onClick: () => setOpened(true) }} title="Часовой пояс" subtitle={selected?.label ?? value} after={selected?.meta} />{children}</List>
     {opened && <Sheet opened onBackdropClick={() => setOpened(false)} className="flex h-[min(88dvh,46rem)] flex-col gap-2 overflow-hidden">
       <Navbar title="Часовой пояс" right={<Button inline clear rounded={false} onClick={() => setOpened(false)}>Готово</Button>} />
-      <Searchbar value={query} onInput={(event) => setQuery(event.target.value)} onClear={() => setQuery("")} placeholder="Город, регион или время" />
+      <div className="px-4"><Searchbar value={query} onInput={(event) => setQuery(event.target.value)} onClear={() => setQuery("")} placeholder="Город, регион или время" /></div>
       <div className="min-h-0 overflow-auto pb-[calc(var(--component-safe-area-bottom)+1rem)]">{filtered.length === 0 ? <Card outline><p className="m-0">Ничего не найдено</p></Card> : [...groups.entries()].map(([group, items]) => <List key={group} strong inset dividers className="my-2"><ListItem groupTitle title={group} colors={{ groupTitleBgIos: "bg-surface-subtle", secondaryTextIos: "text-text-muted" }} />{items.map((option) => <ListItem key={option.value} link chevron={false} linkComponent="button" contentClassName="w-full" innerClassName="text-left" linkProps={{ type: "button", onClick: () => { onChange(option.value); setOpened(false); } }} title={option.label} subtitle={option.meta} after={option.value === value ? <Icon name="check" /> : null} />)}</List>)}</div>
     </Sheet>}
   </>;

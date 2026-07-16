@@ -9,7 +9,7 @@ export function WelcomeScreen() {
   const router = useRouter();
   return <main className="safe-shell flow-screen gap-5 md:grid md:grid-cols-[minmax(16rem,1fr)_minmax(18rem,1fr)] md:items-center">
     <Card contentWrap={false} className="relative min-h-72 overflow-hidden md:min-h-[31rem]">
-      <Image src="/media/home-program.webp" alt="Спокойная практика йоги" fill priority sizes="100vw" className="object-cover object-[center_35%]" />
+      <Image src="/media/home-program.webp" alt="Спокойная практика йоги" fill priority decoding="sync" sizes="100vw" className="object-cover object-[center_35%]" />
     </Card>
 
     <section className="grid gap-3 md:content-center">

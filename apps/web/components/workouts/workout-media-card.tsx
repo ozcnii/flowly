@@ -1,6 +1,6 @@
 import { Badge, Button, Card } from "konsta/react";
 import Image from "next/image";
-import { Icon } from "@flowly/ui";
+import { YoutubePlayButton } from "@/components/youtube/youtube-play-button";
 
 const focusRing = "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent";
 
@@ -30,8 +30,8 @@ export function WorkoutMediaCard({ title, coverSrc, durationSeconds, metadata, e
   return <Card component="article" contentWrap={false} outline className={`relative m-0 overflow-hidden ${className}`}>
     {onOpen && <Button clear className={`absolute inset-0 z-10 !h-auto !w-auto rounded-3xl p-0 ${focusRing}`} onClick={onOpen} aria-label={`Открыть ${title}`} />}
     <div className="relative aspect-video bg-accent-soft">
-      {coverSrc && <Image src={coverSrc} alt="" fill sizes="(max-width: 430px) calc(100vw - 40px), 640px" loading={eager ? "eager" : "lazy"} unoptimized={unoptimized} className="object-cover" />}
-      {onPlay && <Button clear className={`absolute inset-0 z-10 !h-auto !w-auto rounded-none p-0 ${focusRing}`} onClick={(event) => onPlay(event.currentTarget)} aria-label={`Воспроизвести «${title}»`}><Icon name="play" className="size-10 text-white drop-shadow-lg" /></Button>}
+      {coverSrc && <Image src={coverSrc} alt="" fill sizes="(max-width: 430px) calc(100vw - 40px), 640px" loading={eager ? "eager" : "lazy"} decoding="sync" unoptimized={unoptimized} className="object-cover" />}
+      {onPlay && <YoutubePlayButton title={title} onClick={(event) => onPlay(event.currentTarget)} />}
       <Badge className="pointer-events-none absolute bottom-3 right-3 z-20">{workoutTimecode(durationSeconds)}</Badge>
     </div>
     <div className="grid min-w-0 gap-2 p-4 [&>*]:min-w-0">
