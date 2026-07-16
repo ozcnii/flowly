@@ -17,5 +17,5 @@ export function AppRouteShell({ children }: { children: ReactNode }) {
   const preview = process.env.NODE_ENV !== "production" && (search.has("onboarding") || search.has("recovery") || search.has("web"));
   if (preview) return <>{children}</>;
   const scenario = resolveShellScenario(search.get("scenario") ?? undefined);
-  return <AuthGate><ProductOnboardingGuard><TelegramBackButton /><AppShell activeTab={activeTabFor(pathname)} scenario={scenario} showScenario={false} primaryTitle={primaryTitleByPath[pathname]}>{children}</AppShell></ProductOnboardingGuard></AuthGate>;
+  return <AuthGate><ProductOnboardingGuard><TelegramBackButton><AppShell activeTab={activeTabFor(pathname)} scenario={scenario} showScenario={false} primaryTitle={primaryTitleByPath[pathname]}>{children}</AppShell></TelegramBackButton></ProductOnboardingGuard></AuthGate>;
 }

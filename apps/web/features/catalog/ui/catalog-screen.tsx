@@ -52,17 +52,18 @@ function ToggleFilter({ title, checked, onChange }: { title: string; checked: bo
   return <ListItem label title={title} after={<Toggle component="div" className={choiceFocus} checked={checked} onChange={(event) => onChange(event.target.checked)} />} />;
 }
 
-export function CatalogScreen({ forced = null }: { forced?: Forced }) {
+export function CatalogScreen({ forced = null, initialSource = "" }: { forced?: Forced; initialSource?: string }) {
   const router = useRouter();
   const screenRef = useRef<HTMLDivElement>(null);
   const filterButtonRef = useRef<HTMLElement>(null);
   const sheetRef = useRef<HTMLElement>(null);
-  const [filters, setFilters] = useState<CatalogFilters>(EMPTY_FILTERS);
+  const initialFilters = useMemo<CatalogFilters>(() => ({ ...EMPTY_FILTERS, source: initialSource }), [initialSource]);
+  const [filters, setFilters] = useState<CatalogFilters>(initialFilters);
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [notice, setNotice] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [draftFilters, setDraftFilters] = useState<CatalogFilters>(EMPTY_FILTERS);
+  const [draftFilters, setDraftFilters] = useState<CatalogFilters>(initialFilters);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setDebouncedSearch(searchInput.trim()), 350);

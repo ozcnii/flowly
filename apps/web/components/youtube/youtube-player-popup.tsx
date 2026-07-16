@@ -3,6 +3,8 @@
 import { Button, Navbar, Popup, Preloader } from "konsta/react";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { Icon } from "@flowly/ui";
+import { useTelegramBackOverride } from "@/components/providers/telegram-back-button";
+import { SafeAreaTitleNavbar, useMobileTelegramPlatform } from "@/components/shell/primary-navbar";
 
 export type YoutubePlayerVideo = { videoId: string; title: string; trigger: HTMLElement };
 
@@ -11,8 +13,8 @@ const focusableSelector = "button:not([disabled]), a[href], iframe, input:not([d
 
 function YoutubeFrame({ video }: { video: YoutubePlayerVideo }) {
   const [loaded, setLoaded] = useState(false);
-  return <main className="flex min-h-0 flex-1 flex-col justify-center bg-black">
-    <div className="relative aspect-video w-full bg-black">
+  return <main className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden bg-black">
+    <div className="relative aspect-video bg-black" style={{ width: "min(100%, calc((100dvh - var(--component-safe-area-top)) * 16 / 9))" }}>
       {!loaded && <div className="absolute inset-0 grid place-items-center" role="status" aria-live="polite"><Preloader className="text-white" /><span className="sr-only">Загружаем видео</span></div>}
       {/* DEC-053: Konsta has no video player; this approved raw iframe is the minimal YouTube media exception. */}
       <iframe
@@ -30,6 +32,8 @@ function YoutubeFrame({ video }: { video: YoutubePlayerVideo }) {
 
 export function YoutubePlayerPopup({ video, backgroundRef, onClose }: Props) {
   const popupRef = useRef<HTMLElement>(null), closeRef = useRef<HTMLElement>(null);
+  const mobile = useMobileTelegramPlatform();
+  useTelegramBackOverride(onClose, Boolean(video));
   useEffect(() => {
     if (!video) return;
     const popup = popupRef.current, background = backgroundRef.current;
@@ -38,7 +42,7 @@ export function YoutubePlayerPopup({ video, backgroundRef, onClose }: Props) {
     background.inert = true;
     background.setAttribute("aria-hidden", "true");
     document.documentElement.style.overflow = "hidden";
-    requestAnimationFrame(() => closeRef.current?.focus());
+    requestAnimationFrame(() => mobile ? popup.focus() : closeRef.current?.focus());
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") { event.preventDefault(); onClose(); return; }
       if (event.key !== "Tab") return;
@@ -56,11 +60,11 @@ export function YoutubePlayerPopup({ video, backgroundRef, onClose }: Props) {
       if (previousAria == null) background.removeAttribute("aria-hidden"); else background.setAttribute("aria-hidden", previousAria);
       requestAnimationFrame(() => video.trigger.focus());
     };
-  }, [backgroundRef, onClose, video]);
+  }, [backgroundRef, mobile, onClose, video]);
 
-  return <Popup ref={popupRef} opened={Boolean(video)} onBackdropClick={onClose} className="flex flex-col" role={video ? "dialog" : undefined} aria-modal={video ? "true" : undefined} aria-hidden={video ? undefined : "true"} inert={video ? undefined : true} aria-label={video ? `Видео «${video.title}»` : undefined}>
+  return <Popup ref={popupRef} opened={Boolean(video)} onBackdropClick={onClose} className={`flex flex-col ${mobile ? "pt-[var(--component-safe-area-top)]" : ""}`} tabIndex={video ? -1 : undefined} role={video ? "dialog" : undefined} aria-modal={video ? "true" : undefined} aria-hidden={video ? undefined : "true"} inert={video ? undefined : true} aria-label={video ? `Видео «${video.title}»` : undefined}>
     {video && <>
-      <Navbar title="Видео" right={<Button ref={closeRef} inline clear rounded className="h-11 w-11 min-w-11 p-0" aria-label="Закрыть видео" onClick={onClose}><Icon name="x" /></Button>} />
+      {mobile ? <SafeAreaTitleNavbar title="Видео" className="!absolute left-0" /> : <Navbar title="Видео" right={<Button ref={closeRef} inline clear rounded className="h-11 w-11 min-w-11 p-0" aria-label="Закрыть видео" onClick={onClose}><Icon name="x" /></Button>} />}
       <YoutubeFrame key={video.videoId} video={video} />
     </>}
   </Popup>;

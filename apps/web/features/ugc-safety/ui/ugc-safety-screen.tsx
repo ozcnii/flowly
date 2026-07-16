@@ -36,7 +36,7 @@ export function UgcSafetyScreen({ action, forced = null }: Props) {
   };
 
   return <div className={`flow-screen ${styles.screen}`}>
-    <Link className={`flow-back ${styles.back}`} href={"/authors/user" as never}><Icon name="chevron-left" />Автор</Link>
+    <Link className={`flow-back ${styles.back}`} href={"/catalog" as never}><Icon name="chevron-left" />Каталог</Link>
     <header className={`flow-top ${styles.header}`}>
       <p className="flow-eyebrow">Безопасность</p>
       <h1 className="flow-title">{title[mode]}</h1>
@@ -51,7 +51,7 @@ export function UgcSafetyScreen({ action, forced = null }: Props) {
       {invalid && <p className={styles.validation}>Добавьте причину минимум из 8 символов.</p>}
       <div className={styles.actions}>
         <Button large rounded onClick={submit}>{mode === "report" ? "Отправить жалобу" : mode === "hide" ? "Скрыть" : "Заблокировать"}</Button>
-        <Link className={styles.secondary} href={"/authors/user" as never}>Отмена</Link>
+        <Link className={styles.secondary} href={"/catalog" as never}>Отмена</Link>
       </div>
     </Card>}
 

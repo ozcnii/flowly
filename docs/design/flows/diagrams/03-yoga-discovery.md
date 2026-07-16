@@ -1,12 +1,14 @@
 # F03 — yoga discovery
 
 > Trace: §12–13, §18–19; DEC-016, DEC-021.
-> Canonical screen IDs: `S-MA-020`, `S-MA-021`, `S-MA-022`, `S-MA-023`, `S-MA-024`, `S-MA-088`.
-> Rendered node IDs: `S-MA-020`, `S-MA-021`, `S-MA-022`, `S-MA-023`, `S-MA-024`, `S-MA-088`.
+> Canonical screen IDs: `S-MA-020`, `S-MA-021`, `S-MA-022`, `S-MA-023`, `S-MA-024`, `S-MA-025`, `S-MA-088`.
+> Rendered node IDs: `S-MA-020`, `S-MA-021`, `S-MA-022`, `S-MA-023`, `S-MA-024`, `S-MA-025`, `S-MA-088`.
 
 ```mermaid
 flowchart TD
   A[S-MA-020 catalog] --> F[Search / filters / sources]
+  A --> O[S-MA-025 sources overview]
+  O -->|all Flowly / YouTube| A
   F -->|none| E[Empty + reset filters]
   F --> Y{YouTube?}
   Y -- yes --> C{Valid cache/API?}

@@ -478,6 +478,25 @@
 - **Ограничение:** Telegram SDK не предоставляет keyboard visibility API, а `viewportChanged`/VisualViewport также реагируют на fullscreen, safe-area и native chrome. Поэтому deterministic mobile text-focus является source of truth; если клавиатура закрыта без blur и input остаётся focused, Tabbar остаётся скрыт до blur.
 - **Влияет на:** DEC-032/035/043, E0-D0-T05, AppShell, all current/future ListInput/Searchbar/textarea/contenteditable surfaces, AGENTS, FRONTEND_REVIEW, HANDOFF.
 
+### DEC-057 — Unified catalog sources overview
+
+- **Статус:** approved
+- **Дата:** 2026-07-16
+- **Решение:** source-type pseudo-author pages `/authors/flowly` и `/authors/youtube` удаляются без redirects. Flowly и YouTube — источники каталога, не авторы; они объединяются на одном internal route `/sources` / S-MA-025 с shared PrimaryNavbar `Источники`. Future `/authors/[id]` резервируется только для реальных public user author profiles S-MA-024. `/sources` показывает две независимые sections Flowly/YouTube: concise description, horizontal snap preview из 3 shared DEC-053 `WorkoutMediaCard`, затем direct Konsta link-button `Все тренировки …` в настоящий `/catalog?source=...` filter. Source sections query independently through React Query; loading/error/empty/partial-success не скрывают соседний источник. Semantic outline: H1 `Источники` → H2 source sections → H3 preview workout titles through explicit shared-card heading level. Top-level source H2 neutralize default Konsta BlockTitle safe padding (`!px-0`) and align to the same page edge as description/cards. Legacy `AuthorProfileScreen`, CSS Module, raw header/back, `Skeleton/InlineError`, source hide/block explanatory Cards и mini-card implementation удаляются. Workout details link to `/sources`; current UGC safety cancel/back uses Catalog until real author IDs exist.
+- **Основание:** пользователь спросил, зачем Flowly/YouTube представлены двумя author pages, и approved объединение на `/sources`, deletion without redirects, future real-author reservation и previews `3 карточки + все`. Code audit подтвердил, что обе URL уже использовали один `[source]` component, но UX/model были ошибочными и оставались legacy pre-Konsta UI.
+- **Verification:** `/sources` 360/390/430 light/dark: document overflow 0, targets <44 = 0, Flowly/YouTube headings visible, exactly 3+3 previews, carousels scroll internally without document overflow, shell nav persists. Forced loading/error/empty/flowly-error/youtube-error PASS with independent partial success. 200% text overflow/small/card-overflow = 0. Card click → `/workouts/wo-balance-basic-15`; `/catalog?source=youtube` returns only 5 current YouTube cards; old `/authors/flowly|youtube` HTTP 404; console errors 0. Root typecheck/lint/build/diff-check PASS. Evidence `.temp/E0-D0-T05/screenshots/sources-390-dark.png`.
+- **PRD:** уточняет presentation §12.1/§13.2 without changing catalog source or future public-author contracts.
+- **Влияет на:** DEC-028/029/032/035/052/053/054, E0-D0-T05, F03, new S-MA-025, S-MA-024 future scope, `/sources`, Catalog source filter, workout detail links, UGC safety fallback, flow inventory/HANDOFF/AGENTS.
+
+### DEC-058 — Telegram-safe fullscreen media overlay
+
+- **Статус:** approved
+- **Дата:** 2026-07-16
+- **Решение:** shared YouTube player remains a direct Konsta `Popup`, but Telegram mobile composition is action-free: shared `SafeAreaTitleNavbar` places `Видео` inside the final 44px of the composed `--component-safe-area-top`, local Close is absent, Popup reserves the full composed top inset, and the 16:9 iframe is contained below it in portrait/landscape. Desktop/web retains direct Konsta Navbar + 44px Close. `TelegramBackButton` owns a LIFO modal override stack; while player is open, native Back closes only the top overlay, preserves route/history index and restores trigger focus, then normal history behavior resumes.
+- **Основание:** real iPhone landscape repro on `/workouts/019f6a1f-fcca-7875-b38c-282f16685e00` showed generic Popup Navbar fixed at Konsta default 16px: title overlapped status area, local Close overlapped battery/native chrome, and full-width 16:9 media could extend above the composed inset. Local canonical repro with `--component-safe-area-top:100px` measured Navbar padding 16px/title y27/Close y16.
+- **Ограничение:** native Telegram controls and rotation geometry require final real-device portrait/landscape rerun. Any future fullscreen Popup must name exactly one safe-area owner and register modal Back instead of adding a control inside native chrome.
+- **Влияет на:** DEC-047/052/053/055, E0-D0-T05, TelegramBackButton/AppRouteShell, PrimaryNavbar geometry, YoutubePlayerPopup, YouTube Search/workout detail, AGENTS, FRONTEND_REVIEW, HANDOFF.
+
 ## Открытые решения
 
 ### DEC-006 — Operational thresholds

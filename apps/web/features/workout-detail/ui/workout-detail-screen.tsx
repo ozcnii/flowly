@@ -92,7 +92,7 @@ function Detail({ workout, forced, onPlay }: { workout: WorkoutDetail; forced: F
         <p className="m-0 text-sm text-text-muted">Инвентарь: {workout.equipment.length ? workout.equipment.join(", ") : "не требуется"}</p>
         {workout.categories.length > 0 && <p className="m-0 text-sm text-text-muted">Категории: {workout.categories.map((category) => category.name).join(", ")}</p>}
         <p className="m-0 text-sm text-text-muted">Источник: {sourceLabel(workout.sourceType)} · Автор: {workout.author.name}</p>
-        <Button component={NextLink} href={`/authors/${encodeURIComponent(workout.sourceType)}` as never} outline rounded className={focusRing}>Открыть публичный профиль</Button>
+        <Button component={NextLink} href="/sources" outline rounded className={focusRing}>Открыть источники</Button>
       </div>
     </Card>
   </>;

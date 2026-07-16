@@ -45,7 +45,7 @@
 | §11.3 initial category: короткая практика | S-MA-020 catalog contract; F03 | covered |
 | §11.3 initial category: дыхание без аудиоинструкций | S-MA-020 catalog contract; F03 | covered |
 | §11.3 categories expand from catalog data without UI-code changes | S-MA-020; F03 | covered; catalog volume blocked downstream: DEC-010 |
-| §12.1 three catalog sources visibly labelled | S-MA-020; F03 | covered |
+| §12.1 three catalog sources visibly labelled | S-MA-020 catalog + S-MA-025 Flowly/YouTube overview; F03; DEC-057 | covered |
 | §12.2 category/duration/difficulty/format/equipment/author-or-channel/source/favorite-only filters | S-MA-020–024 contract; F03, empty/reset state | covered |
 | §12.3 search separately covers title/description/category/author/channel | S-MA-020–024 contract; F03 | covered |
 | §12.4 card cover/title/duration/categories/format/difficulty/source/author/favorite/UGC | S-MA-020–024 contract; F03 | covered |

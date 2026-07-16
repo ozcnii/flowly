@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 const HISTORY_STATE_KEY = "__flowlyHistory";
 const HISTORY_SESSION_KEY = "flowly-history-session";
 const RAPID_BACK_LOCK_MS = 700;
+
+type BackOverride = { id: symbol; handler: () => void };
+type RegisterBackOverride = (handler: () => void) => () => void;
+const BackOverrideContext = createContext<RegisterBackOverride | null>(null);
 
 type FlowlyHistoryState = { session: string; index: number; url: string };
 type HistoryData = Record<string, unknown> & { [HISTORY_STATE_KEY]?: FlowlyHistoryState };
@@ -32,14 +36,19 @@ const fallbackFor = (pathname: string) => {
   if (pathname === "/settings") return "/profile";
   if (pathname === "/profile") return "/";
   if (pathname === "/catalog" || pathname === "/programs" || pathname === "/rhythm" || pathname === "/calendar") return "/";
-  if (pathname.startsWith("/youtube") || pathname.startsWith("/workouts") || pathname.startsWith("/authors") || pathname.startsWith("/safety")) return "/catalog";
+  if (pathname.startsWith("/youtube") || pathname.startsWith("/workouts") || pathname.startsWith("/sources") || pathname.startsWith("/authors") || pathname.startsWith("/safety")) return "/catalog";
   if (pathname.startsWith("/programs/")) return "/programs";
   if (pathname.startsWith("/rhythm/")) return "/rhythm";
   if (pathname.startsWith("/calendar/")) return "/calendar";
   return "/";
 };
 
-export function TelegramBackButton() {
+export function useTelegramBackOverride(handler: () => void, active: boolean) {
+  const register = useContext(BackOverrideContext);
+  useEffect(() => active && register ? register(handler) : undefined, [active, handler, register]);
+}
+
+export function TelegramBackButton({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const indexRef = useRef(0);
@@ -48,6 +57,13 @@ export function TelegramBackButton() {
   const unlockTimerRef = useRef<number | undefined>(undefined);
   const [index, setIndex] = useState(0);
   const [initialized, setInitialized] = useState(false);
+  const [overrides, setOverrides] = useState<BackOverride[]>([]);
+  const registerOverride = useCallback<RegisterBackOverride>((handler) => {
+    const override = { id: Symbol(), handler };
+    setOverrides((current) => [...current, override]);
+    return () => setOverrides((current) => current.filter(({ id }) => id !== override.id));
+  }, []);
+  const override = overrides.at(-1)?.handler;
 
   useEffect(() => {
     const session = sessionId();
@@ -101,8 +117,9 @@ export function TelegramBackButton() {
     const backButton = webApp?.BackButton;
     if (!backButton) return;
     const fallback = fallbackFor(pathname);
-    const canGoBack = index > 0 || Boolean(fallback);
+    const canGoBack = Boolean(override) || index > 0 || Boolean(fallback);
     const back = () => {
+      if (override) { override(); return; }
       if (lockedRef.current) return;
       lockedRef.current = true;
       if (unlockTimerRef.current) window.clearTimeout(unlockTimerRef.current);
@@ -117,7 +134,7 @@ export function TelegramBackButton() {
       if (canGoBack) webApp.disableClosingConfirmation?.(); else webApp.enableClosingConfirmation?.();
     }
     return () => { backButton.offClick(back); };
-  }, [index, initialized, pathname, router]);
+  }, [index, initialized, override, pathname, router]);
 
-  return null;
+  return <BackOverrideContext.Provider value={registerOverride}>{children}</BackOverrideContext.Provider>;
 }

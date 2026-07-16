@@ -19,7 +19,8 @@
 | S-MA-021 | YouTube results | mobile-only internal Navbar `Поиск YouTube` (web hidden); shared Card + fullscreen in-app player/save, stale/saved/error states; create deferred (DEC-047/048/051/053) | F03,F05 | §19 | owner saves private copy | partial: search/save |
 | S-MA-022 | Workout detail | mobile-only internal Navbar `Тренировка` (web hidden); adaptive media-first Cover→H1→meta; real/disabled exercise states + compact future actions + explicit disclosure (DEC-047/048/051/054) | F03,F04,F10 | §13 | visibility checked; UGC warning | partial: detail |
 | S-MA-023 | Favorites | workouts/videos/programs; no folders | F03,F06 | §18 | owner only | gap |
-| S-MA-024 | Author profile/public content | inspect; block/unblock author | F03,F10 | §13.2, §56.6 | public data only | gap |
+| S-MA-024 | Author profile/public content | real user author by ID; inspect/block/unblock (source pseudo-authors forbidden by DEC-057) | F03,F10 | §13.2, §56.6 | public data only | gap |
+| S-MA-025 | Источники | one `/sources` overview; Flowly + YouTube independent 3-card previews; open detail / all via real source filter (DEC-057) | F03 | §12.1 | public/entitled content | partial: sources |
 | S-MA-030 | Video session | play/pause/resume/finish | F04 | §14.1, §14.4 | session owner; one active | gap |
 | S-MA-031 | Step session | back/pause/next/skip/+30/finish | F04 | §14.2, §14.4 | session owner | gap |
 | S-MA-032 | Mixed mode chooser/session | choose video/steps, then execute | F04 | §14.3 | session owner | gap |
@@ -101,7 +102,9 @@ These records make list-valued PRD obligations observable rather than treating a
 - Workout cards expose cover, title, duration, categories, format, difficulty, source, author, favorite and UGC marker. Detail exposes the §13.1 fields/actions; UGC adds warning, report, hide and author profile.
 - DEC-050/053 presentation contract: Catalog and YouTube share one vertical 16:9 `WorkoutMediaCard` built only from direct Konsta primitives plus media Image; visual titles are limited to two lines while full text remains accessible/on detail, one-line secondary metadata may truncate, compact icon actions differ by domain. Filter single-select groups use Radio, independent filters use Toggle; modal Sheet owns focus trap/inert/Escape/restore; disabled favorite remains visible by explicit approval; loading uses Preloader and offline keeps available data.
 - DEC-051/053 presentation contract: YouTube and workout detail use mobile-only action-free PrimaryNavbar/native BackButton, direct Konsta without CSS Modules/custom Skeleton, accessible Preloader states and Dynamic Type-safe content. YouTube keeps real Save and opens a privacy-enhanced fullscreen in-app player from cover; external Watch links are absent.
+- DEC-058 player contract: Telegram mobile Popup uses shared action-free safe-area title, contains 16:9 media below composed top inset in portrait/landscape and delegates close to the shared native Back override stack; desktop/web keeps Konsta Navbar + Close.
 - DEC-054 workout detail contract: all source variants use media-first Cover→H1≤3→metadata→meaningful description; real exercises render as compact List, missing exercises and future Start/Favorite/Share/UGC functions remain visible compact-disabled with `Скоро`; `Сведения` is an explicit info/subtitle/chevron disclosure without compounded section margins.
+- DEC-057 sources contract: `/sources` combines Flowly and YouTube as independent 3-card horizontal previews plus real filtered-Catalog links; source-type `/authors/*` pages do not exist, while S-MA-024 remains reserved for future real user author IDs.
 - DEC-052 navigation contract: native Telegram BackButton is session-history aware across child and tab routes; direct entries use contextual parent fallbacks, active-tab taps are no-op, rapid clicks cannot skip entries, and only Home boundary index 0 hides Back/enables closing confirmation.
 - DEC-056 keyboard contract: mobile text-entry focus globally hides the shared bottom Tabbar and reduces main reserve; blur restores both, while non-text controls and desktop focus preserve navigation.
 - YouTube query is generated from every selected filter rather than arbitrary text. Results show cover, title, channel, duration, publication date, description, view, favorite and create-workout actions; Russian preference and language-detection limitation are disclosed.
@@ -185,6 +188,7 @@ Each ID is assigned to one explicitly defined profile below; this is the canonic
 | S-MA-022 | P-DETAIL | inaccessible/hidden content is ER, not empty |
 | S-MA-023 | P-COLLECTION | empty favorites is explained; no folders |
 | S-MA-024 | P-DETAIL | block/unblock success is visible |
+| S-MA-025 | P-COLLECTION | source sections load independently; partial failure keeps the successful source visible |
 | S-MA-030 | P-RUNTIME | player failure preserves active session |
 | S-MA-031 | P-RUNTIME | invalid timer/step controls show disabled reason |
 | S-MA-032 | P-RUNTIME | unavailable mode is disabled with reason |

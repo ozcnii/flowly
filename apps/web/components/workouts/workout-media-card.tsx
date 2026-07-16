@@ -20,11 +20,14 @@ type Props = {
   onPlay?: (trigger: HTMLElement) => void;
   actions?: React.ReactNode;
   status?: React.ReactNode;
+  className?: string;
+  headingLevel?: "h2" | "h3";
 };
 
 // DEC-053: Konsta has no domain workout-card component; this approved composite only arranges direct Konsta primitives.
-export function WorkoutMediaCard({ title, coverSrc, durationSeconds, metadata, eager, unoptimized, onOpen, onPlay, actions, status }: Props) {
-  return <Card component="article" contentWrap={false} outline className="relative m-0 overflow-hidden">
+export function WorkoutMediaCard({ title, coverSrc, durationSeconds, metadata, eager, unoptimized, onOpen, onPlay, actions, status, className = "", headingLevel = "h2" }: Props) {
+  const Heading = headingLevel;
+  return <Card component="article" contentWrap={false} outline className={`relative m-0 overflow-hidden ${className}`}>
     {onOpen && <Button clear className={`absolute inset-0 z-10 !h-auto !w-auto rounded-3xl p-0 ${focusRing}`} onClick={onOpen} aria-label={`Открыть ${title}`} />}
     <div className="relative aspect-video bg-accent-soft">
       {coverSrc && <Image src={coverSrc} alt="" fill sizes="(max-width: 430px) calc(100vw - 40px), 640px" loading={eager ? "eager" : "lazy"} unoptimized={unoptimized} className="object-cover" />}
@@ -34,7 +37,7 @@ export function WorkoutMediaCard({ title, coverSrc, durationSeconds, metadata, e
     <div className="grid min-w-0 gap-2 p-4 [&>*]:min-w-0">
       <div className="flex min-w-0 items-start gap-2">
         <div className="min-w-0 flex-1">
-          <h2 className="m-0 line-clamp-2 break-words text-lg font-semibold leading-tight" title={title}>{title}</h2>
+          <Heading className="m-0 line-clamp-2 break-words text-lg font-semibold leading-tight" title={title}>{title}</Heading>
           <p className="mt-1 mb-0 truncate text-sm leading-snug text-text-muted">{metadata}</p>
         </div>
         {actions && <div className="relative z-20 flex min-h-11 shrink-0 items-center">{actions}</div>}
