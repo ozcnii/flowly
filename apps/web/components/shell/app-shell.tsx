@@ -48,7 +48,7 @@ export function AppShell({ activeTab, scenario, showScenario, stateLabel, primar
 
       <Tabbar labels icons className="left-0 bottom-0 fixed" style={telegramSafeArea} aria-label="Основная навигация">
         <ToolbarPane>
-          {tabs.map(([id, icon, label]) => <TabbarLink key={id} active={id === activeTab} icon={<Icon name={icon} />} label={<span className="text-[9px]">{label}</span>} component="button" linkProps={{ type: "button" }} aria-current={id === activeTab ? "page" : undefined} onClick={() => router.push(hrefById[id] ?? "/")} />)}
+          {tabs.map(([id, icon, label]) => <TabbarLink key={id} active={id === activeTab} icon={<Icon name={icon} />} label={<span className="text-[9px]">{label}</span>} component="button" linkProps={{ type: "button" }} aria-current={id === activeTab ? "page" : undefined} onClick={() => { if (id !== activeTab) router.push(hrefById[id] ?? "/"); }} />)}
         </ToolbarPane>
       </Tabbar>
     </div>

@@ -20,7 +20,10 @@ interface TelegramWebApp {
   contentSafeAreaInset?: TelegramSafeAreaInset;
   isFullscreen?: boolean;
   BackButton?: TelegramBackButton;
+  isClosingConfirmationEnabled?: boolean;
   isVersionAtLeast?: (version: string) => boolean;
+  enableClosingConfirmation?: () => void;
+  disableClosingConfirmation?: () => void;
   requestFullscreen?: () => void;
   ready?: () => void;
   expand?: () => void;

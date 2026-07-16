@@ -1,54 +1,65 @@
 "use client";
 
-import { Button, Card, Searchbar, Sheet } from "konsta/react";
+import { Badge, BlockTitle, Button, Card, List, ListItem, Navbar, Preloader, Radio, Searchbar, Sheet, Toggle } from "konsta/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "@flowly/ui";
 import { DisabledFavoriteButton } from "@/components/workouts/disabled-favorite-button";
+import { WorkoutMediaCard } from "@/components/workouts/workout-media-card";
 import type { CatalogWorkout } from "../model/catalog";
-import { DIFFICULTY, DURATION, FORMAT, minutes } from "../model/catalog";
+import { DIFFICULTY, DURATION, FORMAT, SOURCE } from "../model/catalog";
 import { useCatalogQuery, type CatalogFilters } from "../model/catalog-queries";
-import styles from "./catalog-screen.module.css";
 
 type Forced = "loading" | "empty" | "error" | "offline" | null;
+type Choice = readonly [value: string, label: string];
 
 const EMPTY_FILTERS: CatalogFilters = { q: "", category: "", duration: "", difficulty: "", format: "", source: "", equipment: "", favorite: "" };
-const set = (filters: CatalogFilters, key: keyof CatalogFilters, value: string): CatalogFilters => ({ ...filters, [key]: filters[key] === value ? "" : value });
-const choiceColors = { textIos: "text-accent", outlineBorderIos: "border-accent", tonalBgIos: "bg-accent-soft", tonalTextIos: "text-accent" };
+const focusRing = "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent";
+const choiceFocus = "rounded-full has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent";
 const workoutCountLabel = (count: number) => {
   const mod10 = count % 10, mod100 = count % 100;
   return `${count} ${mod10 === 1 && mod100 !== 11 ? "тренировка" : mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14) ? "тренировки" : "тренировок"}`;
 };
 
-function WorkoutCard({ workout, onOpen }: { workout: CatalogWorkout; onOpen: (id: string) => void }) {
+function WorkoutCard({ workout, onOpen, eager }: { workout: CatalogWorkout; onOpen: (id: string) => void; eager?: boolean }) {
   const thumb = workout.sourceType === "youtube" && workout.youtubeVideoId ? `https://i.ytimg.com/vi/${workout.youtubeVideoId}/hqdefault.jpg` : workout.coverObjectKey ? `/media/${workout.coverObjectKey}` : "";
+  const source = SOURCE[workout.sourceType as keyof typeof SOURCE] ?? workout.sourceType;
+  const format = FORMAT[workout.format as keyof typeof FORMAT] ?? workout.format;
   const difficulty = DIFFICULTY[workout.difficulty as keyof typeof DIFFICULTY] ?? workout.difficulty;
-  return <Card component="article" contentWrap={false} outline className={`${styles.card} ${thumb ? "" : styles.cardTextOnly}`}>
-    <Button inline clear className={styles.cardOpen} onClick={() => onOpen(workout.id)} aria-label={`Открыть ${workout.title}`} />
-    {thumb && <div className={styles.cover} data-source={workout.sourceType} style={{ backgroundImage: `${workout.sourceType === "youtube" ? "linear-gradient(135deg, rgba(28, 45, 39, 0.1), rgba(28, 45, 39, 0.55)), " : ""}url(${thumb})` }} aria-hidden="true"><span className={styles.duration}>{minutes(workout.durationSeconds)}</span>{workout.sourceType === "youtube" && <Icon name="play" />}</div>}
-    <div className={styles.cardBody}>
-      <div className={styles.cardTop}><span>{difficulty}</span>{!thumb && <span>{minutes(workout.durationSeconds)}</span>}</div>
-      <h2 className="flow-card-title">{workout.title}</h2>
-      <p>{workout.description}</p>
-    </div>
-    <DisabledFavoriteButton title={workout.title} className={styles.favoriteButton} />
-  </Card>;
+  const category = workout.categories[0]?.name;
+  return <WorkoutMediaCard
+    title={workout.title}
+    coverSrc={thumb}
+    durationSeconds={workout.durationSeconds}
+    source={source}
+    format={format}
+    metadata={[difficulty, category].filter(Boolean).join(" · ")}
+    marker={workout.sourceType === "user" ? "Сообщество" : undefined}
+    eager={eager}
+    unoptimized={workout.sourceType === "youtube"}
+    onOpen={() => onOpen(workout.id)}
+    actions={<DisabledFavoriteButton title={workout.title} className="h-11 w-11 min-w-11 p-0" />}
+  />;
 }
 
-function Skeleton() {
-  return <div className={styles.list} aria-label="Загрузка каталога">{[0, 1, 2].map((i) => <div key={i} className={`${styles.card} ${styles.skeleton}`}><i /><div><span /><b /></div></div>)}</div>;
+function FilterGroup({ title, name, value, choices, onChange }: { title: string; name: string; value: string; choices: readonly Choice[]; onChange: (value: string) => void }) {
+  return <section aria-labelledby={`catalog-filter-${name}`}>
+    <BlockTitle component="h3" id={`catalog-filter-${name}`}>{title}</BlockTitle>
+    <List strong inset>
+      {choices.map(([choice, label]) => <ListItem key={choice || "all"} label title={label} after={<Radio component="div" className={choiceFocus} name={name} value={choice} checked={value === choice} onChange={() => onChange(choice)} />} />)}
+    </List>
+  </section>;
 }
 
-function FilterGroup({ title, children }: { title: string; children: ReactNode }) {
-  return <div className={styles.filterGroup}><h3>{title}</h3><div>{children}</div></div>;
-}
-
-function FilterChoice({ pressed, onClick, children }: { pressed: boolean; onClick: () => void; children: ReactNode }) {
-  return <Button inline small rounded colors={choiceColors} tonal={pressed} outline={!pressed} aria-pressed={pressed} onClick={onClick}>{children}</Button>;
+function ToggleFilter({ title, checked, onChange }: { title: string; checked: boolean; onChange: (checked: boolean) => void }) {
+  return <ListItem label title={title} after={<Toggle component="div" className={choiceFocus} checked={checked} onChange={(event) => onChange(event.target.checked)} />} />;
 }
 
 export function CatalogScreen({ forced = null }: { forced?: Forced }) {
   const router = useRouter();
+  const screenRef = useRef<HTMLDivElement>(null);
+  const filterButtonRef = useRef<HTMLElement>(null);
+  const sheetRef = useRef<HTMLElement>(null);
   const [filters, setFilters] = useState<CatalogFilters>(EMPTY_FILTERS);
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -61,15 +72,40 @@ export function CatalogScreen({ forced = null }: { forced?: Forced }) {
     return () => window.clearTimeout(timer);
   }, [searchInput]);
 
-  const queryFilters = useMemo<CatalogFilters>(() => ({ ...filters, q: debouncedSearch }), [debouncedSearch, filters]);
-  const catalog = useCatalogQuery(queryFilters, !forced);
-  const data = catalog.data ?? null;
+  useEffect(() => {
+    if (!filtersOpen) return;
+    const sheet = sheetRef.current, screen = screenRef.current, trigger = filterButtonRef.current;
+    if (!sheet || !screen) return;
+    const backgrounds = [screen, document.querySelector<HTMLElement>(".primary-navbar"), document.querySelector<HTMLElement>("[aria-label='Основная навигация']")].filter((element): element is HTMLElement => Boolean(element));
+    const previousOverflow = document.documentElement.style.overflow, previousAria = backgrounds.map((element) => element.getAttribute("aria-hidden"));
+    sheet.querySelector<HTMLElement>("[data-filter-close]")?.focus();
+    for (const element of backgrounds) { element.inert = true; element.setAttribute("aria-hidden", "true"); }
+    document.documentElement.style.overflow = "hidden";
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { event.preventDefault(); setFiltersOpen(false); return; }
+      if (event.key !== "Tab") return;
+      const focusable = [...sheet.querySelectorAll<HTMLElement>("button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex='-1'])")].filter((element) => element.offsetParent !== null);
+      if (!focusable.length) { event.preventDefault(); return; }
+      const first = focusable[0]!, last = focusable.at(-1)!;
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.documentElement.style.overflow = previousOverflow;
+      backgrounds.forEach((element, index) => { element.inert = false; const value = previousAria[index]; if (value == null) element.removeAttribute("aria-hidden"); else element.setAttribute("aria-hidden", value); });
+      requestAnimationFrame(() => trigger?.focus());
+    };
+  }, [filtersOpen]);
 
+  const queryFilters = useMemo<CatalogFilters>(() => ({ ...filters, q: debouncedSearch }), [debouncedSearch, filters]);
+  const catalog = useCatalogQuery(queryFilters, forced === null || forced === "offline");
+  const data = catalog.data ?? null;
   const reset = () => { setFilters(EMPTY_FILTERS); setDraftFilters(EMPTY_FILTERS); setSearchInput(""); setDebouncedSearch(""); setNotice("Фильтры сброшены"); };
-  const updateDraft = (key: keyof CatalogFilters, value: string) => setDraftFilters((f) => set(f, key, value));
+  const updateDraft = (key: keyof CatalogFilters, value: string) => setDraftFilters((current) => ({ ...current, [key]: value }));
   const openFilters = () => { setDraftFilters(filters); setFiltersOpen(true); };
-  const applyFilters = () => { setFilters(draftFilters); setFiltersOpen(false); };
-  const onOpen = (id: string) => router.push(`/workouts/${encodeURIComponent(id)}` as never);
+  const applyFilters = () => { setFilters(draftFilters); setFiltersOpen(false); setNotice("Фильтры применены"); };
   const openYoutube = () => {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries({ category: filters.category, duration: filters.duration, difficulty: filters.difficulty, equipment: filters.equipment })) if (value) params.set(key, value);
@@ -78,31 +114,47 @@ export function CatalogScreen({ forced = null }: { forced?: Forced }) {
   const categories = data?.categories ?? [];
   const workouts = forced === "empty" ? [] : data?.workouts ?? [];
   const extraFilterCount = [filters.category, filters.duration, filters.difficulty, filters.format, filters.source, filters.equipment, filters.favorite].filter(Boolean).length;
-  const viewState = forced === "loading" ? "loading" : forced === "error" ? "error" : forced === "empty" ? "ready" : catalog.isError ? "error" : catalog.isPending ? "loading" : "ready";
+  const viewState = forced === "loading" ? "loading" : forced === "error" ? "error" : forced === "empty" ? "ready" : catalog.isError && !data ? "error" : catalog.isPending && !data ? "loading" : "ready";
   const explanation = forced === "empty" ? "По таким фильтрам ничего не найдено." : data?.explanation;
+  const categoryChoices = [["", "Любая"], ...categories.map((category) => [category.slug, category.name] as const)] as const;
+  const choices = (values: Record<string, string>): readonly Choice[] => [["", "Любая"], ...Object.entries(values)];
 
-  return <div className="flow-screen">
-    <section className={styles.searchBox} aria-label="Поиск и фильтры">
-      <div className={styles.searchRow}>
-        <Searchbar className={styles.search} value={searchInput} onInput={(e) => setSearchInput(e.target.value)} onClear={() => setSearchInput("")} placeholder="Поиск тренировок" />
-        <Button inline clear rounded className={styles.filterToggle} aria-label={extraFilterCount ? `Открыть фильтры, выбрано: ${extraFilterCount}` : "Открыть фильтры"} aria-haspopup="dialog" aria-expanded={filtersOpen} onClick={openFilters}><Icon name="funnel" />{extraFilterCount > 0 && <span className={styles.filterCount}>{extraFilterCount}</span>}</Button>
+  return <>
+    <div ref={screenRef} className="flow-screen">
+      <h1 className="sr-only">Йога</h1>
+      <section aria-label="Поиск и фильтры" className="grid gap-2">
+        <div className="flex items-center gap-2">
+          <label htmlFor="catalog-search" className="sr-only">Поиск тренировок</label>
+          {/* DEC-050: Konsta 5.2.0 Searchbar drops className; this single focus owner restores the required keyboard cue without changing its anatomy. */}
+          <div className="min-w-0 flex-1 rounded-3xl focus-within:ring-2 focus-within:ring-inset focus-within:ring-accent"><Searchbar inputId="catalog-search" value={searchInput} onInput={(event) => setSearchInput(event.target.value)} clearButton={false} placeholder="Поиск" /></div>
+          {searchInput && <Button inline clear rounded className={`h-11 w-11 min-w-11 p-0 ${focusRing}`} aria-label="Очистить поиск" onClick={() => setSearchInput("")}><Icon name="x" /></Button>}
+          <Button ref={filterButtonRef} inline clear rounded className={`relative h-11 w-11 min-w-11 p-0 ${focusRing}`} aria-label={extraFilterCount ? `Открыть фильтры, выбрано: ${extraFilterCount}` : "Открыть фильтры"} aria-haspopup="dialog" aria-expanded={filtersOpen} onClick={openFilters}><Icon name="funnel" />{extraFilterCount > 0 && <Badge className="absolute -right-1 -top-1 min-w-5">{extraFilterCount}</Badge>}</Button>
+        </div>
+      </section>
+
+      {forced === "offline" && <Card component="aside" outline className="m-0" role="status" contentWrapPadding="p-3"><p className="m-0 text-sm text-text-muted">Офлайн: показываем доступные данные, новые источники подтянутся позже.</p></Card>}
+      {viewState === "loading" ? <div className="grid min-h-48 place-items-center" role="status" aria-live="polite" aria-busy="true"><Preloader /><span className="sr-only">Загружаем каталог</span></div> : viewState === "error" ? <Card component="section" outline className="m-0 text-center" role="alert" contentWrapPadding="p-6 grid justify-items-center gap-3"><Icon name="triangle-alert" /><h2 className="m-0 text-lg font-semibold">Не удалось загрузить каталог</h2><p className="m-0 text-sm text-text-muted">Повторите запрос. Ввод и фильтры сохраняются.</p><Button large rounded className={focusRing} onClick={() => catalog.refetch()}>Повторить</Button></Card> : workouts.length === 0 ? <Card component="section" outline className="m-0 text-center" contentWrapPadding="p-6 grid justify-items-center gap-3"><Icon name="search-x" /><h2 className="m-0 text-lg font-semibold">Ничего не найдено</h2><p className="m-0 text-sm text-text-muted">{explanation || "Попробуйте убрать часть фильтров."}</p><Button large rounded className={focusRing} onClick={reset}>Сбросить фильтры</Button><Button clear rounded className={focusRing} onClick={openYoutube}>Искать видео</Button></Card> : <>
+        <div className="flex flex-wrap items-center gap-2 text-sm font-semibold"><span aria-live="polite">{workoutCountLabel(data?.total ?? workouts.length)}</span><span aria-hidden="true" className="text-text-muted">·</span><Button inline clear small rounded className={focusRing} onClick={openYoutube}>Искать видео</Button></div>
+        <div className="grid gap-2">{workouts.map((workout, index) => <WorkoutCard key={workout.id} workout={workout} eager={index === 0} onOpen={(id) => router.push(`/workouts/${encodeURIComponent(id)}` as never)} />)}</div>
+      </>}
+      {notice && <p className="m-0 text-sm text-text-muted" aria-live="polite">{notice}</p>}
+    </div>
+
+    {filtersOpen && <Sheet ref={sheetRef} opened backdrop onBackdropClick={() => setFiltersOpen(false)} className="flex h-[82dvh] max-h-[44rem] flex-col" role="dialog" aria-modal="true" aria-labelledby="catalog-filter-title">
+      <Navbar title={<span id="catalog-filter-title">Уточнить каталог</span>} titleClassName="!text-xl" right={<Button data-filter-close inline clear rounded className={`h-11 w-11 min-w-11 p-0 ${focusRing}`} aria-label="Закрыть фильтры" onClick={() => setFiltersOpen(false)}><Icon name="x" /></Button>} />
+      <div className="min-h-0 flex-1 overflow-y-auto pb-4">
+        <FilterGroup title="Категория" name="category" value={draftFilters.category} choices={categoryChoices} onChange={(value) => updateDraft("category", value)} />
+        <FilterGroup title="Длительность" name="duration" value={draftFilters.duration} choices={choices(DURATION)} onChange={(value) => updateDraft("duration", value)} />
+        <FilterGroup title="Сложность" name="difficulty" value={draftFilters.difficulty} choices={choices(DIFFICULTY)} onChange={(value) => updateDraft("difficulty", value)} />
+        <FilterGroup title="Формат" name="format" value={draftFilters.format} choices={choices(FORMAT)} onChange={(value) => updateDraft("format", value)} />
+        <BlockTitle component="h3">Дополнительно</BlockTitle>
+        <List strong inset>
+          <ToggleFilter title="Без инвентаря" checked={draftFilters.equipment === "none"} onChange={(checked) => updateDraft("equipment", checked ? "none" : "")} />
+          <ToggleFilter title="YouTube" checked={draftFilters.source === "youtube"} onChange={(checked) => updateDraft("source", checked ? "youtube" : "")} />
+          <ToggleFilter title="Избранное" checked={draftFilters.favorite === "1"} onChange={(checked) => updateDraft("favorite", checked ? "1" : "")} />
+        </List>
       </div>
-
-      {filtersOpen && <Sheet opened backdrop onBackdropClick={() => setFiltersOpen(false)} className={styles.filterSheet} role="dialog" aria-modal="true" aria-labelledby="catalog-filter-title">
-          <div className={styles.sheetTop}><h2 id="catalog-filter-title">Уточнить каталог</h2><Button inline clear rounded aria-label="Закрыть фильтры" onClick={() => setFiltersOpen(false)}><Icon name="x" /></Button></div>
-          <div className={styles.sheetBody}>
-            <FilterGroup title="Категория">{categories.map((c) => <FilterChoice key={c.id} pressed={draftFilters.category === c.slug} onClick={() => updateDraft("category", c.slug)}>{c.name}</FilterChoice>)}</FilterGroup>
-            <FilterGroup title="Длительность">{Object.entries(DURATION).map(([k, v]) => <FilterChoice key={k} pressed={draftFilters.duration === k} onClick={() => updateDraft("duration", k)}>{v}</FilterChoice>)}</FilterGroup>
-            <FilterGroup title="Сложность">{Object.entries(DIFFICULTY).map(([k, v]) => <FilterChoice key={k} pressed={draftFilters.difficulty === k} onClick={() => updateDraft("difficulty", k)}>{v}</FilterChoice>)}</FilterGroup>
-            <FilterGroup title="Формат">{Object.entries(FORMAT).map(([k, v]) => <FilterChoice key={k} pressed={draftFilters.format === k} onClick={() => updateDraft("format", k)}>{v}</FilterChoice>)}</FilterGroup>
-            <FilterGroup title="Дополнительно"><FilterChoice pressed={draftFilters.equipment === "none"} onClick={() => updateDraft("equipment", "none")}>Без инвентаря</FilterChoice><FilterChoice pressed={draftFilters.source === "youtube"} onClick={() => updateDraft("source", "youtube")}>YouTube</FilterChoice><FilterChoice pressed={draftFilters.favorite === "1"} onClick={() => updateDraft("favorite", "1")}>Избранное</FilterChoice></FilterGroup>
-          </div>
-          <div className={styles.sheetActions}><Button clear rounded onClick={() => setDraftFilters(EMPTY_FILTERS)}>Сбросить</Button><Button large rounded onClick={applyFilters}>Готово</Button></div>
-      </Sheet>}
-    </section>
-
-    {forced === "offline" && <p className={styles.offline}>Офлайн: показываем доступные данные, новые источники подтянутся позже.</p>}
-    {viewState === "loading" ? <Skeleton /> : viewState === "error" ? <section className={styles.empty} role="alert"><Icon name="triangle-alert" /><h2 className="flow-section-title">Не удалось загрузить каталог</h2><p>Повторите запрос. Ввод и фильтры сохраняются.</p><Button large rounded onClick={() => catalog.refetch()}>Повторить</Button></section> : workouts.length === 0 ? <section className={styles.empty}><Icon name="search-x" /><h2 className="flow-section-title">Ничего не найдено</h2><p>{explanation || "Попробуйте убрать часть фильтров."}</p><div className={styles.emptyActions}><Button large rounded onClick={reset}>Сбросить фильтры</Button><Button clear rounded onClick={openYoutube}>Искать видео</Button></div></section> : <><div className={styles.resultBar}><span>{workoutCountLabel(data?.total ?? workouts.length)}</span><Button inline clear small rounded className={styles.videoLink} onClick={openYoutube}>Искать видео</Button></div><div className={styles.list}>{workouts.map((w) => <WorkoutCard key={w.id} workout={w} onOpen={onOpen} />)}</div></>}
-    <p className={styles.notice} aria-live="polite">{notice}</p>
-  </div>;
+      <div className="grid grid-cols-2 gap-2 border-t border-border p-4 pb-safe-4"><Button clear rounded className={focusRing} onClick={() => setDraftFilters(EMPTY_FILTERS)}>Сбросить</Button><Button large rounded className={focusRing} onClick={applyFilters}>Готово</Button></div>
+    </Sheet>}
+  </>;
 }

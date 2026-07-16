@@ -391,7 +391,7 @@
 
 ### DEC-048 — Native Telegram BackButton для внутренних routes
 
-- **Статус:** approved
+- **Статус:** approved; visibility/history portion superseded by DEC-052
 - **Дата:** 2026-07-15
 - **Решение:** web `NavbarBackLink`/custom Back controls удаляются из Profile, Settings и будущих internal routes. Route-aware `TelegramBackButton` вызывает official `window.Telegram.WebApp.BackButton.show()` на всех routes AppShell кроме exact top-level `/`, `/catalog`, `/programs`, `/rhythm`, `/calendar`; на top-level вызывает `hide()`. Handler регистрируется через `BackButton.onClick` и симметрично удаляется через `offClick`; cleanup internal route не вызывает `hide()`, чтобы Settings → Profile не мигал native Close/X. `hide()` вызывается только effect следующего exact top-level route; действие Back — `router.back()`. Вне Telegram component no-op. Profile/Settings используют action-free `PrimaryNavbar`, поэтому fixed title и safe-area blur совпадают с основными pages.
 - **Ограничение Telegram:** native Close/X нельзя перехватить или превратить в Back — Telegram API этого не предоставляет. `BackButton` является отдельным native header control; конкретный клиент может визуально разместить его рядом с Close или заменить часть chrome.
@@ -399,12 +399,12 @@
 - **Источник:** official Telegram Mini Apps docs — [`BackButton`](https://core.telegram.org/bots/webapps#backbutton), [`backButtonClicked`](https://core.telegram.org/bots/webapps#events-available-for-mini-apps).
 - **Влияет на:** DEC-032/041/043/047, E0-D0-T05, Profile/Settings, AppRouteShell, Telegram SDK typings, AGENTS/FRONTEND_REVIEW/HANDOFF.
 
-### DEC-049 — Konsta/HIG composition каталога
+### DEC-050 — Konsta/HIG composition каталога
 
 - **Статус:** approved
 - **Дата:** 2026-07-15
-- **Решение:** S-MA-020 использует compact horizontal direct Konsta `Card`: фиксированное небольшое изображение слева, source/format/title/difficulty/category справа, duration на cover и UGC text cue для user source; detail открывает вся основная область. Disabled favorite control остаётся видимым по явному выбору пользователя. Filter Sheet использует direct Konsta `Navbar/List/ListItem/Radio/Toggle`: category/duration/difficulty/format являются single-select radio groups с `Любая`, equipment/YouTube/favorite — независимые toggles. Sheet обязан иметь modal focus transfer/trap/restore, inert+aria-hidden background, Escape/backdrop close и один primary `Готово`. Custom catalog Skeleton/CSS recreation запрещены; loading использует direct `Preloader`, offline показывает available data. Единственный Searchbar focus-owner wrapper разрешён как documented workaround: Konsta 5.2.0 принимает, но теряет `className`, поэтому без дополнительного DOM owner невозможно дать keyboard focus cue, не вмешиваясь в internal anatomy.
-- **Основание:** standalone code/browser/Apple HIG review выявил inconsistent custom CSS, color-only toggle chips, вечный offline skeleton, недоступный Sheet и clipping при 200% text. Пользователь явно выбрал `Radio + Toggle`, compact card и сохранение disabled favorite.
+- **Решение:** S-MA-020 использует approved shared `WorkoutMediaCard` DEC-053 из direct Konsta primitives: стабильная full-width 16:9 cover сверху, timecode на cover, затем source/format badges, полный title без line-clamp, compact difficulty/category metadata и domain action row; UGC получает text cue, detail открывает вся основная область. Cover geometry не растягивается от длины текста; при unusually long title общая высота Card адаптируется вместо обрезки content. Disabled favorite control остаётся видимым по явному выбору пользователя. Filter Sheet использует direct Konsta `Navbar/List/ListItem/Radio/Toggle`: category/duration/difficulty/format являются single-select radio groups с `Любая`, equipment/YouTube/favorite — независимые toggles. Sheet обязан иметь modal focus transfer/trap/restore, inert+aria-hidden background, Escape/backdrop close и один primary `Готово`. Custom catalog Skeleton/CSS recreation запрещены; loading использует direct `Preloader`, offline показывает available data. Единственный Searchbar focus-owner wrapper разрешён как documented workaround: Konsta 5.2.0 принимает, но теряет `className`, поэтому без дополнительного DOM owner невозможно дать keyboard focus cue, не вмешиваясь в internal anatomy. Native clear button Konsta имеет 32×32 target, поэтому отключён; при непустом input используется отдельный direct Konsta 44×44 clear Button.
+- **Основание:** standalone code/browser/Apple HIG review выявил inconsistent custom CSS, color-only toggle chips, вечный offline skeleton, недоступный Sheet и clipping при 200% text. Пользователь явно выбрал `Radio + Toggle` и сохранение disabled favorite. Последующий screenshot review показал, что horizontal grid растягивает image/card вслед за длинным title и ломает визуальный ритм; пользователь выбрал vertical cards и отдельно отклонил two-line clamp, потребовав полный title.
 - **PRD:** уточняет presentation/interaction S-MA-020 в рамках §12–13 без изменения API/routes/React Query contracts.
 - **Влияет на:** DEC-028/029/033/035, E0-D0-T05, S-MA-020, catalog UI/state evidence, HANDOFF.
 
@@ -418,6 +418,36 @@
 - **Риски:** public Piped instance остаётся best-effort внешней зависимостью; stale cache/unavailable contract обязателен. `/streams/:videoId` может не иметь metadata для отдельных видео, но normal save после search использует cached result.
 - **PRD:** §19, §43.28, §44.5, §55.2.
 - **Влияет на:** DEC-030, E2-D2-T04 historical provider contract, `packages/youtube`, `/api/v1/youtube/**`, `youtube_search_cache`, wrangler/env, HANDOFF.
+
+### DEC-051 — Konsta/HIG composition YouTube search и workout detail
+
+- **Статус:** approved
+- **Дата:** 2026-07-15
+- **Решение:** internal routes `/youtube` и `/workouts/[id]` используют action-free shared `PrimaryNavbar` с titles `Поиск YouTube` и `Тренировка`; собственные web Back/header rows запрещены, Back принадлежит native Telegram manager DEC-048. Desktop/web Navbar отсутствует по DEC-047, поэтому страницы сохраняют semantic H1. Оба screen family используют direct Konsta и не имеют CSS Modules/custom Skeleton. YouTube использует тот же shared `WorkoutMediaCard` DEC-053, real Save mutation и in-app fullscreen player вместо внешнего Watch link; stale/saved query остаётся enabled и показывает соответствующий status. Workout detail использует direct Card/Badge/Chip/List/ListItem/Button/Link/Preloader; semantic workout H1 вынесен над hero Card, а Card содержит только обложку, metadata, описание и действия; упражнения text-first, semantic `<details>` разрешён из-за отсутствия Konsta accordion. По явному выбору пользователя disabled Start/Favorite/Share и applicable UGC actions остаются видимыми с text/non-color cue `Скоро`; technical roadmap copy удаляется.
+- **Основание:** standalone review выявил 628 строк custom CSS, legacy web Back/raw header, custom Skeleton, сломанные stale/saved states, technical placeholders и несогласованность с последними Profile/Settings header commits. Последующий screenshot review пользователя выявил пустое/невыстроенное начало workout detail; пользователь явно утвердил перенос названия из hero Card в page heading.
+- **PRD:** уточняет presentation S-MA-021/022 в рамках §13/§19 без изменения routes, API, React Query, save mutation или visibility contracts.
+- **Влияет на:** DEC-028/029/035/041/047/048/050/053, E0-D0-T05, S-MA-021/022, YouTube/workout state evidence, HANDOFF.
+
+### DEC-052 — App-owned navigation history для Telegram BackButton
+
+- **Статус:** approved
+- **Дата:** 2026-07-16
+- **Решение:** native Telegram BackButton становится history-aware на всех AppShell routes, включая пять tab pages; правило DEC-048 `top-level => hide()` superseded. Provider маркирует Next/browser history entries session-scoped `{session,index,url}` state, сохраняет Next fields, различает push/replace/pop и не выходит за границу запуска Mini App. Distinct Tabbar переходы используют push; повторный tap active tab — no-op. При `index>0` Back выполняет `router.back()`; rapid events блокируются до pop/path completion. При direct entry index 0 используются contextual replace-fallbacks: Settings→Profile, YouTube/workout/author/safety→Catalog, Profile и exact tabs→Home, будущие child routes→свой tab parent. Back скрывается только на Home boundary index 0; там Bot API 6.2+ `enableClosingConfirmation()` защищает Close/X, а при доступном Back confirmation отключается. Native Close/X по-прежнему нельзя перехватить, скрыть или запретить; подтверждённое пользователем закрытие завершает Mini App.
+- **Основание:** пользователь потребовал Home→Yoga→Back→Home и Settings→Tracks→Back→Settings, а также защиту от accidental exit после серии Back. Empirical Next App Router probe подтвердил, что push создаёт entry без custom marker, поэтому provider может безопасно stamp state; browser/mock verification закрывает active-tab duplicates, rapid clicks, direct fallbacks, reload/back/forward и root confirmation.
+- **Источник:** official Telegram Mini Apps docs — BackButton Bot API 6.1 (`show/hide/onClick/offClick`) и closing confirmation Bot API 6.2 (`enableClosingConfirmation/disableClosingConfirmation`).
+- **PRD:** уточняет shared shell/back/close behavior §9/§38 без изменения routes или domain flows.
+- **Влияет на:** DEC-032/043/047/048, E0-D0-T05, AppRouteShell/TelegramBackButton/AppShell, Telegram typings, AGENTS/FRONTEND_REVIEW/flow inventory/HANDOFF.
+
+### DEC-053 — Shared workout media card и in-app YouTube player
+
+- **Статус:** approved exception
+- **Дата:** 2026-07-16
+- **Решение:** S-MA-020/021 используют один Flowly-specific `WorkoutMediaCard`, потому что Konsta не предоставляет domain workout-card component. Composite не переопределяет anatomy Konsta и только размещает direct `Card/Badge/Button`, cover Image, full title, compact one-line secondary metadata и domain action slot; Catalog и YouTube различаются только behavior/actions. Titles остаются полными по явному выбору пользователя, поэтому exact equal height не гарантируется; cover/timecode/padding/badges/typography/metadata/action geometry едины. S-MA-021 и YouTube workout detail не открывают внешний Watch link: tap по cover открывает shared fullscreen `YoutubePlayerPopup` из direct Konsta `Popup/Navbar/Button/Preloader`. Единственный raw `iframe` — approved minimal media exception из-за отсутствия Konsta player; используется `youtube-nocookie.com`, `autoplay=1`, `playsinline=1`, 16:9 edge-to-edge player ≥200px high at 360px, CSP `frame-src` allowlist, explicit close, Escape, focus restore, background inert/aria-hidden и scroll lock. Popup close unmounts iframe и останавливает playback.
+- **UX/content:** один timecode на cover, source+format Badges, full title, localized Russian views/publication metadata; duplicate duration и external `Смотреть` удалены. Native 32×32 Konsta Searchbar clear отключён в Catalog/YouTube и заменён conditional direct 44×44 clear Button.
+- **Основание:** пользователь указал на drift и разную высоту Catalog/YouTube cards, назвал YouTube лучшим baseline и поручил провести его review/fix. Явно выбраны: YouTube-after-review baseline, full titles, domain-specific actions, shared Card exception, fullscreen Popup, Search+Detail scope, autoplay after tap и shared Player/raw iframe exception. Official YouTube embed docs требуют player ≥200×200 и поддерживают `playsinline`; Apple HIG guidance для video предпочитает fullscreen media presentation.
+- **Ограничения:** iframe UI/branding контролирует YouTube и может предложить переход на YouTube; Flowly cover/action сами внешнюю навигацию не выполняют. Telegram WebView может заблокировать autoplay, тогда остаётся native Play внутри player; embedding может быть запрещён отдельным видео. Требуется real-device Telegram iOS/Android rerun.
+- **PRD:** уточняет presentation/playback S-MA-020/021/022 в рамках §12–13/§19 без изменения API, cache, save mutation или video download/storage contracts.
+- **Влияет на:** DEC-028/035/050/051, E0-D0-T05, S-MA-020/021/022, `apps/web/components/workouts/workout-media-card.tsx`, `apps/web/components/youtube/youtube-player-popup.tsx`, Catalog/YouTube/workout detail, CSP, screen contracts, HANDOFF.
 
 ## Открытые решения
 

@@ -25,6 +25,7 @@ const securityHeaders = [
       "img-src 'self' data: blob: https://i.ytimg.com",
       "font-src 'self' data:",
       "connect-src 'self'",
+      "frame-src https://www.youtube-nocookie.com",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",

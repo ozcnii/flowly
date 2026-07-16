@@ -13,7 +13,9 @@ flowchart TD
   C -- valid cache keyed by all filters, retained at least 24h / API --> R[S-MA-021 results]
   C -- unavailable --> U[Unavailable + retry/alternative]
   Y -- no --> D[S-MA-022 workout detail]
+  R -->|cover play| P[Fullscreen in-app YouTube player]
   R --> D
+  D -->|YouTube cover play| P
   D -->|favorite| Q[S-MA-023]
   D -->|UGC| G[Warning + report/hide/author]
   G --> X[S-MA-088 / S-MA-024]

@@ -36,13 +36,14 @@
 - [ ] AuthGate не должен пересоздаваться на каждом product route, если пользователь уже внутри authenticated shell; session check не должен мигать UI.
 - [ ] Product routes — нормальные paths, не `?screen=...`/`?tab=...`; query params допустимы только для настоящего state (`q`, filters) или временных dev forced states.
 - [ ] Internal page header — full-width direct Konsta `Navbar` вне page-padding container; title задан через `Navbar.title`, optional right action через Konsta `Link/Icon`.
-- [ ] Internal route не содержит web Back control; official Telegram `BackButton` visible only off the five exact top-level routes, click invokes `router.back()`, `onClick/offClick` cleanup is symmetric and does not hide between internal routes; only top-level effect hides it, so Close/X never flashes during internal Back; native Close/X is never treated as interceptable (DEC-048).
+- [ ] Internal route не содержит web Back control; official Telegram `BackButton` следует DEC-052: visible при app-history `index>0` или contextual direct-entry fallback на любом route, один rapid-click выполняет не более одного `router.back()`/replace, active-tab tap не создаёт entry, `onClick/offClick` cleanup симметричен без промежуточного hide; Home boundary index 0 скрывает Back и включает closing confirmation, native Close/X не считается interceptable.
 - [ ] Нет outer padding вокруг Navbar, custom header/title/back Button или CSS navbar imitation.
 - [ ] Telegram fullscreen root Navbar следует DEC-047: Navbar absent on desktop/web and present only for Telegram `ios|android|android_x`; mobile effective inset `max(44px, composed top)` owned once with title centered in the final 44px to avoid notch/native controls, safe-area blur covers the full top inset, title/action-free primary geometry and action-free internal title geometry match their approved contracts at initial and scrolled positions; Home content alone owns the `Твой план` + 44px `user-round` Profile action per DEC-043/046.
 - [ ] Back/cancel placement консистентен внутри раздела: не прыгать между верхом/низом без причины.
 - [ ] Если экран открыт из shared shell, back action не дублирует bottom nav и не нарушает ожидаемый history/back паттерн.
 - [ ] Для Next.js использовать nested `layout.tsx`/route groups там, где это предотвращает remount общего shell, повторную авторизацию и мигание.
 - [ ] Перед сдачей routing/layout changes проверены реальные clicks между разделами, не только прямое открытие URL.
+- [ ] History matrix включает Home→tab→Back, internal→tab→Back, direct-entry fallback chain, active-tab no-op, rapid Back, reload/back/forward с сохранением session marker и root closing confirmation; финальный Close/X rerun выполнен в реальном Telegram client.
 
 ## 4. Layout and spacing
 
@@ -160,6 +161,7 @@
 - [ ] Legacy `packages/ui` implementations/usages и duplicate CSS удалены вместе, а не скрыты новым wrapper layer.
 - [ ] Если `packages/ui` пуст после audit, package/dependencies и `/ui-kit` удалены; если approved composites остались, `/ui-kit` проверяет только их.
 - [ ] Onboarding/Settings используют один shared `@/components/timezone-picker`; duplicate timezone Select/Sheet implementations и legacy `packages/ui` Select/TextField отсутствуют.
+- [ ] Catalog/YouTube results используют один DEC-053 `@/components/workouts/workout-media-card`; Search/YouTube-detail playback использует только shared `@/components/youtube/youtube-player-popup`, external app Watch links и duplicate iframe/player implementations отсутствуют.
 - [ ] Для каждого исключения зафиксированы: отсутствующий Konsta equivalent, user approval, DEC-ID, минимальный DOM/CSS и отдельная verification evidence.
 - [ ] Визуальный язык совпадает с уже approved соседними экранами.
 - [ ] Route/dev forced states задокументированы в карточке/HANDOFF.
