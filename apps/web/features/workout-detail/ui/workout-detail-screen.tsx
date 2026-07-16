@@ -36,10 +36,10 @@ function Hero({ workout, onPlay }: { workout: WorkoutDetail; onPlay: (video: You
 }
 
 function Exercises({ workout }: { workout: WorkoutDetail }) {
-  return <section aria-labelledby="workout-exercises-title">
-    <BlockTitle component="h2" id="workout-exercises-title" className="!mb-2">Упражнения</BlockTitle>
-    <List strong inset dividers>
-      {workout.exercises.length === 0 ? <ListItem title="Упражнения" subtitle="Будут добавлены позже" after={<Badge>Скоро</Badge>} aria-disabled="true" /> : workout.exercises.map((exercise) => <ListItem
+  return <section aria-labelledby="workout-exercises-title" className="grid gap-2">
+    <BlockTitle component="h2" id="workout-exercises-title" className="!m-0">Упражнения</BlockTitle>
+    <List strong inset dividers className="!m-0">
+      {workout.exercises.length === 0 ? <ListItem title="Будут добавлены позже" after={<Badge>Скоро</Badge>} aria-disabled="true" /> : workout.exercises.map((exercise) => <ListItem
         key={`${exercise.position}-${exercise.id}`}
         media={<Badge>{exercise.position}</Badge>}
         title={<span className="block min-w-0 [overflow-wrap:anywhere]">{exercise.title}</span>}
@@ -56,9 +56,9 @@ function Exercises({ workout }: { workout: WorkoutDetail }) {
 
 function ActionPanel({ workout }: { workout: WorkoutDetail }) {
   const future = (title: string, icon: string) => <ListItem key={title} media={<Icon name={icon} />} title={title} after={<Badge>Скоро</Badge>} aria-disabled="true" />;
-  return <section aria-labelledby="workout-actions-title">
-    <BlockTitle component="h2" id="workout-actions-title" className="!mb-2">Возможности</BlockTitle>
-    <List strong inset dividers>
+  return <section aria-labelledby="workout-actions-title" className="grid gap-2">
+    <BlockTitle component="h2" id="workout-actions-title" className="!m-0">Возможности</BlockTitle>
+    <List strong inset dividers className="!m-0">
       {future("Начать тренировку", "play")}
       {future("Добавить в избранное", "bookmark")}
       {future("Поделиться", "share-2")}
@@ -79,8 +79,12 @@ function Detail({ workout, forced, onPlay }: { workout: WorkoutDetail; forced: F
     <Exercises workout={workout} />
     <ActionPanel workout={workout} />
 
-    <Card component="details" outline className="m-0" aria-labelledby="workout-more-title">
-      <summary id="workout-more-title" className={`flex min-h-12 cursor-pointer items-center px-4 py-3 font-semibold ${focusRing}`}>Сведения</summary>
+    <Card component="details" contentWrap={false} outline className="group m-0" aria-labelledby="workout-more-title">
+      <summary id="workout-more-title" className={`flex min-h-16 cursor-pointer items-center gap-3 px-4 py-3 ${focusRing}`}>
+        <Icon name="info" />
+        <span className="min-w-0 flex-1"><span className="block font-semibold">Сведения</span><span className="block truncate text-sm text-text-muted">Противопоказания, источник и автор</span></span>
+        <Icon name="chevron-down" className="transition-transform group-open:rotate-180" />
+      </summary>
       <div className="grid gap-3 px-4 pb-4">
         <h2 className="m-0 text-lg font-semibold">Противопоказания</h2>
         <ul className="m-0 grid gap-2 ps-5 text-sm leading-relaxed text-text-muted">{contraindications.map((item) => <li key={item}>{item}</li>)}</ul>
