@@ -29,10 +29,10 @@
 ## 3. App shell, routing and navigation architecture
 
 - [ ] Product screen использует общий route/layout/shell паттерн Next.js, а не standalone page, если это часть приложения.
-- [ ] Нижняя навигация, header/profile action и общий shell не исчезают при переходе между product routes, кроме явно immersive/fullscreen flows.
+- [ ] Shared AppShell/AuthGate не remount; DEC-061 Tabbar видим только на exact roots `/`, `/catalog`, `/programs`, `/rhythm`, `/calendar`, а на любом internal pathname скрыт независимо от platform; query params root classification не меняют.
 - [ ] Fullscreen shell использует вложенную модель Telegram: system safe inset и content-safe inset складываются; top content не уходит под Telegram chrome.
 - [ ] DEC-055: native Telegram header/background/bottom bar синхронизированы с resolved Flowly light/dark canvas через supported SDK versions; real-device time/signal/battery icons контрастны, отдельный foreground API не предполагается.
-- [ ] Floating navbar остаётся 64px при bottom safe area `0/34/48`, меняет только offset, а последний content/action при максимальном scroll остаётся выше navbar.
+- [ ] На exact roots floating navbar остаётся 64px при bottom safe area `0/34/48`, меняет только offset, а последний content/action остаётся выше него через `pb-safe-24`; internal route без Tabbar использует `pb-safe-4`.
 - [ ] Навигация не вызывает видимый full reload, re-auth flicker или повторный auth/error/loading screen при обычном переходе внутри app.
 - [ ] AuthGate не должен пересоздаваться на каждом product route, если пользователь уже внутри authenticated shell; session check не должен мигать UI.
 - [ ] Product routes — нормальные paths, не `?screen=...`/`?tab=...`; query params допустимы только для настоящего state (`q`, filters) или временных dev forced states.
@@ -45,6 +45,7 @@
 - [ ] Для Next.js использовать nested `layout.tsx`/route groups там, где это предотвращает remount общего shell, повторную авторизацию и мигание.
 - [ ] Перед сдачей routing/layout changes проверены реальные clicks между разделами, не только прямое открытие URL.
 - [ ] History matrix включает Home→tab→Back, internal→tab→Back, direct-entry fallback chain, active-tab no-op, rapid Back, reload/back/forward с сохранением session marker и root closing confirmation; финальный Close/X rerun выполнен в реальном Telegram client.
+- [ ] DEC-061 route matrix: пять exact roots + `/catalog?...` имеют один Tabbar/`pb-safe-24`; Profile/Settings/YouTube/Workout/Sources/Safety имеют 0 Tabbar/`pb-safe-4`; Home→Profile→Settings→Back×2 и Catalog→internal→Back не remount/flicker и восстанавливают Tabbar только на root.
 - [ ] DEC-056 keyboard matrix: на mobile focus каждого ListInput/Searchbar/textarea/contenteditable скрывает bottom Tabbar и переключает main reserve `pb-safe-24`→`pb-safe-4`; blur/Sheet close возвращает navigation, переход input→input не мигает, checkbox/radio/toggle и desktop focus не скрывают Tabbar.
 - [ ] DEC-058 fullscreen overlay matrix: один composed safe-area owner; mobile action-free title целиком внутри final top inset, local Close не пересекает status/battery/native chrome, media начинается ниже inset и contained в portrait/landscape; native Back закрывает overlay без route/index change и восстанавливает trigger focus; desktop Close остаётся 44px.
 
