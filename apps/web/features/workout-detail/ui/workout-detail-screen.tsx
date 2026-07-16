@@ -11,6 +11,7 @@ import { YoutubePlayerPopup, type YoutubePlayerVideo } from "@/components/youtub
 import type { WorkoutDetail } from "@/features/catalog/model/catalog";
 import { DIFFICULTY, FORMAT, SOURCE, minutes } from "@/features/catalog/model/catalog";
 import { useWorkoutDetailQuery } from "@/features/catalog/model/catalog-queries";
+import { IMAGE_BLUR_DATA_URL } from "@/lib/image";
 
 type Forced = "loading" | "error" | "offline" | "hidden" | null;
 type Props = { id: string; forced?: Forced };
@@ -25,7 +26,7 @@ function Hero({ workout, onPlay }: { workout: WorkoutDetail; onPlay: (video: You
   const description = /^Видео канала\s+/i.test(workout.description.trim()) ? "" : workout.description.trim();
   return <Card component="section" contentWrap={false} outline className="m-0">
     {image && <div className="relative aspect-video bg-accent-soft">
-      <Image src={image} alt={`Практика «${workout.title}»`} fill sizes="(max-width: 430px) calc(100vw - 40px), 640px" priority decoding="sync" unoptimized={workout.sourceType === "youtube"} className="object-cover" />
+      <Image src={image} alt={`Практика «${workout.title}»`} fill sizes="(max-width: 430px) calc(100vw - 40px), 640px" preload decoding="sync" placeholder="blur" blurDataURL={IMAGE_BLUR_DATA_URL} unoptimized={workout.sourceType === "youtube"} className="object-cover" />
       {workout.youtubeVideoId && <YoutubePlayButton title={workout.title} onClick={(event) => onPlay({ videoId: workout.youtubeVideoId!, title: workout.title, trigger: event.currentTarget })} />}
     </div>}
     <div className="grid min-w-0 gap-2 p-4 [&>*]:min-w-0">

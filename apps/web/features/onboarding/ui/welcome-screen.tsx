@@ -3,13 +3,14 @@
 import { BlockTitle, Button, Card } from "konsta/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { IMAGE_BLUR_DATA_URL } from "@/lib/image";
 
 /** S-MA-002 — Apple HIG / Konsta-first welcome (DEC-036, DEC-037). */
 export function WelcomeScreen() {
   const router = useRouter();
   return <main className="safe-shell flow-screen gap-5 md:grid md:grid-cols-[minmax(16rem,1fr)_minmax(18rem,1fr)] md:items-center">
     <Card contentWrap={false} className="relative min-h-72 overflow-hidden md:min-h-[31rem]">
-      <Image src="/media/home-program.webp" alt="Спокойная практика йоги" fill priority decoding="sync" sizes="100vw" className="object-cover object-[center_35%]" />
+      <Image src="/media/home-program.webp" alt="Спокойная практика йоги" fill preload decoding="sync" sizes="100vw" placeholder="blur" blurDataURL={IMAGE_BLUR_DATA_URL} className="object-cover object-[center_35%]" />
     </Card>
 
     <section className="grid gap-3 md:content-center">

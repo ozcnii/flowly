@@ -294,10 +294,10 @@
 
 - **Статус:** approved
 - **Дата:** 2026-07-15
-- **Решение:** Konsta UI предоставляет `Icon` layout/container, но не поставляет icon artwork. Разрешён существующий локальный versioned Lucide SVG sprite `/icons/lucide.svg` через единственный минимальный `packages/ui/Icon` composite. Другие icon sources и app-local icon wrappers запрещены без нового approval. Composite не меняет Konsta control anatomy, SVG всегда decorative (`aria-hidden`, `focusable=false`), accessible name принадлежит control.
+- **Решение:** Konsta UI предоставляет `Icon` layout/container, но не поставляет icon artwork. Разрешён локальный versioned Lucide inline SVG sprite `packages/ui/src/icon-sprite.tsx`, один раз отрендеренный root layout; единственный минимальный `packages/ui/Icon` composite использует same-document fragment `#icon-*`, без внешнего sprite fetch/revalidation. Другие icon sources и app-local icon wrappers запрещены без нового approval. Composite не меняет Konsta control anatomy, SVG всегда decorative (`aria-hidden`, `focusable=false`), accessible name принадлежит control.
 - **Основание:** source audit Konsta 5.2.0 подтвердил отсутствие bundled icon artwork; пользователь явно выбрал «Разрешить Lucide» после обязательного вопроса по AGENTS.md.
 - **PRD:** §40, §55.1.
-- **Влияет на:** E0-D0-T05, `packages/ui/src/icon.tsx`, `/icons/lucide.svg`, все Konsta controls с icon artwork, `/ui-kit`.
+- **Влияет на:** E0-D0-T05, `packages/ui/src/icon.tsx`, `packages/ui/src/icon-sprite.tsx`, root layout, все Konsta controls с icon artwork, `/ui-kit`.
 
 ### DEC-038 — Konsta Preloader для loading state Главной
 
@@ -504,6 +504,25 @@
 - **Решение:** standalone icon actions Profile, Catalog filter и YouTube play используют один `GlassIconButton`, точно повторяющий source composition Konsta Navbar action: direct `Glass` с default light/dark glass colors, shadows, backdrop blur и enabled iOS highlight оборачивает direct clear rounded `Button` 44×44 и default inherited-primary Lucide icon 20×20. Play дополнительно использует только absolute centering wrapper в `YoutubePlayButton`; в Catalog cards play отсутствует и cover открывает detail. Timezone Sheet Searchbar получает symmetric 16px horizontal layout inset, поскольку Searchbar `className` не применяется Konsta 5.2.0.
 - **Основание:** screenshot review выявил bare play без подложки, затем custom circle, не совпадающий с documented Konsta Close glass по размеру, цвету и interaction effects; отдельные screenshots потребовали тот же Glass contract для filter/Profile и inset для timezone search.
 - **Влияет на:** DEC-036/043/050/053, E0-D0-T05, GlassIconButton/YoutubePlayButton, Home/Catalog/YouTube/workout detail/TimezonePicker, AGENTS, FRONTEND_REVIEW, HANDOFF.
+
+### DEC-060 — Next-native media paint without route flicker
+
+- **Статус:** approved
+- **Дата:** 2026-07-16
+- **Решение:** production artwork icons use the DEC-037 inline same-document SVG sprite, so route remounts never depend on an external sprite request. Production `next/image` instances use only official Next.js 16 behavior: `preload` for unique hero/LCP media, `loading="eager"` for above-the-fold images, default/lazy loading for remaining cards, `placeholder="blur"` with one shared lightweight `blurDataURL`, and `decoding="sync"`. A custom session URL/image cache is explicitly rejected; application routing, media URLs and visual layout remain unchanged.
+- **Основание:** canonical Catalog → Programs → Catalog Chromium repro recorded `/icons/lucide.svg` as initial `200` plus repeated route-level `304`; icon `<use>` nodes were recreated on each route. Cached lazy card images could initially expose empty `currentSrc` before the next paint. Пользователь approved inline sprite fix and then explicitly selected «только Next»: official preload/eager/lazy+blur behavior without custom URL cache.
+- **Verification:** post-fix frame sampling at 0/16/50/100/250/500ms keeps the previous route until commit and shows complete Catalog images on the first captured new-route frame; all icon refs are local `#icon-*`, `/icons/lucide.svg` responses are zero, repeated YouTube thumbnail is served from disk cache. All five production `Image` sites have sync decode + blur placeholder, deprecated `priority` usages are zero. Root typecheck/lint/build, OpenNext/Cloudflare deploy-check and diff-check PASS.
+- **Ограничение:** real Telegram iOS/Android WebView paint still requires device confirmation; below-fold lazy images may briefly show the approved blur placeholder rather than a blank surface.
+- **Влияет на:** DEC-037/053/054, E0-D0-T05, root layout, `@flowly/ui/Icon`, Home, onboarding, Catalog, Sources, YouTube Search and workout detail.
+
+### DEC-061 — Tabbar только на exact top-level routes
+
+- **Статус:** approved
+- **Дата:** 2026-07-16
+- **Решение:** shared bottom Konsta Tabbar рендерится только на пяти exact roots `/`, `/catalog`, `/programs`, `/rhythm`, `/calendar` на всех platforms; query params root classification не меняют. Любой другой текущий или будущий AppShell pathname автоматически internal: `/profile`, `/settings`, `/youtube`, `/workouts/[id]`, `/sources`, `/safety/[action]` скрывают Tabbar и используют `pb-safe-4` вместо navbar reserve `pb-safe-24`. Top/internal Navbar, persistent AuthGate/AppShell и native Telegram Back/history остаются; возврат на exact root восстанавливает Tabbar без full reload/remount.
+- **Основание:** пользовательский UX review сценария Home→Profile→Settings показал, что persistent Tabbar делает child pages визуально равноправными основным разделам и конфликтует с Apple-like navigation hierarchy. Пользователь явно выбрал all internal routes на mobile+desktop.
+- **Ограничение:** новый top-level tab может появиться только через явное approved изменение exact root set/shared mapping; local page-level hide/show props запрещены.
+- **Влияет на:** DEC-032/043/052/056, E0-D0-T05, AppRouteShell/AppShell, all current/future product routes, AGENTS, FRONTEND_REVIEW, HANDOFF.
 
 ## Открытые решения
 
