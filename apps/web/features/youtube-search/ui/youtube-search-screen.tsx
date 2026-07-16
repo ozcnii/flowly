@@ -43,16 +43,12 @@ function ResultCard({ result, filters, onPlay, initialSaved = false, eager = fal
     title={result.title}
     coverSrc={result.thumbnailUrl ?? ""}
     durationSeconds={result.durationSeconds}
-    source="YouTube"
-    format="Видео"
     metadata={[result.channelTitle, viewsLabel(result.viewCount), publishedLabel(result.publishedAt)].filter(Boolean).join(" · ")}
     eager={eager}
     unoptimized
     onPlay={(trigger) => onPlay({ videoId: result.videoId, title: result.title, trigger })}
-    actions={<>
-      <Button inline rounded tonal={isSaved} disabled={save.isPending || isSaved} aria-busy={save.isPending || undefined} className={`gap-2 ${focusRing}`} onClick={submit}>{save.isPending && <Preloader className="size-4" />}<span aria-live="polite">{isSaved ? "Сохранено" : "Сохранить"}</span></Button>
-      {save.isError && <p className="basis-full m-0 text-right text-sm text-danger" role="alert">Не удалось сохранить. Повторите позже.</p>}
-    </>}
+    actions={<Button inline clear={!isSaved} tonal={isSaved} rounded disabled={save.isPending || isSaved} aria-busy={save.isPending || undefined} aria-label={isSaved ? `«${result.title}» сохранено` : `Сохранить «${result.title}»`} title={isSaved ? "Сохранено" : "Сохранить"} className={`h-11 w-11 min-w-11 p-0 ${focusRing}`} onClick={submit}>{save.isPending ? <Preloader className="size-4" /> : <Icon name={isSaved ? "check" : "bookmark"} />}<span className="sr-only" aria-live="polite">{isSaved ? "Сохранено" : "Сохранить"}</span></Button>}
+    status={save.isError ? <p className="m-0 text-sm text-danger" role="alert">Не удалось сохранить. Повторите позже.</p> : undefined}
   />;
 }
 

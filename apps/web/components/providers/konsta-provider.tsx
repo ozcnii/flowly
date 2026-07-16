@@ -3,6 +3,15 @@
 import { KonstaProvider as Provider } from "konsta/react";
 import { useEffect, useState, type ReactNode } from "react";
 
+const syncTelegramChrome = (telegram: TelegramWebApp | undefined) => {
+  if (!telegram || telegram.isVersionAtLeast?.("6.1") === false) return;
+  const color = getComputedStyle(document.documentElement).getPropertyValue("--color-canvas").trim() as `#${string}`;
+  if (!/^#[\da-f]{6}$/i.test(color)) return;
+  telegram.setHeaderColor?.(telegram.isVersionAtLeast?.("6.9") === false ? "bg_color" : color);
+  telegram.setBackgroundColor?.(color);
+  if (telegram.isVersionAtLeast?.("7.10") !== false) telegram.setBottomBarColor?.(color);
+};
+
 const resolveTheme = () => {
   const forced = process.env.NODE_ENV !== "production" ? new URLSearchParams(location.search).get("theme") : null;
   if (forced === "light" || forced === "dark") return forced;
@@ -22,6 +31,7 @@ export function KonstaProvider({ children }: { children: ReactNode }) {
       const theme = resolveTheme();
       document.documentElement.dataset.theme = theme;
       document.documentElement.classList.toggle("dark", theme === "dark");
+      syncTelegramChrome(telegram);
       setDark(theme === "dark");
     };
     sync();

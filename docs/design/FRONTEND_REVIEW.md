@@ -31,6 +31,7 @@
 - [ ] Product screen использует общий route/layout/shell паттерн Next.js, а не standalone page, если это часть приложения.
 - [ ] Нижняя навигация, header/profile action и общий shell не исчезают при переходе между product routes, кроме явно immersive/fullscreen flows.
 - [ ] Fullscreen shell использует вложенную модель Telegram: system safe inset и content-safe inset складываются; top content не уходит под Telegram chrome.
+- [ ] DEC-054: native Telegram header/background/bottom bar синхронизированы с resolved Flowly light/dark canvas через supported SDK versions; real-device time/signal/battery icons контрастны, отдельный foreground API не предполагается.
 - [ ] Floating navbar остаётся 64px при bottom safe area `0/34/48`, меняет только offset, а последний content/action при максимальном scroll остаётся выше navbar.
 - [ ] Навигация не вызывает видимый full reload, re-auth flicker или повторный auth/error/loading screen при обычном переходе внутри app.
 - [ ] AuthGate не должен пересоздаваться на каждом product route, если пользователь уже внутри authenticated shell; session check не должен мигать UI.
@@ -161,7 +162,7 @@
 - [ ] Legacy `packages/ui` implementations/usages и duplicate CSS удалены вместе, а не скрыты новым wrapper layer.
 - [ ] Если `packages/ui` пуст после audit, package/dependencies и `/ui-kit` удалены; если approved composites остались, `/ui-kit` проверяет только их.
 - [ ] Onboarding/Settings используют один shared `@/components/timezone-picker`; duplicate timezone Select/Sheet implementations и legacy `packages/ui` Select/TextField отсутствуют.
-- [ ] Catalog/YouTube results используют один DEC-053 `@/components/workouts/workout-media-card`; Search/YouTube-detail playback использует только shared `@/components/youtube/youtube-player-popup`, external app Watch links и duplicate iframe/player implementations отсутствуют.
+- [ ] Catalog/YouTube results используют один DEC-053 `@/components/workouts/workout-media-card` с two-line visual/full accessible title и compact 44px domain icon action; Search/YouTube-detail playback использует только shared `@/components/youtube/youtube-player-popup`, external app Watch links и duplicate iframe/player implementations отсутствуют.
 - [ ] Для каждого исключения зафиксированы: отсутствующий Konsta equivalent, user approval, DEC-ID, минимальный DOM/CSS и отдельная verification evidence.
 - [ ] Визуальный язык совпадает с уже approved соседними экранами.
 - [ ] Route/dev forced states задокументированы в карточке/HANDOFF.

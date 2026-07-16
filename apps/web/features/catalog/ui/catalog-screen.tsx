@@ -31,10 +31,7 @@ function WorkoutCard({ workout, onOpen, eager }: { workout: CatalogWorkout; onOp
     title={workout.title}
     coverSrc={thumb}
     durationSeconds={workout.durationSeconds}
-    source={source}
-    format={format}
-    metadata={[difficulty, category].filter(Boolean).join(" · ")}
-    marker={workout.sourceType === "user" ? "Сообщество" : undefined}
+    metadata={[source, format, difficulty, category, workout.sourceType === "user" ? "Сообщество" : ""].filter(Boolean).join(" · ")}
     eager={eager}
     unoptimized={workout.sourceType === "youtube"}
     onOpen={() => onOpen(workout.id)}
@@ -128,7 +125,10 @@ export function CatalogScreen({ forced = null }: { forced?: Forced }) {
           {/* DEC-050: Konsta 5.2.0 Searchbar drops className; this single focus owner restores the required keyboard cue without changing its anatomy. */}
           <div className="min-w-0 flex-1 rounded-3xl focus-within:ring-2 focus-within:ring-inset focus-within:ring-accent"><Searchbar inputId="catalog-search" value={searchInput} onInput={(event) => setSearchInput(event.target.value)} clearButton={false} placeholder="Поиск" /></div>
           {searchInput && <Button inline clear rounded className={`h-11 w-11 min-w-11 p-0 ${focusRing}`} aria-label="Очистить поиск" onClick={() => setSearchInput("")}><Icon name="x" /></Button>}
-          <Button ref={filterButtonRef} inline clear rounded className={`relative h-11 w-11 min-w-11 p-0 ${focusRing}`} aria-label={extraFilterCount ? `Открыть фильтры, выбрано: ${extraFilterCount}` : "Открыть фильтры"} aria-haspopup="dialog" aria-expanded={filtersOpen} onClick={openFilters}><Icon name="funnel" />{extraFilterCount > 0 && <Badge className="absolute -right-1 -top-1 min-w-5">{extraFilterCount}</Badge>}</Button>
+          <span className="relative inline-flex shrink-0">
+            <Button ref={filterButtonRef} inline clear rounded className={`h-11 w-11 min-w-11 p-0 ${focusRing}`} aria-label={extraFilterCount ? `Открыть фильтры, выбрано: ${extraFilterCount}` : "Открыть фильтры"} aria-haspopup="dialog" aria-expanded={filtersOpen} onClick={openFilters}><Icon name="funnel" /></Button>
+            {extraFilterCount > 0 && <Badge aria-hidden="true" className="pointer-events-none absolute -right-1 -top-1 z-20 min-w-5">{extraFilterCount}</Badge>}
+          </span>
         </div>
       </section>
 

@@ -19,11 +19,17 @@ interface TelegramWebApp {
   safeAreaInset?: TelegramSafeAreaInset;
   contentSafeAreaInset?: TelegramSafeAreaInset;
   isFullscreen?: boolean;
+  headerColor?: string;
+  backgroundColor?: string;
+  bottomBarColor?: string;
   BackButton?: TelegramBackButton;
   isClosingConfirmationEnabled?: boolean;
   isVersionAtLeast?: (version: string) => boolean;
   enableClosingConfirmation?: () => void;
   disableClosingConfirmation?: () => void;
+  setHeaderColor?: (color: "bg_color" | "secondary_bg_color" | `#${string}`) => void;
+  setBackgroundColor?: (color: `#${string}`) => void;
+  setBottomBarColor?: (color: "bg_color" | "secondary_bg_color" | `#${string}`) => void;
   requestFullscreen?: () => void;
   ready?: () => void;
   expand?: () => void;
