@@ -133,16 +133,16 @@ export function VideoSessionScreen({ id }: { id: string }) {
     </Shell>
 
     <ModalPortal>
-      {finishOpened && <Sheet ref={finishSheetRef} opened backdrop onBackdropClick={closeFinish} className="flex max-h-[88dvh] flex-col" role="dialog" aria-modal="true" aria-labelledby="finish-session-title">
+      {finishOpened && <Sheet ref={finishSheetRef} opened backdrop onBackdropClick={closeFinish} className="flex max-h-[88dvh] max-w-full flex-col" role="dialog" aria-modal="true" aria-labelledby="finish-session-title">
         <Navbar title={<span id="finish-session-title">Завершить тренировку</span>} />
-        <div className="min-h-0 overflow-auto py-2">
+        <div className="min-h-0 min-w-0 overflow-x-hidden overflow-y-auto py-2">
           <List strong dividers className="!m-0">{FINAL_STATUSES.map((item) => <ListItem key={item} label title={FINAL_STATUS_LABELS[item]} after={<Radio component="div" name="final-status" checked={status === item} onChange={() => setStatus(item)} />} />)}</List>
-          {!commentOpened ? <Button clear rounded className="mx-4 mt-2 gap-2" onClick={() => setCommentOpened(true)}><Icon name="plus" />Добавить комментарий</Button> : <List strong inset className="!my-2"><ListInput title="" outline type="text" label="Комментарий (необязательно)" value={comment} maxLength={1000} onInput={(event) => setComment(event.currentTarget.value)} /></List>}
+          {!commentOpened ? <Button clear rounded className="mx-4 mt-2 w-[calc(100%_-_2rem)] min-w-0 gap-2 whitespace-normal" onClick={() => setCommentOpened(true)}><Icon name="plus" />Добавить комментарий</Button> : <List strong inset className="!my-2"><ListInput title="" outline type="text" label="Комментарий (необязательно)" value={comment} maxLength={1000} onInput={(event) => setComment(event.currentTarget.value)} /></List>}
           {finish.isError && <p className="m-4 text-sm text-danger" role="alert">Не удалось сохранить результат. Выбор и комментарий не потеряны.</p>}
         </div>
-        <div className="grid grid-cols-2 gap-2 border-t border-border p-4 pb-safe-4"><Button clear rounded disabled={finish.isPending} onClick={closeFinish}>Отмена</Button><Button large rounded disabled={!status || finish.isPending || checkpoint.isPending} onClick={() => void submitFinish()}>{finish.isPending ? "Сохраняем…" : "Готово"}</Button></div>
+        <div className="grid grid-cols-2 gap-2 border-t border-border p-4 pb-safe-6"><Button clear rounded disabled={finish.isPending} onClick={closeFinish}>Отмена</Button><Button large rounded disabled={!status || finish.isPending || checkpoint.isPending} onClick={() => void submitFinish()}>{finish.isPending ? "Сохраняем…" : "Готово"}</Button></div>
       </Sheet>}
-      {conflict && <Sheet ref={conflictSheetRef} opened backdrop className="flex max-h-[80dvh] flex-col" role="dialog" aria-modal="true" aria-labelledby="sync-conflict-title">
+      {conflict && <Sheet ref={conflictSheetRef} opened backdrop className="flex max-h-[80dvh] max-w-full flex-col" role="dialog" aria-modal="true" aria-labelledby="sync-conflict-title">
         <Navbar title={<span id="sync-conflict-title">Где продолжить?</span>} />
         <div className="grid gap-4 p-4">
           <p className="m-0 text-sm leading-relaxed text-text-muted">Есть два разных сохранения тренировки. Выберите нужное — автоматически объединять их небезопасно.</p>
