@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 import { Icon } from "@flowly/ui";
 import { useTelegramBackOverride } from "@/components/providers/telegram-back-button";
 import { SafeAreaTitleNavbar, useMobileTelegramPlatform } from "@/components/shell/primary-navbar";
+import { YoutubeIframePlayer } from "@/components/youtube/youtube-iframe-player";
 
 export type YoutubePlayerVideo = { videoId: string; title: string; trigger: HTMLElement };
 
@@ -16,16 +17,7 @@ function YoutubeFrame({ video }: { video: YoutubePlayerVideo }) {
   return <main className="flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden bg-black">
     <div className="relative aspect-video bg-black" style={{ width: "min(100%, calc((100dvh - var(--component-safe-area-top)) * 16 / 9))" }}>
       {!loaded && <div className="absolute inset-0 grid place-items-center" role="status" aria-live="polite"><Preloader className="text-white" /><span className="sr-only">Загружаем видео</span></div>}
-      {/* DEC-053: Konsta has no video player; this approved raw iframe is the minimal YouTube media exception. */}
-      <iframe
-        className="relative size-full border-0"
-        src={`https://www.youtube-nocookie.com/embed/${encodeURIComponent(video.videoId)}?autoplay=1&playsinline=1&rel=0`}
-        title={video.title}
-        allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-        allowFullScreen
-        referrerPolicy="strict-origin-when-cross-origin"
-        onLoad={() => setLoaded(true)}
-      />
+      <YoutubeIframePlayer className="relative size-full border-0" videoId={video.videoId} title={video.title} onReady={() => setLoaded(true)} onError={() => setLoaded(true)} />
     </div>
   </main>;
 }

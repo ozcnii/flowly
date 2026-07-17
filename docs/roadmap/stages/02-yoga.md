@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 6 | 0 | 0 | 0 | 6 |
+| 5 | 1 | 0 | 0 | 6 |
 
 ## Зависимости и инварианты
 
@@ -24,7 +24,7 @@
 - По `DEC-035` Konsta UI 5.2.0 (`konsta/react`, `ios` theme) обязательна для current/future production UI; direct imports — default, `packages/ui` допустим только для Flowly-specific contracts, отсутствующих в Konsta.
 - По `DEC-028` frontend screen slices нельзя показывать пользователю без самостоятельного UI/UX quality pass по [`docs/design/FRONTEND_REVIEW.md`](../../design/FRONTEND_REVIEW.md): визуальная иерархия, плотность/отступы, релевантность actions, отсутствие служебного текста/fake controls, 360–430px, light/dark, overflow=0, targets ≥44px, console errors=0.
 - Home/content errors локальны; YouTube использует cache ≥24h с key по всем filters и явный fallback (`DEC-016`).
-- Active workout хранит offline checkpoint; status выбирается явно по контекстной матрице (`DEC-015`, `DEC-016`).
+- Active workout хранит offline checkpoint; status выбирается явно по контекстной матрице (`DEC-015`, `DEC-016`). По `DEC-062` video runtime использует `/sessions/[id]`, one-open D1 constraint, YouTube IFrame API active-time, explicit server/device conflict и atomic occurrence/history finish.
 - Первое сохранение своей тренировки требует title, duration, difficulty и executable content; sharing создаёт копию только явным действием (`DEC-016`, `DEC-019`).
 - UGC report/hide/block разделены (`DEC-021`); все UI states следуют `DEC-022` и [`docs/design/flows/`](../../design/flows/).
 
@@ -94,12 +94,13 @@
 ## Deliverable E2-D3 — Выполнение и создание тренировок
 
 ### E2-D3-T01 — Реализовать видеосессию
-- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §14.1, §14.4, §15, §43.23 · **depends_on:** E2-D2-T03 · **decisions:** DEC-015, DEC-016, DEC-022, DEC-024, DEC-025, DEC-029
+- **status:** in_progress · **priority:** high · **owner:** AI agent · **updated:** 2026-07-17
+- **prd_refs:** §14.1, §14.4, §15, §43.21, §43.23–43.24 · **depends_on:** E2-D2-T03 · **decisions:** DEC-015, DEC-016, DEC-022, DEC-024, DEC-029, DEC-035, DEC-062
 - **ui_slices:** S-MA-012, S-MA-030, S-MA-033, S-MA-034 — выполнять последовательно; approval каждого ID обязателен до следующего.
-- **scope:** start/resume/finish lifecycle и явный итоговый статус.
+- **scope:** persisted `/sessions/[id]` start/resume/finish lifecycle, YouTube IFrame API active-time, one-open conflict, server+offline checkpoint, explicit final status и minimal occurrence/history persistence.
 - **acceptance:** [ ] открытая сессия сохраняется; [ ] автозавершения нет; [ ] итог подтверждает пользователь.
-- **validation/evidence:** lifecycle sequence и persisted records.
+- **validation/evidence:** plan `.temp/E2-D3-T01/plan.md`; migration `0006_cool_dreadnoughts.sql` local PASS; canonical HTTP evidence `.temp/E2-D3-T01/http/**`: start 201, duplicate/new conflict 409, non-executable 409, checkpoint 200, stale 409, explicit force 200, missing status 400, finish/repeat 200 with same occurrence, five-status matrix PASS, occurrence/history exactly 1. Browser evidence `/tmp/flowly-session-review-shots/session-390-dark.png`: 360/390/430 overflow 0, visible targets ≥44, Tabbar 0, controlled `youtube-nocookie` IFrame API params, Home real resume, historical final Dialog no-default state, Start conflict Continue/Close/Cancel, console errors 0. Root typecheck/lint/build/OpenNext deploy-check PASS. User screenshot review rejected current 3-button conflict Dialog, final-status Dialog and responsive exercises spacing. Canonical bug repro `.temp/E2-D3-T01/checkpoint-repro.json`: after actual `0:03` IFrame playback and SPA Back, local checkpoint=0 and server=0; exact progress loss confirmed. Correction plan/user approval and real-device Telegram player review pending.
+- **journal:** 2026-07-16 — после закрытия E0-D0-T05 пользователь выбрал E2-D3-T01 как следующую карточку. Dependency E2-D2-T03 `done`; прочитаны PRD refs, DEC-015/016/022/024/025/029 и superseding DEC-035, F04/S-MA-012/030/033/034 contracts. Выполнен переход `backlog -> in_progress`; до plan approval runtime code не менять. 2026-07-17 — пользователь выбрал plan file `.temp/E2-D3-T01/plan.md`, подтвердил `/sessions/[id]`, IFrame API, occurrence persistence и server+offline checkpoint, затем approved implementation («да делай»); создан DEC-062. Реализованы schema/API/client/runtime/Home resume/detail conflict/navigation/player integration; local migration, canonical HTTP и focused browser checks PASS. Card остаётся `in_progress` до full build/deploy-check, user slice approval и real-device Telegram player check. 2026-07-17 — user review requested: replace cramped conflict UI; same-workout active detail must show current marker/Continue and route directly without modal; redesign finish UI; stabilize exercise spacing across widths; fix lost short playback/technical offline checkpoint UX; confirm when E2-D3-T02 non-video sessions follow. Existing implementation is not approved. Actual pre-fix repro captured 0:03→SPA Back→local/server 0. Post-fix muted controlled rerun `.temp/E2-D3-T01/checkpoint-postfix.json`: 0:03→local/server 3→restored 0:03; Pause keeps iframe Y/height and Card height exact while status changes only `Идёт тренировка`→`Пауза`. Home resume card compacted and uses shared unbounded `m:ss`/`h:mm:ss` active elapsed. Browser and mocked native Back exact prior-detail→Home→Continue→session→Back both return `/` with history index 1→0; reported workout-detail return not reproduced without the exact pre-Home sequence. Пользователь выбрал: other-active bottom Sheet; same-active Badge/time/direct Continue; final bottom Sheet с default `completed` и раскрываемым comment; duration под exercise title; unbounded PLAYING elapsed formatted `m:ss`/`h:mm:ss`; E2-D3-T02 сразу после acceptance T01. `.temp/E2-D3-T01/plan.md` обновлён до correction v2 (Plan confidence 96%, Implementation confidence 93%); пользователь явно re-approved. Corrections реализованы: StrictMode-safe monotonic restore, stable Pause, human sync copy, compact Home/full elapsed, same-active direct Continue, vertical conflict/final Sheets, default `completed`, responsive exercises. Final root typecheck/lint/build/OpenNext deploy-check/diff-check PASS. Карточка остаётся `in_progress` до user/real Telegram approval и уточнения невоспроизведённой browser-Back preceding sequence. User correction v3 explicitly approved: отдельно сохранять/seek-ить YouTube playback second, не смешивая её с active elapsed; при server/device elapsed delta `<1s` автоматически брать server и не показывать sync Sheet. Implemented migration `0007_married_wrecking_crew.sql`, schema/API/local snapshot/finish/player `seekTo`. HTTP evidence `.temp/E2-D3-T01/http/playback-{position,finish}.json`: start position0, checkpoint elapsed12/position37→position38, stale409 exposes position38, idempotent finish keeps position38/one occurrence. Muted browser `.temp/E2-D3-T01/playback-restore.json`: stale token/equal elapsed auto-server, dialog false, timer0:12, local rebase position38, `seekTo(38)`. Rolling-deploy compatibility `.temp/E2-D3-T01/http/playback-backward-compat.json`: old checkpoint/finish bodies without playback field remain 200 and preserve position44. Plan confidence 97%, implementation confidence 92%.
 
 ### E2-D3-T02 — Реализовать пошаговую и смешанную сессию
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
@@ -134,4 +135,4 @@
 
 ## Handoff этапа
 
-При остановке указать активную карточку, состояние данных/миграций, проверенные пользовательские flows и следующий точный сценарий.
+Активна E2-D3-T01: выполнить deep analysis существующих workout/API/schema flows, согласовать plan file и implementation plan; runtime code до approval не менять.

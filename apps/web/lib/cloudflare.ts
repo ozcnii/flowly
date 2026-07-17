@@ -24,10 +24,14 @@ function webEnv(): WebEnv {
   return getCloudflareContext().env as unknown as WebEnv;
 }
 
-export function getDb(): Database {
+export function getD1(): AnyD1Database {
   const db = webEnv().DB;
   if (!db) throw new Error("D1 binding 'DB' is not available in this environment");
-  return createDatabase(db);
+  return db;
+}
+
+export function getDb(): Database {
+  return createDatabase(getD1());
 }
 
 export function getBotToken(): string {

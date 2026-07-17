@@ -8,7 +8,7 @@ import { TelegramBackButton } from "@/components/providers/telegram-back-button"
 import { AppShell } from "@/components/shell/app-shell";
 import { resolveShellScenario } from "@/lib/scenarios";
 
-const activeTabFor = (path: string) => path.startsWith("/catalog") || path.startsWith("/youtube") || path.startsWith("/workouts") || path.startsWith("/sources") || path.startsWith("/authors") || path.startsWith("/safety") ? "workouts" : path.startsWith("/programs") ? "programs" : path.startsWith("/rhythm") ? "rhythm" : path.startsWith("/calendar") ? "calendar" : "home";
+const activeTabFor = (path: string) => path.startsWith("/catalog") || path.startsWith("/youtube") || path.startsWith("/workouts") || path.startsWith("/sessions") || path.startsWith("/sources") || path.startsWith("/authors") || path.startsWith("/safety") ? "workouts" : path.startsWith("/programs") ? "programs" : path.startsWith("/rhythm") ? "rhythm" : path.startsWith("/calendar") ? "calendar" : "home";
 const primaryTitleByPath: Record<string, string> = { "/": "Flowly", "/catalog": "Йога", "/programs": "Программы", "/rhythm": "Ритм", "/calendar": "Календарь" };
 
 export function AppRouteShell({ children }: { children: ReactNode }) {

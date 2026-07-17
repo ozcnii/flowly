@@ -8,7 +8,7 @@ initOpenNextCloudflareForDev();
 // работает в WebView, не в iframe — frame-ancestors 'none' безопасен. В dev React использует
 // eval() для дебага (в prod — нет), поэтому 'unsafe-eval' только в dev. Harden (nonce-based) в этапе 8.
 const isDev = process.env.NODE_ENV !== "production";
-const scriptSrc = `'self' 'unsafe-inline' https://telegram.org${isDev ? " 'unsafe-eval'" : ""}`;
+const scriptSrc = `'self' 'unsafe-inline' https://telegram.org https://www.youtube.com${isDev ? " 'unsafe-eval'" : ""}`;
 
 const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=15552000; includeSubDomains" },

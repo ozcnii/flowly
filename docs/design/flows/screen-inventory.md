@@ -14,18 +14,18 @@
 | S-MA-006 | Deep-link recovery | reason, auth/recovery, relevant safe exit | F01 | §10, §32, §36 | permission rechecked | gap |
 | S-MA-010 | Главная | mobile-Telegram-only action-free shared Navbar with Flowly name; content header `Твой план` + constant `user-round` Profile action (DEC-043/046); day progress, nearest action, quick start, current program, habits, resume; no separate greeting/date/categories/«Ещё для вас» (DEC-039/043) | F02 | §11 | owner only | partial: home |
 | S-MA-011 | Today action detail | complete/snooze/skip/rest where allowed | F02,F07,F08 | §11, §25–26 | occurrence owner | gap |
-| S-MA-012 | Open-session conflict | continue / close / cancel new launch | F02,F04 | §14.4 | session owner | gap |
+| S-MA-012 | Open-session conflict | continue / close / cancel new launch | F02,F04 | §14.4 | session owner | partial: E2-D3-T01 |
 | S-MA-020 | Йога: catalog | mobile-only shared Navbar `Йога` (web hidden); shared YouTube-like 16:9 WorkoutMediaCard/two-line titles; search/filter/source/favorite/open (DEC-043/047/050/053) | F03 | §12 | public/entitled content | partial: catalog |
 | S-MA-021 | YouTube results | mobile-only internal Navbar `Поиск YouTube` (web hidden); shared Card + fullscreen in-app player/save, stale/saved/error states; create deferred (DEC-047/048/051/053) | F03,F05 | §19 | owner saves private copy | partial: search/save |
 | S-MA-022 | Workout detail | mobile-only internal Navbar `Тренировка` (web hidden); adaptive media-first Cover→H1→meta; real/disabled exercise states + compact future actions + explicit disclosure (DEC-047/048/051/054) | F03,F04,F10 | §13 | visibility checked; UGC warning | partial: detail |
 | S-MA-023 | Favorites | workouts/videos/programs; no folders | F03,F06 | §18 | owner only | gap |
 | S-MA-024 | Author profile/public content | real user author by ID; inspect/block/unblock (source pseudo-authors forbidden by DEC-057) | F03,F10 | §13.2, §56.6 | public data only | gap |
 | S-MA-025 | Источники | one `/sources` overview; Flowly + YouTube independent 3-card previews; open detail / all via real source filter (DEC-057) | F03 | §12.1 | public/entitled content | partial: sources |
-| S-MA-030 | Video session | play/pause/resume/finish | F04 | §14.1, §14.4 | session owner; one active | gap |
+| S-MA-030 | Video session | play/pause/resume/finish | F04 | §14.1, §14.4 | session owner; one active | partial: E2-D3-T01 |
 | S-MA-031 | Step session | back/pause/next/skip/+30/finish | F04 | §14.2, §14.4 | session owner | gap |
 | S-MA-032 | Mixed mode chooser/session | choose video/steps, then execute | F04 | §14.3 | session owner | gap |
-| S-MA-033 | Final status confirmation | explicit allowed status; optional comment | F04 | §14–15 | owner; no automatic status | gap |
-| S-MA-034 | Resume/sync conflict | restore checkpoint, sync, resolve real conflict | F04 | §14.4, §40.2 | owner | gap |
+| S-MA-033 | Final status confirmation | explicit allowed status; optional comment | F04 | §14–15 | owner; no automatic status | partial: E2-D3-T01 |
+| S-MA-034 | Resume/sync conflict | restore checkpoint, sync, resolve real conflict | F04 | §14.4, §40.2 | owner | partial: E2-D3-T01 |
 | S-MA-040 | My workouts | drafts/private/shared/public; create/open | F05 | §16 | owner | gap |
 | S-MA-041 | Workout editor | metadata/media/exercises/reorder/save draft | F05 | §16 | owner; first-save validation | gap |
 | S-MA-042 | Exercise editor | image/GIF/instruction/sets/reps/time/rest | F05 | §16 | owner | gap |

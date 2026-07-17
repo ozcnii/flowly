@@ -27,8 +27,8 @@ type WorkoutDetail = {
 };
 
 const parseJsonArray = (value: string) => { try { const parsed = JSON.parse(value) as unknown; return Array.isArray(parsed) ? parsed.map(String) : []; } catch { return []; } };
-const actionsFor = (sourceType: string): WorkoutDetail["actions"] => ({
-  start: { enabled: false, reason: "Сейчас можно просмотреть описание и план тренировки." },
+const actionsFor = (sourceType: string, format: string, youtubeVideoId: string | null | undefined): WorkoutDetail["actions"] => ({
+  start: format === "video" && youtubeVideoId ? { enabled: true, reason: "Видео готово к запуску." } : { enabled: false, reason: "Для этой тренировки пока нет исполняемого видео." },
   favorite: { enabled: false, reason: "Сохранение будет доступно позже." },
   share: { enabled: false, reason: "Поделиться можно будет позже." },
   report: { enabled: false, reason: sourceType === "user" ? "Можно пожаловаться на пользовательский контент." : "Жалобы доступны только для пользовательского контента." },
@@ -70,7 +70,7 @@ async function loadFromD1(id: string, userId: string | null): Promise<WorkoutDet
       return { id: link.exerciseId, position: link.position, title: e?.title ?? "Упражнение", description: e?.description ?? "Инструкция будет добавлена позже.", mediaObjectKey: e?.mediaObjectKey ?? null, mediaType: e?.mediaType ?? null, durationSeconds: e?.defaultDurationSeconds ?? null, repetitions: e?.defaultRepetitions ?? null, plannedDurationSeconds: link.durationSeconds };
     }),
     author: { name: sourceType === "youtube" ? "YouTube" : sourceType === "user" ? "Автор Flowly" : "Flowly", type: sourceType },
-    actions: actionsFor(sourceType),
+    actions: actionsFor(sourceType, workout.format, workout.youtubeVideoId),
   };
 }
 
@@ -104,7 +104,7 @@ function loadDevFallback(id: string): WorkoutDetail | null {
       return { id: exerciseId, position: index + 1, title: e?.title ?? "Упражнение", description: e?.description ?? "Инструкция будет добавлена позже.", mediaObjectKey: e ? `catalog/exercises/${e.id}.webp` : null, mediaType: e?.mediaType ?? null, durationSeconds: e?.duration ?? null, repetitions: e?.repetitions ?? null, plannedDurationSeconds: e?.duration ?? null };
     }),
     author: { name: sourceType === "youtube" ? "YouTube" : sourceType === "user" ? "Автор Flowly" : "Flowly", type: sourceType },
-    actions: actionsFor(sourceType),
+    actions: actionsFor(sourceType, workout.format, workout.youtubeVideoId),
   };
 }
 

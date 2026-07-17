@@ -1,0 +1,1 @@
+ALTER TABLE `workout_sessions` ADD `playback_position_seconds` integer DEFAULT 0 NOT NULL;

@@ -68,11 +68,11 @@
 | §13.1 Favorite action | S-MA-022 workout-detail contract; F03 | covered |
 | §13.1 Share action | S-MA-022 workout-detail contract; F10 | covered |
 | §13.2 UGC warning/report/hide/author | S-MA-022,S-MA-024,S-MA-088; F03; DEC-021 | covered |
-| §14.1 video start/session/player/time/pause/finish/explicit status/calendar; no subjective prompts or auto-completion | S-MA-030,S-MA-033,S-MA-072; F04 | covered |
+| §14.1 video start/session/player/time/pause/finish/explicit status/calendar; no subjective prompts or auto-completion | S-MA-030,S-MA-033,S-MA-072; F04; DEC-062 | covered |
 | §14.2 step content/progress/timers and all controls incl. +30/skip; explicit final status | S-MA-031,S-MA-033; F04 | covered |
 | §14.3 mixed content and user mode choice | S-MA-032; F04 | covered |
-| §14.4 open-session persistence; one active; continue/close/cancel | S-MA-012,S-MA-034; F04; DEC-016 | covered |
-| §15 five workout final statuses; manual calendar edit + history | S-MA-033,S-MA-073; F04,F09; DEC-015 | covered |
+| §14.4 open-session persistence; one active; continue/close/cancel | S-MA-012,S-MA-034; F04; DEC-016/062 | covered |
+| §15 five workout final statuses; manual calendar edit + history | S-MA-033,S-MA-073; F04,F09; DEC-015/062 | covered |
 | §16.1 set title | S-MA-041 own-workout editor contract; F05 | covered |
 | §16.1 add description | S-MA-041 own-workout editor contract; F05 | covered |
 | §16.1 choose categories | S-MA-041 own-workout editor contract; F05 | covered |

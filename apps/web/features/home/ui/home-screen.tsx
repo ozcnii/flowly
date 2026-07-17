@@ -4,18 +4,23 @@ import { Badge, BlockTitle, Button, Card, List, ListItem, Preloader, Progressbar
 import Image from "next/image";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
+import { useSyncExternalStore } from "react";
 import { Icon } from "@flowly/ui";
 import { GlassIconButton } from "@/components/glass-icon-button";
 import { IMAGE_BLUR_DATA_URL } from "@/lib/image";
 import type { HomeScenario } from "../model/home-scenario";
 import type { HomeViewModel } from "../model/home-view-model";
+import { latestSessionSeconds } from "@/features/workout-session/model/local-checkpoint";
+import { formatSessionDuration } from "@/features/workout-session/model/workout-session";
+import { useActiveSessionQuery } from "@/features/workout-session/model/workout-session-queries";
 
 type Props = { data: HomeViewModel; scenario?: HomeScenario };
 const secondaryColors = { textIos: "text-accent dark:text-white", outlineBorderIos: "border-accent/40 dark:border-white/40", clearBgIos: "bg-transparent active:bg-accent/10 dark:active:bg-white/10" };
 const cardTitle = (title: string, id?: string) => <h2 id={id} className="m-0 font-semibold">{title}</h2>;
+const noSubscription = () => () => undefined;
 
 export function HomeScreen({ data, scenario = "base" }: Props) {
-  const router = useRouter();
+  const router = useRouter(), active = useActiveSessionQuery(scenario !== "loading" && scenario !== "empty"), activeSession = active.data?.session ?? null, resumeSeconds = useSyncExternalStore(noSubscription, () => activeSession ? latestSessionSeconds(activeSession) : 0, () => activeSession?.accumulatedSeconds ?? 0);
   const nextAction = data.plan.find((item) => item.status === "current") ?? data.plan.find((item) => item.status === "upcoming");
   if (scenario === "loading") return <HomeLoading />;
   if (scenario === "empty") return <HomeEmpty />;
@@ -24,12 +29,14 @@ export function HomeScreen({ data, scenario = "base" }: Props) {
     <HomeHeader />
     {scenario === "offline" && <Card component="aside" outline role="status" header={<Badge>Офлайн</Badge>}><p className="m-0 text-sm text-text-muted">Показываем сохранённые данные. Действия, требующие сети, временно недоступны.</p></Card>}
 
-    {scenario === "resume" && <Card component="section" outline header={<Badge>Можно продолжить</Badge>} contentWrapPadding="p-3 grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 items-center">
-      <Image src={data.resume.image} alt="Мягкая практика для спины" width={72} height={72} loading="eager" decoding="sync" placeholder="blur" blurDataURL={IMAGE_BLUR_DATA_URL} className="h-[4.5rem] w-[4.5rem] rounded-xl object-cover" />
-      <div className="grid min-w-0 gap-2">
-        <BlockTitle component="h2" medium className="!m-0 !p-0">{data.resume.title}</BlockTitle>
-        <p className="m-0 text-sm text-text-muted">{data.resume.meta}</p>
-        <Button component={NextLink} href="/workouts/wo-back-soft-15" inline rounded outline colors={secondaryColors}>Открыть тренировку</Button>
+    {(scenario === "resume" || activeSession) && <Card component="section" outline contentWrap={false} className="m-0">
+      <div className="grid gap-3 p-4">
+        <div className="flex min-w-0 items-center justify-between gap-3"><Badge>Можно продолжить</Badge>{activeSession && <span className="shrink-0 text-sm tabular-nums text-text-muted">{formatSessionDuration(resumeSeconds)}</span>}</div>
+        <div className="grid min-w-0 grid-cols-[6rem_minmax(0,1fr)] items-center gap-3">
+          <Image src={activeSession ? `https://i.ytimg.com/vi/${activeSession.workout.youtubeVideoId}/hqdefault.jpg` : data.resume.image} alt={activeSession ? `Практика «${activeSession.workout.title}»` : "Мягкая практика для спины"} width={96} height={54} loading="eager" decoding="sync" placeholder="blur" blurDataURL={IMAGE_BLUR_DATA_URL} unoptimized={Boolean(activeSession)} className="aspect-video w-24 rounded-xl object-cover" />
+          <div className="min-w-0"><h2 className="m-0 line-clamp-2 text-base font-semibold leading-snug" title={activeSession?.workout.title ?? data.resume.title}>{activeSession?.workout.title ?? data.resume.title}</h2><p className="m-0 mt-1 text-sm text-text-muted">{activeSession ? "Открытая сессия" : data.resume.meta}</p></div>
+        </div>
+        <Button component={NextLink} href={activeSession ? `/sessions/${activeSession.id}` : "/workouts/wo-back-soft-15"} large rounded>Продолжить</Button>
       </div>
     </Card>}
 
