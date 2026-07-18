@@ -1,66 +1,71 @@
-# Paste prompts — Flowly workout covers (ChatGPT image)
+# Paste prompts — Flowly covers (16:9)
 
-Covers must match **exercise art** (`flowly-catalog-art-v1`).  
-**Forbidden:** photoreal yoga photos, window light rooms, stock photography (current bad covers).
+**Every cover cell is 16:9 landscape. Canvas sizes are exact.**
 
-**Style lock:** flat vector, one woman black high bun, lavender-gray `#B8B4C4` set + mint `#A8D5C4` trim, sage bg `#D8E8E0`, lilac mat `#E8DDF0`, 16:9, full body, NO text NO logos.
+STYLE = approved M1: green set, bun, dark green mat, wood floor, cream wall, plants optional, flat vector, **no photoreal**, no text.
 
 ---
 
-## Sheet C1 — covers 4×3 (12)
+## Sheet C1 — 4×3 covers
+
+**Canvas: 4112 × 1741 px**  
+Cell **1008 × 567** (16:9), border 16, gutter 16.  
+width=16+4*1008+3*16+16=4112  
+height=16+3*567+2*16+16=1741
 
 ```text
-Create ONE image: 4 columns × 3 rows grid of 16:9 cover illustrations. Equal cells, 16px gutters sage #D8E8E0. flowly-catalog-art-v1 ONLY — flat vector, never photoreal. Same character every cell. No text.
+Create ONE image EXACT size 4112×1741 px.
+Grid: 4 columns × 3 rows.
+Each cell EXACTLY 1008×567 pixels (16:9 landscape — NOT square).
+Border 16px, gutters 16px between cells.
+
+STYLE: flat vector like M1 exercise art — woman black bun, olive/sage green sportswear, dark green mat, light wood floor, cream wall. NO photoreal photo. NO text.
 
 Row1:
-1) wo-morning-10 — calm standing mountain or soft stretch, airy morning mood (still flat sage bg).
-2) wo-back-soft-15 — child’s pose or gentle tabletop, soft back care.
-3) wo-stretch-evening-20 — seated forward fold, evening calm.
-4) wo-core-12 — forearm plank stable.
+1) wo-morning-10 — calm mountain / soft stretch
+2) wo-back-soft-15 — child pose or soft tabletop
+3) wo-stretch-evening-20 — seated forward fold
+4) wo-core-12 — forearm plank
 
 Row2:
-5) wo-hips-25 — low lunge or pigeon hip focus.
-6) wo-balance-basic-15 — tree pose balance.
-7) wo-shoulders-14 — eagle arms or thread-the-needle.
-8) wo-breath-calm-8 — meditation seat, peaceful.
+5) wo-hips-25 — low lunge or pigeon
+6) wo-balance-basic-15 — tree
+7) wo-shoulders-14 — eagle arms
+8) wo-breath-calm-8 — meditation seat
 
 Row3:
-9) wo-energy-20 — warrior II energetic stance (flat vector).
-10) wo-lower-back-10 — knees-to-chest or cat pose.
-11) wo-legs-stretch-18 — half splits or standing fold.
-12) wo-strength-flow-30 — chair pose strength.
+9) wo-energy-20 — warrior II
+10) wo-lower-back-10 — knees to chest or cat
+11) wo-legs-stretch-18 — half split
+12) wo-strength-flow-30 — chair pose
 
-Strict: same character DNA; lilac mat; sage bg; no photo realism.
+Exact 4112×1741; all cells 16:9.
 ```
 
 ---
 
-## Sheet C2 — covers 4×2 (8)
+## Sheet C2 — 4×2 covers
+
+**Canvas: 4112 × 1182 px**  
+Cell 1008×567, border 16, gutter 16.  
+height=16+2*567+16+16=1182
 
 ```text
-Create ONE image: 4×2 grid of 16:9 covers. flowly-catalog-art-v1 ONLY. No text.
+Create ONE image EXACT size 4112×1182 px.
+Grid 4×2; each cell 1008×567 (16:9); border/gutter 16px.
+STYLE: same M1 flat vector green set — NOT stock photo. No text.
 
 Row1:
-1) wo-restorative-25 — savasana or legs-up-wall restorative.
-2) wo-mobility-full-22 — cat-cow mid mobility.
-3) wo-posture-16 — mountain or sphinx posture.
-4) wo-evening-sleep-12 — child pose or savasana sleep calm.
+1) wo-restorative-25 — savasana / legs up wall
+2) wo-mobility-full-22 — cat-cow
+3) wo-posture-16 — mountain or sphinx
+4) wo-evening-sleep-12 — child or savasana
 
 Row2:
-5) wo-balance-flow-20 — half moon or tree flow balance.
-6) wo-wrists-safe-13 — standing arms free (no weight on hands).
-7) wo-deep-stretch-35 — wide fold or deep pigeon.
-8) wo-step-test-short — mountain arms up (test workout cover; still flat vector, not photo).
+5) wo-balance-flow-20 — tree or half moon
+6) wo-wrists-safe-13 — standing, no hand weight
+7) wo-deep-stretch-35 — wide fold
+8) wo-step-test-short — mountain arms up (test cover)
 
-Strict alignment and style lock.
-```
-
----
-
-## After generation
-
-Save as `.temp/catalog-art/input/C1.png`, `C2.png` then:
-
-```bash
-node scripts/slice-catalog-art.mjs --covers
+Exact 4112×1182; all cells 16:9 landscape.
 ```

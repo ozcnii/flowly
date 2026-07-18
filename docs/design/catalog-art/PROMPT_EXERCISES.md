@@ -1,222 +1,198 @@
 # Paste prompts — exercise collages (ChatGPT image)
 
-Copy **one block at a time**. Use model image generation. Do not change style mid-set.
+**IMPORTANT — read before every sheet**
 
-**Style lock (prepend mentally every time):**  
-`flowly-catalog-art-v1` — flat vector iOS fitness illustration, ONE woman black high bun, lavender-gray `#B8B4C4` sports bra + leggings with mint `#A8D5C4` trim, skin `#F0C7A8`, barefoot, solid sage background `#D8E8E0`, pale lilac yoga mat `#E8DDF0`, full body always, 16:9 cells, NO text NO logos NO photoreal NO 3D.
+1. Output **exactly one** image at the **exact pixel size** stated.
+2. Every cell is **exactly 16:9** (width:height = 16:9). **No squares.**
+3. Match style of approved **M1** collage (green set, plants, wood floor).
+4. Thin gutters only (not huge empty margins). Full body + mat inside every cell.
+5. No text, no numbers, no watermarks, no logos.
 
 ---
 
-## Sheet E1 — stills grid 3×4 (cells 1–12)
+## Global style lock (append to every prompt)
 
 ```text
-Create ONE image: a clean 3 columns × 4 rows grid collage (equal cells, 16:9 each, 12px sage gutters #D8E8E0). Same character and environment on EVERY cell (flowly-catalog-art-v1). No labels, no numbers drawn on the art (layout only).
-
-Row1:
-1) ex-down-dog: Downward dog — inverted V, hands and feet on mat, hips high.
-2) ex-low-lunge: Low lunge — back knee down, front knee 90°, torso upright.
-3) ex-half-split: Half splits — front leg straight heel on mat, hips back, torso folds over front leg.
-
-Row2:
-4) ex-forward-fold: Standing forward fold — soft knees, head heavy, hands toward floor.
-5) ex-warrior-one: Warrior I — front knee bent, back leg straight, arms up.
-6) ex-warrior-two: Warrior II — wide stance, front knee bent, arms horizontal.
-
-Row3:
-7) ex-triangle: Triangle — wide stance, hand to shin/floor, other arm up.
-8) ex-side-angle: Extended side angle — front knee bent, forearm on thigh or hand down, top arm overhead.
-9) ex-tree: Tree — balance on one leg, other foot on inner thigh, hands in prayer.
-
-Row4:
-10) ex-chair: Chair — knees bent as if sitting, arms up.
-11) ex-plank: High plank — straight body on hands and toes.
-12) ex-side-plank: Side plank — on one hand, body line, top arm up.
-
-Strict: identical character scale across cells; mat fully visible; flat vector only.
+STYLE (locked — same as approved M1 sheet):
+- Flat clean vector illustration, soft even light, NOT photoreal, NOT 3D
+- ONE adult woman: black hair in high bun, olive/sage-green sports bra + matching leggings
+- Barefoot on a dark green yoga mat on light wood floor
+- Cream wall background; small potted plant LEFT + small plant RIGHT in every cell (same props)
+- Soft contact shadow under body; consistent character scale across the whole collage
+- No text, no UI, no logos, no watermarks
 ```
 
 ---
 
-## Sheet E2 — stills grid 3×4 (cells 13–24)
+## Sheet M1 — motion 2×5 (DONE — reference style only)
 
-```text
-Create ONE image: 3×4 grid collage, equal 16:9 cells, 12px gutters, flowly-catalog-art-v1 ONLY (same woman bun, lavender-mint set, sage #D8E8E0, lilac mat). No text.
-
-Row1:
-1) ex-boat: Boat pose — balance on sit bones, legs lifted, arms forward.
-2) ex-bridge: Bridge — on back, hips lifted, feet planted.
-3) ex-sphinx: Sphinx — on belly, BOTH FOREARMS flat on mat, low chest lift (NOT straight-arm cobra).
-
-Row2:
-4) ex-cobra: Cobra — on belly, hands under shoulders, elbows soft, chest higher than sphinx.
-5) ex-locust: Locust — on belly, chest and legs lifted, arms alongside body.
-6) ex-puppy: Puppy pose — knees under hips, arms long forward, chest melting down, hips high.
-
-Row3:
-7) ex-pigeon: Pigeon — front shin on mat, back leg extended, torso upright or gentle fold.
-8) ex-lizard: Lizard — low lunge, hands inside front foot.
-9) ex-butterfly: Butterfly — seated soles together, knees open, tall spine.
-
-Row4:
-10) ex-seated-fold: Seated forward fold — legs extended, torso folds over.
-11) ex-seated-twist: Seated spinal twist — one knee bent, twist toward bent knee.
-12) ex-supine-twist: Supine twist — on BACK, both knees stacked to one side, arms in T.
-
-Strict flat vector; sphinx must show forearms on floor.
-```
+**Canvas: 2048 × 2880 px** (2 cols × 5 rows of **1024 × 576** = 16:9 cells)  
+Gutters: **16 px** sage/green between cells; outer border **24 px**.
 
 ---
 
-## Sheet E3 — stills grid 3×4 (cells 25–36)
+## Sheet M2 — motion pairs 2×4  ← SEND THIS NEXT
+
+**Canvas: 2048 × 2304 px** exactly.  
+**Grid: 2 columns × 4 rows.**  
+**Each cell: exactly 1024 × 576 px (16:9).**  
+**Gutter: 16 px** between cells. **Outer border: 24 px** (same green as M1).
 
 ```text
-Create ONE image: 3×4 grid, equal 16:9 cells, flowly-catalog-art-v1 only. No text.
+Create ONE image with EXACT canvas size 2064 × 2348 pixels.
 
-Row1:
-1) ex-happy-baby: Happy baby — on back, hold outer feet, knees open.
-2) ex-legs-wall: Legs up the wall — on back, legs vertical up.
-3) ex-savasana: Savasana — fully supine, arms relaxed palms up.
+GRID MATH (do not invent other sizes):
+- Outer border: 16px all sides
+- Columns: 2 | Rows: 4
+- Each cell: 1008 × 567 pixels = exactly 16:9 landscape (width 1008, height 567). NEVER square.
+- Gutters: 16px between columns and between rows
+- Check: width = 16+1008+16+1008+16 = 2064
+- Check: height = 16+567+16+567+16+567+16+567+16 = 2348
 
-Row2:
-4) ex-box-breath: Meditation seat — easy cross-legged, hands on knees, calm.
-5) ex-long-exhale: Same meditation seat, slightly softer shoulders (same framing as box-breath).
-6) ex-crocodile: Crocodile — prone, forehead on stacked hands.
+STYLE (match approved M1 collage exactly):
+- Flat clean vector illustration, NOT photoreal, NOT 3D
+- ONE woman: black hair high bun, olive/sage green sports bra + leggings
+- Barefoot on dark green yoga mat, light wood floor, cream wall
+- Potted plant LEFT + small plant RIGHT in EVERY cell
+- No text, no numbers, no logos, no watermarks
 
-Row3:
-7) ex-tabletop-balance: Tabletop — all fours, one arm OR one leg lifted slightly.
-8) ex-knee-hugs: Knees to chest — on back, hug both knees.
-9) ex-reclined-hamstring: On back, one leg extended up held gently.
+CAMERA LOCK within each row: identical scale, mat position, floor line; only joints change. Full body + full mat inside each cell (~6% padding from cell edges).
 
-Row4:
-10) ex-figure-four: Figure-four — on back, ankle on opposite knee.
-11) ex-calf-stretch: Standing calf stretch — back heel down, front knee soft.
-12) ex-eagle-arms: Eagle arms — standing, arms wrapped elbows stacked.
-
-Strict: same character DNA; full body + mat.
-```
-
----
-
-## Sheet E4 — stills grid 3×4 (cells 37–48)
-
-```text
-Create ONE image: 3×4 grid, equal 16:9 cells, flowly-catalog-art-v1 only. No text.
-
-Row1:
-1) ex-garland: Malasana squat — heels down if possible, hands in prayer.
-2) ex-wide-fold: Wide-legged forward fold — feet wide, torso folds.
-3) ex-half-moon: Half moon — balance on one hand and foot, other limbs lifted.
-
-Row2:
-4) ex-dancer-prep: Dancer prep — standing, hold one foot behind, other arm forward.
-5) ex-crescent: High crescent lunge — back knee off floor, arms up.
-6) ex-humble-warrior: Humble warrior — warrior stance, torso folded, hands clasped behind.
-
-Row3:
-7) ex-prasarita: Same as wide fold (canonical prasarita).
-8) ex-forearm-plank: Forearm plank — elbows under shoulders, body straight.
-9) ex-dolphin: Dolphin — forearms down, hips up inverted V.
-
-Row4:
-10) ex-side-bend: Seated side bend — one arm overhead, lean sideways.
-11) ex-meditation-seat: Easy seat meditation — cross-legged, tall spine.
-12) EMPTY cell: leave solid sage #D8E8E0 only (no character).
-
-Strict flat vector.
-```
-
----
-
-## Sheet M1 — motion pairs (GIF) 2×5 strips
-
-Each **row** = one exercise; **left = Frame A**, **right = Frame B**.  
-**Camera lock within each row:** same scale, mat Y, floor line; only joints change.
-
-```text
-Create ONE image: 2 columns × 5 rows. Each row is a MOTION PAIR for GIF (left A, right B). Equal cells 16:9, gutters 12px sage. flowly-catalog-art-v1 ONLY. No text.
-
-CRITICAL per row: identical camera, character scale, mat position; NO sliding feet; NO zoom.
-
-Row1 ex-mountain:
-A: standing Tadasana arms by sides.
-B: same stance arms straight overhead.
-
-Row2 ex-cat-cow:
-A: Cat — all fours, spine rounded UP, head tucked.
-B: Cow — all fours, belly drops, gaze slightly up.
-
-Row3 ex-child:
-A: Child pose hips on heels, forehead mat, arms by sides.
-B: Same hips/feet, arms stretched forward.
-
-Row4 ex-thread-needle:
-A: all fours, RIGHT arm threaded under, LEFT arm up.
-B: all fours, LEFT arm threaded under, RIGHT arm up. Same tabletop base.
-
-Row5 ex-bird-dog:
-A: tabletop neutral all fours.
-B: right arm forward + left leg back extended (level spine).
-
-Flat vector; perfect alignment within each row.
-```
-
----
-
-## Sheet M2 — motion pairs 2×4
-
-```text
-Create ONE image: 2 columns × 4 rows motion pairs (A left, B right). flowly-catalog-art-v1. Camera lock within each row. No text.
-
-Row1 ex-neck-rolls:
-A: seated or standing tall, head neutral.
-B: same body, head gently tilted to the RIGHT (ear toward shoulder), shoulders down.
+Row1 ex-neck-rolls (LEFT = frame A, RIGHT = frame B):
+A: standing tall side view, head neutral, arms relaxed.
+B: same feet/body, head gently tilted RIGHT (ear toward shoulder), shoulders down.
 
 Row2 ex-shoulder-rolls:
-A: standing/seated, shoulders relaxed.
-B: shoulders lifted/rolled back at peak of roll (same torso).
+A: standing, shoulders relaxed.
+B: same torso/feet, shoulders at peak of backward roll.
 
 Row3 ex-sun-a:
-A: mountain arms up.
-B: standing forward fold soft knees (same foot placement).
+A: mountain, arms straight overhead.
+B: standing forward fold, soft knees, SAME foot placement as A.
 
 Row4 ex-rag-doll:
 A: soft ragdoll fold, arms dangling.
-B: slightly deeper fold, same feet, arms still dangling.
+B: slightly deeper fold, same feet, arms dangling.
 
-Strict alignment; flat vector.
+Output exactly one collage 2064×2348; all 8 cells are 16:9 landscape panels.
 ```
 
 ---
 
 ## Sheet M3 — motion pairs 2×4
 
+**Canvas: 2064 × 2348 px** (same math as M2).  
+**Cells: 1008 × 567 (16:9).** Gutters 16px, border 16px.
+
 ```text
-Create ONE image: 2×4 motion pairs A|B. flowly-catalog-art-v1. Camera lock per row. No text.
+Create ONE image EXACT size 2064×2348 px.
+Grid: 2 cols × 4 rows; each cell 1008×567 (16:9 landscape, NOT square); border 16px; gutters 16px.
+(width=16+1008+16+1008+16=2064; height=16+4*567+3*16+16=2348)
+
+STYLE: same as M1 — green set, bun, dark green mat, wood floor, cream wall, plants L/R, flat vector, no text.
+
+Camera lock per row. Full body + mat in every cell.
 
 Row1 ex-wrist-warmup:
 A: standing/seated, hands interlaced, palms push forward at chest height.
-B: same, wrists flexed a bit more (clear stretch), body unchanged.
+B: same body, wrists flexed further (clear stretch).
 
 Row2 ex-ankle-mobility:
 A: standing on left leg, right foot slightly lifted, ankle neutral.
-B: same balance, right ankle pointed or flexed at peak.
+B: same balance, right ankle at point/flex peak.
 
 Row3 ex-hip-circles:
 A: standing hands on hips, pelvis center.
-B: pelvis shifted to the side (circle peak), feet planted same.
+B: pelvis shifted to side (circle peak), feet planted same.
 
 Row4 ex-dead-bug:
 A: on back, knees tabletop, arms toward ceiling.
-B: left arm back + right leg extended (hover), other limbs hold tabletop.
+B: opposite arm + leg extended (hover), other limbs hold.
 
-Flat vector only.
+Exact 2064×2348; all cells 16:9 landscape.
 ```
 
 ---
 
-## After generation
+## Sheet E1 — stills 3×4
 
-1. Save downloads into `.temp/catalog-art/input/` with names:
-   - `E1.png` … `E4.png`, `M1.png` … `M3.png`
-2. Run: `node scripts/slice-catalog-art.mjs`
-3. Review cells; reject any misaligned GIF pair and re-generate **only that sheet**.
+**Canvas: 3088 × 2324 px**  
+Cells **1008 × 567** (16:9), border 16, gutters 16.  
+width=16+3*1008+2*16+16=3088  
+height=16+4*567+3*16+16=2324
+
+```text
+Create ONE image EXACT size 3088×2324 px.
+Grid 3 cols × 4 rows; each cell 1008×567 (16:9 landscape NOT square); 16px border; 16px gutters.
+
+STYLE: same M1 green outfit, bun, dark green mat, wood floor, cream wall, plants L/R, flat vector, no text.
+Full body + mat in every cell.
+
+Row1: (1) ex-down-dog inverted V (2) ex-low-lunge back knee down (3) ex-half-split front leg straight
+Row2: (4) ex-forward-fold standing (5) ex-warrior-one arms up (6) ex-warrior-two arms horizontal
+Row3: (7) ex-triangle (8) ex-side-angle (9) ex-tree balance
+Row4: (10) ex-chair (11) ex-plank (12) ex-side-plank
+
+Exact 3088×2324; all cells 16:9.
+```
+
+---
+
+## Sheet E2 — stills 3×4
+
+**Same geometry: 3088 × 2324**, cells 1008×567 16:9.
+
+```text
+Create ONE image EXACT 3088×2324. Grid 3×4, cells 1008×567 (16:9), border/gutter 16px.
+STYLE: M1 lock (green set, plants, wood floor). No text.
+
+Row1: boat | bridge | sphinx (FOREARMS flat on mat, low chest — not cobra)
+Row2: cobra (hands under shoulders) | locust | puppy (hips high arms forward)
+Row3: pigeon | lizard | butterfly seated
+Row4: seated fold | seated twist | supine twist (on BACK, knees to one side)
+
+Exact size; 16:9 cells only.
+```
+
+---
+
+## Sheet E3 — stills 3×4
+
+**3088 × 2324**, cells 1008×567.
+
+```text
+Create ONE image EXACT 3088×2324. Grid 3×4, each cell 1008×567 16:9, gutters 16.
+STYLE: M1 lock. No text.
+
+Row1: happy baby | legs up wall | savasana
+Row2: box-breath meditation seat | long-exhale same seat softer | crocodile prone
+Row3: tabletop balance (one limb lifted) | knee hugs on back | reclined hamstring
+Row4: figure-four on back | standing calf stretch | eagle arms
+
+Exact 3088×2324; 16:9 cells.
+```
+
+---
+
+## Sheet E4 — stills 3×4
+
+**3088 × 2324**, cells 1008×567.
+
+```text
+Create ONE image EXACT 3088×2324. Grid 3×4, cells 1008×567 16:9, gutters 16.
+STYLE: M1 lock. No text.
+
+Row1: garland/malasana | wide fold | half moon
+Row2: dancer prep | crescent high lunge | humble warrior
+Row3: prasarita wide fold | forearm plank | dolphin
+Row4: seated side bend | meditation seat | EMPTY solid cream cell (no character)
+
+Exact size; 16:9 cells.
+```
+
+---
+
+## After download
+
+Save as `.temp/catalog-art/input/M2.png` (or E1… / M3…).  
+Agent runs gutter-aware slice → GIF/webp.
