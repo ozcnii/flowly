@@ -300,6 +300,66 @@ export const programEnrollments = sqliteTable(
   ],
 );
 
+// §43.19 reminder_policies
+export const reminderPolicies = sqliteTable("reminder_policies", {
+  id: text("id").primaryKey(),
+  ownerId: text("owner_id").references(() => users.id, { onDelete: "set null" }),
+  name: text("name").notNull(),
+  type: text("type").notNull(),
+  maxMessages: integer("max_messages").notNull(),
+  lastMessageLocalTime: text("last_message_local_time"),
+  quietHoursBehavior: text("quiet_hours_behavior"),
+  allowCustomSnooze: integer("allow_custom_snooze", { mode: "boolean" }).notNull(),
+  createdAt: text("created_at").notNull(),
+});
+
+// §43.20 reminder_policy_steps
+export const reminderPolicySteps = sqliteTable(
+  "reminder_policy_steps",
+  {
+    id: text("id").primaryKey(),
+    policyId: text("policy_id")
+      .notNull()
+      .references(() => reminderPolicies.id, { onDelete: "cascade" }),
+    stepNumber: integer("step_number").notNull(),
+    delayMinutes: integer("delay_minutes").notNull(),
+    messageType: text("message_type").notNull(),
+  },
+  (table) => [uniqueIndex("reminder_policy_steps_policy_step_unique").on(table.policyId, table.stepNumber)],
+);
+
+// §43.22 reminder_jobs — stage 3 creates rows; Telegram delivery is stage 5 (DEC-001)
+export const reminderJobs = sqliteTable(
+  "reminder_jobs",
+  {
+    id: text("id").primaryKey(),
+    occurrenceId: text("occurrence_id")
+      .notNull()
+      .references(() => activityOccurrences.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    policyId: text("policy_id")
+      .notNull()
+      .references(() => reminderPolicies.id, { onDelete: "restrict" }),
+    stepNumber: integer("step_number").notNull(),
+    dueAtUtc: text("due_at_utc").notNull(),
+    status: text("status").notNull(),
+    attemptCount: integer("attempt_count").notNull(),
+    lockedAt: text("locked_at"),
+    sentAt: text("sent_at"),
+    telegramMessageId: text("telegram_message_id"),
+    idempotencyKey: text("idempotency_key").notNull(),
+    errorCode: text("error_code"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [
+    uniqueIndex("reminder_jobs_idempotency_unique").on(table.idempotencyKey),
+    index("reminder_jobs_status_due_idx").on(table.status, table.dueAtUtc),
+    index("reminder_jobs_occurrence_idx").on(table.occurrenceId),
+  ],
+);
+
 // §43.28 youtube_search_cache
 export const youtubeSearchCache = sqliteTable(
   "youtube_search_cache",

@@ -9,8 +9,42 @@ import { getUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/cloudflare";
 import { isLocalDate } from "@/features/programs/model/program-dates";
 import { ensureProgramOccurrences } from "@/lib/programs/ensure-program-occurrences";
+import {
+  ensureProgramReminderJobs,
+  PROGRAM_DEFAULT_POLICY_ID,
+  PROGRAM_DEFAULT_REMINDER_LOCAL_TIME,
+} from "@/lib/programs/ensure-program-reminder-jobs";
 
 const json = (body: unknown, init?: ResponseInit) => NextResponse.json(body, init);
+
+async function materializeEnrollment(
+  db: ReturnType<typeof getDb>,
+  input: {
+    userId: string;
+    enrollmentId: string;
+    startLocalDate: string;
+    timezone: string;
+    days: { id: string; dayNumber: number; type: string; workoutId: string | null }[];
+    policyId: string | null;
+    reminderLocalTime: string | null;
+  },
+) {
+  const occurrences = await ensureProgramOccurrences(db, {
+    userId: input.userId,
+    enrollmentId: input.enrollmentId,
+    startLocalDate: input.startLocalDate,
+    timezone: input.timezone,
+    days: input.days,
+  });
+  const jobs = await ensureProgramReminderJobs(db, {
+    userId: input.userId,
+    enrollmentId: input.enrollmentId,
+    timezone: input.timezone,
+    policyId: input.policyId,
+    reminderLocalTime: input.reminderLocalTime,
+  });
+  return { occurrences, jobs };
+}
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const oversized = rejectOversizedBody(request); if (oversized) return oversized;
@@ -30,20 +64,34 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   const existing = (await db.select().from(schema.programEnrollments).where(and(eq(schema.programEnrollments.userId, userId), eq(schema.programEnrollments.programId, programId), eq(schema.programEnrollments.status, "active"))).limit(1))[0];
   if (existing) {
-    await ensureProgramOccurrences(db, { userId, enrollmentId: existing.id, startLocalDate: existing.startLocalDate, timezone, days });
-    audit("program.enroll", { userId, programId, enrollmentId: existing.id, created: false });
-    return json({ created: false, enrollment: { id: existing.id, programId: existing.programId, startLocalDate: existing.startLocalDate, status: existing.status, createdAt: existing.createdAt } });
+    const materialize = await materializeEnrollment(db, {
+      userId,
+      enrollmentId: existing.id,
+      startLocalDate: existing.startLocalDate,
+      timezone,
+      days,
+      policyId: existing.reminderPolicyId,
+      reminderLocalTime: existing.reminderLocalTime,
+    });
+    audit("program.enroll", { userId, programId, enrollmentId: existing.id, created: false, jobs: materialize.jobs });
+    return json({
+      created: false,
+      enrollment: { id: existing.id, programId: existing.programId, startLocalDate: existing.startLocalDate, status: existing.status, createdAt: existing.createdAt },
+      ...materialize,
+    });
   }
 
   const id = generateId(), createdAt = nowIso();
+  const policyId = PROGRAM_DEFAULT_POLICY_ID;
+  const reminderLocalTime = PROGRAM_DEFAULT_REMINDER_LOCAL_TIME;
   try {
     await db.insert(schema.programEnrollments).values({
       id,
       programId,
       userId,
       startLocalDate,
-      reminderPolicyId: null,
-      reminderLocalTime: null,
+      reminderPolicyId: policyId,
+      reminderLocalTime,
       status: "active",
       createdAt,
       completedAt: null,
@@ -51,12 +99,36 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   } catch (error) {
     const raced = (await db.select().from(schema.programEnrollments).where(and(eq(schema.programEnrollments.userId, userId), eq(schema.programEnrollments.programId, programId), eq(schema.programEnrollments.status, "active"))).limit(1))[0];
     if (raced) {
-      await ensureProgramOccurrences(db, { userId, enrollmentId: raced.id, startLocalDate: raced.startLocalDate, timezone, days });
-      return json({ created: false, enrollment: { id: raced.id, programId: raced.programId, startLocalDate: raced.startLocalDate, status: raced.status, createdAt: raced.createdAt } });
+      const materialize = await materializeEnrollment(db, {
+        userId,
+        enrollmentId: raced.id,
+        startLocalDate: raced.startLocalDate,
+        timezone,
+        days,
+        policyId: raced.reminderPolicyId,
+        reminderLocalTime: raced.reminderLocalTime,
+      });
+      return json({
+        created: false,
+        enrollment: { id: raced.id, programId: raced.programId, startLocalDate: raced.startLocalDate, status: raced.status, createdAt: raced.createdAt },
+        ...materialize,
+      });
     }
     throw error;
   }
-  const materialize = await ensureProgramOccurrences(db, { userId, enrollmentId: id, startLocalDate, timezone, days });
-  audit("program.enroll", { userId, programId, enrollmentId: id, created: true, startLocalDate, occurrencesCreated: materialize.created });
-  return json({ created: true, enrollment: { id, programId, startLocalDate, status: "active", createdAt }, occurrences: materialize }, { status: 201 });
+  const materialize = await materializeEnrollment(db, {
+    userId,
+    enrollmentId: id,
+    startLocalDate,
+    timezone,
+    days,
+    policyId,
+    reminderLocalTime,
+  });
+  audit("program.enroll", { userId, programId, enrollmentId: id, created: true, startLocalDate, jobs: materialize.jobs });
+  return json({
+    created: true,
+    enrollment: { id, programId, startLocalDate, status: "active", createdAt, reminderPolicyId: policyId, reminderLocalTime },
+    ...materialize,
+  }, { status: 201 });
 }

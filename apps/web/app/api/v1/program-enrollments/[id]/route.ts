@@ -13,6 +13,7 @@ import {
   isWorkoutUserRestStatus,
 } from "@/features/programs/model/program-progress";
 import { ensureProgramOccurrences } from "@/lib/programs/ensure-program-occurrences";
+import { ensureProgramReminderJobs } from "@/lib/programs/ensure-program-reminder-jobs";
 
 const CATEGORY: Record<string, string> = {
   beginner: "Старт", back: "Спина", evening: "Вечер", morning: "Утро", mobility: "Мобильность", full: "Полный ритм",
@@ -39,6 +40,13 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     startLocalDate: enrollment.startLocalDate,
     timezone,
     days,
+  });
+  const reminders = await ensureProgramReminderJobs(db, {
+    userId,
+    enrollmentId: enrollment.id,
+    timezone,
+    policyId: enrollment.reminderPolicyId,
+    reminderLocalTime: enrollment.reminderLocalTime,
   });
 
   const occurrences = await db.select({
@@ -131,7 +139,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       status: enrollment.status,
       createdAt: enrollment.createdAt,
       completedAt: enrollment.completedAt,
+      reminderPolicyId: enrollment.reminderPolicyId,
+      reminderLocalTime: enrollment.reminderLocalTime,
       todayLocalDate,
+      reminders: {
+        pendingJobs: reminders.totalPending,
+        policyId: reminders.policyId,
+        reminderLocalTime: reminders.reminderLocalTime,
+        delivery: reminders.delivery,
+      },
       progress: {
         currentDayNumber: current,
         durationDays: program.durationDays,

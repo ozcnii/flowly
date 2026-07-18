@@ -6,6 +6,7 @@ import { getSessionUserId } from "@/lib/auth/session-user";
 import { isSafeOrigin } from "@/lib/auth/csrf";
 import { audit, rejectOversizedBody } from "@/lib/auth/http";
 import { getD1, getDb } from "@/lib/cloudflare";
+import { cancelPendingJobsForOccurrence } from "@/lib/programs/ensure-program-reminder-jobs";
 import { finishSessionSchema, getOwnedSession, localDateTime } from "@/lib/workout-sessions";
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -42,6 +43,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       raw.prepare(`UPDATE workout_sessions SET occurrence_id=?,state='closed',paused_at=NULL,accumulated_seconds=?,playback_position_seconds=?,completed_at=?,final_status=?,updated_at=? WHERE id=? AND user_id=? AND state='open' AND updated_at=?`).bind(occurrenceId, parsed.data.accumulatedSeconds, parsed.data.playbackPositionSeconds ?? current.playbackPositionSeconds, ts, parsed.data.finalStatus, ts, id, userId, parsed.data.baseUpdatedAt),
     ]);
   if (!results[2]?.meta.changes) return NextResponse.json({ error: "checkpoint_conflict", session: await getOwnedSession(db, userId, id) }, { status: 409 });
+  await cancelPendingJobsForOccurrence(db, occurrenceId);
   const session = await getOwnedSession(db, userId, id);
   if (!session) return NextResponse.json({ error: "not_found" }, { status: 404 });
   audit("workout_session.finish", { userId, sessionId: id, occurrenceId, finalStatus: parsed.data.finalStatus, reusedOccurrence: Boolean(existingOcc) });

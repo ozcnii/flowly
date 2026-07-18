@@ -5,6 +5,7 @@ import { schema, type Database } from "@flowly/database";
 import { getUser } from "@/lib/auth/users";
 import { localDateInTimezone, scheduleLocalDate } from "@/features/programs/model/program-dates";
 import { isWorkoutDoneStatus } from "@/features/programs/model/program-progress";
+import { cancelPendingJobsForOccurrence } from "./ensure-program-reminder-jobs";
 import { scheduledAtUtcForLocalDate } from "./ensure-program-occurrences";
 
 export type ProgramDayTerminal = "skipped" | "rest";
@@ -92,6 +93,7 @@ export async function postProgramDayTerminal(
       comment: null,
       createdAt: ts,
     });
+    await cancelPendingJobsForOccurrence(db, row.id);
     return json({
       created: false,
       updated: true,
@@ -129,6 +131,7 @@ export async function postProgramDayTerminal(
     comment: null,
     createdAt: ts,
   });
+  await cancelPendingJobsForOccurrence(db, occurrenceId);
 
   return json({
     created: true,

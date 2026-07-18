@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 1 | 0 | 0 | 0 | 6 |
+| 0 | 0 | 0 | 0 | 7 |
 
 ## Границы
 
@@ -83,12 +83,13 @@
 - **journal:** 2026-07-19 — implement ensureProgramOccurrences + unique index; finish/skip upsert.
 
 ### E3-D4-T07 — Подготовить reminder jobs и закрыть DoD программ
-- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-19
+- **status:** done · **priority:** high · **owner:** agent · **updated:** 2026-07-19
 - **prd_refs:** §20, §43.22, §50.1, §55.3 · **depends_on:** E3-D4-T01–T06 · **decisions:** DEC-001, DEC-002, DEC-003, DEC-015, DEC-016, DEC-029
 - **scope:** создать jobs без Telegram delivery; проверить одиночные программы, пропуски, отдых и прогресс.
-- **acceptance:** [ ] jobs соответствуют planned occurrences; [ ] delivery явно отложена до этапа 5; [ ] все применимые пункты §55.3 имеют evidence; [ ] совместность помечена зависимостью этапа 7.
-- **validation/evidence:** job records и итоговый checklist.
+- **acceptance:** [x] jobs соответствуют planned occurrences; [x] delivery явно отложена до этапа 5; [x] все применимые пункты §55.3 имеют evidence; [x] совместность помечена зависимостью этапа 7.
+- **validation/evidence:** migration `0014`; policy `rp-program-default` 3 steps; enroll/GET materialize pending jobs for open workout occ only; skip cancels 3 pending→cancelled; GET `reminders.delivery=deferred_to_stage_5`; scheduler no-op send; DoD `.temp/E3-D4-T07/dod-55.3.md`; joint DEC-002→E7. typecheck PASS.
+- **journal:** 2026-07-19 — implement + HTTP verify; close done.
 
 ## Handoff этапа
 
-**E3-D4-T06** `done`. Next **E3-D4-T07** jobs + DoD §55.3.
+**E3-D4-T07** `done`. Stage 3 deliverable E3-D4 complete for single-user programs (joint → stage 7).
