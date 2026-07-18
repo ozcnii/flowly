@@ -562,6 +562,15 @@
 - **PRD:** §17, §28, §55.2/§55.6.
 - **Влияет на:** E2-D3-T04 (moved pointer), E2-D3-T05, E6-D7-T01/T03/T08/T09, HANDOFF/README stage counts.
 
+### DEC-066 — S-MA-032 mixed chooser permanently cancelled (v1)
+
+- **Статус:** approved
+- **Дата:** 2026-07-19
+- **Решение:** **S-MA-032** (mixed mode chooser: video vs steps for `format=mixed`) **никогда не выполняется** в Flowly v1 path. Нет residual backlog, нет future card «потом». Product runtime — только **video** (S-MA-030) **или** **step_by_step** (S-MA-031); пользователь выбирает формат, открывая соответствующую тренировку, без chooser. `format=mixed` в catalog/session **не ship'ить**; если такие rows когда-либо появятся — Start disabled с reason, без chooser UI. PRD §14.3 остаётся историческим текстом, не execution obligation.
+- **Основание:** user 2026-07-19: «это слишком — зачем это вообще нужно» → «пометим как задачу которую никогда не будем выполнять».
+- **PRD:** §14.3 — superseded for v1 execution by this DEC (text not deleted from PRD file).
+- **Влияет на:** E2-D3-T02 residual (closed); E2-D3-T05 DoD (no mixed requirement); design S-MA-032 inventory → cancelled; F04 diagram node S-MA-032 not product backlog; no depends_on elsewhere.
+
 ## Открытые решения
 
 ### DEC-006 — Operational thresholds

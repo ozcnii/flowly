@@ -36,9 +36,9 @@
 
 ## Residual (not stage-2 DoD blockers)
 
-- **S-MA-032** mixed chooser — deferred residual after T02
-- **E2-D3-T03** own workouts — blocked DEC-064
-- Manual log — E6
+- **S-MA-032** mixed chooser — **cancelled forever** DEC-066 (never execute)
+- **E2-D3-T03** own workouts — blocked DEC-064 until demand
+- Manual log — E6-D7-T09
 - UGC report/hide full path — partial placeholders
 
 ## Stage 2 close decision

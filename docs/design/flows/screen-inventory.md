@@ -23,7 +23,7 @@
 | S-MA-025 | Источники | one `/sources` overview; Flowly + YouTube independent 3-card previews; open detail / all via real source filter (DEC-057) | F03 | §12.1 | public/entitled content | partial: sources |
 | S-MA-030 | Video session | play/pause/resume/finish | F04 | §14.1, §14.4 | session owner; one active | partial: E2-D3-T01 |
 | S-MA-031 | Step session | back/pause/next/skip/+30/finish | F04 | §14.2, §14.4 | session owner | gap |
-| S-MA-032 | Mixed mode chooser/session | choose video/steps, then execute | F04 | §14.3 | session owner | gap |
+| S-MA-032 | Mixed mode chooser/session | choose video/steps, then execute | F04 | §14.3 | session owner | **cancelled** DEC-066 (v1 never) |
 | S-MA-033 | Final status confirmation | explicit allowed status; optional comment | F04 | §14–15 | owner; no automatic status | partial: E2-D3-T01 |
 | S-MA-034 | Resume/sync conflict | restore checkpoint, sync, resolve real conflict | F04 | §14.4, §40.2 | owner | partial: E2-D3-T01 |
 | S-MA-040 | My workouts | drafts/private/shared/public; create/open | F05 | §16 | owner | gap |

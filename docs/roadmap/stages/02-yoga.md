@@ -117,11 +117,11 @@
 ### E2-D3-T02 — Реализовать пошаговую и смешанную сессию
 - **status:** done · **priority:** high · **owner:** AI agent · **updated:** 2026-07-19
 - **prd_refs:** §14.2–14.4, §15 · **depends_on:** E2-D2-T03, E2-D3-T01 · **decisions:** DEC-015, DEC-016, DEC-022, DEC-024, DEC-025, DEC-029, DEC-035, DEC-053, DEC-062
-- **ui_slices:** S-MA-031 (step — shipped); S-MA-032 (mixed chooser — **deferred residual**, not required for close); S-MA-012/033/034 regression-only.
-- **scope:** шаги, таймер, pause/resume, `+30 секунд`, step media/VO/rest UX; mixed chooser S-MA-032 явно отложен.
-- **acceptance:** [x] переходы шагов корректны; [x] +30 не ломает состояние; [x] mixed flow — deferred (S-MA-032 out of this close, user approved S-MA-031 scope); [x] статус не автоматический.
-- **validation/evidence:** plan `.temp/E2-D3-T02/plan.md`; migration `0009`; `StepSessionScreen` intro→exercise→rest, VO, square MP4 media, done-screen actions; production deploy `e5b55bc` + remote catalog seed; user iterative UX approval on device/local.
-- **journal:** 2026-07-18 — plan approved; Slice 0+1 S-MA-031; `review` for deploy/device. Residual S-MA-032 mixed not shipped. 2026-07-19 — media/VO/rest/done UX loop + prod; user: close T02 (`review -> done`). S-MA-032 remains deferred residual (not blocking).
+- **ui_slices:** S-MA-031 (step — shipped); S-MA-032 **cancelled** (DEC-066, never); S-MA-012/033/034 regression-only.
+- **scope:** шаги, таймер, pause/resume, `+30 секунд`, step media/VO/rest UX. Mixed chooser never (DEC-066).
+- **acceptance:** [x] переходы шагов корректны; [x] +30 не ломает состояние; [x] mixed — **cancelled** DEC-066; [x] статус не автоматический.
+- **validation/evidence:** plan `.temp/E2-D3-T02/plan.md`; migration `0009`; `StepSessionScreen`; production `e5b55bc`; DEC-066.
+- **journal:** 2026-07-18 — S-MA-031 shipped. 2026-07-19 — T02 done. Same day user: S-MA-032 **never** → DEC-066.
 
 ### E2-D3-T06 — Seed ready-made exercise media (user square MP4 pack)
 - **status:** done · **priority:** high · **owner:** AI agent · **updated:** 2026-07-19
@@ -154,8 +154,8 @@
 - **scope:** проверить критерии §55.2 и инварианты §57, **релевантные stage 2**. **N/A / deferred:** own-workout constructor (DEC-064 / T03); **ручная запись §17** — E6-D7-T09 (DEC-065), не блокирует stage-2 DoD.
 - **acceptance:** [x] каждый применимый критерий имеет evidence (или explicit N/A + DEC); [x] privacy/security проверены; [x] риски YouTube записаны.
 - **validation/evidence:** `docs/roadmap/evidence/E2-D3-T05-dod.md`; linked task evidence (catalog/session/step/favorites commits); N/A DEC-064/065.
-- **journal:** 2026-07-19 — DEC-064/065 N/A paths. Same day user: close E2-D2-T05 + E2-D3-T05 DoD as done after favorites `fad6bc2`. Checklist written; residual S-MA-032 / T03 blocked documented.
+- **journal:** 2026-07-19 — DEC-064/065 N/A; close DoD. Same day DEC-066: S-MA-032 permanently cancelled (no residual).
 
 ## Handoff этапа
 
-**Stage-2 DoD closed** (E2-D3-T05 `done`). **E2-D3-T03** remains `blocked` (DEC-064) — does not reopen stage DoD. Residual optional: **S-MA-032** mixed chooser. Manual log → E6-D7-T09.
+**Stage-2 DoD closed.** Residuals: **E2-D3-T03** `blocked` (DEC-064, until demand); **S-MA-032** **cancelled forever** (DEC-066). Manual log → E6-D7-T09. **Next product stage: 3 Программы.**

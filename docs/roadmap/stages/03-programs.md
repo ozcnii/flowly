@@ -85,4 +85,6 @@
 
 ## Handoff этапа
 
-Указать активный enrollment/date scenario, состояние occurrences/jobs, timezone и точное ожидаемое продолжение.
+**Stage 3 is active.** Next card: **E3-D4-T01** (catalog 7/14/30). Dependencies for T01: only E2-D2-T01 `done`. Downstream T02 needs E1-D1-T06 (auth/timezone — foundation done). T03 needs E2-D3-T01 (video sessions — done). Joint programs stay stage 7 (DEC-002).
+
+Указать при работе: активный enrollment/date scenario, occurrences/jobs, timezone.
