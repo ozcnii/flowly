@@ -17,12 +17,19 @@ import { useEnrollProgramMutation, useProgramDetailQuery } from "../model/progra
 
 const focusRing = "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent";
 const choiceFocus = "rounded-full has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-accent";
-type DatePick = "today" | "tomorrow" | "custom";
+/** How many start-date options to list (today + N−1). No native date picker — Telegram WebView often blocks showPicker. */
+const START_OPTIONS = 14;
 
-const openNativeDate = (input: HTMLInputElement | null) => {
-  if (!input) return;
-  try { input.showPicker?.(); } catch { input.click(); }
+const weekdayRu = (localDate: string) => {
+  try {
+    return new Intl.DateTimeFormat("ru-RU", { weekday: "short" }).format(new Date(`${localDate}T12:00:00`));
+  } catch {
+    return "";
+  }
 };
+
+const startOptionTitle = (localDate: string, today: string, tomorrow: string) =>
+  localDate === today ? "Сегодня" : localDate === tomorrow ? "Завтра" : weekdayRu(localDate);
 
 export function ProgramDetailScreen({ id }: { id: string }) {
   const router = useRouter();
@@ -34,19 +41,13 @@ export function ProgramDetailScreen({ id }: { id: string }) {
   const error = query.isError && !program;
   const backgroundRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLElement>(null);
-  const customDateRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const today = useMemo(() => localDateInTimezone(me.data?.user.timezone ?? "Europe/Moscow"), [me.data?.user.timezone]);
   const tomorrow = useMemo(() => addLocalDays(today, 1), [today]);
-  const [pick, setPick] = useState<DatePick>("today");
-  const [customDate, setCustomDate] = useState(today);
-  const dateValue = pick === "today" ? today : pick === "tomorrow" ? tomorrow : customDate;
-  const openSheet = () => { setPick("today"); setCustomDate(today); setOpen(true); };
+  const startOptions = useMemo(() => Array.from({ length: START_OPTIONS }, (_, i) => addLocalDays(today, i)), [today]);
+  const [dateValue, setDateValue] = useState(today);
+  const openSheet = () => { setDateValue(today); setOpen(true); };
   const dismiss = () => { if (!enroll.isPending) setOpen(false); };
-  const pickCustom = () => {
-    setPick("custom");
-    requestAnimationFrame(() => openNativeDate(customDateRef.current));
-  };
   useModalFocus(open, sheetRef, backgroundRef, dismiss);
 
   const endPreview = program ? scheduleLocalDate(dateValue, program.durationDays) : "";
@@ -118,22 +119,14 @@ export function ProgramDetailScreen({ id }: { id: string }) {
       <div className="min-h-0 min-w-0 overflow-x-hidden overflow-y-auto py-2">
         <p className="m-0 px-4 pb-2 text-sm leading-relaxed text-text-muted">{program.title} · {DURATION_LABEL[program.durationDays]}</p>
         <List strong dividers className="!m-0">
-          <ListItem label title="Сегодня" subtitle={formatRuDate(today)} after={<Radio component="div" className={choiceFocus} name="enroll-start" checked={pick === "today"} onChange={() => setPick("today")} />} />
-          <ListItem label title="Завтра" subtitle={formatRuDate(tomorrow)} after={<Radio component="div" className={choiceFocus} name="enroll-start" checked={pick === "tomorrow"} onChange={() => setPick("tomorrow")} />} />
-          <ListItem
+          {startOptions.map((date) => <ListItem
+            key={date}
             label
-            title="Другая дата"
-            subtitle={pick === "custom" ? formatRuDate(customDate) : "Открыть календарь"}
-            after={<Radio component="div" className={choiceFocus} name="enroll-start" checked={pick === "custom"} onChange={pickCustom} />}
-            link
-            linkComponent="button"
-            linkProps={{ type: "button", onClick: pickCustom }}
-            contentClassName="w-full"
-            innerClassName="text-left"
-          />
+            title={startOptionTitle(date, today, tomorrow)}
+            subtitle={formatRuDate(date)}
+            after={<Radio component="div" className={choiceFocus} name="enroll-start" checked={dateValue === date} onChange={() => setDateValue(date)} />}
+          />)}
         </List>
-        {/* Native date only as invisible trigger — Konsta ListInput type=date misaligns label/value in Sheet. */}
-        <input ref={customDateRef} type="date" value={customDate} min={today} tabIndex={-1} aria-hidden className="pointer-events-none fixed h-0 w-0 opacity-0" onChange={(event) => { setPick("custom"); setCustomDate(event.target.value || today); }} />
         <p className="m-0 px-4 pt-2 text-sm text-text-muted">Последний день: {formatRuDate(endPreview)}</p>
         {enroll.isError && <p className="m-4 text-sm text-danger" role="alert">Не удалось сохранить. Дата не потеряна.</p>}
       </div>
