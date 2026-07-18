@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 1 | 1 | 0 | 0 | 5 |
+| 1 | 0 | 0 | 0 | 6 |
 
 ## Границы
 
@@ -75,14 +75,15 @@
 - **journal:** 2026-07-19 — implement after T04; close done + commit/push with T04 batch workflow.
 
 ### E3-D4-T06 — Создать program occurrences
-- **status:** in_progress · **priority:** blocker · **owner:** agent · **updated:** 2026-07-19
+- **status:** done · **priority:** blocker · **owner:** agent · **updated:** 2026-07-19
 - **prd_refs:** §20, §26, §43.21 · **depends_on:** E3-D4-T02, E3-D4-T04, E3-D4-T05 · **decisions:** DEC-015, DEC-016, DEC-029
 - **scope:** backend lifecycle occurrences для дней программ до calendar UI этапа 6.
-- **acceptance:** [ ] occurrence уникален и связан с enrollment/day; [ ] UTC/timezone mapping устойчив; [ ] ручные статусы сохраняются.
-- **validation/evidence:** generated occurrences и boundary cases.
+- **acceptance:** [x] occurrence уникален и связан с enrollment/day; [x] UTC/timezone mapping устойчив; [x] ручные статусы сохраняются.
+- **validation/evidence:** migration 0013 unique (user,entity_type,entity_id,date) + dedupe; enroll full-body creates 30 occ (23 scheduled workouts + 7 rest); parent_entity_id=enrollmentId; GET ensure materialize; skip updates same occurrenceId (updated:true); scheduledAtUtc `YYYY-MM-DDT00:00:00.000Z`; finish reuses existing occ. typecheck PASS.
+- **journal:** 2026-07-19 — implement ensureProgramOccurrences + unique index; finish/skip upsert.
 
 ### E3-D4-T07 — Подготовить reminder jobs и закрыть DoD программ
-- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
+- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-19
 - **prd_refs:** §20, §43.22, §50.1, §55.3 · **depends_on:** E3-D4-T01–T06 · **decisions:** DEC-001, DEC-002, DEC-003, DEC-015, DEC-016, DEC-029
 - **scope:** создать jobs без Telegram delivery; проверить одиночные программы, пропуски, отдых и прогресс.
 - **acceptance:** [ ] jobs соответствуют planned occurrences; [ ] delivery явно отложена до этапа 5; [ ] все применимые пункты §55.3 имеют evidence; [ ] совместность помечена зависимостью этапа 7.
@@ -90,4 +91,4 @@
 
 ## Handoff этапа
 
-**E3-D4-T05** `done`. **E3-D4-T06** `in_progress` — program occurrences lifecycle.
+**E3-D4-T06** `done`. Next **E3-D4-T07** jobs + DoD §55.3.

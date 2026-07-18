@@ -1,12 +1,14 @@
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { generateId, nowIso } from "@flowly/core";
 import { schema } from "@flowly/database";
 import { audit, rejectOversizedBody } from "@/lib/auth/http";
 import { isSafeOrigin } from "@/lib/auth/csrf";
 import { getSessionUserId } from "@/lib/auth/session-user";
+import { getUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/cloudflare";
 import { isLocalDate } from "@/features/programs/model/program-dates";
+import { ensureProgramOccurrences } from "@/lib/programs/ensure-program-occurrences";
 
 const json = (body: unknown, init?: ResponseInit) => NextResponse.json(body, init);
 
@@ -22,9 +24,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const db = getDb();
   const program = (await db.select().from(schema.programs).where(eq(schema.programs.id, programId)).limit(1))[0];
   if (!program) return json({ error: "not_found", message: "Программа не найдена." }, { status: 404 });
+  const days = await db.select().from(schema.programDays).where(eq(schema.programDays.programId, programId)).orderBy(asc(schema.programDays.dayNumber));
+  const user = await getUser(db, userId);
+  const timezone = user?.timezone ?? "Europe/Moscow";
 
   const existing = (await db.select().from(schema.programEnrollments).where(and(eq(schema.programEnrollments.userId, userId), eq(schema.programEnrollments.programId, programId), eq(schema.programEnrollments.status, "active"))).limit(1))[0];
   if (existing) {
+    await ensureProgramOccurrences(db, { userId, enrollmentId: existing.id, startLocalDate: existing.startLocalDate, timezone, days });
     audit("program.enroll", { userId, programId, enrollmentId: existing.id, created: false });
     return json({ created: false, enrollment: { id: existing.id, programId: existing.programId, startLocalDate: existing.startLocalDate, status: existing.status, createdAt: existing.createdAt } });
   }
@@ -44,9 +50,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     });
   } catch (error) {
     const raced = (await db.select().from(schema.programEnrollments).where(and(eq(schema.programEnrollments.userId, userId), eq(schema.programEnrollments.programId, programId), eq(schema.programEnrollments.status, "active"))).limit(1))[0];
-    if (raced) return json({ created: false, enrollment: { id: raced.id, programId: raced.programId, startLocalDate: raced.startLocalDate, status: raced.status, createdAt: raced.createdAt } });
+    if (raced) {
+      await ensureProgramOccurrences(db, { userId, enrollmentId: raced.id, startLocalDate: raced.startLocalDate, timezone, days });
+      return json({ created: false, enrollment: { id: raced.id, programId: raced.programId, startLocalDate: raced.startLocalDate, status: raced.status, createdAt: raced.createdAt } });
+    }
     throw error;
   }
-  audit("program.enroll", { userId, programId, enrollmentId: id, created: true, startLocalDate });
-  return json({ created: true, enrollment: { id, programId, startLocalDate, status: "active", createdAt } }, { status: 201 });
+  const materialize = await ensureProgramOccurrences(db, { userId, enrollmentId: id, startLocalDate, timezone, days });
+  audit("program.enroll", { userId, programId, enrollmentId: id, created: true, startLocalDate, occurrencesCreated: materialize.created });
+  return json({ created: true, enrollment: { id, programId, startLocalDate, status: "active", createdAt }, occurrences: materialize }, { status: 201 });
 }

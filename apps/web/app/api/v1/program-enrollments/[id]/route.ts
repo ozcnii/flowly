@@ -12,6 +12,7 @@ import {
   isWorkoutSkippedStatus,
   isWorkoutUserRestStatus,
 } from "@/features/programs/model/program-progress";
+import { ensureProgramOccurrences } from "@/lib/programs/ensure-program-occurrences";
 
 const CATEGORY: Record<string, string> = {
   beginner: "Старт", back: "Спина", evening: "Вечер", morning: "Утро", mobility: "Мобильность", full: "Полный ритм",
@@ -28,23 +29,39 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   if (!program) return NextResponse.json({ error: "not_found", message: "Программа не найдена." }, { status: 404 });
   const days = await db.select().from(schema.programDays).where(eq(schema.programDays.programId, program.id)).orderBy(asc(schema.programDays.dayNumber));
   const user = await getUser(db, userId);
-  const todayLocalDate = localDateInTimezone(user?.timezone ?? "Europe/Moscow");
+  const timezone = user?.timezone ?? "Europe/Moscow";
+  const todayLocalDate = localDateInTimezone(timezone);
   const endLocalDate = scheduleLocalDate(enrollment.startLocalDate, program.durationDays);
 
+  await ensureProgramOccurrences(db, {
+    userId,
+    enrollmentId: enrollment.id,
+    startLocalDate: enrollment.startLocalDate,
+    timezone,
+    days,
+  });
+
   const occurrences = await db.select({
+    id: schema.activityOccurrences.id,
+    entityType: schema.activityOccurrences.entityType,
     entityId: schema.activityOccurrences.entityId,
     scheduledLocalDate: schema.activityOccurrences.scheduledLocalDate,
     status: schema.activityOccurrences.status,
+    parentEntityId: schema.activityOccurrences.parentEntityId,
+    timezone: schema.activityOccurrences.timezone,
+    scheduledAtUtc: schema.activityOccurrences.scheduledAtUtc,
   }).from(schema.activityOccurrences).where(and(
     eq(schema.activityOccurrences.userId, userId),
-    eq(schema.activityOccurrences.entityType, "workout"),
     gte(schema.activityOccurrences.scheduledLocalDate, enrollment.startLocalDate),
     lte(schema.activityOccurrences.scheduledLocalDate, endLocalDate),
   ));
 
-  const doneKeys = new Set(occurrences.filter((r) => isWorkoutDoneStatus(r.status)).map((r) => `${r.entityId}|${r.scheduledLocalDate}`));
-  const skipKeys = new Set(occurrences.filter((r) => isWorkoutSkippedStatus(r.status)).map((r) => `${r.entityId}|${r.scheduledLocalDate}`));
-  const restKeys = new Set(occurrences.filter((r) => isWorkoutUserRestStatus(r.status)).map((r) => `${r.entityId}|${r.scheduledLocalDate}`));
+  const workoutOcc = occurrences.filter((r) => r.entityType === "workout");
+  const doneKeys = new Set(workoutOcc.filter((r) => isWorkoutDoneStatus(r.status)).map((r) => `${r.entityId}|${r.scheduledLocalDate}`));
+  const skipKeys = new Set(workoutOcc.filter((r) => isWorkoutSkippedStatus(r.status)).map((r) => `${r.entityId}|${r.scheduledLocalDate}`));
+  const restKeys = new Set(workoutOcc.filter((r) => isWorkoutUserRestStatus(r.status)).map((r) => `${r.entityId}|${r.scheduledLocalDate}`));
+  const occByWorkoutKey = new Map(workoutOcc.map((r) => [`${r.entityId}|${r.scheduledLocalDate}`, r]));
+  const occByProgramDay = new Map(occurrences.filter((r) => r.entityType === "program_day").map((r) => [`${r.entityId}|${r.scheduledLocalDate}`, r]));
 
   let completedWorkoutDays = 0;
   let totalWorkoutDays = 0;
@@ -61,6 +78,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const workoutDone = Boolean(key && doneKeys.has(key));
     const workoutSkipped = Boolean(key && !workoutDone && skipKeys.has(key));
     const workoutUserRest = Boolean(key && !workoutDone && !workoutSkipped && restKeys.has(key));
+    const occ = day.type === "rest"
+      ? occByProgramDay.get(`${day.id}|${scheduledLocalDate}`)
+      : key ? occByWorkoutKey.get(key) : undefined;
     if (day.type === "rest") plannedRestDays += 1;
     if (day.type === "workout") {
       totalWorkoutDays += 1;
@@ -93,6 +113,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       userRest: workoutUserRest,
       canSkip: day.type === "workout" && Boolean(day.workoutId) && !resolved && scheduledLocalDate <= todayLocalDate,
       canRest: day.type === "workout" && Boolean(day.workoutId) && !resolved && scheduledLocalDate <= todayLocalDate,
+      occurrenceId: occ?.id ?? null,
+      occurrenceStatus: occ?.status ?? null,
+      occurrenceTimezone: occ?.timezone ?? null,
+      scheduledAtUtc: occ?.scheduledAtUtc ?? null,
     };
   });
 

@@ -174,7 +174,15 @@ export const activityOccurrences = sqliteTable(
     createdAt: text("created_at").notNull(),
     updatedAt: text("updated_at").notNull(),
   },
-  (table) => [index("activity_occurrences_user_date_idx").on(table.userId, table.scheduledLocalDate)],
+  (table) => [
+    index("activity_occurrences_user_date_idx").on(table.userId, table.scheduledLocalDate),
+    uniqueIndex("activity_occurrences_user_entity_date_unique").on(
+      table.userId,
+      table.entityType,
+      table.entityId,
+      table.scheduledLocalDate,
+    ),
+  ],
 );
 
 // §43.23 workout_sessions

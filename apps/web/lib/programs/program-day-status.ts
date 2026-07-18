@@ -5,6 +5,7 @@ import { schema, type Database } from "@flowly/database";
 import { getUser } from "@/lib/auth/users";
 import { localDateInTimezone, scheduleLocalDate } from "@/features/programs/model/program-dates";
 import { isWorkoutDoneStatus } from "@/features/programs/model/program-progress";
+import { scheduledAtUtcForLocalDate } from "./ensure-program-occurrences";
 
 export type ProgramDayTerminal = "skipped" | "rest";
 
@@ -14,9 +15,10 @@ const MSG = {
   rest: { not_workout: "Отдых отмечают только в день с практикой.", future: "Нельзя отметить отдых на будущий день.", conflict: "День уже отмечен пропуском." },
 } as const;
 
+const TERMINAL = new Set(["completed", "partial", "not_completed", "rest", "skipped", "no_response"]);
 const json = (body: unknown, init?: ResponseInit) => NextResponse.json(body, init);
 
-/** Write terminal skip/rest for a program workout day. Never mutates startLocalDate / day map. */
+/** Write terminal skip/rest for a program workout day. Does not mutate startLocalDate / day map. */
 export async function postProgramDayTerminal(
   db: Database,
   userId: string,
@@ -50,24 +52,56 @@ export async function postProgramDayTerminal(
     eq(schema.activityOccurrences.entityId, day.workoutId),
     eq(schema.activityOccurrences.scheduledLocalDate, scheduledLocalDate),
   ));
-  const done = existing.find((row) => isWorkoutDoneStatus(row.status));
-  if (done) return json({ error: "already_done", message: "День уже отмечен выполненным.", occurrence: { id: done.id, status: done.status, scheduledLocalDate } }, { status: 409 });
-
-  const same = existing.find((row) => row.status === status);
-  if (same) {
+  const row = existing[0];
+  if (row && isWorkoutDoneStatus(row.status)) {
+    return json({ error: "already_done", message: "День уже отмечен выполненным.", occurrence: { id: row.id, status: row.status, scheduledLocalDate } }, { status: 409 });
+  }
+  if (row && row.status === status) {
     return json({
       created: false,
       startLocalDate: enrollment.startLocalDate,
       scheduledLocalDate,
-      occurrence: { id: same.id, status: same.status, scheduledLocalDate },
+      occurrence: { id: row.id, status: row.status, scheduledLocalDate },
+    });
+  }
+  const other: ProgramDayTerminal = status === "skipped" ? "rest" : "skipped";
+  if (row && row.status === other) {
+    return json({ error: "status_conflict", message: MSG[status].conflict, occurrence: { id: row.id, status: row.status, scheduledLocalDate } }, { status: 409 });
+  }
+  if (row && TERMINAL.has(row.status) && row.status !== status) {
+    return json({ error: "status_conflict", message: "Статус дня уже зафиксирован.", occurrence: { id: row.id, status: row.status, scheduledLocalDate } }, { status: 409 });
+  }
+
+  const source = SOURCE[status], ts = nowIso(), historyId = generateId();
+  if (row) {
+    const oldStatus = row.status;
+    await db.update(schema.activityOccurrences).set({
+      status,
+      completedAt: ts,
+      parentEntityId: row.parentEntityId ?? enrollmentId,
+      source,
+      updatedAt: ts,
+    }).where(eq(schema.activityOccurrences.id, row.id));
+    await db.insert(schema.statusHistory).values({
+      id: historyId,
+      occurrenceId: row.id,
+      oldStatus,
+      newStatus: status,
+      changedByUserId: userId,
+      source,
+      comment: null,
+      createdAt: ts,
+    });
+    return json({
+      created: false,
+      updated: true,
+      startLocalDate: enrollment.startLocalDate,
+      scheduledLocalDate,
+      occurrence: { id: row.id, status, scheduledLocalDate },
     });
   }
 
-  const other: ProgramDayTerminal = status === "skipped" ? "rest" : "skipped";
-  const conflict = existing.find((row) => row.status === other);
-  if (conflict) return json({ error: "status_conflict", message: MSG[status].conflict, occurrence: { id: conflict.id, status: conflict.status, scheduledLocalDate } }, { status: 409 });
-
-  const occurrenceId = generateId(), historyId = generateId(), ts = nowIso(), source = SOURCE[status];
+  const occurrenceId = generateId();
   await db.insert(schema.activityOccurrences).values({
     id: occurrenceId,
     userId,
@@ -77,7 +111,7 @@ export async function postProgramDayTerminal(
     scheduledLocalDate,
     scheduledLocalTime: "00:00",
     timezone,
-    scheduledAtUtc: ts,
+    scheduledAtUtc: scheduledAtUtcForLocalDate(scheduledLocalDate),
     status,
     completedAt: ts,
     durationSeconds: 0,
