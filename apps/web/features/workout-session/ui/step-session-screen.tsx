@@ -320,23 +320,37 @@ export function StepSessionScreen({ id }: { id: string }) {
           <Button large rounded tonal className={`w-full gap-2 ${focusRing}`} disabled={finish.isPending} onClick={resumeExercises}><Icon name="chevron-left" />Вернуться к упражнениям</Button>
           <Button clear rounded component={NextLink} href="/" className={focusRing}>На главную</Button>
         </div> : <>
-          <div className="relative aspect-video bg-accent-soft">
-            {current?.mediaObjectKey ? (
-              current.mediaType === "gif" || current.mediaObjectKey.endsWith(".gif")
-                // GIF must stay as raw img so animation is not frozen by next/image optimization.
-                ? <img src={`/media/${current.mediaObjectKey}`} alt={current.title} className="absolute inset-0 size-full object-cover" decoding="async" />
-                : <Image src={`/media/${current.mediaObjectKey}`} alt={current.title} fill sizes="(max-width: 430px) calc(100vw - 40px), 640px" className="object-cover" placeholder="blur" blurDataURL={IMAGE_BLUR_DATA_URL} decoding="async" />
-            ) : (
-              <div className="absolute inset-0 grid place-items-center"><Icon name="dumbbell" className="size-10 text-text-muted" /></div>
-            )}
-            <div className="absolute left-4 top-4"><span className="rounded-full bg-black/55 px-3 py-1 text-sm font-medium text-white">{progressBadge}</span></div>
-          </div>
+          {(() => {
+            const nextEx = exercises[position + 1];
+            const media = phase === "rest" ? (nextEx ?? null) : current;
+            const mediaKey = media?.mediaObjectKey ?? null;
+            const isGif = Boolean(media && (media.mediaType === "gif" || mediaKey?.endsWith(".gif")));
+            return <div className="relative aspect-video bg-accent-soft">
+              {mediaKey ? (
+                isGif
+                  ? <img src={`/media/${mediaKey}`} alt={media?.title ?? ""} className={`absolute inset-0 size-full object-cover ${phase === "rest" ? "opacity-45" : ""}`} decoding="async" />
+                  : <Image src={`/media/${mediaKey}`} alt={media?.title ?? ""} fill sizes="(max-width: 430px) calc(100vw - 40px), 640px" className={`object-cover ${phase === "rest" ? "opacity-45" : ""}`} placeholder="blur" blurDataURL={IMAGE_BLUR_DATA_URL} decoding="async" />
+              ) : (
+                <div className="absolute inset-0 grid place-items-center"><Icon name="dumbbell" className="size-10 text-text-muted" /></div>
+              )}
+              {phase === "rest" && (
+                <div className="absolute inset-0 grid place-items-center bg-gradient-to-t from-black/55 via-black/25 to-black/15 p-4 text-center">
+                  <div className="grid max-w-[18rem] justify-items-center gap-1.5">
+                    <span className="grid size-12 place-items-center rounded-full bg-white/20 text-white backdrop-blur-sm" aria-hidden><Icon name="timer" className="size-6" /></span>
+                    <p className="m-0 text-lg font-semibold text-white">Отдых</p>
+                    <p className="m-0 text-sm font-medium text-white/90">{nextCompletesSteps ? "Дальше — итог" : nextEx ? `Далее: ${nextEx.title}` : "Перерыв"}</p>
+                  </div>
+                </div>
+              )}
+              <div className="absolute left-4 top-4"><span className="rounded-full bg-black/55 px-3 py-1 text-sm font-medium text-white">{progressBadge}</span></div>
+            </div>;
+          })()}
           <div className="grid gap-3 p-4">
-            <p className="m-0 min-h-[2.25rem] text-center text-2xl font-semibold leading-tight line-clamp-2" title={current?.title}>{phase === "rest" ? "Отдых" : current?.title ?? ""}</p>
-            <p className="m-0 min-h-[1.25rem] text-center text-sm text-text-muted">{phase === "exercise" && current && exerciseReps(current) != null ? `${exerciseReps(current)} повторений` : ""}</p>
+            <p className="m-0 min-h-[2.25rem] text-center text-2xl font-semibold leading-tight line-clamp-2" title={phase === "rest" ? "Отдых" : current?.title}>{phase === "rest" ? "Отдых" : current?.title ?? ""}</p>
+            <p className="m-0 min-h-[1.25rem] text-center text-sm text-text-muted">{phase === "exercise" && current && exerciseReps(current) != null ? `${exerciseReps(current)} повторений` : phase === "rest" && !nextCompletesSteps && exercises[position + 1] ? `Готовимся к «${exercises[position + 1]?.title ?? ""}»` : ""}</p>
             <p className="m-0 text-center text-5xl font-semibold tabular-nums" aria-live="off">{mainTimer}</p>
             <p className="m-0 min-h-[1.25rem] text-center text-sm text-text-muted" role="status" aria-live="polite">{statusText}</p>
-            <p className="m-0 min-h-[3.75rem] text-center text-sm leading-relaxed text-text-muted [overflow-wrap:anywhere] line-clamp-3">{phase === "rest" ? (nextCompletesSteps ? "Дальше — итог тренировки" : `Далее: ${exercises[position + 1]?.title ?? "завершение"}`) : current?.description ?? ""}</p>
+            <p className="m-0 min-h-[3.75rem] text-center text-sm leading-relaxed text-text-muted [overflow-wrap:anywhere] line-clamp-3">{phase === "rest" ? (nextCompletesSteps ? "Отдышитесь — затем сохраним результат." : `Спокойно подышите. Следующее: ${exercises[position + 1]?.title ?? "завершение"}.`) : current?.description ?? ""}</p>
             <Button large rounded className={`w-full gap-2 ${focusRing}`} onClick={toggleRun}><Icon name={running ? "pause" : "play"} />{running ? "Пауза" : "Продолжить"}</Button>
             {/*
               Transport: ‹ · Skip · › on normal steps.
