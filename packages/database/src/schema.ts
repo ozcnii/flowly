@@ -237,6 +237,35 @@ export const favorites = sqliteTable(
   ],
 );
 
+// §43.13 programs
+export const programs = sqliteTable("programs", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  coverObjectKey: text("cover_object_key"),
+  durationDays: integer("duration_days").notNull(),
+  category: text("category").notNull(),
+  isSystem: integer("is_system", { mode: "boolean" }).notNull(),
+  createdAt: text("created_at").notNull(),
+});
+
+// §43.14 program_days
+export const programDays = sqliteTable(
+  "program_days",
+  {
+    id: text("id").primaryKey(),
+    programId: text("program_id")
+      .notNull()
+      .references(() => programs.id, { onDelete: "cascade" }),
+    dayNumber: integer("day_number").notNull(),
+    type: text("type").notNull(),
+    workoutId: text("workout_id").references(() => workouts.id, { onDelete: "restrict" }),
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+  },
+  (table) => [uniqueIndex("program_days_program_day_unique").on(table.programId, table.dayNumber)],
+);
+
 // §43.28 youtube_search_cache
 export const youtubeSearchCache = sqliteTable(
   "youtube_search_cache",

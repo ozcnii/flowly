@@ -26,6 +26,7 @@
     "db:seed": "npm run db:seed --workspace @flowly/web",
     "db:seed:catalog": "npm run db:seed:catalog --workspace @flowly/web",
     "catalog:build-seed": "node scripts/build-starter-catalog-sql.mjs",
+    "programs:build-seed": "node scripts/build-programs-seed-sql.mjs",
     "db:reset": "npm run db:reset --workspace @flowly/web",
     "deploy:check": "npm run deploy:check --workspaces --if-present",
     "deploy:test": "npm run deploy:test --workspaces --if-present",

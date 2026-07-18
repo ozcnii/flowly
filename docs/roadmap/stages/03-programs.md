@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 7 | 0 | 0 | 0 | 0 |
+| 6 | 0 | 0 | 0 | 1 |
 
 ## Границы
 
@@ -30,12 +30,13 @@
 ## Deliverable E3-D4 — Одиночные программы
 
 ### E3-D4-T01 — Реализовать каталог программ
-- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §20.1–20.2, §43.13–43.14, §44.6 · **depends_on:** E2-D2-T01 · **decisions:** DEC-016, DEC-022, DEC-024, DEC-025, DEC-029
-- **ui_slices:** S-MA-050, S-MA-051 — выполнять последовательно; approval каждого ID обязателен до следующего.
-- **scope:** модели/API/UI программ и их дней для длительностей 7/14/30.
-- **acceptance:** [ ] порядок дней стабилен; [ ] workout/rest day различимы; [ ] данные валидируются.
-- **validation/evidence:** program fixtures и API/UI samples.
+- **status:** done · **priority:** high · **owner:** AI agent · **updated:** 2026-07-19
+- **prd_refs:** §20.1–20.2, §43.13–43.14, §44.6 · **depends_on:** E2-D2-T01 · **decisions:** DEC-016, DEC-022, DEC-024, DEC-029, DEC-035 (DEC-025 superseded)
+- **ui_slices:** S-MA-050 + S-MA-051 (one-pass review per user).
+- **scope:** модели/API/UI программ и их дней для длительностей 7/14/30; 6 system programs from Flowly catalog; Start disabled (T02).
+- **acceptance:** [x] порядок дней стабилен; [x] workout/rest day различимы; [x] данные валидируются.
+- **validation/evidence:** plan `.temp/E3-D4-T01/plan.md` approved; migration `0011_programs.sql`; seed 6 programs / 79 days; HTTP list/filter/detail PASS; duration filter final UX: BlockTitle + Segmented `Все · 7 дн · 14 дн · 30 дн` (onboarding pattern); typecheck/lint PASS; user close «закрываем».
+- **journal:** 2026-07-19 — plan approved; implement; filter UX iterations → Segmented + «N дн»; user: «хорошо» / «закрываем»; `review -> done`.
 
 ### E3-D4-T02 — Реализовать начало программы с выбранной даты
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
@@ -85,6 +86,4 @@
 
 ## Handoff этапа
 
-**Stage 3 is active.** Next card: **E3-D4-T01** (catalog 7/14/30). Dependencies for T01: only E2-D2-T01 `done`. Downstream T02 needs E1-D1-T06 (auth/timezone — foundation done). T03 needs E2-D3-T01 (video sessions — done). Joint programs stay stage 7 (DEC-002).
-
-Указать при работе: активный enrollment/date scenario, occurrences/jobs, timezone.
+**E3-D4-T01** `done`. Next: **E3-D4-T02** enroll (start date).

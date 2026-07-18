@@ -18,6 +18,7 @@
     "db:reset": "node scripts/db-reset-local.mjs",
     "db:seed": "wrangler d1 execute flowly-db --local --file=../../seeds/0001_test_users.sql",
     "db:seed:catalog": "wrangler d1 execute flowly-db --local --file=../../seeds/0002_starter_catalog.sql",
+    "db:seed:programs": "wrangler d1 execute flowly-db --local --file=../../seeds/0008_starter_programs.sql",
     "typecheck": "tsc --noEmit",
     "lint": "eslint ."
   },

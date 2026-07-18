@@ -32,8 +32,8 @@
 | S-MA-043 | Workout visibility/share | private/friends/link/public/revoke | F05,F10 | §16.2, §33.2 | owner only | gap |
 | S-MA-044 | Manual workout | date/time/duration/category/comment/status/source | F05,F09 | §17 | owner | gap |
 | S-MA-045 | Media upload state | validate JPEG/PNG/WebP/GIF; retry/remove | F05 | §16.3, §40 | owner | gap |
-| S-MA-050 | Программы: catalog/current | browse 7/14/30, favorites, current progress | F06 | §20 | owner; system/shared | gap (tab absent) |
-| S-MA-051 | Program detail/days | inspect sequence/rest/goal/start | F06 | §20.1–20.2 | entitled viewer | gap |
+| S-MA-050 | Программы: catalog/current | browse 7/14/30; progress/favorites later T02+ | F06 | §20 | system programs | partial: E3-D4-T01 list |
+| S-MA-051 | Program detail/days | sequence/rest/workout links; start → T02 | F06 | §20.1–20.2 | entitled viewer | partial: E3-D4-T01 detail |
 | S-MA-052 | Program start | date/time/policy/friend invitation | F06,F10 | §20.3, §20.6 | owner; friend acceptance | gap |
 | S-MA-053 | Program enrollment | today/progress/participants/leave/restart | F06,F10 | §20.4–20.6 | participant; scoped progress | gap |
 | S-MA-054 | Program leave/ownership | confirm leave; transfer or end if owner | F06,F10 | §20.6 | owner/participant matrix | gap |
