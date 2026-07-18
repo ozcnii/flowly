@@ -53,28 +53,31 @@ For any two frames of the same exercise, **identical**: canvas crop, mat positio
 
 ## 4. Motion / GIF rules
 
-- Static poses (`mediaType: image` historically): **one** locked still cell is enough (we export webp or 1-frame gif later).
-- Motion poses (need GIF): generate **exactly two** cells **A then B** side-by-side as one strip **or** two cells in fixed grid slots with same camera lock.
-- Transition A→B must be a clear readable yoga movement (e.g. cat ↔ cow), **not** a random hop or scale zoom.
+- Static poses: **one** still cell → `.webp` (or later single-frame gif).
+- Motion poses: **not limited to 2 frames**. Prefer **3–4 frames** (or more) for smooth loops when the motion is a cycle (cat→cow→cat, circle, roll).
+  - **2 frames** only for simple A/B toggles (arms down/up) if multi-frame is not available.
+  - Generate as a **horizontal filmstrip** of N equal 16:9 cells with **camera lock** across all frames of that exercise (same scale, mat Y, floor line).
+- Motion must be readable (joint change), **not** hop/zoom/pan of the whole character.
 - **No** Ken Burns, zoom, pan, or character sliding on the mat between frames.
+- Slice rule: every frame of one GIF must be **identical pixel size**; crop with detected gutters + uniform cell size to avoid micro-jitter.
 
-### Motion pair list (must be GIF)
+### Motion list (GIF) — recommended frame counts
 
-| id | Frame A | Frame B |
-|----|---------|---------|
-| ex-mountain | Tadasana arms by sides | Tadasana arms overhead |
-| ex-neck-rolls | seated/standing head neutral | head tilted gently to right (neck stretch) |
-| ex-shoulder-rolls | shoulders neutral | shoulders rolled back/up peak |
-| ex-cat-cow | Cat: spine rounded up, head tucked | Cow: belly down, gaze slightly up |
-| ex-child | Child: arms by sides, hips on heels | Child: arms extended forward, hips on heels |
-| ex-sun-a | Mountain arms up | Forward fold soft knees |
-| ex-thread-needle | Right arm threaded under, left up | Left arm threaded under, right up |
-| ex-wrist-warmup | hands interlaced palms out front | wrists flexed slightly further |
-| ex-ankle-mobility | standing, right foot lifted ankle neutral | same pose, ankle flexed/pointed peak |
-| ex-hip-circles | standing hands on hips, pelvis center | pelvis shifted to side (circle peak) |
-| ex-bird-dog | tabletop neutral | opposite arm+leg extended |
-| ex-dead-bug | back on mat, knees tabletop arms up | opposite arm+leg extended |
-| ex-rag-doll | soft forward fold arms dangling | slightly deeper fold (same feet) |
+| id | frames | Notes |
+|----|--------|--------|
+| ex-mountain | 2–3 | arms down → mid → up (or 2) |
+| ex-neck-rolls | 3–4 | neutral → right → neutral → left (loop) |
+| ex-shoulder-rolls | 3–4 | roll cycle |
+| ex-cat-cow | **4** | cat → mid → cow → mid (smooth loop) |
+| ex-child | 2 | arms sides ↔ forward |
+| ex-sun-a | 3–4 | sun salutation key poses |
+| ex-thread-needle | 2–3 | under L ↔ center ↔ under R |
+| ex-wrist-warmup | 2–3 | stretch cycle |
+| ex-ankle-mobility | 3–4 | circle or flex cycle |
+| ex-hip-circles | 4 | 4 points of circle |
+| ex-bird-dog | 3 | tabletop → extend → tabletop |
+| ex-dead-bug | 3 | tabletop → extend → tabletop |
+| ex-rag-doll | 2–3 | shallow → deep fold |
 
 All other exercises: single still cell (canonical pose).
 
