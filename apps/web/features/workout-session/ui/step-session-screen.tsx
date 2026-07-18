@@ -154,7 +154,11 @@ export function StepSessionScreen({ id }: { id: string }) {
     // Celebrate only when the user just crossed the last step (auto-advance / next / skip).
     if (exercises.length > 0 && from < exercises.length && next >= exercises.length) {
       sounds.celebrate();
-      if (mountedRef.current) setCelebrating(true);
+      if (mountedRef.current) {
+        setCelebrating(true);
+        // Keep confetti/pop visible ~2.6s (was ~1s and felt too short).
+        window.setTimeout(() => { if (mountedRef.current) setCelebrating(false); }, 2_600);
+      }
     }
     // autoContinue → not paused; manual jump → paused until user taps Продолжить
     persist(accumulatedRef.current, next, !opts?.autoContinue);
@@ -381,18 +385,18 @@ function Shell({ children, rootRef }: { children: React.ReactNode; rootRef?: Ref
 
 /** Lightweight CSS confetti + pop — no assets, no layout shift (absolute overlay). */
 const CONFETTI = [
-  { left: "8%", delay: "0ms", dx: "-18px", dy: "110px", rot: "-40deg", color: "var(--color-accent, #7eb8a2)" },
-  { left: "22%", delay: "40ms", dx: "12px", dy: "130px", rot: "55deg", color: "#f5c16c" },
-  { left: "38%", delay: "80ms", dx: "-8px", dy: "120px", rot: "20deg", color: "#e8a0bf" },
-  { left: "52%", delay: "30ms", dx: "20px", dy: "140px", rot: "-70deg", color: "var(--color-accent, #7eb8a2)" },
-  { left: "66%", delay: "90ms", dx: "-14px", dy: "115px", rot: "35deg", color: "#8ec5e8" },
-  { left: "78%", delay: "50ms", dx: "10px", dy: "125px", rot: "-25deg", color: "#f5c16c" },
-  { left: "90%", delay: "70ms", dx: "-6px", dy: "135px", rot: "48deg", color: "#e8a0bf" },
-  { left: "15%", delay: "110ms", dx: "16px", dy: "100px", rot: "-55deg", color: "#8ec5e8" },
-  { left: "45%", delay: "20ms", dx: "-22px", dy: "145px", rot: "62deg", color: "var(--color-accent, #7eb8a2)" },
-  { left: "72%", delay: "100ms", dx: "8px", dy: "105px", rot: "-18deg", color: "#f5c16c" },
-  { left: "30%", delay: "60ms", dx: "4px", dy: "150px", rot: "30deg", color: "#e8a0bf" },
-  { left: "58%", delay: "0ms", dx: "-12px", dy: "118px", rot: "-45deg", color: "#8ec5e8" },
+  { left: "8%", delay: "0ms", dx: "-18px", dy: "165px", rot: "-40deg", color: "var(--color-accent, #7eb8a2)" },
+  { left: "22%", delay: "40ms", dx: "12px", dy: "195px", rot: "55deg", color: "#f5c16c" },
+  { left: "38%", delay: "80ms", dx: "-8px", dy: "180px", rot: "20deg", color: "#e8a0bf" },
+  { left: "52%", delay: "30ms", dx: "20px", dy: "210px", rot: "-70deg", color: "var(--color-accent, #7eb8a2)" },
+  { left: "66%", delay: "90ms", dx: "-14px", dy: "172px", rot: "35deg", color: "#8ec5e8" },
+  { left: "78%", delay: "50ms", dx: "10px", dy: "187px", rot: "-25deg", color: "#f5c16c" },
+  { left: "90%", delay: "70ms", dx: "-6px", dy: "202px", rot: "48deg", color: "#e8a0bf" },
+  { left: "15%", delay: "110ms", dx: "16px", dy: "150px", rot: "-55deg", color: "#8ec5e8" },
+  { left: "45%", delay: "20ms", dx: "-22px", dy: "217px", rot: "62deg", color: "var(--color-accent, #7eb8a2)" },
+  { left: "72%", delay: "100ms", dx: "8px", dy: "157px", rot: "-18deg", color: "#f5c16c" },
+  { left: "30%", delay: "60ms", dx: "4px", dy: "225px", rot: "30deg", color: "#e8a0bf" },
+  { left: "58%", delay: "0ms", dx: "-12px", dy: "177px", rot: "-45deg", color: "#8ec5e8" },
 ] as const;
 
 function CelebrationBurst({ active }: { active: boolean }) {
@@ -402,21 +406,24 @@ function CelebrationBurst({ active }: { active: boolean }) {
       <style>{`
         @keyframes step-celebrate-pop {
           0% { transform: scale(0.82); opacity: 0; }
-          55% { transform: scale(1.06); opacity: 1; }
+          20% { transform: scale(1.06); opacity: 1; }
+          70% { transform: scale(1); opacity: 1; }
           100% { transform: scale(1); opacity: 1; }
         }
         @keyframes step-celebrate-badge {
           0% { transform: scale(0.5) rotate(-12deg); }
-          60% { transform: scale(1.12) rotate(6deg); }
+          25% { transform: scale(1.12) rotate(6deg); }
+          55% { transform: scale(1) rotate(0); }
           100% { transform: scale(1) rotate(0); }
         }
         @keyframes step-celebrate-confetti {
           0% { transform: translate3d(0, -8px, 0) rotate(0deg); opacity: 0; }
-          12% { opacity: 1; }
+          8% { opacity: 1; }
+          75% { opacity: 1; }
           100% { transform: translate3d(var(--dx), var(--dy), 0) rotate(var(--rot)); opacity: 0; }
         }
-        .step-celebrate-pop { animation: step-celebrate-pop 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
-        .step-celebrate-badge { animation: step-celebrate-badge 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+        .step-celebrate-pop { animation: step-celebrate-pop 2.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+        .step-celebrate-badge { animation: step-celebrate-badge 2.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
         .step-celebrate-piece {
           position: absolute;
           top: 12%;
@@ -424,7 +431,7 @@ function CelebrationBurst({ active }: { active: boolean }) {
           height: 12px;
           border-radius: 2px;
           opacity: 0;
-          animation: step-celebrate-confetti 1.15s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+          animation: step-celebrate-confetti 2.5s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
         }
       `}</style>
       {CONFETTI.map((piece, index) => (
