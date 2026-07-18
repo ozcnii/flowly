@@ -1,5 +1,6 @@
 -- Short step smoke workout: 3 exercises 10s / 15s / 5s + rest 5s between (not after last).
--- Idempotent. Keep on local + prod for TMA audio/rest verification — do not delete.
+-- Uses square MP4 pilot poses: mountain / cobra / tree.
+-- Idempotent. Keep on local + prod for step media verification — do not delete.
 PRAGMA foreign_keys=ON;
 
 INSERT INTO workouts (
@@ -12,7 +13,7 @@ INSERT INTO workouts (
   'flowly',
   'public',
   'Тест step 10+15+5',
-  'Короткая тренировка для проверки step-runtime: 10/15/5 сек и отдых 5 сек между упражнениями. Не удалять.',
+  'Короткая тренировка для проверки step-runtime + square MP4: гора / кобра / дерево. 10/15/5 сек, отдых 5 сек. Не удалять.',
   'catalog/covers/wo-morning-10.webp',
   NULL,
   40,
@@ -22,7 +23,7 @@ INSERT INTO workouts (
   'step_by_step',
   'published',
   '2026-07-18T00:00:00.000Z',
-  '2026-07-18T22:45:00.000Z',
+  '2026-07-19T00:00:00.000Z',
   '2026-07-18T00:00:00.000Z'
 )
 ON CONFLICT(id) DO UPDATE SET
@@ -44,6 +45,6 @@ INSERT INTO workout_exercises (
   workout_id, exercise_id, position, sets_count, repetitions,
   duration_seconds, rest_seconds, custom_instruction
 ) VALUES
-('wo-step-test-short', 'ex-mountain', 1, NULL, NULL, 10, 5, NULL),
-('wo-step-test-short', 'ex-cat-cow', 2, NULL, NULL, 15, 5, NULL),
-('wo-step-test-short', 'ex-child', 3, NULL, NULL, 5, NULL, NULL);
+('wo-step-test-short', 'ex-mountain-pose', 1, NULL, NULL, 10, 5, NULL),
+('wo-step-test-short', 'ex-cobra-pose', 2, NULL, NULL, 15, 5, NULL),
+('wo-step-test-short', 'ex-tree-pose', 3, NULL, NULL, 5, NULL, NULL);

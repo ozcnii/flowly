@@ -2,9 +2,8 @@ import { useCallback, useRef } from "react";
 
 /**
  * Step session cues for Telegram iOS.
- * Beeps alone sound cheap; prefer Web Speech API (ru-RU) for meaning:
- * «Отдых», «5»…«1», «Готово» — plus soft WAV as secondary layer.
- * Speech + HTMLAudio must unlock on the first user tap (Начать).
+ * Prefer speech for meaning; soft WAV + haptic as secondary layer.
+ * Speech unlocks on first user tap (Начать / Продолжить).
  */
 const FILES = {
   silent: "/sounds/silent.wav",
@@ -43,12 +42,13 @@ function pickRuVoice(): SpeechSynthesisVoice | null {
   );
 }
 
+const clean = (s: string) => s.replace(/\s+/g, " ").trim();
+
 export function useStepSounds(enabled = true) {
   const ready = useRef(false);
   const pool = useRef<Partial<Record<SoundId, HTMLAudioElement>>>({});
   const keepAlive = useRef<HTMLAudioElement | null>(null);
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
-  const speechOk = useRef(false);
 
   const haptic = useCallback((style: "light" | "medium" | "rigid" | "success" = "light") => {
     try {
@@ -62,11 +62,13 @@ export function useStepSounds(enabled = true) {
 
   const speak = useCallback((text: string, opts?: { rate?: number; pitch?: number }) => {
     if (!enabled || typeof window === "undefined" || typeof speechSynthesis === "undefined") return false;
+    const line = clean(text);
+    if (!line) return false;
     try {
       speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
+      const u = new SpeechSynthesisUtterance(line);
       u.lang = "ru-RU";
-      u.rate = opts?.rate ?? 1.05;
+      u.rate = opts?.rate ?? 1.0;
       u.pitch = opts?.pitch ?? 1;
       u.volume = 1;
       const v = voiceRef.current ?? pickRuVoice();
@@ -88,21 +90,18 @@ export function useStepSounds(enabled = true) {
       keepAlive.current = map.silent ?? null;
       ready.current = true;
     }
-    // Warm voices list (iOS often populates only after interaction)
     try {
       voiceRef.current = pickRuVoice();
       if (typeof speechSynthesis !== "undefined") {
         speechSynthesis.getVoices();
         speechSynthesis.onvoiceschanged = () => { voiceRef.current = pickRuVoice(); };
-        // silent warm-up utterance cancelled immediately (gesture unlock)
         const warm = new SpeechSynthesisUtterance(" ");
         warm.volume = 0;
         warm.lang = "ru-RU";
         speechSynthesis.speak(warm);
         speechSynthesis.cancel();
-        speechOk.current = true;
       }
-    } catch { speechOk.current = false; }
+    } catch { /* no-op */ }
 
     const silent = keepAlive.current;
     if (silent) {
@@ -130,15 +129,92 @@ export function useStepSounds(enabled = true) {
     else run();
   }, [enabled, unlock]);
 
+  /** Soft chime only — no speech (skip / next tap must not spam «Следующее»). */
+  const softCue = useCallback(() => {
+    play("next");
+    haptic("light");
+  }, [play, haptic]);
+
+  const speakLine = useCallback((text: string, opts?: { rate?: number }) => {
+    if (!enabled || typeof window === "undefined" || typeof speechSynthesis === "undefined") return false;
+    const line = clean(text);
+    if (!line) return false;
+    try {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(line);
+      u.lang = "ru-RU";
+      u.rate = opts?.rate ?? 1.05;
+      u.pitch = 1;
+      u.volume = 1;
+      const v = voiceRef.current ?? pickRuVoice();
+      if (v) { voiceRef.current = v; u.voice = v; }
+      speechSynthesis.speak(u);
+      return true;
+    } catch {
+      return false;
+    }
+  }, [enabled]);
+
+  /** After pause / short cue — only «Начинайте», not full exercise re-read. */
+  const sayStart = useCallback(() => {
+    unlock();
+    speakLine("Начинайте", { rate: 1.05 });
+    play("start");
+    haptic("medium");
+  }, [unlock, speakLine, play, haptic]);
+
+  /** Intro (once per step): title + description, then «Начинайте». */
+  const announceExercise = useCallback((title: string, description?: string | null) => {
+    if (!enabled || typeof window === "undefined" || typeof speechSynthesis === "undefined") {
+      unlock();
+      play("start");
+      haptic("medium");
+      return;
+    }
+    unlock();
+    const t = clean(title);
+    const d = clean(description ?? "");
+    const line = d ? `${t}. ${d}` : t;
+    try {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(line || "Упражнение");
+      u.lang = "ru-RU";
+      u.rate = 0.98;
+      u.pitch = 1;
+      u.volume = 1;
+      const v = voiceRef.current ?? pickRuVoice();
+      if (v) { voiceRef.current = v; u.voice = v; }
+      u.onend = () => { speakLine("Начинайте", { rate: 1.05 }); };
+      speechSynthesis.speak(u);
+    } catch { /* no-op */ }
+    play("start");
+    haptic("medium");
+  }, [enabled, unlock, play, haptic, speakLine]);
+
+  /** Rest: announce what comes next (title + description). */
+  const restStart = useCallback((nextTitle?: string | null, nextDescription?: string | null) => {
+    unlock();
+    const t = clean(nextTitle ?? "");
+    const d = clean(nextDescription ?? "");
+    const line = t
+      ? (d ? `Отдых. Дальше: ${t}. ${d}` : `Отдых. Дальше: ${t}`)
+      : "Отдых";
+    speak(line, { rate: 0.98 });
+    play("rest");
+    haptic("light");
+  }, [unlock, speak, play, haptic]);
+
   return {
     unlock,
+    softCue,
+    sayStart,
+    announceExercise,
+    restStart,
     start: useCallback(() => {
       unlock();
-      const said = speak("Начинаем");
-      if (!said) play("start");
-      else play("start"); // soft underlay
+      play("start");
       haptic("medium");
-    }, [unlock, speak, play, haptic]),
+    }, [unlock, play, haptic]),
     pause: useCallback(() => {
       speak("Пауза");
       play("pause");
@@ -146,24 +222,16 @@ export function useStepSounds(enabled = true) {
     }, [speak, play, haptic]),
     resume: useCallback(() => {
       unlock();
-      speak("Продолжаем");
       play("start");
       haptic("medium");
-    }, [unlock, speak, play, haptic]),
-    restStart: useCallback(() => {
-      speak("Отдых");
-      play("rest");
-      haptic("light");
-    }, [speak, play, haptic]),
+    }, [unlock, play, haptic]),
+    /** @deprecated use softCue — kept name for fewer call-site renames where only chime needed */
     nextExercise: useCallback(() => {
-      speak("Следующее");
       play("next");
-      play("next2", 100);
-      haptic("medium");
-    }, [speak, play, haptic]),
+      haptic("light");
+    }, [play, haptic]),
     countdownTick: useCallback((remainingSeconds: number) => {
       const n = Math.max(1, Math.min(5, Math.round(remainingSeconds)));
-      // Voice: «пять»…«один» — clearer than ugly beeps for last 5s
       const words = ["", "один", "два", "три", "четыре", "пять"] as const;
       speak(words[n] ?? String(n), { rate: 1.15 });
       if (n === 1) {

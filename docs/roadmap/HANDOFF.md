@@ -100,7 +100,10 @@
 
 1. E2-D3-T02 `review`: дождаться production deploy (migration 0009 `mode`) и real-device Telegram pass step session (auto-flow, ticks, celebration, last-step, finish sheet).
 2. После device OK — либо `done` S-MA-031 slice, либо residual S-MA-032 mixed chooser, затем close card.
-3. Visible report UI (text Badge `YouTube`) остаётся E6; report-source data contract already via occurrence→workout join.
+3. **E2-D3-T06** square MP4 catalog (user assets): local full rebuild DONE 2026-07-19 — 46 exercises + 21 step workouts + 3 YouTube; pilot UI (white 16:9 contain video) approved. Next: user review catalog/step on more workouts; then prod seed + commit **only on command**.
+4. UX hotfix (uncommitted): detail Start CTA outside «Возможности».
+5. Visible report UI (text Badge `YouTube`) остаётся E6.
+6. **Hard rule:** never commit/push without explicit user command.
 
 ## Открытые блокеры
 

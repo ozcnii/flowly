@@ -1,19 +1,8 @@
 {
-  "version": "starter-catalog-v1",
+  "version": "starter-catalog-v2-square-mp4",
   "review": {
-    "status": "pending-user-approval",
-    "checklist": [
-      "title",
-      "description",
-      "categories",
-      "duration",
-      "format",
-      "difficulty",
-      "contraindications",
-      "youtubeVideoId/source",
-      "exercises",
-      "mediaKeys"
-    ]
+    "status": "user-assets-2026-07-19",
+    "notes": "Exercises rebuilt from .temp/assets square MP4 set (46 files)."
   },
   "categories": [
     {
@@ -89,431 +78,379 @@
   ],
   "exercises": [
     {
-      "id": "ex-mountain",
+      "id": "ex-anjali-mudra",
+      "title": "Анджали мудра",
+      "description": "Ладони у груди, спокойное выравнивание.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/anjali-mudra.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-ardha-chakrasana",
+      "title": "Ардха чакрасана",
+      "description": "Мягкий прогиб назад стоя.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/ardha-chakrasana.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-boat-pose",
+      "title": "Поза лодки",
+      "description": "Укрепление корпуса в балансе на седалище.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/boat-pose.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-chair-pose",
+      "title": "Поза стула",
+      "description": "Сила ног и устойчивость в полуприседе.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/chair-pose.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-cobra-pose",
+      "title": "Кобра",
+      "description": "Мягкое раскрытие груди лёжа на животе.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/cobra-pose.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-crescent-lunge",
+      "title": "Выпад полумесяца",
+      "description": "Выпад с вытяжением вверх.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/crescent-lunge.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-crescent-lunge-2",
+      "title": "Выпад полумесяца · вариант",
+      "description": "Альтернативный выпад полумесяца.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/crescent-lunge-2.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-dancer-pose",
+      "title": "Поза танцора",
+      "description": "Баланс на одной ноге с захватом стопы.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/dancer-pose.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-digasana",
+      "title": "Дигасана",
+      "description": "Стоячее вытяжение с раскрытием корпуса.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/digasana.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-exercise-pose",
+      "title": "Базовая мобильность",
+      "description": "Универсальное движение для разминки.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/exercise-pose.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-extended-side",
+      "title": "Вытянутый боковой угол",
+      "description": "Боковое вытяжение в выпаде.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/extended-side.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-extended-triangle",
+      "title": "Вытянутый треугольник",
+      "description": "Раскрытие боковой линии тела.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/extended-triangle.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-glyph",
+      "title": "Символ / центр",
+      "description": "Спокойная центрирующая поза.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/glyph.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-gymnastic-pose",
+      "title": "Гимнастический баланс",
+      "description": "Сила и контроль корпуса.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/gymnastic-pose.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-half-twist",
+      "title": "Полускручивание",
+      "description": "Мягкое скручивание позвоночника.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/half-twist.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-kakasana",
+      "title": "Какасана",
+      "description": "Баланс на руках (ворона), осторожно с запястьями.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/kakasana.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-koundinyasana",
+      "title": "Кундиниасана",
+      "description": "Продвинутый баланс на руках.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/koundinyasana.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-leg-extended",
+      "title": "Нога вытянута",
+      "description": "Вытяжение ноги сидя или лёжа.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/leg-extended.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-legs-up",
+      "title": "Ноги вверх",
+      "description": "Восстановление с ногами выше сердца.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/legs-up.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-lunging-forward",
+      "title": "Выпад вперёд",
+      "description": "Выпад с акцентом на сгибатели бедра.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/lunging-forward.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-moon-pose",
+      "title": "Поза луны",
+      "description": "Боковое вытяжение стоя.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/moon-pose.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-mountain-pose",
       "title": "Поза горы",
-      "description": "Выравнивание стоп, таза и плеч перед практикой.",
-      "mediaType": "gif",
-      "duration": 60
+      "description": "Выравнивание стоп, таза и плеч.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/mountain-pose.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-neck-rolls",
-      "title": "Мягкие круги шеей",
-      "description": "Медленные полукруги без запрокидывания головы.",
-      "mediaType": "gif",
-      "duration": 60
+      "id": "ex-natarajasana",
+      "title": "Натараджасана",
+      "description": "Классическая поза танцора Шивы.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/natarajasana.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-shoulder-rolls",
-      "title": "Круги плечами",
-      "description": "Разогрев плеч и грудного отдела.",
-      "mediaType": "gif",
-      "duration": 60
+      "id": "ex-navasana",
+      "title": "Навасана",
+      "description": "Лодка: сила глубокого кора.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/navasana.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-cat-cow",
-      "title": "Кошка-корова",
-      "description": "Мобилизация позвоночника в комфортном темпе.",
-      "mediaType": "gif",
-      "duration": 90
+      "id": "ex-one-legged",
+      "title": "Баланс на одной ноге",
+      "description": "Устойчивость и фокус.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/one-legged.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-child",
-      "title": "Поза ребёнка",
-      "description": "Восстановление дыхания и разгрузка поясницы.",
-      "mediaType": "gif",
-      "duration": 90
+      "id": "ex-pigeon-pose",
+      "title": "Голубь",
+      "description": "Раскрытие таза и внешней поверхности бедра.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/pigeon-pose.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-down-dog",
-      "title": "Собака мордой вниз",
-      "description": "Удлинение задней поверхности тела и плеч.",
-      "mediaType": "image",
-      "duration": 90
+      "id": "ex-puppy-pose",
+      "title": "Поза щенка",
+      "description": "Мягкое вытяжение плеч и спины.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/puppy-pose.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-low-lunge",
-      "title": "Низкий выпад",
-      "description": "Мягкое раскрытие сгибателей бедра.",
-      "mediaType": "image",
-      "duration": 90
+      "id": "ex-reclined-twist",
+      "title": "Скручивание лёжа",
+      "description": "Расслабляющее скручивание на спине.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/reclined-twist.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-half-split",
-      "title": "Полушпагат",
-      "description": "Растяжение задней поверхности бедра без рывков.",
-      "mediaType": "image",
-      "duration": 90
+      "id": "ex-reclines-staff",
+      "title": "Посох лёжа",
+      "description": "Вытяжение на спине.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/reclines-staff.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-forward-fold",
-      "title": "Наклон вперёд",
-      "description": "Спокойное вытяжение спины и ног.",
-      "mediaType": "image",
-      "duration": 90
-    },
-    {
-      "id": "ex-sun-a",
-      "title": "Приветствие солнцу A",
-      "description": "Классическая связка для разогрева всего тела.",
-      "mediaType": "gif",
-      "duration": 180
-    },
-    {
-      "id": "ex-warrior-one",
-      "title": "Воин I",
-      "description": "Стабильная стойка с раскрытием грудной клетки.",
-      "mediaType": "image",
-      "duration": 75
-    },
-    {
-      "id": "ex-warrior-two",
-      "title": "Воин II",
-      "description": "Сила ног, раскрытие таза и устойчивость.",
-      "mediaType": "image",
-      "duration": 75
-    },
-    {
-      "id": "ex-triangle",
-      "title": "Треугольник",
-      "description": "Боковое вытяжение и работа с опорой.",
-      "mediaType": "image",
-      "duration": 90
-    },
-    {
-      "id": "ex-side-angle",
-      "title": "Боковой угол",
-      "description": "Укрепление ног и вытяжение боковой линии.",
-      "mediaType": "image",
-      "duration": 90
-    },
-    {
-      "id": "ex-tree",
-      "title": "Дерево",
-      "description": "Баланс с мягким фокусом взгляда.",
-      "mediaType": "image",
-      "duration": 90
-    },
-    {
-      "id": "ex-chair",
-      "title": "Стул",
-      "description": "Силовая работа ног и кора.",
-      "mediaType": "image",
-      "duration": 75
-    },
-    {
-      "id": "ex-plank",
-      "title": "Планка",
-      "description": "Стабилизация корпуса и плечевого пояса.",
-      "mediaType": "image",
+      "id": "ex-sage-twist",
+      "title": "Скручивание мудреца",
+      "description": "Сидячее скручивание.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/sage-twist.mp4",
       "duration": 45
     },
     {
       "id": "ex-side-plank",
       "title": "Боковая планка",
-      "description": "Боковая линия корпуса и плечо.",
-      "mediaType": "image",
+      "description": "Сила боковой линии и плеч.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/side-plank.mp4",
       "duration": 45
     },
     {
-      "id": "ex-boat",
-      "title": "Лодка",
-      "description": "Контроль кора без зажима шеи.",
-      "mediaType": "image",
-      "duration": 60
+      "id": "ex-side-stretch",
+      "title": "Боковое вытяжение",
+      "description": "Раскрытие боковой поверхности.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/side-stretch.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-bridge",
-      "title": "Мост",
-      "description": "Мягкое раскрытие передней линии и ягодицы.",
-      "mediaType": "image",
-      "duration": 90
+      "id": "ex-spinal-twist",
+      "title": "Скручивание позвоночника",
+      "description": "Мобильность грудного и поясничного отдела.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/spinal-twist.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-sphinx",
-      "title": "Сфинкс",
-      "description": "Нежное разгибание грудного отдела.",
-      "mediaType": "image",
-      "duration": 90
+      "id": "ex-staff-pose",
+      "title": "Посох",
+      "description": "Вытяжение сидя с прямой спиной.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/staff-pose.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-cobra",
-      "title": "Кобра",
-      "description": "Активное разгибание с контролем поясницы.",
-      "mediaType": "image",
-      "duration": 60
+      "id": "ex-standing-balancing",
+      "title": "Стоячий баланс",
+      "description": "Удержание равновесия стоя.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/standing-balancing.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-locust",
-      "title": "Саранча",
-      "description": "Укрепление задней линии тела.",
-      "mediaType": "image",
-      "duration": 60
+      "id": "ex-standing-split",
+      "title": "Стоячий шпагат",
+      "description": "Наклон с ногой вверх у стены или свободно.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/standing-split.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-thread-needle",
-      "title": "Нить в иголку",
-      "description": "Скручивание грудного отдела и плечи.",
-      "mediaType": "gif",
-      "duration": 90
+      "id": "ex-stretching-sideway",
+      "title": "Растяжка вбок",
+      "description": "Боковая линия тела.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/stretching-sideway.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-puppy",
-      "title": "Поза щенка",
-      "description": "Раскрытие плеч и вытяжение грудного отдела.",
-      "mediaType": "image",
-      "duration": 90
+      "id": "ex-supine-eagle",
+      "title": "Орёл лёжа",
+      "description": "Скручивание/обхват лёжа.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/supine-eagle.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-pigeon",
-      "title": "Голубь",
-      "description": "Глубокая работа с ягодичными мышцами.",
-      "mediaType": "image",
-      "duration": 120
-    },
-    {
-      "id": "ex-lizard",
-      "title": "Ящерица",
-      "description": "Мобильность таза и внутренняя линия бедра.",
-      "mediaType": "image",
-      "duration": 120
-    },
-    {
-      "id": "ex-butterfly",
-      "title": "Бабочка",
-      "description": "Мягкое раскрытие бёдер сидя.",
-      "mediaType": "image",
-      "duration": 120
-    },
-    {
-      "id": "ex-seated-fold",
-      "title": "Складка сидя",
-      "description": "Вытяжение задней поверхности тела.",
-      "mediaType": "image",
-      "duration": 120
-    },
-    {
-      "id": "ex-seated-twist",
-      "title": "Скручивание сидя",
-      "description": "Спокойная ротация позвоночника.",
-      "mediaType": "image",
-      "duration": 90
-    },
-    {
-      "id": "ex-supine-twist",
-      "title": "Скручивание лёжа",
-      "description": "Расслабление спины и таза.",
-      "mediaType": "image",
-      "duration": 120
-    },
-    {
-      "id": "ex-happy-baby",
-      "title": "Счастливый ребёнок",
-      "description": "Разгрузка поясницы и тазобедренных.",
-      "mediaType": "image",
-      "duration": 90
-    },
-    {
-      "id": "ex-legs-wall",
-      "title": "Ноги у стены",
-      "description": "Восстановительная поза для вечера.",
-      "mediaType": "image",
-      "duration": 180
-    },
-    {
-      "id": "ex-savasana",
-      "title": "Шавасана",
-      "description": "Финальное расслабление.",
-      "mediaType": "image",
-      "duration": 180
-    },
-    {
-      "id": "ex-box-breath",
-      "title": "Квадратное дыхание",
-      "description": "Ровный счёт вдоха, паузы, выдоха и паузы.",
-      "mediaType": "image",
-      "duration": 180
-    },
-    {
-      "id": "ex-long-exhale",
-      "title": "Длинный выдох",
-      "description": "Успокаивающее дыхание с удлинённым выдохом.",
-      "mediaType": "image",
-      "duration": 180
-    },
-    {
-      "id": "ex-crocodile",
-      "title": "Крокодил",
-      "description": "Отдых лёжа на животе с наблюдением дыхания.",
-      "mediaType": "image",
-      "duration": 120
-    },
-    {
-      "id": "ex-wrist-warmup",
-      "title": "Разминка запястий",
-      "description": "Подготовка кистей к опорам.",
-      "mediaType": "gif",
-      "duration": 90
-    },
-    {
-      "id": "ex-ankle-mobility",
-      "title": "Мобильность голеностопа",
-      "description": "Круги стопами и мягкая работа с балансом.",
-      "mediaType": "gif",
-      "duration": 90
-    },
-    {
-      "id": "ex-hip-circles",
-      "title": "Круги тазом",
-      "description": "Разогрев таза стоя.",
-      "mediaType": "gif",
-      "duration": 90
-    },
-    {
-      "id": "ex-tabletop-balance",
-      "title": "Баланс на четвереньках",
-      "description": "Противоположная рука и нога, контроль корпуса.",
-      "mediaType": "image",
-      "duration": 90
-    },
-    {
-      "id": "ex-bird-dog",
-      "title": "Bird dog",
-      "description": "Стабилизация спины и кора.",
-      "mediaType": "gif",
-      "duration": 90
-    },
-    {
-      "id": "ex-dead-bug",
-      "title": "Dead bug",
-      "description": "Контроль корпуса лёжа.",
-      "mediaType": "gif",
-      "duration": 90
-    },
-    {
-      "id": "ex-knee-hugs",
-      "title": "Колени к груди",
-      "description": "Мягкая разгрузка поясницы.",
-      "mediaType": "image",
-      "duration": 90
-    },
-    {
-      "id": "ex-reclined-hamstring",
-      "title": "Растяжка задней поверхности лёжа",
-      "description": "Работа с ремнём или полотенцем.",
-      "mediaType": "image",
-      "duration": 120
-    },
-    {
-      "id": "ex-figure-four",
+      "id": "ex-supine-figure",
       "title": "Четвёрка лёжа",
-      "description": "Ягодичные мышцы и тазобедренные.",
-      "mediaType": "image",
-      "duration": 120
-    },
-    {
-      "id": "ex-calf-stretch",
-      "title": "Растяжка икр",
-      "description": "Вытяжение голени у стены или в выпаде.",
-      "mediaType": "image",
-      "duration": 90
-    },
-    {
-      "id": "ex-eagle-arms",
-      "title": "Руки орла",
-      "description": "Плечи и верх спины без нагрузки на запястья.",
-      "mediaType": "image",
-      "duration": 90
-    },
-    {
-      "id": "ex-garland",
-      "title": "Гирлянда",
-      "description": "Глубокий присед с поддержкой при необходимости.",
-      "mediaType": "image",
-      "duration": 90
-    },
-    {
-      "id": "ex-wide-fold",
-      "title": "Широкий наклон",
-      "description": "Вытяжение ног и расслабление спины.",
-      "mediaType": "image",
-      "duration": 120
-    },
-    {
-      "id": "ex-half-moon",
-      "title": "Полумесяц",
-      "description": "Баланс и раскрытие боковой линии.",
-      "mediaType": "image",
-      "duration": 75
-    },
-    {
-      "id": "ex-dancer-prep",
-      "title": "Подготовка к танцору",
-      "description": "Баланс с мягким раскрытием передней линии.",
-      "mediaType": "image",
-      "duration": 75
-    },
-    {
-      "id": "ex-crescent",
-      "title": "Высокий выпад",
-      "description": "Сила ног и вытяжение корпуса.",
-      "mediaType": "image",
-      "duration": 75
-    },
-    {
-      "id": "ex-humble-warrior",
-      "title": "Смиренный воин",
-      "description": "Плечи, грудной отдел и устойчивость ног.",
-      "mediaType": "image",
-      "duration": 90
-    },
-    {
-      "id": "ex-prasarita",
-      "title": "Прасарита",
-      "description": "Широкий наклон стоя с мягкой опорой.",
-      "mediaType": "image",
-      "duration": 120
-    },
-    {
-      "id": "ex-forearm-plank",
-      "title": "Планка на предплечьях",
-      "description": "Кор и плечи с меньшей нагрузкой на запястья.",
-      "mediaType": "image",
+      "description": "Раскрытие ягодиц и таза на спине.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/supine-figure.mp4",
       "duration": 45
     },
     {
-      "id": "ex-dolphin",
-      "title": "Дельфин",
-      "description": "Плечи и задняя линия в опоре на предплечьях.",
-      "mediaType": "image",
-      "duration": 75
+      "id": "ex-supported-bridge",
+      "title": "Мост с опорой",
+      "description": "Мягкий прогиб на спине.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/supported-bridge.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-rag-doll",
-      "title": "Тряпичная кукла",
-      "description": "Свободный наклон с расслаблением шеи.",
-      "mediaType": "gif",
-      "duration": 90
+      "id": "ex-tree-pose",
+      "title": "Поза дерева",
+      "description": "Баланс на одной ноге.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/tree-pose.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-side-bend",
-      "title": "Боковое вытяжение сидя",
-      "description": "Мягкое раскрытие рёбер и дыхания.",
-      "mediaType": "image",
-      "duration": 90
+      "id": "ex-twisted-monkey",
+      "title": "Скрученный обезьяна",
+      "description": "Выпад со скручиванием.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/twisted-monkey.mp4",
+      "duration": 45
     },
     {
-      "id": "ex-meditation-seat",
-      "title": "Удобное сидение",
-      "description": "Поза для спокойного дыхания и наблюдения.",
-      "mediaType": "image",
-      "duration": 180
+      "id": "ex-upward-salute",
+      "title": "Приветствие вверх",
+      "description": "Вытяжение рук вверх стоя.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/upward-salute.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-urdhva-prasarita",
+      "title": "Урдхва прасарита",
+      "description": "Вытяжение ног вверх.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/urdhva-prasarita.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-vrikshasana",
+      "title": "Врикшасана",
+      "description": "Классическое дерево.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/vrikshasana.mp4",
+      "duration": 45
+    },
+    {
+      "id": "ex-warrior-pose",
+      "title": "Воин",
+      "description": "Сильный выпад с открытой грудью.",
+      "mediaType": "video",
+      "mediaObjectKey": "catalog/exercises/warrior-pose.mp4",
+      "duration": 45
     }
   ],
   "workouts": [
     {
       "id": "wo-morning-10",
       "title": "Утро за 10 минут",
-      "description": "Короткий мягкий старт дня без интенсивной нагрузки.",
+      "description": "Мягкий старт дня: гора, приветствие вверх, стул и баланс.",
       "categories": [
         "morning",
         "mobility"
@@ -526,18 +463,18 @@
         "острая боль"
       ],
       "exercises": [
-        "ex-mountain",
-        "ex-neck-rolls",
-        "ex-shoulder-rolls",
-        "ex-cat-cow",
-        "ex-down-dog",
-        "ex-forward-fold"
+        "ex-mountain-pose",
+        "ex-upward-salute",
+        "ex-chair-pose",
+        "ex-crescent-lunge",
+        "ex-warrior-pose",
+        "ex-tree-pose"
       ]
     },
     {
       "id": "wo-back-soft-15",
       "title": "Мягкая спина",
-      "description": "Спокойная практика для грудного отдела и поясницы.",
+      "description": "Кобра, щенок, скручивания и мост для спокойной спины.",
       "categories": [
         "back",
         "relax"
@@ -552,18 +489,18 @@
         "острая боль в спине"
       ],
       "exercises": [
-        "ex-cat-cow",
-        "ex-child",
-        "ex-thread-needle",
-        "ex-sphinx",
-        "ex-supine-twist",
-        "ex-knee-hugs"
+        "ex-puppy-pose",
+        "ex-cobra-pose",
+        "ex-supported-bridge",
+        "ex-spinal-twist",
+        "ex-reclined-twist",
+        "ex-legs-up"
       ]
     },
     {
       "id": "wo-stretch-evening-20",
       "title": "Вечерняя растяжка",
-      "description": "Расслабляющая растяжка ног и спины перед сном.",
+      "description": "Растяжка и восстановление перед сном.",
       "categories": [
         "evening",
         "stretch",
@@ -571,47 +508,26 @@
       ],
       "duration": 1200,
       "difficulty": "beginner",
-      "format": "mixed",
+      "format": "step_by_step",
       "equipment": [
-        "коврик",
-        "полотенце"
+        "коврик"
       ],
       "contraindications": [
         "травмы тазобедренных"
       ],
       "exercises": [
-        "ex-butterfly",
-        "ex-seated-fold",
-        "ex-figure-four",
-        "ex-supine-twist",
-        "ex-legs-wall",
-        "ex-savasana"
+        "ex-pigeon-pose",
+        "ex-supine-figure",
+        "ex-leg-extended",
+        "ex-side-stretch",
+        "ex-reclined-twist",
+        "ex-legs-up"
       ]
-    },
-    {
-      "id": "wo-sun-a-18",
-      "title": "Приветствие солнцу",
-      "description": "Разогревающая связка с понятным темпом.",
-      "categories": [
-        "morning",
-        "strength"
-      ],
-      "duration": 1080,
-      "difficulty": "intermediate",
-      "format": "video",
-      "equipment": [
-        "коврик"
-      ],
-      "contraindications": [
-        "травмы запястий",
-        "высокое давление без консультации"
-      ],
-      "exercises": []
     },
     {
       "id": "wo-core-12",
       "title": "Кор без спешки",
-      "description": "Стабилизация корпуса без прыжков и рывков.",
+      "description": "Лодка, планка сбоку и контроль корпуса.",
       "categories": [
         "core",
         "strength"
@@ -626,44 +542,43 @@
         "обострение боли в пояснице"
       ],
       "exercises": [
-        "ex-dead-bug",
-        "ex-bird-dog",
-        "ex-plank",
-        "ex-boat",
-        "ex-child"
+        "ex-boat-pose",
+        "ex-navasana",
+        "ex-side-plank",
+        "ex-staff-pose",
+        "ex-mountain-pose"
       ]
     },
     {
       "id": "wo-hips-25",
       "title": "Таз и бёдра",
-      "description": "Глубокая, но спокойная мобильность тазобедренных.",
+      "description": "Выпады, голубь и раскрытие таза.",
       "categories": [
         "mobility",
         "stretch"
       ],
       "duration": 1500,
       "difficulty": "intermediate",
-      "format": "mixed",
+      "format": "step_by_step",
       "equipment": [
-        "коврик",
-        "блок"
+        "коврик"
       ],
       "contraindications": [
         "острые травмы коленей"
       ],
       "exercises": [
-        "ex-low-lunge",
-        "ex-lizard",
-        "ex-pigeon",
-        "ex-butterfly",
-        "ex-happy-baby",
-        "ex-savasana"
+        "ex-crescent-lunge",
+        "ex-lunging-forward",
+        "ex-pigeon-pose",
+        "ex-twisted-monkey",
+        "ex-supine-figure",
+        "ex-legs-up"
       ]
     },
     {
       "id": "wo-balance-basic-15",
       "title": "Баланс база",
-      "description": "Устойчивость и спокойный фокус без сложных переходов.",
+      "description": "Дерево, воин и стоячие балансы.",
       "categories": [
         "balance",
         "mobility"
@@ -676,18 +591,18 @@
         "головокружение"
       ],
       "exercises": [
-        "ex-mountain",
-        "ex-ankle-mobility",
-        "ex-tree",
-        "ex-tabletop-balance",
-        "ex-half-moon",
-        "ex-child"
+        "ex-mountain-pose",
+        "ex-tree-pose",
+        "ex-vrikshasana",
+        "ex-warrior-pose",
+        "ex-standing-balancing",
+        "ex-one-legged"
       ]
     },
     {
       "id": "wo-shoulders-14",
-      "title": "Плечи и шея",
-      "description": "Разгрузка плеч после работы за компьютером.",
+      "title": "Плечи и грудной отдел",
+      "description": "Щенок, кобра и мягкие скручивания.",
       "categories": [
         "back",
         "mobility",
@@ -701,40 +616,18 @@
         "острая боль в шее"
       ],
       "exercises": [
-        "ex-neck-rolls",
-        "ex-shoulder-rolls",
-        "ex-eagle-arms",
-        "ex-puppy",
-        "ex-thread-needle",
-        "ex-side-bend"
-      ]
-    },
-    {
-      "id": "wo-breath-calm-8",
-      "title": "Дыхание для спокойствия",
-      "description": "Короткая практика дыхания без физических нагрузок.",
-      "categories": [
-        "breath",
-        "relax",
-        "evening"
-      ],
-      "duration": 480,
-      "difficulty": "beginner",
-      "format": "step_by_step",
-      "equipment": [],
-      "contraindications": [
-        "дискомфорт при задержке дыхания"
-      ],
-      "exercises": [
-        "ex-meditation-seat",
-        "ex-long-exhale",
-        "ex-box-breath"
+        "ex-puppy-pose",
+        "ex-cobra-pose",
+        "ex-ardha-chakrasana",
+        "ex-half-twist",
+        "ex-spinal-twist",
+        "ex-anjali-mudra"
       ]
     },
     {
       "id": "wo-energy-20",
       "title": "Энергия без прыжков",
-      "description": "Активная практика средней интенсивности для всего тела.",
+      "description": "Динамичные стоячие позы без ударной нагрузки.",
       "categories": [
         "morning",
         "strength",
@@ -742,27 +635,27 @@
       ],
       "duration": 1200,
       "difficulty": "intermediate",
-      "format": "mixed",
+      "format": "step_by_step",
       "equipment": [
         "коврик"
       ],
       "contraindications": [
-        "травмы запястий"
+        "острая боль"
       ],
       "exercises": [
-        "ex-wrist-warmup",
-        "ex-chair",
-        "ex-crescent",
-        "ex-warrior-two",
-        "ex-side-angle",
-        "ex-down-dog",
-        "ex-child"
+        "ex-mountain-pose",
+        "ex-upward-salute",
+        "ex-chair-pose",
+        "ex-crescent-lunge",
+        "ex-warrior-pose",
+        "ex-extended-triangle",
+        "ex-tree-pose"
       ]
     },
     {
       "id": "wo-lower-back-10",
       "title": "Поясница: мягко",
-      "description": "Небольшая разгрузка поясницы без глубоких прогибов.",
+      "description": "Мост, скручивания и ноги вверх.",
       "categories": [
         "back",
         "relax"
@@ -774,21 +667,20 @@
         "коврик"
       ],
       "contraindications": [
-        "острая боль",
-        "онемение ноги"
+        "грыжа в острой фазе"
       ],
       "exercises": [
-        "ex-crocodile",
-        "ex-cat-cow",
-        "ex-child",
-        "ex-knee-hugs",
-        "ex-supine-twist"
+        "ex-supported-bridge",
+        "ex-reclined-twist",
+        "ex-supine-figure",
+        "ex-legs-up",
+        "ex-reclines-staff"
       ]
     },
     {
       "id": "wo-legs-stretch-18",
       "title": "Растяжка ног",
-      "description": "Задняя поверхность бедра, икры и мягкая складка.",
+      "description": "Вытяжение ног, шпагат стоя и боковые линии.",
       "categories": [
         "stretch",
         "mobility"
@@ -797,181 +689,179 @@
       "difficulty": "beginner",
       "format": "step_by_step",
       "equipment": [
-        "полотенце"
+        "коврик"
       ],
       "contraindications": [
         "травмы задней поверхности бедра"
       ],
       "exercises": [
-        "ex-reclined-hamstring",
-        "ex-calf-stretch",
-        "ex-half-split",
-        "ex-wide-fold",
-        "ex-seated-fold"
+        "ex-leg-extended",
+        "ex-standing-split",
+        "ex-urdhva-prasarita",
+        "ex-side-stretch",
+        "ex-stretching-sideway"
       ]
     },
     {
       "id": "wo-strength-flow-30",
       "title": "Силовой flow",
-      "description": "Более плотная практика для ног, плеч и кора.",
+      "description": "Стул, воин, боковая планка и балансы.",
       "categories": [
         "strength",
         "core"
       ],
       "duration": 1800,
-      "difficulty": "advanced",
-      "format": "mixed",
+      "difficulty": "intermediate",
+      "format": "step_by_step",
       "equipment": [
         "коврик"
       ],
       "contraindications": [
-        "травмы плеч",
-        "травмы запястий"
+        "травмы запястий",
+        "острая боль"
       ],
       "exercises": [
-        "ex-sun-a",
-        "ex-warrior-one",
-        "ex-warrior-two",
-        "ex-chair",
-        "ex-plank",
+        "ex-chair-pose",
+        "ex-warrior-pose",
+        "ex-crescent-lunge",
         "ex-side-plank",
-        "ex-boat",
-        "ex-child"
+        "ex-boat-pose",
+        "ex-tree-pose",
+        "ex-dancer-pose",
+        "ex-kakasana"
       ]
     },
     {
       "id": "wo-restorative-25",
       "title": "Восстановление",
-      "description": "Медленная практика с долгими удержаниями.",
+      "description": "Спокойные позы для сброса напряжения.",
       "categories": [
         "relax",
-        "evening",
-        "breath"
+        "evening"
       ],
       "duration": 1500,
-      "difficulty": "beginner",
-      "format": "step_by_step",
-      "equipment": [
-        "подушка",
-        "плед"
-      ],
-      "contraindications": [],
-      "exercises": [
-        "ex-child",
-        "ex-butterfly",
-        "ex-legs-wall",
-        "ex-long-exhale",
-        "ex-savasana"
-      ]
-    },
-    {
-      "id": "wo-mobility-full-22",
-      "title": "Мобильность всего тела",
-      "description": "Суставная разминка и плавные переходы.",
-      "categories": [
-        "mobility",
-        "morning"
-      ],
-      "duration": 1320,
-      "difficulty": "beginner",
-      "format": "mixed",
-      "equipment": [],
-      "contraindications": [
-        "острое воспаление суставов"
-      ],
-      "exercises": [
-        "ex-neck-rolls",
-        "ex-shoulder-rolls",
-        "ex-hip-circles",
-        "ex-ankle-mobility",
-        "ex-cat-cow",
-        "ex-rag-doll"
-      ]
-    },
-    {
-      "id": "wo-posture-16",
-      "title": "Осанка и грудной отдел",
-      "description": "Плечи, грудной отдел и мягкое укрепление спины.",
-      "categories": [
-        "back",
-        "strength"
-      ],
-      "duration": 960,
       "difficulty": "beginner",
       "format": "step_by_step",
       "equipment": [
         "коврик"
       ],
       "contraindications": [
-        "острая боль в плече"
+        "острая боль"
       ],
       "exercises": [
-        "ex-eagle-arms",
-        "ex-puppy",
-        "ex-sphinx",
-        "ex-locust",
-        "ex-thread-needle",
-        "ex-child"
+        "ex-legs-up",
+        "ex-supported-bridge",
+        "ex-reclined-twist",
+        "ex-puppy-pose",
+        "ex-anjali-mudra"
+      ]
+    },
+    {
+      "id": "wo-mobility-full-22",
+      "title": "Мобильность всего тела",
+      "description": "Вытяжения, скрутки и выпады.",
+      "categories": [
+        "mobility",
+        "stretch"
+      ],
+      "duration": 1320,
+      "difficulty": "beginner",
+      "format": "step_by_step",
+      "equipment": [
+        "коврик"
+      ],
+      "contraindications": [
+        "острая боль"
+      ],
+      "exercises": [
+        "ex-mountain-pose",
+        "ex-side-stretch",
+        "ex-spinal-twist",
+        "ex-crescent-lunge",
+        "ex-extended-side",
+        "ex-pigeon-pose"
+      ]
+    },
+    {
+      "id": "wo-posture-16",
+      "title": "Осанка",
+      "description": "Гора, приветствие вверх и раскрытие груди.",
+      "categories": [
+        "back",
+        "morning"
+      ],
+      "duration": 960,
+      "difficulty": "beginner",
+      "format": "step_by_step",
+      "equipment": [],
+      "contraindications": [
+        "острая боль в шее"
+      ],
+      "exercises": [
+        "ex-mountain-pose",
+        "ex-upward-salute",
+        "ex-ardha-chakrasana",
+        "ex-cobra-pose",
+        "ex-staff-pose",
+        "ex-anjali-mudra"
       ]
     },
     {
       "id": "wo-evening-sleep-12",
       "title": "Перед сном",
-      "description": "Минимум усилий, больше дыхания и расслабления.",
+      "description": "Короткая вечерняя серия для сна.",
       "categories": [
         "evening",
-        "breath",
         "relax"
       ],
       "duration": 720,
       "difficulty": "beginner",
       "format": "step_by_step",
       "equipment": [
-        "плед"
+        "коврик"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "острая боль"
+      ],
       "exercises": [
-        "ex-side-bend",
-        "ex-supine-twist",
-        "ex-legs-wall",
-        "ex-long-exhale",
-        "ex-savasana"
+        "ex-supine-figure",
+        "ex-reclined-twist",
+        "ex-legs-up",
+        "ex-supported-bridge",
+        "ex-anjali-mudra"
       ]
     },
     {
       "id": "wo-balance-flow-20",
       "title": "Баланс flow",
-      "description": "Плавная практика с простыми балансами.",
+      "description": "Дерево, танцор и стоячие балансы.",
       "categories": [
         "balance",
         "strength"
       ],
       "duration": 1200,
       "difficulty": "intermediate",
-      "format": "mixed",
-      "equipment": [
-        "коврик"
-      ],
+      "format": "step_by_step",
+      "equipment": [],
       "contraindications": [
-        "головокружение",
-        "травмы голеностопа"
+        "головокружение"
       ],
       "exercises": [
-        "ex-mountain",
-        "ex-tree",
-        "ex-warrior-two",
-        "ex-half-moon",
-        "ex-dancer-prep",
-        "ex-child"
+        "ex-mountain-pose",
+        "ex-tree-pose",
+        "ex-vrikshasana",
+        "ex-dancer-pose",
+        "ex-natarajasana",
+        "ex-standing-balancing"
       ]
     },
     {
       "id": "wo-wrists-safe-13",
       "title": "Без нагрузки на запястья",
-      "description": "Практика на предплечьях и стоя без долгих опор на кисти.",
+      "description": "Стоячие и лежачие позы без упора на ладони.",
       "categories": [
         "mobility",
-        "back"
+        "relax"
       ],
       "duration": 780,
       "difficulty": "beginner",
@@ -980,44 +870,119 @@
         "коврик"
       ],
       "contraindications": [
-        "острая боль в локтях"
+        "острая боль"
       ],
       "exercises": [
-        "ex-eagle-arms",
-        "ex-dolphin",
-        "ex-forearm-plank",
-        "ex-sphinx",
-        "ex-child"
+        "ex-mountain-pose",
+        "ex-chair-pose",
+        "ex-tree-pose",
+        "ex-side-stretch",
+        "ex-legs-up"
       ]
     },
     {
       "id": "wo-deep-stretch-35",
       "title": "Глубокая растяжка",
-      "description": "Длинные удержания для опытных пользователей.",
+      "description": "Длинная серия на таз, ноги и скрутки.",
       "categories": [
         "stretch",
-        "evening"
+        "mobility"
       ],
       "duration": 2100,
-      "difficulty": "advanced",
-      "format": "mixed",
+      "difficulty": "intermediate",
+      "format": "step_by_step",
       "equipment": [
-        "коврик",
-        "блок",
-        "ремень"
+        "коврик"
       ],
       "contraindications": [
-        "гипермобильность без контроля",
-        "острые травмы"
+        "травмы тазобедренных"
       ],
       "exercises": [
-        "ex-lizard",
-        "ex-pigeon",
-        "ex-wide-fold",
-        "ex-prasarita",
-        "ex-seated-fold",
-        "ex-figure-four",
-        "ex-savasana"
+        "ex-crescent-lunge",
+        "ex-pigeon-pose",
+        "ex-twisted-monkey",
+        "ex-standing-split",
+        "ex-leg-extended",
+        "ex-spinal-twist",
+        "ex-legs-up"
+      ]
+    },
+    {
+      "id": "wo-twists-15",
+      "title": "Скручивания 15 минут",
+      "description": "Сидячие и лежачие скрутки.",
+      "categories": [
+        "back",
+        "mobility"
+      ],
+      "duration": 900,
+      "difficulty": "beginner",
+      "format": "step_by_step",
+      "equipment": [
+        "коврик"
+      ],
+      "contraindications": [
+        "острая боль в спине"
+      ],
+      "exercises": [
+        "ex-half-twist",
+        "ex-sage-twist",
+        "ex-spinal-twist",
+        "ex-reclined-twist",
+        "ex-supine-eagle"
+      ]
+    },
+    {
+      "id": "wo-standing-18",
+      "title": "Стоячая практика",
+      "description": "Гора, воин, треугольник, дерево.",
+      "categories": [
+        "morning",
+        "strength",
+        "balance"
+      ],
+      "duration": 1080,
+      "difficulty": "beginner",
+      "format": "step_by_step",
+      "equipment": [],
+      "contraindications": [
+        "головокружение"
+      ],
+      "exercises": [
+        "ex-mountain-pose",
+        "ex-upward-salute",
+        "ex-warrior-pose",
+        "ex-extended-triangle",
+        "ex-moon-pose",
+        "ex-tree-pose"
+      ]
+    },
+    {
+      "id": "wo-sun-a-18",
+      "title": "Приветствие солнцу",
+      "description": "Стоячий разогрев: гора, руки вверх, выпады и воин.",
+      "categories": [
+        "morning",
+        "strength"
+      ],
+      "duration": 1080,
+      "difficulty": "intermediate",
+      "format": "step_by_step",
+      "equipment": [
+        "коврик"
+      ],
+      "contraindications": [
+        "травмы запястий",
+        "высокое давление без консультации"
+      ],
+      "exercises": [
+        "ex-mountain-pose",
+        "ex-upward-salute",
+        "ex-crescent-lunge",
+        "ex-warrior-pose",
+        "ex-chair-pose",
+        "ex-cobra-pose",
+        "ex-tree-pose"
       ]
     },
     {

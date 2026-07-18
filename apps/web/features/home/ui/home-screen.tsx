@@ -33,7 +33,10 @@ export function HomeScreen({ data, scenario = "base" }: Props) {
       <div className="grid gap-3 p-4">
         <div className="flex min-w-0 items-center justify-between gap-3"><Badge>Можно продолжить</Badge>{activeSession && <span className="shrink-0 text-sm tabular-nums text-text-muted">{formatSessionDuration(resumeSeconds)}</span>}</div>
         <div className="grid min-w-0 grid-cols-[6rem_minmax(0,1fr)] items-center gap-3">
-          <ResumeCover src={activeSession ? `https://i.ytimg.com/vi/${activeSession.workout.youtubeVideoId}/hqdefault.jpg` : data.resume.image} alt={activeSession ? `Практика «${activeSession.workout.title}»` : "Мягкая практика для спины"} unoptimized={Boolean(activeSession)} />
+          {(() => {
+            const src = activeSession ? resumeCoverSrc(activeSession.workout.youtubeVideoId, activeSession.workout.coverObjectKey, data.resume.image) : data.resume.image;
+            return <ResumeCover key={src} src={src} alt={activeSession ? `Практика «${activeSession.workout.title}»` : "Мягкая практика для спины"} unoptimized={Boolean(activeSession?.workout.youtubeVideoId)} />;
+          })()}
           <div className="min-w-0"><h2 className="m-0 line-clamp-2 text-base font-semibold leading-snug" title={activeSession?.workout.title ?? data.resume.title}>{activeSession?.workout.title ?? data.resume.title}</h2><p className="m-0 mt-1 text-sm text-text-muted">{activeSession ? "Открытая сессия" : data.resume.meta}</p></div>
         </div>
         <Button component={NextLink} href={activeSession ? `/sessions/${activeSession.id}` : "/workouts/wo-back-soft-15"} large rounded>Продолжить</Button>
@@ -80,6 +83,14 @@ export function HomeScreen({ data, scenario = "base" }: Props) {
     <Button component={NextLink} href="/catalog" large rounded className="gap-2"><Icon name="play" />Начать тренировку</Button>
   </div>;
 }
+
+/** YouTube → yt thumb; step/flowly → cover webp; else fixture fallback. Never hit yt with empty video id. */
+const resumeCoverSrc = (youtubeVideoId: string | null | undefined, coverObjectKey: string | null | undefined, fallback: string) => {
+  const yt = youtubeVideoId?.trim();
+  if (yt) return `https://i.ytimg.com/vi/${yt}/hqdefault.jpg`;
+  if (coverObjectKey) return `/media/${coverObjectKey}`;
+  return fallback;
+};
 
 function ResumeCover({ src, alt, unoptimized }: { src: string; alt: string; unoptimized: boolean }) {
   const [errored, setErrored] = useState(false);

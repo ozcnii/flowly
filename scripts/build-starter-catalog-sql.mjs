@@ -28,8 +28,8 @@ const exercises = catalog.exercises ?? [];
 const workouts = catalog.workouts ?? [];
 uniq(categories, "id", "categories"); uniq(categories, "slug", "categories"); uniq(exercises, "id", "exercises"); uniq(workouts, "id", "workouts");
 if (categories.length < 10) fail(`expected >=10 categories, got ${categories.length}`);
-if (workouts.length < 20) fail(`expected >=20 workouts, got ${workouts.length}`);
-if (exercises.length < 60) fail(`expected >=60 exercises, got ${exercises.length}`);
+if (workouts.length < 15) fail(`expected >=15 workouts, got ${workouts.length}`);
+if (exercises.length < 40) fail(`expected >=40 exercises, got ${exercises.length}`);
 
 const catBySlug = new Map(categories.map((c) => [c.slug, c]));
 const exById = new Map(exercises.map((e) => [e.id, e]));
@@ -45,9 +45,12 @@ for (const w of workouts) {
     const c = catBySlug.get(slug); if (!c) fail(`workout ${w.id}: unknown category ${slug}`);
     workoutCategoryRows.push([w.id, c.id]);
   }
-  (w.exercises ?? []).forEach((exId, i) => {
+  const list = w.exercises ?? [];
+  list.forEach((exId, i) => {
     const ex = exById.get(exId); if (!ex) fail(`workout ${w.id}: unknown exercise ${exId}`);
-    workoutExerciseRows.push({ workoutId: w.id, exerciseId: exId, position: i + 1, duration: ex.duration ?? null });
+    // Default rest between steps (except after last) so step runtime has rest + next-exercise VO.
+    const rest = i < list.length - 1 ? 10 : null;
+    workoutExerciseRows.push({ workoutId: w.id, exerciseId: exId, position: i + 1, duration: ex.duration ?? null, rest });
   });
 }
 
@@ -61,10 +64,15 @@ out.push("INSERT INTO workout_categories (id, slug, name, icon, sort_order, is_a
 out.push(categories.map((c) => tuple([sql(c.id), sql(c.slug), sql(c.name), sql(c.icon), c.sortOrder, 1])).join(",\n") + "\nON CONFLICT(id) DO UPDATE SET slug=excluded.slug, name=excluded.name, icon=excluded.icon, sort_order=excluded.sort_order, is_active=excluded.is_active;\n");
 
 out.push("INSERT INTO exercises (id, owner_id, title, description, media_object_key, media_type, default_duration_seconds, default_repetitions, created_at, updated_at) VALUES");
-// Starter art: webp stills by default; mediaType "gif" → catalog/exercises/{id}.gif when shipped.
-out.push(exercises.map((e) => {
+// mediaObjectKey explicit (square MP4) or legacy gif/webp by id.
+const mediaKey = (e) => {
+  if (e.mediaObjectKey) return e.mediaObjectKey;
+  if (e.mediaType === "video") return `catalog/exercises/${String(e.id).replace(/^ex-/, "")}.mp4`;
   const ext = e.mediaType === "gif" ? "gif" : "webp";
-  return tuple([sql(e.id), "NULL", sql(e.title), sql(e.description), sql(`catalog/exercises/${e.id}.${ext}`), sql(e.mediaType), e.duration ?? "NULL", e.repetitions ?? "NULL", sql(ts), sql(ts)]);
+  return `catalog/exercises/${e.id}.${ext}`;
+};
+out.push(exercises.map((e) => {
+  return tuple([sql(e.id), "NULL", sql(e.title), sql(e.description), sql(mediaKey(e)), sql(e.mediaType ?? "image"), e.duration ?? "NULL", e.repetitions ?? "NULL", sql(ts), sql(ts)]);
 }).join(",\n") + "\nON CONFLICT(id) DO UPDATE SET title=excluded.title, description=excluded.description, media_object_key=excluded.media_object_key, media_type=excluded.media_type, default_duration_seconds=excluded.default_duration_seconds, default_repetitions=excluded.default_repetitions, updated_at=excluded.updated_at;\n");
 
 out.push("INSERT INTO workouts (id, owner_id, source_type, visibility, title, description, cover_object_key, youtube_video_id, duration_seconds, difficulty, equipment, contraindications, format, status, created_at, updated_at, published_at) VALUES");
@@ -76,7 +84,12 @@ out.push(workoutCategoryRows.map((r) => tuple([sql(r[0]), sql(r[1])])).join(",\n
 
 out.push(`DELETE FROM workout_exercises WHERE workout_id IN (${workouts.map((w) => sql(w.id)).join(", ")});`);
 out.push("INSERT INTO workout_exercises (workout_id, exercise_id, position, sets_count, repetitions, duration_seconds, rest_seconds, custom_instruction) VALUES");
-out.push(workoutExerciseRows.map((r) => tuple([sql(r.workoutId), sql(r.exerciseId), r.position, "NULL", "NULL", r.duration ?? "NULL", "NULL", "NULL"])).join(",\n") + ";\n");
+out.push(workoutExerciseRows.map((r) => tuple([sql(r.workoutId), sql(r.exerciseId), r.position, "NULL", "NULL", r.duration ?? "NULL", r.rest ?? "NULL", "NULL"])).join(",\n") + ";\n");
+
+// Drop legacy exercises (old webp/gif catalog) not present in this seed.
+const exerciseIds = exercises.map((e) => sql(e.id)).join(", ");
+out.push(`DELETE FROM workout_exercises WHERE exercise_id LIKE 'ex-%' AND exercise_id NOT IN (${exerciseIds});`);
+out.push(`DELETE FROM exercises WHERE id LIKE 'ex-%' AND id NOT IN (${exerciseIds});`);
 
 out.push("COMMIT;");
 writeFileSync(output, out.join("\n"));

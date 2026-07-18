@@ -80,15 +80,27 @@ function ActionPanel({ workout, backgroundRef }: { workout: WorkoutDetail; backg
     try { await close.mutateAsync({ accumulatedSeconds: latestSessionSeconds(conflict.activeSession), playbackPositionSeconds: latestPlaybackPosition(conflict.activeSession), finalStatus: "not_completed", baseUpdatedAt: conflict.activeSession.updatedAt }); setClosed(true); }
     catch (error) { if (error instanceof ApiError && error.status === 409 && typeof error.body === "object" && error.body !== null && "session" in error.body) setConflict({ ...conflict, activeSession: (error.body as { session: ActiveSessionConflict["activeSession"] }).session }); }
   };
-  return <section aria-labelledby="workout-actions-title" className="grid gap-2">
-    <BlockTitle component="h2" id="workout-actions-title" className="!m-0">Возможности</BlockTitle>
-    <List strong inset dividers className="!m-0">
-      {sameActive ? <ListItem link linkComponent="button" contentClassName="w-full" innerClassName="text-left" linkProps={{ type: "button", onClick: continueCurrent }} media={<Icon name="play" />} title="Продолжить тренировку" subtitle={`Прошло ${formatSessionDuration(activeSeconds)}`} after={<Badge>Идёт сейчас</Badge>} /> : workout.actions.start.enabled ? <ListItem link linkComponent="button" contentClassName="w-full" innerClassName="text-left" linkProps={{ type: "button", onClick: () => void startSession(), disabled: start.isPending || activeQuery.isPending }} media={start.isPending ? <Preloader /> : <Icon name="play" />} title="Начать тренировку" subtitle={workout.actions.start.reason} /> : <ListItem media={<Icon name="play" />} title="Начать тренировку" subtitle={workout.actions.start.reason} aria-disabled="true" />}
-      {future("Добавить в избранное", "bookmark")}
-      {future("Поделиться", "share-2")}
-      {workout.sourceType === "user" && <>{future("Пожаловаться", "triangle-alert")}{future("Скрыть", "eye-off")}</>}
-    </List>
+  const startEnabled = workout.actions.start.enabled, startBusy = start.isPending || activeQuery.isPending;
+  return <section aria-labelledby="workout-start-title" className="grid gap-3">
+    {/* Primary CTA outside «Возможности» — strong filled Button, not a List row */}
+    <div className="grid gap-1.5">
+      <h2 id="workout-start-title" className="sr-only">{sameActive ? "Продолжить тренировку" : "Начать тренировку"}</h2>
+      {sameActive
+        ? <Button large rounded className="min-h-12 gap-2 font-semibold" onClick={continueCurrent}><Icon name="play" className="size-5 shrink-0" aria-hidden />Продолжить · {formatSessionDuration(activeSeconds)}</Button>
+        : startEnabled
+          ? <Button large rounded className="min-h-12 gap-2 font-semibold" disabled={startBusy} onClick={() => void startSession()}>{start.isPending ? <><Preloader className="size-5 shrink-0" />Запускаем…</> : <><Icon name="play" className="size-5 shrink-0" aria-hidden />Начать тренировку</>}</Button>
+          : <Button large rounded className="min-h-12 font-semibold" disabled>Начать тренировку</Button>}
+      {sameActive ? <p className="m-0 text-center text-xs text-text-muted">Идёт сейчас · можно вернуться в сессию</p> : !startEnabled && workout.actions.start.reason ? <p className="m-0 text-center text-xs text-text-muted">{workout.actions.start.reason}</p> : null}
+    </div>
     {start.isError && !conflict && <Card component="aside" outline className="m-0" role="alert" contentWrapPadding="p-3 text-sm">Не удалось начать тренировку. Попробуйте ещё раз.</Card>}
+    <div className="grid gap-2">
+      <BlockTitle component="h2" id="workout-actions-title" className="!m-0">Возможности</BlockTitle>
+      <List strong inset dividers className="!m-0">
+        {future("Добавить в избранное", "bookmark")}
+        {future("Поделиться", "share-2")}
+        {workout.sourceType === "user" && <>{future("Пожаловаться", "triangle-alert")}{future("Скрыть", "eye-off")}</>}
+      </List>
+    </div>
     <ModalPortal>{conflict && <Sheet ref={conflictSheetRef} opened backdrop onBackdropClick={dismiss} className="flex max-h-[80dvh] flex-col" role="dialog" aria-modal="true" aria-labelledby="active-session-title">
       <Navbar title={<span id="active-session-title">{closed ? "Начать тренировку?" : "Уже идёт тренировка"}</span>} />
       {!closed ? <div className="grid gap-3 p-4">

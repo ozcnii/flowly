@@ -85,15 +85,17 @@ All other exercises: single still cell (canonical pose).
 
 ## 5. Covers DNA (workout headers / catalog cards)
 
-Same character + same outfit + same flat style as exercises.
+**Production covers are photoreal editorial wellness photos (1:1), not flat vector.**  
+Canonical paste prompt: `PROMPT_COVERS.md` (original «Гибкая спина» block).
 
 | Spec | Value |
 |------|--------|
-| Aspect | **16:9** |
-| Background | Same sage `#D8E8E0` (not photo interiors, not windows, not realistic rooms) |
-| Composition | Character in a pose that matches the workout mood; mat visible; generous breathing room |
-| Style | Flat vector only — **forbid** stock photo, soft-focus photography, realistic lighting blooms |
-| Text | **Never** |
+| Aspect | **1:1 square** |
+| Style | Photoreal journal wellness photo |
+| Outfit | Muted sage sports top, neutral bottoms |
+| Set | Light ivory/sage studio, soft morning light, one plant in ceramic vase |
+| Composition | Clear silhouette for small mobile cards |
+| Text | **Never** on the image (app draws titles) |
 
 Cover list (Flowly only; not YouTube thumbnails):
 
@@ -119,6 +121,8 @@ Cover list (Flowly only; not YouTube thumbnails):
 | wo-wrists-safe-13 | Standing arms free (no weight on wrists) |
 | wo-deep-stretch-35 | Wide fold or pigeon |
 | wo-step-test-short | Mountain arms up (test badge energy, still flat) |
+| wo-twists-15 | Seated/reclined spinal twist (NEW 2026-07-19) |
+| wo-standing-18 | Warrior or mountain + upward salute (NEW 2026-07-19) |
 
 ---
 

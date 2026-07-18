@@ -12,14 +12,13 @@ We lock style in `STYLE_BIBLE.md` and generate **collages** in ChatGPT (your acc
 ## Workflow
 
 1. Open [ChatGPT](https://chatgpt.com) (you log in).
-2. Paste prompts from `PROMPT_EXERCISES.md` then `PROMPT_COVERS.md` **one sheet at a time** (order **M1→M2→M3→E1→E4→C1→C2**).
-3. Every prompt has **exact canvas px** and **1008×567 (16:9) cells**. Reject square outputs.
-4. Download each collage PNG into:
+2. **Covers (production):** paste photoreal **1:1 square** prompts from `PROMPT_COVERS.md` (canonical Russian editorial prompt). One cover = one image. **Not** flat-vector collages.
+3. **Exercise collages (legacy/optional):** `PROMPT_EXERCISES.md` with exact canvas px / 16:9 cells if regenerating exercise art.
+4. Download into:
 
 ```text
-.temp/catalog-art/input/M1.png … M3.png   # multi-frame motion (4 frames/row)
-.temp/catalog-art/input/E1.png … E4.png   # static stills
-.temp/catalog-art/input/C1.png C2.png     # covers (same style, not photos)
+.temp/catalog-art/input/wo-*.png          # photoreal square covers (production)
+.temp/catalog-art/input/M1.png …          # optional exercise collages
 ```
 
 5. Tell agent «M1 done» / «E2 done» — gutter-aware slice → GIF (multi-frame) / webp.

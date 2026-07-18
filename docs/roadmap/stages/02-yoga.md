@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 4 | 0 | 0 | 1 | 8 |
+| 5 | 0 | 0 | 1 | 8 |
 
 ## Зависимости и инварианты
 
@@ -122,6 +122,21 @@
 - **validation/evidence:** plan `.temp/E2-D3-T02/plan.md`; UX audit `.temp/E2-D3-T02/ux-audit-2026-07-18.md`; migration `0009_ordinary_annihilus.sql` (`workout_sessions.mode`); shared `FinishSessionSheet`/`SyncConflictSheet`; `StepSessionScreen` auto pipeline exercise→rest→next, last-5s countdown ticks, complete fanfare+confetti, last-step «К итогу»/✓, done return path; DEC-062 conflict parity (elapsed &lt;1s auto-server); typecheck/lint PASS; user real-device Telegram review pending after deploy.
 - **journal:** 2026-07-18 — plan approved; Slice 0 backend (mode, exercises payload, checkpoint position) + Slice 1 S-MA-031 step runtime implemented. User UX loop: transport buttons, auto-continue, celebration, last-step labels, conflict parity with video. `in_progress -> review` for production deploy + real-device pass. Residual: S-MA-032 mixed chooser not shipped; exercise media placeholder until E2-D3-T03.
 
+### E2-D3-T06 — Seed ready-made exercise GIFs (external library)
+- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-18
+- **prd_refs:** §12.1, §14.2–14.4, §43.6–43.10, §55.2 · **depends_on:** E2-D3-T02 · **decisions:** DEC-016, DEC-029, DEC-053, DEC-062
+- **ui_slices:** regression S-MA-031 step media; no new surface ID until pilot approved.
+- **scope:** заменить самодельные/битые exercise media в step-каталоге на **готовые коммерчески/открыто лицензированные GIF** с внешнего источника. **Не** генерировать art через image_gen/ChatGPT collage. Pilot: **ровно 2** Flowly step-workout’а (локально + prod) с полным набором exercise GIF; дальше — пополнение из того же источника после user pick. Отдельная от E2-D3-T03 (UGC uploads) content-seed задача.
+- **acceptance:**
+  - [ ] пользователь явно выбрал source/site (и понятен license path);
+  - [ ] pilot: 2 workouts, GIF на каждом exercise step, media доступны local + production;
+  - [ ] старые плохие custom GIFs для этих workouts вычищены (DB keys + `public/media` / R2 path);
+  - [ ] step session показывает GIF без layout-shift / object-cover clipping;
+  - [ ] license/attribution зафиксированы в seed/docs (если требуется источником);
+  - [ ] commit/push только по явной команде пользователя.
+- **validation/evidence:** browser step session на pilot workouts; SQL/media path check local+prod; source URL + license note in journal.
+- **journal:** 2026-07-18 — создана по запросу пользователя: текущие custom GIF «плохо нарезаны»; pivot на готовые библиотеки. Пока **не implement**: показать кандидатов source → user approval → pilot 2 workouts. Hard rule: no commit/push without explicit user command. 2026-07-19 — user supplied square MP4 pack in `.temp/assets` (46). Pilot 3 on `wo-step-test-short` approved («нравится»). Full local rebuild: 46 `ex-*-pose` video exercises, 21 step workouts re-composed, 3 YouTube kept; media under `public/media/catalog/exercises/*.mp4`; step UI white 16:9 + `object-contain` video. Local D1 reseeded. Prod/commit pending user command.
+
 ### E2-D3-T03 — Реализовать собственные тренировки и media uploads
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
 - **prd_refs:** §13.2, §16, §43.7–43.11, §44.3–44.4, §44.13, §46 · **depends_on:** E1-D1-T05, E2-D2-T03 · **decisions:** DEC-016, DEC-019, DEC-022, DEC-024, DEC-025, DEC-029
@@ -147,4 +162,4 @@
 
 ## Handoff этапа
 
-Активна E2-D3-T02 `review`: step session S-MA-031 shipped for real-device Telegram verification after deploy; residual S-MA-032 mixed chooser.
+Активна E2-D3-T02 `review`: step session S-MA-031 shipped for real-device Telegram verification after deploy; residual S-MA-032 mixed chooser. Новая content-задача **E2-D3-T06** `backlog`: ready-made exercise GIFs (external library), pilot 2 workouts после user pick source.
