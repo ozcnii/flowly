@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 4 | 0 | 0 | 0 | 3 |
+| 2 | 1 | 0 | 0 | 4 |
 
 ## Границы
 
@@ -57,20 +57,22 @@
 - **journal:** 2026-07-19 — implement progress; user «вроде нормально» → close done only, no push.
 
 ### E3-D4-T04 — Обработать пропуск без сдвига программы
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
+- **status:** done · **priority:** blocker · **owner:** agent · **updated:** 2026-07-19
 - **prd_refs:** §20.4, §26, §55.3, §57 · **depends_on:** E3-D4-T02 · **decisions:** DEC-015, DEC-016, DEC-022, DEC-024, DEC-025, DEC-029
 - **ui_slices:** S-MA-053 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** missed/skipped occurrence без изменения дат последующих дней.
-- **acceptance:** [ ] календарь программы неизменен; [ ] статус записан отдельно; [ ] прогресс пересчитан корректно.
-- **validation/evidence:** canonical missed-day sequence до/после.
+- **acceptance:** [x] календарь программы неизменен; [x] статус записан отдельно; [x] прогресс пересчитан корректно.
+- **validation/evidence:** local HTTP: enroll soft-start start=2026-07-17; POST skip day1 → 201 occurrence skipped scheduled=2026-07-17; idempotent 200 created=false; startLocalDate+day map unchanged; percent stays 0 (skip ≠ done); rest day → 400 not_workout; future day → 400 future_day; already_done → 409. typecheck PASS. UI: «Пропустить день» + missed list. User: close done + commit + push.
+- **journal:** 2026-07-19 — implement skip API/UI; user «переводи в done коммить пушь» → done.
 
 ### E3-D4-T05 — Реализовать дни отдыха
-- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
+- **status:** in_progress · **priority:** high · **owner:** agent · **updated:** 2026-07-19
 - **prd_refs:** §8.6, §20.5, §55.3 · **depends_on:** E3-D4-T02 · **decisions:** DEC-015, DEC-016, DEC-022, DEC-024, DEC-025, DEC-029
 - **ui_slices:** S-MA-051, S-MA-053 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** rest day как отдельный тип/статус, не равный skip.
 - **acceptance:** [ ] UI и данные различают rest/skip; [ ] rest не требует тренировки; [ ] серии/прогресс получают корректный сигнал.
 - **validation/evidence:** rest vs skip examples.
+- **journal:** 2026-07-19 — start after T04 done.
 
 ### E3-D4-T06 — Создать program occurrences
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
@@ -88,4 +90,4 @@
 
 ## Handoff этапа
 
-**E3-D4-T03** `done`. Next: **E3-D4-T04** skip без сдвига (blocker).
+**E3-D4-T04** `done`. **E3-D4-T05** `in_progress` — rest vs skip.

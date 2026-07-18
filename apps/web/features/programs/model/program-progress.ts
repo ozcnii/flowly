@@ -1,6 +1,6 @@
 import { differenceInCalendarDays, parseISO } from "date-fns";
 
-export type DayProgressState = "completed" | "today" | "upcoming" | "missed" | "rest" | "rest_today";
+export type DayProgressState = "completed" | "skipped" | "today" | "upcoming" | "missed" | "rest" | "rest_today";
 
 const DONE = new Set(["completed", "partial"]);
 
@@ -16,18 +16,22 @@ export const dayProgressState = (
   scheduledLocalDate: string,
   todayLocalDate: string,
   workoutDone: boolean,
+  workoutSkipped = false,
 ): DayProgressState => {
   if (type === "rest") return scheduledLocalDate === todayLocalDate ? "rest_today" : "rest";
   if (workoutDone) return "completed";
+  if (workoutSkipped) return "skipped";
   if (scheduledLocalDate === todayLocalDate) return "today";
   if (scheduledLocalDate > todayLocalDate) return "upcoming";
   return "missed";
 };
 
 export const isWorkoutDoneStatus = (status: string) => DONE.has(status);
+export const isWorkoutSkippedStatus = (status: string) => status === "skipped";
 
 export const DAY_STATE_LABEL: Record<DayProgressState, string> = {
   completed: "Сделано",
+  skipped: "Пропущено",
   today: "Сегодня",
   upcoming: "Скоро",
   missed: "Не отмечено",

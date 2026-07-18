@@ -5,7 +5,7 @@ import { getSessionUserId } from "@/lib/auth/session-user";
 import { getUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/cloudflare";
 import { localDateInTimezone, scheduleLocalDate } from "@/features/programs/model/program-dates";
-import { currentDayNumber, dayProgressState, isWorkoutDoneStatus } from "@/features/programs/model/program-progress";
+import { currentDayNumber, dayProgressState, isWorkoutDoneStatus, isWorkoutSkippedStatus } from "@/features/programs/model/program-progress";
 
 const CATEGORY: Record<string, string> = {
   beginner: "Старт", back: "Спина", evening: "Вечер", morning: "Утро", mobility: "Мобильность", full: "Полный ритм",
@@ -39,20 +39,29 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const doneKeys = new Set(
     occurrences.filter((row) => isWorkoutDoneStatus(row.status)).map((row) => `${row.entityId}|${row.scheduledLocalDate}`),
   );
+  const skipKeys = new Set(
+    occurrences.filter((row) => isWorkoutSkippedStatus(row.status)).map((row) => `${row.entityId}|${row.scheduledLocalDate}`),
+  );
 
   let completedWorkoutDays = 0;
   let totalWorkoutDays = 0;
   let todayWorkoutId: string | null = null;
+  let todayDayNumber: number | null = null;
 
   const mapped = days.map((day) => {
     const scheduledLocalDate = scheduleLocalDate(enrollment.startLocalDate, day.dayNumber);
-    const workoutDone = Boolean(day.workoutId && doneKeys.has(`${day.workoutId}|${scheduledLocalDate}`));
+    const key = day.workoutId ? `${day.workoutId}|${scheduledLocalDate}` : "";
+    const workoutDone = Boolean(key && doneKeys.has(key));
+    const workoutSkipped = Boolean(key && !workoutDone && skipKeys.has(key));
     if (day.type === "workout") {
       totalWorkoutDays += 1;
       if (workoutDone) completedWorkoutDays += 1;
     }
-    const state = dayProgressState(day.type, scheduledLocalDate, todayLocalDate, workoutDone);
-    if (state === "today" && day.workoutId && !workoutDone) todayWorkoutId = day.workoutId;
+    const state = dayProgressState(day.type, scheduledLocalDate, todayLocalDate, workoutDone, workoutSkipped);
+    if (state === "today" && day.workoutId && !workoutDone) {
+      todayWorkoutId = day.workoutId;
+      todayDayNumber = day.dayNumber;
+    }
     return {
       id: day.id,
       dayNumber: day.dayNumber,
@@ -62,7 +71,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       workoutId: day.workoutId,
       scheduledLocalDate,
       state,
-      done: workoutDone || day.type === "rest" && scheduledLocalDate <= todayLocalDate,
+      done: workoutDone || workoutSkipped || (day.type === "rest" && scheduledLocalDate <= todayLocalDate),
+      skipped: workoutSkipped,
+      canSkip: day.type === "workout" && Boolean(day.workoutId) && !workoutDone && !workoutSkipped && scheduledLocalDate <= todayLocalDate,
     };
   });
 
@@ -85,6 +96,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         totalWorkoutDays,
         percent: totalWorkoutDays ? Math.round(completedWorkoutDays / totalWorkoutDays * 100) : 0,
         todayWorkoutId,
+        todayDayNumber,
       },
       program: {
         id: program.id,
