@@ -2,12 +2,13 @@
 
 **Перед каждым sheet:**
 
-1. Canvas size — **exact pixels** from the prompt (no “approximately”).
-2. Every cell **1008×567 = 16:9 landscape**. **Never square.**
+1. Canvas size — **exact pixels** from the prompt. If the model downscales, keep the **same aspect ratio** (M1 ≈ **1.40**, M2/M3 ≈ **1.77**, E ≈ **1.33**) and the same grid (4×5 / 4×4 / 3×4). Never square cells.
+2. Every cell **16:9 landscape** (target 1008×567). **Never square.**
 3. Style = approved **M1** (green set, plants, wood floor).
-4. Gutters **16px**, border **16px**. Full body + mat in every cell (~6% pad).
+4. Gutters **16px** (or thin white), border **16px**. Full body + mat in every cell (~6% pad).
 5. No text, numbers, logos, watermarks.
 6. Motion sheets: **camera lock** across frames of the same exercise.
+7. After download: verify real `width×height` before slice; GIF default **900 ms per frame** (readable yoga tempo).
 
 **Save downloads to:** `.temp/catalog-art/input/{SHEET}.png`  
 Order: **M1 → M2 → M3 → E1 → E2 → E3 → E4**
