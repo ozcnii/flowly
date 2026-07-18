@@ -334,8 +334,9 @@ export function StepSessionScreen({ id }: { id: string }) {
             return <div className="relative aspect-video bg-accent-soft">
               {mediaKey ? (
                 isGif
-                  ? <img src={`/media/${mediaKey}`} alt={media?.title ?? ""} className={`absolute inset-0 size-full object-cover ${phase === "rest" ? "opacity-45" : ""}`} decoding="async" />
-                  : <Image src={`/media/${mediaKey}`} alt={media?.title ?? ""} fill sizes="(max-width: 430px) calc(100vw - 40px), 640px" className={`object-cover ${phase === "rest" ? "opacity-45" : ""}`} placeholder="blur" blurDataURL={IMAGE_BLUR_DATA_URL} decoding="async" />
+                  // object-contain: full pose + mat + hands (object-cover was clipping heads)
+                  ? <img src={`/media/${mediaKey}`} alt={media?.title ?? ""} className={`absolute inset-0 size-full object-contain ${phase === "rest" ? "opacity-45" : ""}`} decoding="async" />
+                  : <Image src={`/media/${mediaKey}`} alt={media?.title ?? ""} fill sizes="(max-width: 430px) calc(100vw - 40px), 640px" className={`object-contain ${phase === "rest" ? "opacity-45" : ""}`} placeholder="blur" blurDataURL={IMAGE_BLUR_DATA_URL} decoding="async" />
               ) : (
                 <div className="absolute inset-0 grid place-items-center"><Icon name="dumbbell" className="size-10 text-text-muted" /></div>
               )}
