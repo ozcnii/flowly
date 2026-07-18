@@ -17,11 +17,11 @@ INSERT INTO workout_categories (id, slug, name, icon, sort_order, is_active) VAL
 ON CONFLICT(id) DO UPDATE SET slug=excluded.slug, name=excluded.name, icon=excluded.icon, sort_order=excluded.sort_order, is_active=excluded.is_active;
 
 INSERT INTO exercises (id, owner_id, title, description, media_object_key, media_type, default_duration_seconds, default_repetitions, created_at, updated_at) VALUES
-('ex-mountain', NULL, 'Поза горы', 'Выравнивание стоп, таза и плеч перед практикой.', 'catalog/exercises/ex-mountain.webp', 'image', 60, NULL, '2026-07-14T00:00:00.000Z', '2026-07-14T00:00:00.000Z'),
+('ex-mountain', NULL, 'Поза горы', 'Выравнивание стоп, таза и плеч перед практикой.', 'catalog/exercises/ex-mountain.gif', 'gif', 60, NULL, '2026-07-14T00:00:00.000Z', '2026-07-14T00:00:00.000Z'),
 ('ex-neck-rolls', NULL, 'Мягкие круги шеей', 'Медленные полукруги без запрокидывания головы.', 'catalog/exercises/ex-neck-rolls.gif', 'gif', 60, NULL, '2026-07-14T00:00:00.000Z', '2026-07-14T00:00:00.000Z'),
 ('ex-shoulder-rolls', NULL, 'Круги плечами', 'Разогрев плеч и грудного отдела.', 'catalog/exercises/ex-shoulder-rolls.gif', 'gif', 60, NULL, '2026-07-14T00:00:00.000Z', '2026-07-14T00:00:00.000Z'),
 ('ex-cat-cow', NULL, 'Кошка-корова', 'Мобилизация позвоночника в комфортном темпе.', 'catalog/exercises/ex-cat-cow.gif', 'gif', 90, NULL, '2026-07-14T00:00:00.000Z', '2026-07-14T00:00:00.000Z'),
-('ex-child', NULL, 'Поза ребёнка', 'Восстановление дыхания и разгрузка поясницы.', 'catalog/exercises/ex-child.webp', 'image', 90, NULL, '2026-07-14T00:00:00.000Z', '2026-07-14T00:00:00.000Z'),
+('ex-child', NULL, 'Поза ребёнка', 'Восстановление дыхания и разгрузка поясницы.', 'catalog/exercises/ex-child.gif', 'gif', 90, NULL, '2026-07-14T00:00:00.000Z', '2026-07-14T00:00:00.000Z'),
 ('ex-down-dog', NULL, 'Собака мордой вниз', 'Удлинение задней поверхности тела и плеч.', 'catalog/exercises/ex-down-dog.webp', 'image', 90, NULL, '2026-07-14T00:00:00.000Z', '2026-07-14T00:00:00.000Z'),
 ('ex-low-lunge', NULL, 'Низкий выпад', 'Мягкое раскрытие сгибателей бедра.', 'catalog/exercises/ex-low-lunge.webp', 'image', 90, NULL, '2026-07-14T00:00:00.000Z', '2026-07-14T00:00:00.000Z'),
 ('ex-half-split', NULL, 'Полушпагат', 'Растяжение задней поверхности бедра без рывков.', 'catalog/exercises/ex-half-split.webp', 'image', 90, NULL, '2026-07-14T00:00:00.000Z', '2026-07-14T00:00:00.000Z'),
@@ -181,12 +181,6 @@ INSERT INTO workout_exercises (workout_id, exercise_id, position, sets_count, re
 ('wo-stretch-evening-20', 'ex-supine-twist', 4, NULL, NULL, 120, NULL, NULL),
 ('wo-stretch-evening-20', 'ex-legs-wall', 5, NULL, NULL, 180, NULL, NULL),
 ('wo-stretch-evening-20', 'ex-savasana', 6, NULL, NULL, 180, NULL, NULL),
-('wo-sun-a-18', 'ex-wrist-warmup', 1, NULL, NULL, 90, NULL, NULL),
-('wo-sun-a-18', 'ex-mountain', 2, NULL, NULL, 60, NULL, NULL),
-('wo-sun-a-18', 'ex-sun-a', 3, NULL, NULL, 180, NULL, NULL),
-('wo-sun-a-18', 'ex-low-lunge', 4, NULL, NULL, 90, NULL, NULL),
-('wo-sun-a-18', 'ex-down-dog', 5, NULL, NULL, 90, NULL, NULL),
-('wo-sun-a-18', 'ex-child', 6, NULL, NULL, 90, NULL, NULL),
 ('wo-core-12', 'ex-dead-bug', 1, NULL, NULL, 90, NULL, NULL),
 ('wo-core-12', 'ex-bird-dog', 2, NULL, NULL, 90, NULL, NULL),
 ('wo-core-12', 'ex-plank', 3, NULL, NULL, 45, NULL, NULL),
@@ -277,21 +271,6 @@ INSERT INTO workout_exercises (workout_id, exercise_id, position, sets_count, re
 ('wo-deep-stretch-35', 'ex-prasarita', 4, NULL, NULL, 120, NULL, NULL),
 ('wo-deep-stretch-35', 'ex-seated-fold', 5, NULL, NULL, 120, NULL, NULL),
 ('wo-deep-stretch-35', 'ex-figure-four', 6, NULL, NULL, 120, NULL, NULL),
-('wo-deep-stretch-35', 'ex-savasana', 7, NULL, NULL, 180, NULL, NULL),
-('wo-yt-malova-morning-10', 'ex-mountain', 1, NULL, NULL, 60, NULL, NULL),
-('wo-yt-malova-morning-10', 'ex-neck-rolls', 2, NULL, NULL, 60, NULL, NULL),
-('wo-yt-malova-morning-10', 'ex-shoulder-rolls', 3, NULL, NULL, 60, NULL, NULL),
-('wo-yt-malova-morning-10', 'ex-cat-cow', 4, NULL, NULL, 90, NULL, NULL),
-('wo-yt-malova-morning-10', 'ex-forward-fold', 5, NULL, NULL, 90, NULL, NULL),
-('wo-yt-malova-vinyasa-24', 'ex-sun-a', 1, NULL, NULL, 180, NULL, NULL),
-('wo-yt-malova-vinyasa-24', 'ex-low-lunge', 2, NULL, NULL, 90, NULL, NULL),
-('wo-yt-malova-vinyasa-24', 'ex-warrior-one', 3, NULL, NULL, 75, NULL, NULL),
-('wo-yt-malova-vinyasa-24', 'ex-down-dog', 4, NULL, NULL, 90, NULL, NULL),
-('wo-yt-malova-vinyasa-24', 'ex-child', 5, NULL, NULL, 90, NULL, NULL),
-('wo-yt-adriene-stress-7', 'ex-meditation-seat', 1, NULL, NULL, 180, NULL, NULL),
-('wo-yt-adriene-stress-7', 'ex-box-breath', 2, NULL, NULL, 180, NULL, NULL),
-('wo-yt-adriene-stress-7', 'ex-side-bend', 3, NULL, NULL, 90, NULL, NULL),
-('wo-yt-adriene-stress-7', 'ex-child', 4, NULL, NULL, 90, NULL, NULL),
-('wo-yt-adriene-stress-7', 'ex-savasana', 5, NULL, NULL, 180, NULL, NULL);
+('wo-deep-stretch-35', 'ex-savasana', 7, NULL, NULL, 180, NULL, NULL);
 
 COMMIT;

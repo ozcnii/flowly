@@ -38,12 +38,14 @@ const workoutCategoryRows = [];
 for (const w of workouts) {
   for (const k of ["title", "description", "duration", "difficulty", "format"]) if (!w[k]) fail(`workout ${w.id}: missing ${k}`);
   if (!Array.isArray(w.categories) || !w.categories.length) fail(`workout ${w.id}: missing categories`);
-  if (!Array.isArray(w.exercises) || !w.exercises.length) fail(`workout ${w.id}: missing exercises`);
+  const isVideo = w.format === "video" || w.sourceType === "youtube";
+  // Video/YouTube workouts are player-first; step exercise lists are optional/empty (DEC-062).
+  if (!isVideo && (!Array.isArray(w.exercises) || !w.exercises.length)) fail(`workout ${w.id}: missing exercises`);
   for (const slug of w.categories) {
     const c = catBySlug.get(slug); if (!c) fail(`workout ${w.id}: unknown category ${slug}`);
     workoutCategoryRows.push([w.id, c.id]);
   }
-  w.exercises.forEach((exId, i) => {
+  (w.exercises ?? []).forEach((exId, i) => {
     const ex = exById.get(exId); if (!ex) fail(`workout ${w.id}: unknown exercise ${exId}`);
     workoutExerciseRows.push({ workoutId: w.id, exerciseId: exId, position: i + 1, duration: ex.duration ?? null });
   });

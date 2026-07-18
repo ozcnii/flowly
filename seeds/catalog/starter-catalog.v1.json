@@ -92,7 +92,7 @@
       "id": "ex-mountain",
       "title": "Поза горы",
       "description": "Выравнивание стоп, таза и плеч перед практикой.",
-      "mediaType": "image",
+      "mediaType": "gif",
       "duration": 60
     },
     {
@@ -120,7 +120,7 @@
       "id": "ex-child",
       "title": "Поза ребёнка",
       "description": "Восстановление дыхания и разгрузка поясницы.",
-      "mediaType": "image",
+      "mediaType": "gif",
       "duration": 90
     },
     {
@@ -606,14 +606,7 @@
         "травмы запястий",
         "высокое давление без консультации"
       ],
-      "exercises": [
-        "ex-wrist-warmup",
-        "ex-mountain",
-        "ex-sun-a",
-        "ex-low-lunge",
-        "ex-down-dog",
-        "ex-child"
-      ]
+      "exercises": []
     },
     {
       "id": "wo-core-12",
@@ -1044,13 +1037,7 @@
       "contraindications": [
         "острая боль"
       ],
-      "exercises": [
-        "ex-mountain",
-        "ex-neck-rolls",
-        "ex-shoulder-rolls",
-        "ex-cat-cow",
-        "ex-forward-fold"
-      ]
+      "exercises": []
     },
     {
       "id": "wo-yt-malova-vinyasa-24",
@@ -1073,13 +1060,7 @@
         "острая боль",
         "высокое давление без консультации врача"
       ],
-      "exercises": [
-        "ex-sun-a",
-        "ex-low-lunge",
-        "ex-warrior-one",
-        "ex-down-dog",
-        "ex-child"
-      ]
+      "exercises": []
     },
     {
       "id": "wo-yt-adriene-stress-7",
@@ -1098,13 +1079,7 @@
       "contraindications": [
         "острая боль"
       ],
-      "exercises": [
-        "ex-meditation-seat",
-        "ex-box-breath",
-        "ex-side-bend",
-        "ex-child",
-        "ex-savasana"
-      ]
+      "exercises": []
     }
   ]
 }

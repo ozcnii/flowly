@@ -1,6 +1,5 @@
--- Short step-session smoke workout for prod/local verification (E2-D3-T02).
--- 3 exercises: 10s → 15s → 5s, rest 5s between (not after last).
--- Reuses existing catalog exercises + cover; idempotent UPSERT.
+-- Short step smoke workout: 3 exercises 10s / 15s / 5s + rest 5s between (not after last).
+-- Idempotent. Keep on local + prod for TMA audio/rest verification — do not delete.
 PRAGMA foreign_keys=ON;
 
 INSERT INTO workouts (
@@ -13,7 +12,7 @@ INSERT INTO workouts (
   'flowly',
   'public',
   'Тест step 10+15+5',
-  'Короткая тренировка для проверки step-runtime: 3 упражнения 10/15/5 сек и отдых 5 сек между ними.',
+  'Короткая тренировка для проверки step-runtime: 10/15/5 сек и отдых 5 сек между упражнениями. Не удалять.',
   'catalog/covers/wo-morning-10.webp',
   NULL,
   40,
@@ -23,20 +22,13 @@ INSERT INTO workouts (
   'step_by_step',
   'published',
   '2026-07-18T00:00:00.000Z',
-  '2026-07-18T00:00:00.000Z',
+  '2026-07-18T22:45:00.000Z',
   '2026-07-18T00:00:00.000Z'
 )
 ON CONFLICT(id) DO UPDATE SET
-  source_type=excluded.source_type,
-  visibility=excluded.visibility,
   title=excluded.title,
   description=excluded.description,
-  cover_object_key=excluded.cover_object_key,
-  youtube_video_id=excluded.youtube_video_id,
   duration_seconds=excluded.duration_seconds,
-  difficulty=excluded.difficulty,
-  equipment=excluded.equipment,
-  contraindications=excluded.contraindications,
   format=excluded.format,
   status=excluded.status,
   updated_at=excluded.updated_at,
