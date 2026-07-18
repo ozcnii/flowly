@@ -1,198 +1,319 @@
 # Paste prompts — exercise collages (ChatGPT image)
 
-**IMPORTANT — read before every sheet**
+**Перед каждым sheet:**
 
-1. Output **exactly one** image at the **exact pixel size** stated.
-2. Every cell is **exactly 16:9** (width:height = 16:9). **No squares.**
-3. Match style of approved **M1** collage (green set, plants, wood floor).
-4. Thin gutters only (not huge empty margins). Full body + mat inside every cell.
-5. No text, no numbers, no watermarks, no logos.
+1. Canvas size — **exact pixels** from the prompt (no “approximately”).
+2. Every cell **1008×567 = 16:9 landscape**. **Never square.**
+3. Style = approved **M1** (green set, plants, wood floor).
+4. Gutters **16px**, border **16px**. Full body + mat in every cell (~6% pad).
+5. No text, numbers, logos, watermarks.
+6. Motion sheets: **camera lock** across frames of the same exercise.
+
+**Save downloads to:** `.temp/catalog-art/input/{SHEET}.png`  
+Order: **M1 → M2 → M3 → E1 → E2 → E3 → E4**
 
 ---
 
-## Global style lock (append to every prompt)
+## Shared STYLE block (same in every prompt)
 
 ```text
-STYLE (locked — same as approved M1 sheet):
+STYLE (locked — match approved M1 collage):
 - Flat clean vector illustration, soft even light, NOT photoreal, NOT 3D
-- ONE adult woman: black hair in high bun, olive/sage-green sports bra + matching leggings
-- Barefoot on a dark green yoga mat on light wood floor
-- Cream wall background; small potted plant LEFT + small plant RIGHT in every cell (same props)
+- ONE adult woman: black hair high bun, olive/sage-green sports bra + matching leggings
+- Barefoot on dark green yoga mat, light wood floor, cream wall
+- Small potted plant LEFT + small plant RIGHT in EVERY cell (same props)
 - Soft contact shadow under body; consistent character scale across the whole collage
 - No text, no UI, no logos, no watermarks
 ```
 
 ---
 
-## Sheet M1 — motion 2×5 (DONE — reference style only)
+## Sheet M1 — motion 4×5 (4 frames × 5 exercises)
 
-**Canvas: 2048 × 2880 px** (2 cols × 5 rows of **1024 × 576** = 16:9 cells)  
-Gutters: **16 px** sage/green between cells; outer border **24 px**.
-
----
-
-## Sheet M2 — motion pairs 2×4  ← SEND THIS NEXT
-
-**Canvas: 2048 × 2304 px** exactly.  
-**Grid: 2 columns × 4 rows.**  
-**Each cell: exactly 1024 × 576 px (16:9).**  
-**Gutter: 16 px** between cells. **Outer border: 24 px** (same green as M1).
+**Canvas: 4112 × 2939**  
+**Grid: 4 cols × 5 rows** · cell **1008×567** · border/gutter **16**  
+width=16+4×1008+3×16+16=**4112** · height=16+5×567+4×16+16=**2939**
 
 ```text
-Create ONE image with EXACT canvas size 2064 × 2348 pixels.
+Create ONE image with EXACT canvas size 4112 × 2939 pixels.
 
 GRID MATH (do not invent other sizes):
 - Outer border: 16px all sides
-- Columns: 2 | Rows: 4
-- Each cell: 1008 × 567 pixels = exactly 16:9 landscape (width 1008, height 567). NEVER square.
+- Columns: 4 | Rows: 5
+- Each cell: 1008 × 567 pixels = exactly 16:9 landscape (NOT square)
 - Gutters: 16px between columns and between rows
-- Check: width = 16+1008+16+1008+16 = 2064
-- Check: height = 16+567+16+567+16+567+16+567+16 = 2348
+- Check width = 16 + 4*1008 + 3*16 + 16 = 4112
+- Check height = 16 + 5*567 + 4*16 + 16 = 2939
 
-STYLE (match approved M1 collage exactly):
-- Flat clean vector illustration, NOT photoreal, NOT 3D
-- ONE woman: black hair high bun, olive/sage green sports bra + leggings
-- Barefoot on dark green yoga mat, light wood floor, cream wall
-- Potted plant LEFT + small plant RIGHT in EVERY cell
-- No text, no numbers, no logos, no watermarks
+Each ROW = one exercise, smooth 4-frame strip left→right (f1→f2→f3→f4).
+Camera LOCK within each row: identical character scale, mat Y, floor line, plants; ONLY joints change. Full body + full mat; ~6% pad from cell edges. No sliding/hop/zoom.
 
-CAMERA LOCK within each row: identical scale, mat position, floor line; only joints change. Full body + full mat inside each cell (~6% padding from cell edges).
+STYLE (locked — match approved M1):
+- Flat clean vector, soft light, NOT photoreal, NOT 3D
+- ONE woman black high bun, olive/sage-green sports bra + leggings
+- Barefoot, dark green mat, light wood floor, cream wall
+- Plant LEFT + small plant RIGHT in EVERY cell
+- No text, numbers, logos, watermarks
 
-Row1 ex-neck-rolls (LEFT = frame A, RIGHT = frame B):
-A: standing tall side view, head neutral, arms relaxed.
-B: same feet/body, head gently tilted RIGHT (ear toward shoulder), shoulders down.
+Row1 ex-mountain: 1 arms by sides → 2 arms mid-up → 3 arms overhead → 4 arms mid-down (loop)
+Row2 ex-cat-cow: 1 full Cat → 2 neutral tabletop → 3 full Cow → 4 neutral tabletop
+Row3 ex-child: 1 arms by sides → 2 arms slightly forward → 3 arms fully forward → 4 arms slightly forward
+Row4 ex-thread-needle: 1 tabletop → 2 right arm threading → 3 full thread right / left up → 4 returning tabletop
+Row5 ex-bird-dog: 1 tabletop → 2 start extend → 3 full opposite arm+leg → 4 return tabletop
 
-Row2 ex-shoulder-rolls:
-A: standing, shoulders relaxed.
-B: same torso/feet, shoulders at peak of backward roll.
-
-Row3 ex-sun-a:
-A: mountain, arms straight overhead.
-B: standing forward fold, soft knees, SAME foot placement as A.
-
-Row4 ex-rag-doll:
-A: soft ragdoll fold, arms dangling.
-B: slightly deeper fold, same feet, arms dangling.
-
-Output exactly one collage 2064×2348; all 8 cells are 16:9 landscape panels.
+Output exactly one collage 4112×2939; all 20 cells 16:9 landscape.
 ```
+
+Save: `.temp/catalog-art/input/M1.png`
 
 ---
 
-## Sheet M3 — motion pairs 2×4
+## Sheet M2 — motion 4×4 (4 frames × 4 exercises)
 
-**Canvas: 2064 × 2348 px** (same math as M2).  
-**Cells: 1008 × 567 (16:9).** Gutters 16px, border 16px.
+**Canvas: 4112 × 2324**  
+**Grid: 4 cols × 4 rows** · cell **1008×567** · border/gutter **16**  
+height=16+4×567+3×16+16=**2324**
 
 ```text
-Create ONE image EXACT size 2064×2348 px.
-Grid: 2 cols × 4 rows; each cell 1008×567 (16:9 landscape, NOT square); border 16px; gutters 16px.
-(width=16+1008+16+1008+16=2064; height=16+4*567+3*16+16=2348)
+Create ONE image with EXACT canvas size 4112 × 2324 pixels.
+
+GRID MATH:
+- Border 16px all sides; gutters 16px
+- 4 columns × 4 rows
+- Each cell 1008 × 567 (16:9 landscape, NOT square)
+- width = 16+4*1008+3*16+16 = 4112
+- height = 16+4*567+3*16+16 = 2324
+
+Each ROW = one exercise, 4-frame strip f1→f2→f3→f4.
+Camera LOCK within each row (same scale, mat Y, floor, plants). Full body + mat. No hop/slide/zoom.
 
 STYLE: same as M1 — green set, bun, dark green mat, wood floor, cream wall, plants L/R, flat vector, no text.
 
-Camera lock per row. Full body + mat in every cell.
+Row1 ex-neck-rolls:
+1 head neutral standing → 2 head tilt right start → 3 full ear-to-shoulder right → 4 back toward neutral
 
-Row1 ex-wrist-warmup:
-A: standing/seated, hands interlaced, palms push forward at chest height.
-B: same body, wrists flexed further (clear stretch).
+Row2 ex-shoulder-rolls:
+1 shoulders relaxed → 2 shoulders lift → 3 peak roll back → 4 lower toward relaxed
 
-Row2 ex-ankle-mobility:
-A: standing on left leg, right foot slightly lifted, ankle neutral.
-B: same balance, right ankle at point/flex peak.
+Row3 ex-sun-a:
+1 mountain arms up → 2 hinge start → 3 half fold → 4 full forward fold soft knees (same feet)
 
-Row3 ex-hip-circles:
-A: standing hands on hips, pelvis center.
-B: pelvis shifted to side (circle peak), feet planted same.
+Row4 ex-rag-doll:
+1 soft fold arms dangling → 2 deeper → 3 deepest hang → 4 slightly release (loop)
 
-Row4 ex-dead-bug:
-A: on back, knees tabletop, arms toward ceiling.
-B: opposite arm + leg extended (hover), other limbs hold.
-
-Exact 2064×2348; all cells 16:9 landscape.
+Output exactly one collage 4112×2324; all 16 cells 16:9 landscape.
 ```
+
+Save: `.temp/catalog-art/input/M2.png`
 
 ---
 
-## Sheet E1 — stills 3×4
+## Sheet M3 — motion 4×4 (4 frames × 4 exercises)
 
-**Canvas: 3088 × 2324 px**  
-Cells **1008 × 567** (16:9), border 16, gutters 16.  
-width=16+3*1008+2*16+16=3088  
-height=16+4*567+3*16+16=2324
+**Canvas: 4112 × 2324** (same as M2)
 
 ```text
-Create ONE image EXACT size 3088×2324 px.
-Grid 3 cols × 4 rows; each cell 1008×567 (16:9 landscape NOT square); 16px border; 16px gutters.
+Create ONE image with EXACT canvas size 4112 × 2324 pixels.
 
-STYLE: same M1 green outfit, bun, dark green mat, wood floor, cream wall, plants L/R, flat vector, no text.
-Full body + mat in every cell.
+GRID MATH (same as M2):
+- Border 16px; gutters 16px; 4 cols × 4 rows
+- Each cell 1008 × 567 (16:9 landscape, NOT square)
+- width 4112; height 2324
 
-Row1: (1) ex-down-dog inverted V (2) ex-low-lunge back knee down (3) ex-half-split front leg straight
-Row2: (4) ex-forward-fold standing (5) ex-warrior-one arms up (6) ex-warrior-two arms horizontal
-Row3: (7) ex-triangle (8) ex-side-angle (9) ex-tree balance
-Row4: (10) ex-chair (11) ex-plank (12) ex-side-plank
+Each ROW = 4-frame motion strip. Camera LOCK per row. Full body + mat. No hop/slide.
 
-Exact 3088×2324; all cells 16:9.
+STYLE: same as M1 — green outfit, bun, dark green mat, wood floor, cream wall, plants L/R, flat vector, no text.
+
+Row1 ex-wrist-warmup:
+1 hands interlaced palms front relaxed → 2 push forward → 3 max wrist stretch → 4 slightly release
+
+Row2 ex-ankle-mobility:
+1 stand on left, right foot lifted ankle neutral → 2 point → 3 flex → 4 neutral
+
+Row3 ex-hip-circles:
+1 hands on hips pelvis center → 2 shift right → 3 shift back → 4 shift left (circle keyframes, feet planted)
+
+Row4 ex-dead-bug:
+1 on back knees tabletop arms up → 2 start extend opposite → 3 full extend hover → 4 return tabletop
+
+Output exactly one collage 4112×2324; all 16 cells 16:9 landscape.
 ```
+
+Save: `.temp/catalog-art/input/M3.png`
+
+---
+
+## Sheet E1 — stills 3×4 (12 static poses)
+
+**Canvas: 3088 × 2324**  
+**Grid: 3 cols × 4 rows** · cell **1008×567** · border/gutter **16**  
+width=16+3×1008+2×16+16=**3088** · height=**2324**
+
+```text
+Create ONE image with EXACT canvas size 3088 × 2324 pixels.
+
+GRID MATH:
+- Border 16px; gutters 16px
+- 3 columns × 4 rows
+- Each cell 1008 × 567 (16:9 landscape, NOT square)
+- width = 16+3*1008+2*16+16 = 3088
+- height = 16+4*567+3*16+16 = 2324
+
+Each cell = ONE static canonical pose (not a motion strip). Full body + full mat, ~6% pad. Same character scale across grid.
+
+STYLE: same as M1 — green set, bun, dark green mat, wood floor, cream wall, plants L/R, flat vector, no text.
+
+Row1:
+1) ex-down-dog — inverted V, hands and feet on mat, hips high
+2) ex-low-lunge — back knee down, front knee 90°, torso upright
+3) ex-half-split — front leg straight heel on mat, hips back, fold over front leg
+
+Row2:
+4) ex-forward-fold — standing, soft knees, head heavy
+5) ex-warrior-one — front knee bent, back leg straight, arms up
+6) ex-warrior-two — wide stance, front knee bent, arms horizontal
+
+Row3:
+7) ex-triangle — wide stance, hand to shin/floor, other arm up
+8) ex-side-angle — front knee bent, forearm on thigh or hand down, top arm overhead
+9) ex-tree — balance, foot on inner thigh, hands prayer or up
+
+Row4:
+10) ex-chair — knees bent as if sitting, arms up
+11) ex-plank — high plank straight body on hands and toes
+12) ex-side-plank — on one hand, body line, top arm up
+
+Output exactly one collage 3088×2324; all 12 cells 16:9 landscape.
+```
+
+Save: `.temp/catalog-art/input/E1.png`
 
 ---
 
 ## Sheet E2 — stills 3×4
 
-**Same geometry: 3088 × 2324**, cells 1008×567 16:9.
+**Canvas: 3088 × 2324** (same as E1)
 
 ```text
-Create ONE image EXACT 3088×2324. Grid 3×4, cells 1008×567 (16:9), border/gutter 16px.
-STYLE: M1 lock (green set, plants, wood floor). No text.
+Create ONE image with EXACT canvas size 3088 × 2324 pixels.
 
-Row1: boat | bridge | sphinx (FOREARMS flat on mat, low chest — not cobra)
-Row2: cobra (hands under shoulders) | locust | puppy (hips high arms forward)
-Row3: pigeon | lizard | butterfly seated
-Row4: seated fold | seated twist | supine twist (on BACK, knees to one side)
+GRID MATH: border 16; gutters 16; 3×4; each cell 1008×567 (16:9 NOT square); width 3088; height 2324.
+One static pose per cell. Full body + mat. Same character scale.
 
-Exact size; 16:9 cells only.
+STYLE: same as M1 — green set, bun, dark green mat, wood floor, cream wall, plants L/R, flat vector, no text.
+
+Row1:
+1) ex-boat — sit bones, legs lifted, arms forward
+2) ex-bridge — on back, hips lifted, feet planted
+3) ex-sphinx — on belly, BOTH FOREARMS flat on mat, low chest lift (NOT straight-arm cobra)
+
+Row2:
+4) ex-cobra — hands under shoulders, elbows soft, chest higher than sphinx
+5) ex-locust — on belly, chest and legs lifted, arms by sides
+6) ex-puppy — knees under hips, arms long forward, chest melting, hips high
+
+Row3:
+7) ex-pigeon — front shin on mat, back leg extended
+8) ex-lizard — low lunge, hands inside front foot
+9) ex-butterfly — seated soles together, knees open, tall spine
+
+Row4:
+10) ex-seated-fold — legs extended, torso folds over
+11) ex-seated-twist — seated spinal twist
+12) ex-supine-twist — ON BACK, both knees stacked to one side, arms in T
+
+Output exactly one collage 3088×2324; all cells 16:9. Sphinx must show forearms on floor.
 ```
+
+Save: `.temp/catalog-art/input/E2.png`
 
 ---
 
 ## Sheet E3 — stills 3×4
 
-**3088 × 2324**, cells 1008×567.
+**Canvas: 3088 × 2324**
 
 ```text
-Create ONE image EXACT 3088×2324. Grid 3×4, each cell 1008×567 16:9, gutters 16.
-STYLE: M1 lock. No text.
+Create ONE image with EXACT canvas size 3088 × 2324 pixels.
 
-Row1: happy baby | legs up wall | savasana
-Row2: box-breath meditation seat | long-exhale same seat softer | crocodile prone
-Row3: tabletop balance (one limb lifted) | knee hugs on back | reclined hamstring
-Row4: figure-four on back | standing calf stretch | eagle arms
+GRID MATH: border 16; gutters 16; 3×4; each cell 1008×567 (16:9 NOT square); width 3088; height 2324.
+One static pose per cell. Full body + mat.
 
-Exact 3088×2324; 16:9 cells.
+STYLE: same as M1 — green set, bun, dark green mat, wood floor, cream wall, plants L/R, flat vector, no text.
+
+Row1:
+1) ex-happy-baby — on back, hold outer feet, knees open
+2) ex-legs-wall — on back, legs vertical up
+3) ex-savasana — fully supine, arms relaxed palms up
+
+Row2:
+4) ex-box-breath — easy cross-legged meditation seat, hands on knees
+5) ex-long-exhale — same seat, softer shoulders (same framing as box-breath)
+6) ex-crocodile — prone, forehead on stacked hands
+
+Row3:
+7) ex-tabletop-balance — all fours, one arm OR one leg slightly lifted
+8) ex-knee-hugs — on back, hug both knees to chest
+9) ex-reclined-hamstring — on back, one leg extended up held gently
+
+Row4:
+10) ex-figure-four — on back, ankle on opposite knee
+11) ex-calf-stretch — standing, back heel down
+12) ex-eagle-arms — standing, arms wrapped elbows stacked
+
+Output exactly one collage 3088×2324; all cells 16:9 landscape.
 ```
+
+Save: `.temp/catalog-art/input/E3.png`
 
 ---
 
 ## Sheet E4 — stills 3×4
 
-**3088 × 2324**, cells 1008×567.
+**Canvas: 3088 × 2324**
 
 ```text
-Create ONE image EXACT 3088×2324. Grid 3×4, cells 1008×567 16:9, gutters 16.
-STYLE: M1 lock. No text.
+Create ONE image with EXACT canvas size 3088 × 2324 pixels.
 
-Row1: garland/malasana | wide fold | half moon
-Row2: dancer prep | crescent high lunge | humble warrior
-Row3: prasarita wide fold | forearm plank | dolphin
-Row4: seated side bend | meditation seat | EMPTY solid cream cell (no character)
+GRID MATH: border 16; gutters 16; 3×4; each cell 1008×567 (16:9 NOT square); width 3088; height 2324.
+One static pose per cell. Full body + mat (except empty cell).
 
-Exact size; 16:9 cells.
+STYLE: same as M1 — green set, bun, dark green mat, wood floor, cream wall, plants L/R, flat vector, no text.
+
+Row1:
+1) ex-garland — Malasana squat, hands in prayer
+2) ex-wide-fold — feet wide, torso folds
+3) ex-half-moon — balance on one hand and foot, other limbs lifted
+
+Row2:
+4) ex-dancer-prep — standing, hold one foot behind, other arm forward
+5) ex-crescent — high lunge, back knee off floor, arms up
+6) ex-humble-warrior — warrior stance, torso folded, hands clasped behind
+
+Row3:
+7) ex-prasarita — wide-legged forward fold (canonical)
+8) ex-forearm-plank — elbows under shoulders, body straight
+9) ex-dolphin — forearms down, hips up inverted V
+
+Row4:
+10) ex-side-bend — seated, one arm overhead, lean sideways
+11) ex-meditation-seat — easy cross-legged, tall spine
+12) EMPTY — solid cream wall color only, no character, no mat (placeholder cell)
+
+Output exactly one collage 3088×2324; all non-empty cells 16:9 landscape.
 ```
+
+Save: `.temp/catalog-art/input/E4.png`
 
 ---
 
 ## After download
 
-Save as `.temp/catalog-art/input/M2.png` (or E1… / M3…).  
-Agent runs gutter-aware slice → GIF/webp.
+| File | Contents |
+|------|----------|
+| `M1.png` | 5 exercises × 4 frames → GIF |
+| `M2.png` | neck, shoulders, sun-a, rag-doll × 4 frames → GIF |
+| `M3.png` | wrists, ankles, hips, dead-bug × 4 frames → GIF |
+| `E1–E4.png` | static poses → webp |
+
+Agent: gutter-aware slice + multi-frame GIF assembly. Say **«M1 done»** / **«E1 done»** etc.

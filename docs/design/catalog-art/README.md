@@ -12,20 +12,22 @@ We lock style in `STYLE_BIBLE.md` and generate **collages** in ChatGPT (your acc
 ## Workflow
 
 1. Open [ChatGPT](https://chatgpt.com) (you log in).
-2. Paste prompts from `PROMPT_EXERCISES.md` then `PROMPT_COVERS.md` **one sheet at a time**.
-3. Download each collage PNG into:
+2. Paste prompts from `PROMPT_EXERCISES.md` then `PROMPT_COVERS.md` **one sheet at a time** (order **M1→M2→M3→E1→E4→C1→C2**).
+3. Every prompt has **exact canvas px** and **1008×567 (16:9) cells**. Reject square outputs.
+4. Download each collage PNG into:
 
 ```text
-.temp/catalog-art/input/E1.png … E4.png
-.temp/catalog-art/input/M1.png … M3.png
-.temp/catalog-art/input/C1.png C2.png
+.temp/catalog-art/input/M1.png … M3.png   # multi-frame motion (4 frames/row)
+.temp/catalog-art/input/E1.png … E4.png   # static stills
+.temp/catalog-art/input/C1.png C2.png     # covers (same style, not photos)
 ```
 
-4. Slice + export:
+5. Tell agent «M1 done» / «E2 done» — gutter-aware slice → GIF (multi-frame) / webp.
+
+Optional local tools:
 
 ```bash
-node scripts/slice-catalog-art.mjs           # exercises
-node scripts/slice-catalog-art.mjs --covers  # covers
+node scripts/slice-catalog-art.mjs --all
 ```
 
 5. Spot-check GIF pairs (A/B alignment). Re-roll only the bad **sheet**.
