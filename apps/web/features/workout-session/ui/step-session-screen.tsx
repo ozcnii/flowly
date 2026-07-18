@@ -1,6 +1,6 @@
 "use client";
 
-import { BlockTitle, Button, Card, Preloader } from "konsta/react";
+import { Button, Card, Preloader } from "konsta/react";
 import Image from "next/image";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
@@ -302,7 +302,7 @@ export function StepSessionScreen({ id }: { id: string }) {
 
   return <>
     <Shell rootRef={backgroundRef}>
-      <BlockTitle component="h1" large className="!m-0 !p-0">{session.workout.title}</BlockTitle>
+      {/* Workout name lives on detail/start; during step runtime primary = current exercise (navbar stays «Тренировка»). */}
       <Card component="section" contentWrap={false} outline className="m-0 overflow-hidden">
         {phase === "done" ? <div className="relative grid gap-3 overflow-hidden p-4">
           <CelebrationBurst active={celebrating} />
