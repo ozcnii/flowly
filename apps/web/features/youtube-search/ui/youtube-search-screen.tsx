@@ -51,7 +51,8 @@ function ResultCard({ result, filters, onPlay, initialSaved = false, eager = fal
     onOpen={open.isPending ? undefined : () => void openWorkout()}
     onPlay={(trigger) => onPlay({ videoId: result.videoId, title: result.title, trigger })}
     actions={<Button inline clear={!isSaved} tonal={isSaved} rounded disabled={save.isPending || isSaved} aria-busy={save.isPending || undefined} aria-label={isSaved ? `«${result.title}» сохранено` : `Сохранить «${result.title}»`} title={isSaved ? "Сохранено" : "Сохранить"} className={`h-11 w-11 min-w-11 p-0 ${focusRing}`} onClick={submit}>{save.isPending ? <Preloader className="size-4" /> : <Icon name={isSaved ? "check" : "bookmark"} />}<span className="sr-only" aria-live="polite">{isSaved ? "Сохранено" : "Сохранить"}</span></Button>}
-    status={open.isPending ? <p className="m-0 text-sm text-text-muted" role="status">Открываем тренировку…</p> : open.isError ? <p className="m-0 text-sm text-danger" role="alert">Не удалось открыть тренировку. Повторите позже.</p> : save.isError ? <p className="m-0 text-sm text-danger" role="alert">Не удалось сохранить. Повторите позже.</p> : undefined}
+    pending={open.isPending}
+    error={open.isError ? "Не удалось открыть тренировку" : save.isError ? "Не удалось сохранить" : undefined}
   />;
 }
 

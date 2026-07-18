@@ -14,7 +14,7 @@ export type CatalogWorkout = {
   categories: CatalogCategory[];
 };
 export type CatalogResponse = { filters: Record<string, string>; total: number; categories: CatalogCategory[]; workouts: CatalogWorkout[]; explanation: string | null };
-export type WorkoutExercise = { id: string; position: number; title: string; description: string; mediaObjectKey: string | null; mediaType: string | null; durationSeconds: number | null; repetitions: number | null; plannedDurationSeconds: number | null };
+export type WorkoutExercise = { id: string; position: number; title: string; description: string; mediaObjectKey: string | null; mediaType: string | null; durationSeconds: number | null; repetitions: number | null; restSeconds: number | null; plannedDurationSeconds: number | null };
 export type WorkoutAction = { enabled: boolean; reason: string };
 export type WorkoutDetail = CatalogWorkout & {
   visibility: string;

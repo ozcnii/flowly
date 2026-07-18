@@ -1,25 +1,24 @@
 "use client";
 
-import { BlockTitle, Button, Card, List, ListInput, ListItem, Navbar, Preloader, Radio, Sheet } from "konsta/react";
+import { BlockTitle, Button, Card, Preloader } from "konsta/react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { Icon } from "@flowly/ui";
-import { ModalPortal } from "@/components/modal-portal";
 import { PrimaryNavbar } from "@/components/shell/primary-navbar";
-import { useModalFocus } from "@/components/use-modal-focus";
 import { YoutubeIframePlayer, type YoutubePlayerHandle } from "@/components/youtube/youtube-iframe-player";
 import { ApiError } from "@/lib/api/client";
 import { advanceLocalCheckpoint, readLocalCheckpoint, rebaseLocalCheckpoint, removeLocalCheckpoint, replaceLocalCheckpoint, type LocalCheckpoint } from "../model/local-checkpoint";
-import { FINAL_STATUSES, FINAL_STATUS_LABELS, formatSessionDuration, type CheckpointConflict, type FinalStatus, type WorkoutSession } from "../model/workout-session";
+import { FINAL_STATUS_LABELS, formatSessionDuration, type CheckpointConflict, type FinalStatus, type WorkoutSession } from "../model/workout-session";
 import { checkpointWorkoutSession, useCheckpointWorkoutSessionMutation, useFinishWorkoutSessionMutation, useWorkoutSessionQuery } from "../model/workout-session-queries";
+import { FinishSessionSheet, SyncConflictSheet } from "./session-sheets";
 
 type SyncConflict = { local: LocalCheckpoint; server: WorkoutSession };
 const conflictBody = (error: unknown): CheckpointConflict | null => error instanceof ApiError && error.status === 409 && typeof error.body === "object" && error.body !== null && "error" in error.body && error.body.error === "checkpoint_conflict" ? error.body as CheckpointConflict : null;
 
 export function VideoSessionScreen({ id }: { id: string }) {
   const router = useRouter(), query = useWorkoutSessionQuery(id), checkpoint = useCheckpointWorkoutSessionMutation(id), finish = useFinishWorkoutSessionMutation(id), backgroundRef = useRef<HTMLDivElement>(null), playerRef = useRef<YoutubePlayerHandle>(null), finishSheetRef = useRef<HTMLElement>(null), conflictSheetRef = useRef<HTMLElement>(null), initialized = useRef(""), tokenRef = useRef(""), secondsRef = useRef(0), playbackRef = useRef(0), segmentRef = useRef<number | null>(null), playingRef = useRef(false), playerReadyRef = useRef(false), syncingRef = useRef(false), finishingRef = useRef(false), mountedRef = useRef(true);
-  const [seconds, setSeconds] = useState(0), [playing, setPlaying] = useState(false), [ready, setReady] = useState(false), [playerError, setPlayerError] = useState(false), [syncState, setSyncState] = useState<"synced" | "offline" | "storage-error">("synced"), [finishOpened, setFinishOpened] = useState(false), [commentOpened, setCommentOpened] = useState(false), [status, setStatus] = useState<FinalStatus | null>("completed"), [comment, setComment] = useState(""), [conflict, setConflict] = useState<SyncConflict | null>(null);
+  const [seconds, setSeconds] = useState(0), [playing, setPlaying] = useState(false), [ready, setReady] = useState(false), [playerError, setPlayerError] = useState(false), [syncState, setSyncState] = useState<"synced" | "offline" | "storage-error">("synced"), [finishOpened, setFinishOpened] = useState(false), [conflict, setConflict] = useState<SyncConflict | null>(null);
   const currentSeconds = useCallback(() => Math.max(0, Math.round(secondsRef.current + (segmentRef.current == null ? 0 : (performance.now() - segmentRef.current) / 1000))), []);
   const currentPlayback = useCallback(() => Math.max(0, Math.round(playerReadyRef.current ? playerRef.current?.currentTime() ?? playbackRef.current : playbackRef.current)), []);
   const restorePlayback = useCallback((value: number) => { playbackRef.current = Math.max(0, Math.round(value)); if (playerReadyRef.current) playerRef.current?.seekTo(playbackRef.current); }, []);
@@ -55,10 +54,7 @@ export function VideoSessionScreen({ id }: { id: string }) {
       else if (mountedRef.current && readLocalCheckpoint(id)) setSyncState("offline");
     } finally { syncingRef.current = false; }
   }, [applyServer, checkpoint, currentPlayback, currentSeconds, id, persist, restorePlayback, stopClock]);
-  const closeFinish = useCallback(() => { if (finish.isPending) return; finishingRef.current = false; setFinishOpened(false); setCommentOpened(false); setStatus("completed"); setComment(""); void sync(true); }, [finish.isPending, sync]);
-  const keepConflictOpen = useCallback(() => undefined, []);
-  useModalFocus(finishOpened, finishSheetRef, backgroundRef, closeFinish);
-  useModalFocus(Boolean(conflict), conflictSheetRef, backgroundRef, keepConflictOpen);
+  const finishClose = useCallback(() => { finishingRef.current = false; setFinishOpened(false); void sync(true); }, [sync]);
 
   useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
   useEffect(() => {
@@ -98,10 +94,10 @@ export function VideoSessionScreen({ id }: { id: string }) {
     if (playingRef.current) stopClock();
     if (!finishingRef.current && (state === 0 || state === 2)) void sync(true);
   };
-  const openFinish = () => { finishingRef.current = true; playerRef.current?.pause(); persist(stopClock(), true); setStatus("completed"); setComment(""); setCommentOpened(false); setFinishOpened(true); };
-  const submitFinish = async () => {
-    if (!status || checkpoint.isPending) return;
-    try { await finish.mutateAsync({ accumulatedSeconds: currentSeconds(), playbackPositionSeconds: currentPlayback(), finalStatus: status, comment: comment.trim() || undefined, baseUpdatedAt: tokenRef.current }); removeLocalCheckpoint(id); setFinishOpened(false); router.push(`/calendar` as never); }
+  const openFinish = () => { finishingRef.current = true; playerRef.current?.pause(); persist(stopClock(), true); setFinishOpened(true); };
+  const submitFinish = async (status: FinalStatus, comment: string) => {
+    if (checkpoint.isPending) return;
+    try { await finish.mutateAsync({ accumulatedSeconds: currentSeconds(), playbackPositionSeconds: currentPlayback(), finalStatus: status, comment: comment || undefined, baseUpdatedAt: tokenRef.current }); removeLocalCheckpoint(id); setFinishOpened(false); router.push(`/calendar` as never); }
     catch (error) { const body = conflictBody(error); if (body) { const local = readLocalCheckpoint(id) ?? persist(currentSeconds(), true); if (local) { setFinishOpened(false); setConflict({ local, server: body.session }); } } }
   };
   const useServer = () => { if (conflict) applyServer(conflict.server); };
@@ -126,32 +122,14 @@ export function VideoSessionScreen({ id }: { id: string }) {
           <p className="m-0 min-h-5 text-center text-sm text-text-muted" role="status" aria-live="polite">{statusText}</p>
           <div className="grid gap-2 sm:grid-cols-2">
             <Button large rounded tonal className="gap-2" disabled={!ready || playerError || Boolean(conflict)} onClick={playing ? () => playerRef.current?.pause() : () => playerRef.current?.play()}><Icon name={playing ? "pause" : "play"} />{playing ? "Пауза" : "Продолжить"}</Button>
-            <Button large rounded className="gap-2" disabled={Boolean(conflict)} onClick={openFinish}><Icon name="square" />Завершить</Button>
+            <Button large rounded outline colors={{ textIos: "text-danger", outlineBorderIos: "border-danger" }} className="gap-2" disabled={Boolean(conflict)} onClick={openFinish}><Icon name="square" />Завершить</Button>
           </div>
         </div>
       </Card>
     </Shell>
 
-    <ModalPortal>
-      {finishOpened && <Sheet ref={finishSheetRef} opened backdrop onBackdropClick={closeFinish} className="flex max-h-[88dvh] max-w-full flex-col" role="dialog" aria-modal="true" aria-labelledby="finish-session-title">
-        <Navbar title={<span id="finish-session-title">Завершить тренировку</span>} />
-        <div className="min-h-0 min-w-0 overflow-x-hidden overflow-y-auto py-2">
-          <List strong dividers className="!m-0">{FINAL_STATUSES.map((item) => <ListItem key={item} label title={FINAL_STATUS_LABELS[item]} after={<Radio component="div" name="final-status" checked={status === item} onChange={() => setStatus(item)} />} />)}</List>
-          {!commentOpened ? <Button clear rounded className="mx-4 mt-2 w-[calc(100%_-_2rem)] min-w-0 gap-2 whitespace-normal" onClick={() => setCommentOpened(true)}><Icon name="plus" />Добавить комментарий</Button> : <List strong inset className="!my-2"><ListInput title="" outline type="text" label="Комментарий (необязательно)" value={comment} maxLength={1000} onInput={(event) => setComment(event.currentTarget.value)} /></List>}
-          {finish.isError && <p className="m-4 text-sm text-danger" role="alert">Не удалось сохранить результат. Выбор и комментарий не потеряны.</p>}
-        </div>
-        <div className="grid grid-cols-2 gap-2 border-t border-border p-4 pb-safe-6"><Button clear rounded disabled={finish.isPending} onClick={closeFinish}>Отмена</Button><Button large rounded disabled={!status || finish.isPending || checkpoint.isPending} onClick={() => void submitFinish()}>{finish.isPending ? "Сохраняем…" : "Готово"}</Button></div>
-      </Sheet>}
-      {conflict && <Sheet ref={conflictSheetRef} opened backdrop className="flex max-h-[80dvh] max-w-full flex-col" role="dialog" aria-modal="true" aria-labelledby="sync-conflict-title">
-        <Navbar title={<span id="sync-conflict-title">Где продолжить?</span>} />
-        <div className="grid gap-4 p-4">
-          <p className="m-0 text-sm leading-relaxed text-text-muted">Есть два разных сохранения тренировки. Выберите нужное — автоматически объединять их небезопасно.</p>
-          <List strong inset dividers className="!m-0"><ListItem title="На сервере" after={formatSessionDuration(conflict.server.accumulatedSeconds)} /><ListItem title="На этом устройстве" after={formatSessionDuration(conflict.local.accumulatedSeconds)} /></List>
-          <Button large rounded tonal disabled={checkpoint.isPending} onClick={useServer}>Продолжить с сервера</Button>
-          <Button large rounded disabled={checkpoint.isPending} onClick={() => void selectDevice()}>Продолжить с этого устройства</Button>
-        </div>
-      </Sheet>}
-    </ModalPortal>
+    <FinishSessionSheet opened={finishOpened} sheetRef={finishSheetRef} backgroundRef={backgroundRef} finishPending={finish.isPending} checkpointPending={checkpoint.isPending} finishError={finish.isError} onClose={finishClose} onSubmit={(status, comment) => void submitFinish(status, comment)} />
+    <SyncConflictSheet conflict={conflict ? { localSeconds: conflict.local.accumulatedSeconds, serverSeconds: conflict.server.accumulatedSeconds } : null} sheetRef={conflictSheetRef} backgroundRef={backgroundRef} pending={checkpoint.isPending} onUseServer={useServer} onSelectDevice={selectDevice} />
   </>;
 }
 

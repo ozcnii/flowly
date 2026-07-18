@@ -193,6 +193,7 @@ export const workoutSessions = sqliteTable(
     completedAt: text("completed_at"),
     finalStatus: text("final_status"),
     currentExercisePosition: integer("current_exercise_position"),
+    mode: text("mode"),
     createdAt: text("created_at").notNull(),
     updatedAt: text("updated_at").notNull(),
   },

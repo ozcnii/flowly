@@ -6,7 +6,7 @@ import { getDb } from "@/lib/cloudflare";
 import starterCatalog from "../../../../../../../seeds/catalog/starter-catalog.v1.json";
 
 type Category = { id: string; slug: string; name: string; icon: string; sortOrder: number; isActive: boolean };
-type Exercise = { id: string; title: string; description: string; mediaObjectKey: string | null; mediaType: string | null; durationSeconds: number | null; repetitions: number | null };
+type Exercise = { id: string; title: string; description: string; mediaObjectKey: string | null; mediaType: string | null; durationSeconds: number | null; repetitions: number | null; restSeconds: number | null; plannedDurationSeconds: number | null };
 type WorkoutDetail = {
   id: string;
   title: string;
@@ -27,8 +27,8 @@ type WorkoutDetail = {
 };
 
 const parseJsonArray = (value: string) => { try { const parsed = JSON.parse(value) as unknown; return Array.isArray(parsed) ? parsed.map(String) : []; } catch { return []; } };
-const actionsFor = (sourceType: string, format: string, youtubeVideoId: string | null | undefined): WorkoutDetail["actions"] => ({
-  start: format === "video" && youtubeVideoId ? { enabled: true, reason: "Видео готово к запуску." } : { enabled: false, reason: "Для этой тренировки пока нет исполняемого видео." },
+const actionsFor = (sourceType: string, format: string, youtubeVideoId: string | null | undefined, exerciseCount: number): WorkoutDetail["actions"] => ({
+  start: format === "video" && youtubeVideoId ? { enabled: true, reason: "Видео готово к запуску." } : (format === "step_by_step" || format === "mixed") && exerciseCount > 0 ? { enabled: true, reason: "Готово к пошаговому выполнению." } : { enabled: false, reason: "Для этой тренировки пока нет исполняемого содержания." },
   favorite: { enabled: false, reason: "Сохранение будет доступно позже." },
   share: { enabled: false, reason: "Поделиться можно будет позже." },
   report: { enabled: false, reason: sourceType === "user" ? "Можно пожаловаться на пользовательский контент." : "Жалобы доступны только для пользовательского контента." },
@@ -67,10 +67,10 @@ async function loadFromD1(id: string, userId: string | null): Promise<WorkoutDet
     categories: links.map((l) => categoryById.get(l.categoryId)).filter((c): c is typeof categories[number] => Boolean(c)).sort((a, b) => a.sortOrder - b.sortOrder).map((c) => ({ id: c.id, slug: c.slug, name: c.name, icon: c.icon })),
     exercises: exerciseLinks.sort((a, b) => a.position - b.position).map((link) => {
       const e = exerciseById.get(link.exerciseId);
-      return { id: link.exerciseId, position: link.position, title: e?.title ?? "Упражнение", description: e?.description ?? "Инструкция будет добавлена позже.", mediaObjectKey: e?.mediaObjectKey ?? null, mediaType: e?.mediaType ?? null, durationSeconds: e?.defaultDurationSeconds ?? null, repetitions: e?.defaultRepetitions ?? null, plannedDurationSeconds: link.durationSeconds };
+      return { id: link.exerciseId, position: link.position, title: e?.title ?? "Упражнение", description: e?.description ?? "Инструкция будет добавлена позже.", mediaObjectKey: e?.mediaObjectKey ?? null, mediaType: e?.mediaType ?? null, durationSeconds: e?.defaultDurationSeconds ?? null, repetitions: link.repetitions ?? e?.defaultRepetitions ?? null, restSeconds: link.restSeconds ?? null, plannedDurationSeconds: link.durationSeconds };
     }),
     author: { name: sourceType === "youtube" ? "YouTube" : sourceType === "user" ? "Автор Flowly" : "Flowly", type: sourceType },
-    actions: actionsFor(sourceType, workout.format, workout.youtubeVideoId),
+    actions: actionsFor(sourceType, workout.format, workout.youtubeVideoId, exerciseLinks.length),
   };
 }
 
@@ -101,10 +101,10 @@ function loadDevFallback(id: string): WorkoutDetail | null {
     categories: workout.categories.map((slug) => bySlug.get(slug)).filter((c): c is typeof catalog.categories[number] => Boolean(c)).map((c) => ({ id: c.id, slug: c.slug, name: c.name, icon: c.icon })),
     exercises: workout.exercises.map((exerciseId, index) => {
       const e = byExercise.get(exerciseId);
-      return { id: exerciseId, position: index + 1, title: e?.title ?? "Упражнение", description: e?.description ?? "Инструкция будет добавлена позже.", mediaObjectKey: e ? `catalog/exercises/${e.id}.webp` : null, mediaType: e?.mediaType ?? null, durationSeconds: e?.duration ?? null, repetitions: e?.repetitions ?? null, plannedDurationSeconds: e?.duration ?? null };
+      return { id: exerciseId, position: index + 1, title: e?.title ?? "Упражнение", description: e?.description ?? "Инструкция будет добавлена позже.", mediaObjectKey: e ? `catalog/exercises/${e.id}.webp` : null, mediaType: e?.mediaType ?? null, durationSeconds: e?.duration ?? null, repetitions: e?.repetitions ?? null, restSeconds: null, plannedDurationSeconds: e?.duration ?? null };
     }),
     author: { name: sourceType === "youtube" ? "YouTube" : sourceType === "user" ? "Автор Flowly" : "Flowly", type: sourceType },
-    actions: actionsFor(sourceType, workout.format, workout.youtubeVideoId),
+    actions: actionsFor(sourceType, workout.format, workout.youtubeVideoId, workout.exercises.length),
   };
 }
 

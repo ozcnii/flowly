@@ -4,7 +4,7 @@ import { Badge, BlockTitle, Button, Card, List, ListItem, Preloader, Progressbar
 import Image from "next/image";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
-import { useSyncExternalStore } from "react";
+import { useSyncExternalStore, useState } from "react";
 import { Icon } from "@flowly/ui";
 import { GlassIconButton } from "@/components/glass-icon-button";
 import { IMAGE_BLUR_DATA_URL } from "@/lib/image";
@@ -33,7 +33,7 @@ export function HomeScreen({ data, scenario = "base" }: Props) {
       <div className="grid gap-3 p-4">
         <div className="flex min-w-0 items-center justify-between gap-3"><Badge>Можно продолжить</Badge>{activeSession && <span className="shrink-0 text-sm tabular-nums text-text-muted">{formatSessionDuration(resumeSeconds)}</span>}</div>
         <div className="grid min-w-0 grid-cols-[6rem_minmax(0,1fr)] items-center gap-3">
-          <Image src={activeSession ? `https://i.ytimg.com/vi/${activeSession.workout.youtubeVideoId}/hqdefault.jpg` : data.resume.image} alt={activeSession ? `Практика «${activeSession.workout.title}»` : "Мягкая практика для спины"} width={96} height={54} loading="eager" decoding="sync" placeholder="blur" blurDataURL={IMAGE_BLUR_DATA_URL} unoptimized={Boolean(activeSession)} className="aspect-video w-24 rounded-xl object-cover" />
+          <ResumeCover src={activeSession ? `https://i.ytimg.com/vi/${activeSession.workout.youtubeVideoId}/hqdefault.jpg` : data.resume.image} alt={activeSession ? `Практика «${activeSession.workout.title}»` : "Мягкая практика для спины"} unoptimized={Boolean(activeSession)} />
           <div className="min-w-0"><h2 className="m-0 line-clamp-2 text-base font-semibold leading-snug" title={activeSession?.workout.title ?? data.resume.title}>{activeSession?.workout.title ?? data.resume.title}</h2><p className="m-0 mt-1 text-sm text-text-muted">{activeSession ? "Открытая сессия" : data.resume.meta}</p></div>
         </div>
         <Button component={NextLink} href={activeSession ? `/sessions/${activeSession.id}` : "/workouts/wo-back-soft-15"} large rounded>Продолжить</Button>
@@ -79,6 +79,12 @@ export function HomeScreen({ data, scenario = "base" }: Props) {
 
     <Button component={NextLink} href="/catalog" large rounded className="gap-2"><Icon name="play" />Начать тренировку</Button>
   </div>;
+}
+
+function ResumeCover({ src, alt, unoptimized }: { src: string; alt: string; unoptimized: boolean }) {
+  const [errored, setErrored] = useState(false);
+  if (errored) return <div className="grid aspect-video w-24 place-items-center rounded-xl bg-accent-soft" aria-hidden="true"><Icon name="dumbbell" className="size-5 text-text-muted" /></div>;
+  return <Image src={src} alt={alt} width={96} height={54} loading="eager" decoding="sync" placeholder="blur" blurDataURL={IMAGE_BLUR_DATA_URL} unoptimized={unoptimized} className="aspect-video w-24 rounded-xl object-cover" onError={() => setErrored(true)} />;
 }
 
 function HomeHeader() {
