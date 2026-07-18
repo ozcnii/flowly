@@ -112,20 +112,28 @@ const COVER_SHEETS = {
   },
 };
 
-async function sliceGrid(path, cols, rows) {
+/**
+ * Equal grid with outer border + inset (simple path).
+ * Prefer scripts/reslice-m1-gutter.py style detection for ChatGPT collages with gutters.
+ */
+async function sliceGrid(path, cols, rows, { outerFrac = 0.02, insetFrac = 0.07 } = {}) {
   if (!existsSync(path)) throw new Error(`missing ${path}`);
   const img = sharp(path);
   const meta = await img.metadata();
   const W = meta.width, H = meta.height;
   if (!W || !H) throw new Error(`bad size ${path}`);
-  const cw = Math.floor(W / cols), ch = Math.floor(H / rows);
+  const ox = Math.round(W * outerFrac), oy = Math.round(H * outerFrac);
+  const iw = W - ox * 2, ih = H - oy * 2;
+  const cw = iw / cols, ch = ih / rows;
   const cells = [];
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
-      const buf = await sharp(path)
-        .extract({ left: c * cw, top: r * ch, width: cw, height: ch })
-        .png()
-        .toBuffer();
+      const ix = Math.round(cw * insetFrac), iy = Math.round(ch * insetFrac);
+      const left = Math.round(ox + c * cw + ix);
+      const top = Math.round(oy + r * ch + iy);
+      const width = Math.round(cw - ix * 2);
+      const height = Math.round(ch - iy * 2);
+      const buf = await sharp(path).extract({ left, top, width, height }).png().toBuffer();
       cells.push(buf);
     }
   }
