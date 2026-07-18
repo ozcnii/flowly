@@ -69,6 +69,26 @@ Save: `.temp/catalog-art/input/wo-standing-18.png`
 
 ---
 
+## Program covers (E3-D4-T01) — 6 system tracks
+
+**Aspect for program cards: 16:9** (cards use `aspect-video`). Workout covers may stay 1:1; program heroes are landscape.
+
+Output path: `apps/web/public/media/programs/{programId}.webp` (~960×540 webp).  
+Seed `cover_object_key`: `programs/{programId}.webp`.
+
+| id | Program | Pose intent (must read at card size) |
+|----|---------|--------------------------------------|
+| `pr-soft-start-7` | Мягкий старт | easy seated, soft welcoming beginner energy |
+| `pr-back-care-7` | Гибкая спина | spinal twist / cat-cow — **back/spine readable** |
+| `pr-evening-unwind-7` | Вечернее заземление | restorative recline / evening fold |
+| `pr-morning-rhythm-14` | Утренний ритм | standing arms up, bright morning energy |
+| `pr-mobility-14` | Мобильность всего тела | hip opener / side stretch, mobility |
+| `pr-full-body-30` | Полный ритм · 30 дней | warrior / strong full-body balance |
+
+Use photoreal ivory/sage studio DNA; **no text on image**. Pose must match program theme.
+
+---
+
 ## Historical — unused flat-vector collage path (do not use for production covers)
 
 <details>

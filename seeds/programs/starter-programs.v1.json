@@ -4,151 +4,607 @@
       "id": "pr-soft-start-7",
       "title": "Мягкий старт",
       "description": "Неделя коротких практик без перегруза: утро, спина, вечер и два дня отдыха. Подходит, если йога только начинается.",
-      "coverObjectKey": "home-program.webp",
+      "coverObjectKey": "programs/pr-soft-start-7.webp",
       "durationDays": 7,
       "category": "beginner",
       "isSystem": true,
       "goal": "Войти в привычку без боли и спешки",
       "days": [
-        { "day": 1, "type": "workout", "workoutId": "wo-morning-10", "title": "Утро за 10 минут", "description": "Лёгкое пробуждение тела." },
-        { "day": 2, "type": "workout", "workoutId": "wo-lower-back-10", "title": "Поясница: мягко", "description": "Бережная работа с низом спины." },
-        { "day": 3, "type": "rest", "title": "Отдых", "description": "Восстановление. Можно короткая прогулка." },
-        { "day": 4, "type": "workout", "workoutId": "wo-evening-sleep-12", "title": "Перед сном", "description": "Снижаем тонус перед сном." },
-        { "day": 5, "type": "workout", "workoutId": "wo-wrists-safe-13", "title": "Без нагрузки на запястья", "description": "Мягкая мобильность без упоров." },
-        { "day": 6, "type": "rest", "title": "Отдых", "description": "Слушайте тело." },
-        { "day": 7, "type": "workout", "workoutId": "wo-stretch-evening-20", "title": "Вечерняя растяжка", "description": "Закрытие недели длинной растяжкой." }
+        {
+          "day": 1,
+          "type": "workout",
+          "workoutId": "wo-morning-10",
+          "title": "Утро за 10 минут",
+          "description": "Лёгкое пробуждение тела."
+        },
+        {
+          "day": 2,
+          "type": "workout",
+          "workoutId": "wo-lower-back-10",
+          "title": "Поясница: мягко",
+          "description": "Бережная работа с низом спины."
+        },
+        {
+          "day": 3,
+          "type": "rest",
+          "title": "Отдых",
+          "description": "Восстановление. Можно короткая прогулка."
+        },
+        {
+          "day": 4,
+          "type": "workout",
+          "workoutId": "wo-evening-sleep-12",
+          "title": "Перед сном",
+          "description": "Снижаем тонус перед сном."
+        },
+        {
+          "day": 5,
+          "type": "workout",
+          "workoutId": "wo-wrists-safe-13",
+          "title": "Без нагрузки на запястья",
+          "description": "Мягкая мобильность без упоров."
+        },
+        {
+          "day": 6,
+          "type": "rest",
+          "title": "Отдых",
+          "description": "Слушайте тело."
+        },
+        {
+          "day": 7,
+          "type": "workout",
+          "workoutId": "wo-stretch-evening-20",
+          "title": "Вечерняя растяжка",
+          "description": "Закрытие недели длинной растяжкой."
+        }
       ]
     },
     {
       "id": "pr-back-care-7",
       "title": "Гибкая спина",
       "description": "Семь дней фокуса на спине, плечах и осанке. Чередование мягких и чуть более активных практик со днём отдыха.",
-      "coverObjectKey": "home-program.webp",
+      "coverObjectKey": "programs/pr-back-care-7.webp",
       "durationDays": 7,
       "category": "back",
       "isSystem": true,
       "goal": "Снять зажимы и вернуть подвижность позвоночнику",
       "days": [
-        { "day": 1, "type": "workout", "workoutId": "wo-lower-back-10", "title": "Поясница: мягко", "description": "Старт с бережной поясницы." },
-        { "day": 2, "type": "workout", "workoutId": "wo-back-soft-15", "title": "Мягкая спина", "description": "Расслабление вдоль позвоночника." },
-        { "day": 3, "type": "workout", "workoutId": "wo-shoulders-14", "title": "Плечи и грудной отдел", "description": "Открываем грудь и плечи." },
-        { "day": 4, "type": "rest", "title": "Отдых", "description": "Дайте спине восстановиться." },
-        { "day": 5, "type": "workout", "workoutId": "wo-twists-15", "title": "Скручивания 15 минут", "description": "Мягкие скрутки." },
-        { "day": 6, "type": "workout", "workoutId": "wo-posture-16", "title": "Осанка", "description": "Стабилизация осанки." },
-        { "day": 7, "type": "workout", "workoutId": "wo-restorative-25", "title": "Восстановление", "description": "Длинное восстановление в конце." }
+        {
+          "day": 1,
+          "type": "workout",
+          "workoutId": "wo-lower-back-10",
+          "title": "Поясница: мягко",
+          "description": "Старт с бережной поясницы."
+        },
+        {
+          "day": 2,
+          "type": "workout",
+          "workoutId": "wo-back-soft-15",
+          "title": "Мягкая спина",
+          "description": "Расслабление вдоль позвоночника."
+        },
+        {
+          "day": 3,
+          "type": "workout",
+          "workoutId": "wo-shoulders-14",
+          "title": "Плечи и грудной отдел",
+          "description": "Открываем грудь и плечи."
+        },
+        {
+          "day": 4,
+          "type": "rest",
+          "title": "Отдых",
+          "description": "Дайте спине восстановиться."
+        },
+        {
+          "day": 5,
+          "type": "workout",
+          "workoutId": "wo-twists-15",
+          "title": "Скручивания 15 минут",
+          "description": "Мягкие скрутки."
+        },
+        {
+          "day": 6,
+          "type": "workout",
+          "workoutId": "wo-posture-16",
+          "title": "Осанка",
+          "description": "Стабилизация осанки."
+        },
+        {
+          "day": 7,
+          "type": "workout",
+          "workoutId": "wo-restorative-25",
+          "title": "Восстановление",
+          "description": "Длинное восстановление в конце."
+        }
       ]
     },
     {
       "id": "pr-evening-unwind-7",
       "title": "Вечернее заземление",
       "description": "Неделя практик для снятия напряжения после дня: растяжка, дыхание через расслабление, восстановление.",
-      "coverObjectKey": "home-program.webp",
+      "coverObjectKey": "programs/pr-evening-unwind-7.webp",
       "durationDays": 7,
       "category": "evening",
       "isSystem": true,
       "goal": "Лучше засыпать и сбрасывать стресс",
       "days": [
-        { "day": 1, "type": "workout", "workoutId": "wo-evening-sleep-12", "title": "Перед сном", "description": "Короткий вечерний ритуал." },
-        { "day": 2, "type": "workout", "workoutId": "wo-stretch-evening-20", "title": "Вечерняя растяжка", "description": "Растяжка после сидячего дня." },
-        { "day": 3, "type": "rest", "title": "Отдых", "description": "Без практики." },
-        { "day": 4, "type": "workout", "workoutId": "wo-hips-25", "title": "Таз и бёдра", "description": "Снимаем таз после сидения." },
-        { "day": 5, "type": "workout", "workoutId": "wo-deep-stretch-35", "title": "Глубокая растяжка", "description": "Длинная растяжка." },
-        { "day": 6, "type": "rest", "title": "Отдых", "description": "Восстановление." },
-        { "day": 7, "type": "workout", "workoutId": "wo-restorative-25", "title": "Восстановление", "description": "Мягкий финал недели." }
+        {
+          "day": 1,
+          "type": "workout",
+          "workoutId": "wo-evening-sleep-12",
+          "title": "Перед сном",
+          "description": "Короткий вечерний ритуал."
+        },
+        {
+          "day": 2,
+          "type": "workout",
+          "workoutId": "wo-stretch-evening-20",
+          "title": "Вечерняя растяжка",
+          "description": "Растяжка после сидячего дня."
+        },
+        {
+          "day": 3,
+          "type": "rest",
+          "title": "Отдых",
+          "description": "Без практики."
+        },
+        {
+          "day": 4,
+          "type": "workout",
+          "workoutId": "wo-hips-25",
+          "title": "Таз и бёдра",
+          "description": "Снимаем таз после сидения."
+        },
+        {
+          "day": 5,
+          "type": "workout",
+          "workoutId": "wo-deep-stretch-35",
+          "title": "Глубокая растяжка",
+          "description": "Длинная растяжка."
+        },
+        {
+          "day": 6,
+          "type": "rest",
+          "title": "Отдых",
+          "description": "Восстановление."
+        },
+        {
+          "day": 7,
+          "type": "workout",
+          "workoutId": "wo-restorative-25",
+          "title": "Восстановление",
+          "description": "Мягкий финал недели."
+        }
       ]
     },
     {
       "id": "pr-morning-rhythm-14",
       "title": "Утренний ритм",
       "description": "Две недели утренних и дневных практик: энергия, баланс, осанка. Четыре дня отдыха, чтобы привычка прижилась.",
-      "coverObjectKey": "home-program.webp",
+      "coverObjectKey": "programs/pr-morning-rhythm-14.webp",
       "durationDays": 14,
       "category": "morning",
       "isSystem": true,
       "goal": "Стабильное утро 10–20 минут",
       "days": [
-        { "day": 1, "type": "workout", "workoutId": "wo-morning-10", "title": "Утро за 10 минут", "description": "" },
-        { "day": 2, "type": "workout", "workoutId": "wo-sun-a-18", "title": "Приветствие солнцу", "description": "" },
-        { "day": 3, "type": "workout", "workoutId": "wo-standing-18", "title": "Стоячая практика", "description": "" },
-        { "day": 4, "type": "rest", "title": "Отдых", "description": "" },
-        { "day": 5, "type": "workout", "workoutId": "wo-energy-20", "title": "Энергия без прыжков", "description": "" },
-        { "day": 6, "type": "workout", "workoutId": "wo-balance-basic-15", "title": "Баланс база", "description": "" },
-        { "day": 7, "type": "workout", "workoutId": "wo-posture-16", "title": "Осанка", "description": "" },
-        { "day": 8, "type": "rest", "title": "Отдых", "description": "" },
-        { "day": 9, "type": "workout", "workoutId": "wo-morning-10", "title": "Утро за 10 минут", "description": "Повтор — закрепление." },
-        { "day": 10, "type": "workout", "workoutId": "wo-balance-flow-20", "title": "Баланс flow", "description": "" },
-        { "day": 11, "type": "workout", "workoutId": "wo-core-12", "title": "Кор без спешки", "description": "" },
-        { "day": 12, "type": "rest", "title": "Отдых", "description": "" },
-        { "day": 13, "type": "workout", "workoutId": "wo-sun-a-18", "title": "Приветствие солнцу", "description": "" },
-        { "day": 14, "type": "workout", "workoutId": "wo-energy-20", "title": "Энергия без прыжков", "description": "Финал двух недель." }
+        {
+          "day": 1,
+          "type": "workout",
+          "workoutId": "wo-morning-10",
+          "title": "Утро за 10 минут",
+          "description": ""
+        },
+        {
+          "day": 2,
+          "type": "workout",
+          "workoutId": "wo-sun-a-18",
+          "title": "Приветствие солнцу",
+          "description": ""
+        },
+        {
+          "day": 3,
+          "type": "workout",
+          "workoutId": "wo-standing-18",
+          "title": "Стоячая практика",
+          "description": ""
+        },
+        {
+          "day": 4,
+          "type": "rest",
+          "title": "Отдых",
+          "description": ""
+        },
+        {
+          "day": 5,
+          "type": "workout",
+          "workoutId": "wo-energy-20",
+          "title": "Энергия без прыжков",
+          "description": ""
+        },
+        {
+          "day": 6,
+          "type": "workout",
+          "workoutId": "wo-balance-basic-15",
+          "title": "Баланс база",
+          "description": ""
+        },
+        {
+          "day": 7,
+          "type": "workout",
+          "workoutId": "wo-posture-16",
+          "title": "Осанка",
+          "description": ""
+        },
+        {
+          "day": 8,
+          "type": "rest",
+          "title": "Отдых",
+          "description": ""
+        },
+        {
+          "day": 9,
+          "type": "workout",
+          "workoutId": "wo-morning-10",
+          "title": "Утро за 10 минут",
+          "description": "Повтор — закрепление."
+        },
+        {
+          "day": 10,
+          "type": "workout",
+          "workoutId": "wo-balance-flow-20",
+          "title": "Баланс flow",
+          "description": ""
+        },
+        {
+          "day": 11,
+          "type": "workout",
+          "workoutId": "wo-core-12",
+          "title": "Кор без спешки",
+          "description": ""
+        },
+        {
+          "day": 12,
+          "type": "rest",
+          "title": "Отдых",
+          "description": ""
+        },
+        {
+          "day": 13,
+          "type": "workout",
+          "workoutId": "wo-sun-a-18",
+          "title": "Приветствие солнцу",
+          "description": ""
+        },
+        {
+          "day": 14,
+          "type": "workout",
+          "workoutId": "wo-energy-20",
+          "title": "Энергия без прыжков",
+          "description": "Финал двух недель."
+        }
       ]
     },
     {
       "id": "pr-mobility-14",
       "title": "Мобильность всего тела",
       "description": "14 дней на суставы, таз, ноги и грудной отдел. Темп спокойный, с отдыхом каждые 3–4 дня.",
-      "coverObjectKey": "home-program.webp",
+      "coverObjectKey": "programs/pr-mobility-14.webp",
       "durationDays": 14,
       "category": "mobility",
       "isSystem": true,
       "goal": "Вернуть свободу движений",
       "days": [
-        { "day": 1, "type": "workout", "workoutId": "wo-mobility-full-22", "title": "Мобильность всего тела", "description": "" },
-        { "day": 2, "type": "workout", "workoutId": "wo-shoulders-14", "title": "Плечи и грудной отдел", "description": "" },
-        { "day": 3, "type": "workout", "workoutId": "wo-legs-stretch-18", "title": "Растяжка ног", "description": "" },
-        { "day": 4, "type": "rest", "title": "Отдых", "description": "" },
-        { "day": 5, "type": "workout", "workoutId": "wo-hips-25", "title": "Таз и бёдра", "description": "" },
-        { "day": 6, "type": "workout", "workoutId": "wo-wrists-safe-13", "title": "Без нагрузки на запястья", "description": "" },
-        { "day": 7, "type": "workout", "workoutId": "wo-twists-15", "title": "Скручивания 15 минут", "description": "" },
-        { "day": 8, "type": "rest", "title": "Отдых", "description": "" },
-        { "day": 9, "type": "workout", "workoutId": "wo-mobility-full-22", "title": "Мобильность всего тела", "description": "" },
-        { "day": 10, "type": "workout", "workoutId": "wo-deep-stretch-35", "title": "Глубокая растяжка", "description": "" },
-        { "day": 11, "type": "workout", "workoutId": "wo-balance-basic-15", "title": "Баланс база", "description": "" },
-        { "day": 12, "type": "rest", "title": "Отдых", "description": "" },
-        { "day": 13, "type": "workout", "workoutId": "wo-hips-25", "title": "Таз и бёдра", "description": "" },
-        { "day": 14, "type": "workout", "workoutId": "wo-stretch-evening-20", "title": "Вечерняя растяжка", "description": "Закрытие цикла." }
+        {
+          "day": 1,
+          "type": "workout",
+          "workoutId": "wo-mobility-full-22",
+          "title": "Мобильность всего тела",
+          "description": ""
+        },
+        {
+          "day": 2,
+          "type": "workout",
+          "workoutId": "wo-shoulders-14",
+          "title": "Плечи и грудной отдел",
+          "description": ""
+        },
+        {
+          "day": 3,
+          "type": "workout",
+          "workoutId": "wo-legs-stretch-18",
+          "title": "Растяжка ног",
+          "description": ""
+        },
+        {
+          "day": 4,
+          "type": "rest",
+          "title": "Отдых",
+          "description": ""
+        },
+        {
+          "day": 5,
+          "type": "workout",
+          "workoutId": "wo-hips-25",
+          "title": "Таз и бёдра",
+          "description": ""
+        },
+        {
+          "day": 6,
+          "type": "workout",
+          "workoutId": "wo-wrists-safe-13",
+          "title": "Без нагрузки на запястья",
+          "description": ""
+        },
+        {
+          "day": 7,
+          "type": "workout",
+          "workoutId": "wo-twists-15",
+          "title": "Скручивания 15 минут",
+          "description": ""
+        },
+        {
+          "day": 8,
+          "type": "rest",
+          "title": "Отдых",
+          "description": ""
+        },
+        {
+          "day": 9,
+          "type": "workout",
+          "workoutId": "wo-mobility-full-22",
+          "title": "Мобильность всего тела",
+          "description": ""
+        },
+        {
+          "day": 10,
+          "type": "workout",
+          "workoutId": "wo-deep-stretch-35",
+          "title": "Глубокая растяжка",
+          "description": ""
+        },
+        {
+          "day": 11,
+          "type": "workout",
+          "workoutId": "wo-balance-basic-15",
+          "title": "Баланс база",
+          "description": ""
+        },
+        {
+          "day": 12,
+          "type": "rest",
+          "title": "Отдых",
+          "description": ""
+        },
+        {
+          "day": 13,
+          "type": "workout",
+          "workoutId": "wo-hips-25",
+          "title": "Таз и бёдра",
+          "description": ""
+        },
+        {
+          "day": 14,
+          "type": "workout",
+          "workoutId": "wo-stretch-evening-20",
+          "title": "Вечерняя растяжка",
+          "description": "Закрытие цикла."
+        }
       ]
     },
     {
       "id": "pr-full-body-30",
       "title": "Полный ритм · 30 дней",
       "description": "Месяц разнообразных Flowly-практик: утро, спина, сила, баланс, растяжка. Дни отдыха раз в несколько активных дней — без перегрузки.",
-      "coverObjectKey": "home-program.webp",
+      "coverObjectKey": "programs/pr-full-body-30.webp",
       "durationDays": 30,
       "category": "full",
       "isSystem": true,
       "goal": "Устойчивая практика на месяц",
       "days": [
-        { "day": 1, "type": "workout", "workoutId": "wo-morning-10", "title": "Утро за 10 минут", "description": "" },
-        { "day": 2, "type": "workout", "workoutId": "wo-lower-back-10", "title": "Поясница: мягко", "description": "" },
-        { "day": 3, "type": "workout", "workoutId": "wo-core-12", "title": "Кор без спешки", "description": "" },
-        { "day": 4, "type": "rest", "title": "Отдых", "description": "" },
-        { "day": 5, "type": "workout", "workoutId": "wo-shoulders-14", "title": "Плечи и грудной отдел", "description": "" },
-        { "day": 6, "type": "workout", "workoutId": "wo-balance-basic-15", "title": "Баланс база", "description": "" },
-        { "day": 7, "type": "workout", "workoutId": "wo-back-soft-15", "title": "Мягкая спина", "description": "" },
-        { "day": 8, "type": "rest", "title": "Отдых", "description": "" },
-        { "day": 9, "type": "workout", "workoutId": "wo-sun-a-18", "title": "Приветствие солнцу", "description": "" },
-        { "day": 10, "type": "workout", "workoutId": "wo-legs-stretch-18", "title": "Растяжка ног", "description": "" },
-        { "day": 11, "type": "workout", "workoutId": "wo-standing-18", "title": "Стоячая практика", "description": "" },
-        { "day": 12, "type": "rest", "title": "Отдых", "description": "" },
-        { "day": 13, "type": "workout", "workoutId": "wo-energy-20", "title": "Энергия без прыжков", "description": "" },
-        { "day": 14, "type": "workout", "workoutId": "wo-twists-15", "title": "Скручивания 15 минут", "description": "" },
-        { "day": 15, "type": "workout", "workoutId": "wo-balance-flow-20", "title": "Баланс flow", "description": "" },
-        { "day": 16, "type": "rest", "title": "Отдых", "description": "" },
-        { "day": 17, "type": "workout", "workoutId": "wo-mobility-full-22", "title": "Мобильность всего тела", "description": "" },
-        { "day": 18, "type": "workout", "workoutId": "wo-posture-16", "title": "Осанка", "description": "" },
-        { "day": 19, "type": "workout", "workoutId": "wo-hips-25", "title": "Таз и бёдра", "description": "" },
-        { "day": 20, "type": "rest", "title": "Отдых", "description": "" },
-        { "day": 21, "type": "workout", "workoutId": "wo-strength-flow-30", "title": "Силовой flow", "description": "" },
-        { "day": 22, "type": "workout", "workoutId": "wo-stretch-evening-20", "title": "Вечерняя растяжка", "description": "" },
-        { "day": 23, "type": "workout", "workoutId": "wo-wrists-safe-13", "title": "Без нагрузки на запястья", "description": "" },
-        { "day": 24, "type": "rest", "title": "Отдых", "description": "" },
-        { "day": 25, "type": "workout", "workoutId": "wo-deep-stretch-35", "title": "Глубокая растяжка", "description": "" },
-        { "day": 26, "type": "workout", "workoutId": "wo-morning-10", "title": "Утро за 10 минут", "description": "" },
-        { "day": 27, "type": "workout", "workoutId": "wo-back-soft-15", "title": "Мягкая спина", "description": "" },
-        { "day": 28, "type": "rest", "title": "Отдых", "description": "" },
-        { "day": 29, "type": "workout", "workoutId": "wo-energy-20", "title": "Энергия без прыжков", "description": "" },
-        { "day": 30, "type": "workout", "workoutId": "wo-restorative-25", "title": "Восстановление", "description": "Мягкий финал месяца." }
+        {
+          "day": 1,
+          "type": "workout",
+          "workoutId": "wo-morning-10",
+          "title": "Утро за 10 минут",
+          "description": ""
+        },
+        {
+          "day": 2,
+          "type": "workout",
+          "workoutId": "wo-lower-back-10",
+          "title": "Поясница: мягко",
+          "description": ""
+        },
+        {
+          "day": 3,
+          "type": "workout",
+          "workoutId": "wo-core-12",
+          "title": "Кор без спешки",
+          "description": ""
+        },
+        {
+          "day": 4,
+          "type": "rest",
+          "title": "Отдых",
+          "description": ""
+        },
+        {
+          "day": 5,
+          "type": "workout",
+          "workoutId": "wo-shoulders-14",
+          "title": "Плечи и грудной отдел",
+          "description": ""
+        },
+        {
+          "day": 6,
+          "type": "workout",
+          "workoutId": "wo-balance-basic-15",
+          "title": "Баланс база",
+          "description": ""
+        },
+        {
+          "day": 7,
+          "type": "workout",
+          "workoutId": "wo-back-soft-15",
+          "title": "Мягкая спина",
+          "description": ""
+        },
+        {
+          "day": 8,
+          "type": "rest",
+          "title": "Отдых",
+          "description": ""
+        },
+        {
+          "day": 9,
+          "type": "workout",
+          "workoutId": "wo-sun-a-18",
+          "title": "Приветствие солнцу",
+          "description": ""
+        },
+        {
+          "day": 10,
+          "type": "workout",
+          "workoutId": "wo-legs-stretch-18",
+          "title": "Растяжка ног",
+          "description": ""
+        },
+        {
+          "day": 11,
+          "type": "workout",
+          "workoutId": "wo-standing-18",
+          "title": "Стоячая практика",
+          "description": ""
+        },
+        {
+          "day": 12,
+          "type": "rest",
+          "title": "Отдых",
+          "description": ""
+        },
+        {
+          "day": 13,
+          "type": "workout",
+          "workoutId": "wo-energy-20",
+          "title": "Энергия без прыжков",
+          "description": ""
+        },
+        {
+          "day": 14,
+          "type": "workout",
+          "workoutId": "wo-twists-15",
+          "title": "Скручивания 15 минут",
+          "description": ""
+        },
+        {
+          "day": 15,
+          "type": "workout",
+          "workoutId": "wo-balance-flow-20",
+          "title": "Баланс flow",
+          "description": ""
+        },
+        {
+          "day": 16,
+          "type": "rest",
+          "title": "Отдых",
+          "description": ""
+        },
+        {
+          "day": 17,
+          "type": "workout",
+          "workoutId": "wo-mobility-full-22",
+          "title": "Мобильность всего тела",
+          "description": ""
+        },
+        {
+          "day": 18,
+          "type": "workout",
+          "workoutId": "wo-posture-16",
+          "title": "Осанка",
+          "description": ""
+        },
+        {
+          "day": 19,
+          "type": "workout",
+          "workoutId": "wo-hips-25",
+          "title": "Таз и бёдра",
+          "description": ""
+        },
+        {
+          "day": 20,
+          "type": "rest",
+          "title": "Отдых",
+          "description": ""
+        },
+        {
+          "day": 21,
+          "type": "workout",
+          "workoutId": "wo-strength-flow-30",
+          "title": "Силовой flow",
+          "description": ""
+        },
+        {
+          "day": 22,
+          "type": "workout",
+          "workoutId": "wo-stretch-evening-20",
+          "title": "Вечерняя растяжка",
+          "description": ""
+        },
+        {
+          "day": 23,
+          "type": "workout",
+          "workoutId": "wo-wrists-safe-13",
+          "title": "Без нагрузки на запястья",
+          "description": ""
+        },
+        {
+          "day": 24,
+          "type": "rest",
+          "title": "Отдых",
+          "description": ""
+        },
+        {
+          "day": 25,
+          "type": "workout",
+          "workoutId": "wo-deep-stretch-35",
+          "title": "Глубокая растяжка",
+          "description": ""
+        },
+        {
+          "day": 26,
+          "type": "workout",
+          "workoutId": "wo-morning-10",
+          "title": "Утро за 10 минут",
+          "description": ""
+        },
+        {
+          "day": 27,
+          "type": "workout",
+          "workoutId": "wo-back-soft-15",
+          "title": "Мягкая спина",
+          "description": ""
+        },
+        {
+          "day": 28,
+          "type": "rest",
+          "title": "Отдых",
+          "description": ""
+        },
+        {
+          "day": 29,
+          "type": "workout",
+          "workoutId": "wo-energy-20",
+          "title": "Энергия без прыжков",
+          "description": ""
+        },
+        {
+          "day": 30,
+          "type": "workout",
+          "workoutId": "wo-restorative-25",
+          "title": "Восстановление",
+          "description": "Мягкий финал месяца."
+        }
       ]
     }
   ]
