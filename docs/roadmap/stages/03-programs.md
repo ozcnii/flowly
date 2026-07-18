@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 4 | 1 | 0 | 0 | 2 |
+| 4 | 0 | 0 | 0 | 3 |
 
 ## Границы
 
@@ -48,13 +48,13 @@
 - **journal:** 2026-07-19 — implement + date UX fixes; user: ok → close done, next T03. No push without ask.
 
 ### E3-D4-T03 — Реализовать текущий день и прогресс
-- **status:** in_progress · **priority:** high · **owner:** AI agent · **updated:** 2026-07-19
+- **status:** done · **priority:** high · **owner:** AI agent · **updated:** 2026-07-19
 - **prd_refs:** §20.2–20.3, §55.3 · **depends_on:** E3-D4-T02, E2-D3-T01 · **decisions:** DEC-016, DEC-022, DEC-024, DEC-029, DEC-035
 - **ui_slices:** S-MA-053
 - **scope:** вычисление текущего дня, completed count и отображение прогресса.
-- **acceptance:** [ ] прогресс основан на фактических статусах; [ ] будущие дни не выполнены; [ ] границы timezone корректны.
-- **validation/evidence:** —
-- **journal:** 2026-07-19 — user: progress later ok; start T03 after T02 close.
+- **acceptance:** [x] прогресс основан на фактических статусах; [x] будущие дни не выполнены; [x] границы timezone корректны.
+- **validation/evidence:** enrollment GET progress from activity_occurrences (completed/partial); day states; Progressbar + today CTA; local commits `25ceae8`/`0fc644b` (not pushed until asked).
+- **journal:** 2026-07-19 — implement progress; user «вроде нормально» → close done only, no push.
 
 ### E3-D4-T04 — Обработать пропуск без сдвига программы
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
@@ -88,4 +88,4 @@
 
 ## Handoff этапа
 
-**E3-D4-T03** `in_progress` — progress from workout occurrences.
+**E3-D4-T03** `done`. Next: **E3-D4-T04** skip без сдвига (blocker).
