@@ -12,6 +12,7 @@ export type CatalogWorkout = {
   equipment: string[];
   contraindications: string[];
   categories: CatalogCategory[];
+  isFavorite?: boolean;
 };
 export type CatalogResponse = { filters: Record<string, string>; total: number; categories: CatalogCategory[]; workouts: CatalogWorkout[]; explanation: string | null };
 export type WorkoutExercise = { id: string; position: number; title: string; description: string; mediaObjectKey: string | null; mediaType: string | null; durationSeconds: number | null; repetitions: number | null; restSeconds: number | null; plannedDurationSeconds: number | null };
@@ -20,6 +21,7 @@ export type WorkoutDetail = CatalogWorkout & {
   visibility: string;
   exercises: WorkoutExercise[];
   author: { name: string; type: "flowly" | "youtube" | "user" };
+  isFavorite: boolean;
   actions: Record<"start" | "favorite" | "share" | "report" | "hide" | "author", WorkoutAction>;
 };
 export type WorkoutDetailResponse = { workout: WorkoutDetail };

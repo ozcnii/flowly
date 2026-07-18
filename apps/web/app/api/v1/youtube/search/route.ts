@@ -1,19 +1,42 @@
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { isoFromNowMs, nowIso } from "@flowly/core";
 import { schema } from "@flowly/database";
 import { buildYogaYoutubeQuery, searchPiped, type YoutubeFilters, type YoutubeResult } from "@flowly/youtube";
 import { getDb, getPipedBaseUrl } from "@/lib/cloudflare";
 import { audit } from "@/lib/auth/http";
+import { getSessionUserId } from "@/lib/auth/session-user";
 import starterCatalog from "../../../../../../../seeds/catalog/starter-catalog.v1.json";
 
 type CacheState = "hit" | "miss" | "stale" | "unavailable";
-type ResponseBody = { query: { text: string; filters: YoutubeFilters; cacheKey: string }; cache: CacheState; provider: "piped"; results: YoutubeResult[]; warning: string | null; explanation: string | null };
+type EnrichedResult = YoutubeResult & { workoutId?: string | null; isFavorite?: boolean };
+type ResponseBody = { query: { text: string; filters: YoutubeFilters; cacheKey: string }; cache: CacheState; provider: "piped"; results: EnrichedResult[]; warning: string | null; explanation: string | null };
 const TTL_MS = 24 * 60 * 60 * 1000;
 const FILTER_KEYS = ["category", "duration", "difficulty", "equipment", "query"] as const;
 
 const json = (body: ResponseBody, init?: ResponseInit) => NextResponse.json(body, init);
 const parseResults = (value: string): YoutubeResult[] => { try { const parsed = JSON.parse(value) as unknown; return Array.isArray(parsed) ? parsed as YoutubeResult[] : []; } catch { return []; } };
+
+/** Attach user's materialized YouTube workout + favorite flag (not cached — per-user). */
+async function enrichForUser(results: YoutubeResult[], userId: string | null): Promise<EnrichedResult[]> {
+  if (!userId || !results.length) return results.map((result) => ({ ...result, workoutId: null, isFavorite: false }));
+  try {
+    const videoIds = results.map((result) => result.videoId);
+    const workouts = await getDb().select({ id: schema.workouts.id, youtubeVideoId: schema.workouts.youtubeVideoId }).from(schema.workouts).where(and(eq(schema.workouts.ownerId, userId), eq(schema.workouts.sourceType, "youtube"), inArray(schema.workouts.youtubeVideoId, videoIds)));
+    const workoutByVideo = new Map(workouts.map((workout) => [workout.youtubeVideoId!, workout.id]));
+    const favoriteIds = new Set<string>();
+    if (workouts.length) {
+      const rows = await getDb().select({ entityId: schema.favorites.entityId }).from(schema.favorites).where(and(eq(schema.favorites.userId, userId), eq(schema.favorites.entityType, "workout"), inArray(schema.favorites.entityId, workouts.map((workout) => workout.id))));
+      for (const row of rows) favoriteIds.add(row.entityId);
+    }
+    return results.map((result) => {
+      const workoutId = workoutByVideo.get(result.videoId) ?? null;
+      return { ...result, workoutId, isFavorite: workoutId ? favoriteIds.has(workoutId) : false };
+    });
+  } catch {
+    return results.map((result) => ({ ...result, workoutId: null, isFavorite: false }));
+  }
+}
 
 async function categoryName(slug: string): Promise<string> {
   if (!slug) return "";
@@ -36,11 +59,12 @@ export async function GET(request: Request) {
   }
   if (filters.category) filters.categoryName = await categoryName(filters.category);
   const query = buildYogaYoutubeQuery(filters);
+  const userId = await getSessionUserId(request).catch(() => null);
 
   let cacheRow: { resultsJson: string; expiresAt: string } | null = null;
   try { cacheRow = (await getDb().select().from(schema.youtubeSearchCache).where(eq(schema.youtubeSearchCache.cacheKey, query.cacheKey)).limit(1))[0] ?? null; } catch { cacheRow = null; }
   const cached = cacheRow ? parseResults(cacheRow.resultsJson) : [];
-  if (cacheRow && Date.parse(cacheRow.expiresAt) > Date.now()) return json({ query, cache: "hit", provider: "piped", results: cached, warning: null, explanation: null });
+  if (cacheRow && Date.parse(cacheRow.expiresAt) > Date.now()) return json({ query, cache: "hit", provider: "piped", results: await enrichForUser(cached, userId), warning: null, explanation: null });
 
   const baseUrl = getPipedBaseUrl();
   try {
@@ -53,10 +77,10 @@ export async function GET(request: Request) {
     } catch {
       // Plain next dev may not have D1; UI can still render provider results.
     }
-    return json({ query, cache: "miss", provider: "piped", results, warning: null, explanation: null });
+    return json({ query, cache: "miss", provider: "piped", results: await enrichForUser(results, userId), warning: null, explanation: null });
   } catch (error) {
     audit("youtube.search_provider_failed", { detail: error instanceof Error ? error.message : "unknown", providerConfigured: Boolean(baseUrl), cacheKey: query.cacheKey });
-    if (cached.length) return json({ query, cache: "stale", provider: "piped", results: cached, warning: "Показываем сохранённые результаты: YouTube-поиск временно недоступен.", explanation: null });
+    if (cached.length) return json({ query, cache: "stale", provider: "piped", results: await enrichForUser(cached, userId), warning: "Показываем сохранённые результаты: YouTube-поиск временно недоступен.", explanation: null });
     return json({ query, cache: "unavailable", provider: "piped", results: [], warning: "YouTube-поиск временно недоступен.", explanation: "Попробуйте позже или вернитесь в каталог Flowly." });
   }
 }

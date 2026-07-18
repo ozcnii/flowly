@@ -33,7 +33,7 @@ const sessionId = () => {
 };
 const fallbackFor = (pathname: string) => {
   if (pathname === "/") return null;
-  if (pathname === "/settings") return "/profile";
+  if (pathname === "/settings" || pathname === "/favorites") return "/profile";
   if (pathname === "/profile") return "/";
   if (pathname === "/catalog" || pathname === "/programs" || pathname === "/rhythm" || pathname === "/calendar") return "/";
   if (pathname.startsWith("/youtube") || pathname.startsWith("/workouts") || pathname.startsWith("/sessions") || pathname.startsWith("/sources") || pathname.startsWith("/authors") || pathname.startsWith("/safety")) return "/catalog";

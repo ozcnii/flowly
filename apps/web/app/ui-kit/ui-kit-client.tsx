@@ -3,7 +3,7 @@
 import { BlockTitle, Card } from "konsta/react";
 import { Icon } from "@flowly/ui";
 
-const icons = ["house", "heart", "calendar-days", "chart-no-axes-column", "user-round", "search", "chevron-left", "chevron-right", "chevron-down", "plus", "x", "check", "circle-check", "triangle-alert", "info", "refresh-cw", "wifi-off", "loader-circle", "play", "pause", "square", "timer", "ellipsis", "settings", "bell", "sun", "moon", "lock", "shield", "share-2", "copy", "download", "trash-2", "flag", "eye-off", "ban", "users", "bot", "external-link", "upload", "clock-3", "circle-help", "sparkles", "dumbbell", "leaf", "funnel", "bookmark", "circle", "glass-water", "sunrise", "menu"] as const;
+const icons = ["house", "heart", "calendar-days", "chart-no-axes-column", "user-round", "search", "chevron-left", "chevron-right", "chevron-down", "plus", "x", "check", "circle-check", "triangle-alert", "info", "refresh-cw", "wifi-off", "loader-circle", "play", "pause", "square", "timer", "ellipsis", "settings", "bell", "sun", "moon", "lock", "shield", "share-2", "copy", "download", "trash-2", "flag", "eye-off", "ban", "users", "bot", "external-link", "upload", "clock-3", "circle-help", "sparkles", "dumbbell", "leaf", "funnel", "bookmark", "bookmark-fill", "circle", "glass-water", "sunrise", "menu"] as const;
 
 export function UIKitClient() {
   return <main className="safe-shell flow-screen flow-screen--wide">

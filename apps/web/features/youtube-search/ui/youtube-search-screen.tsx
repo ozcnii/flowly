@@ -4,12 +4,14 @@ import { Button, Card, Preloader, Searchbar } from "konsta/react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Icon } from "@flowly/ui";
 import { PrimaryNavbar } from "@/components/shell/primary-navbar";
 import { WorkoutMediaCard } from "@/components/workouts/workout-media-card";
 import { YoutubePlayerPopup, type YoutubePlayerVideo } from "@/components/youtube/youtube-player-popup";
-import type { YoutubeFilters, YoutubeResult } from "../model/youtube";
-import { useCreateYoutubeWorkoutMutation, useSaveYoutubeVideoMutation, useYoutubeSearchQuery } from "../model/youtube-queries";
+import { putFavorite, deleteFavorite, favoritesKey, type FavoritesResponse } from "@/features/favorites/model/favorites-queries";
+import type { YoutubeFilters, YoutubeResult, YoutubeSearchResponse } from "../model/youtube";
+import { useCreateYoutubeWorkoutMutation, useSaveYoutubeVideoMutation, useYoutubeSearchQuery, youtubeKeys } from "../model/youtube-queries";
 
 type Forced = "loading" | "error" | "empty" | "stale" | "saved" | null;
 type Props = { filters?: YoutubeFilters; forced?: Forced };
@@ -35,12 +37,88 @@ const filterLabel = (key: string, value?: string) => {
   return key === "duration" ? DURATION[value] ?? value : key === "difficulty" ? DIFFICULTY[value] ?? value : EQUIPMENT[value] ?? value;
 };
 
-function ResultCard({ result, filters, onPlay, initialSaved = false, eager = false }: { result: YoutubeResult; filters: YoutubeFilters; onPlay: (video: YoutubePlayerVideo) => void; initialSaved?: boolean; eager?: boolean }) {
-  const router = useRouter(), save = useSaveYoutubeVideoMutation(), open = useCreateYoutubeWorkoutMutation();
-  const [saved, setSaved] = useState(false);
-  const isSaved = saved || initialSaved;
-  const submit = async () => { try { await save.mutateAsync({ result, filters }); setSaved(true); } catch { /* mutation state renders the inline error */ } };
-  const openWorkout = async () => { try { const data = await open.mutateAsync({ result, filters }); router.push(`/workouts/${data.workout.id}` as never); } catch { /* mutation state renders the inline error */ } };
+function patchYoutubeFavorite(qc: ReturnType<typeof useQueryClient>, videoId: string, patch: { isFavorite: boolean; workoutId?: string | null }) {
+  qc.setQueriesData<YoutubeSearchResponse>({ queryKey: ["youtube", "search"] }, (data) => {
+    if (!data?.results) return data;
+    return {
+      ...data,
+      results: data.results.map((result) => result.videoId === videoId ? { ...result, isFavorite: patch.isFavorite, workoutId: patch.workoutId ?? result.workoutId } : result),
+    };
+  });
+}
+
+function ResultCard({ result, filters, onPlay, eager = false }: { result: YoutubeResult; filters: YoutubeFilters; onPlay: (video: YoutubePlayerVideo) => void; eager?: boolean }) {
+  const router = useRouter(), qc = useQueryClient(), save = useSaveYoutubeVideoMutation(), open = useCreateYoutubeWorkoutMutation();
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const isFavorite = Boolean(result.isFavorite);
+  const label = isFavorite ? `Убрать «${result.title}» из избранного` : `Добавить «${result.title}» в избранное`;
+
+  const toggleFavorite = async () => {
+    if (pending) return;
+    setPending(true);
+    setError(null);
+    const previous = { isFavorite: result.isFavorite, workoutId: result.workoutId };
+    try {
+      if (isFavorite) {
+        const workoutId = result.workoutId;
+        if (!workoutId) throw new Error("missing_workout");
+        patchYoutubeFavorite(qc, result.videoId, { isFavorite: false });
+        await deleteFavorite("workout", workoutId);
+        const favorites = qc.getQueryData<FavoritesResponse>(favoritesKey);
+        if (favorites) qc.setQueryData<FavoritesResponse>(favoritesKey, { total: Math.max(0, favorites.total - 1), items: favorites.items.filter((item) => item.entityId !== workoutId) });
+      } else {
+        patchYoutubeFavorite(qc, result.videoId, { isFavorite: true, workoutId: result.workoutId });
+        const data = result.workoutId
+          ? { created: false, workout: { id: result.workoutId, title: result.title, youtubeVideoId: result.videoId } }
+          : await save.mutateAsync({ result, filters });
+        await putFavorite("workout", data.workout.id);
+        patchYoutubeFavorite(qc, result.videoId, { isFavorite: true, workoutId: data.workout.id });
+        const favorites = qc.getQueryData<FavoritesResponse>(favoritesKey) ?? { total: 0, items: [] };
+        if (!favorites.items.some((item) => item.entityId === data.workout.id)) {
+          qc.setQueryData<FavoritesResponse>(favoritesKey, {
+            total: favorites.total + 1,
+            items: [{
+              entityType: "workout",
+              entityId: data.workout.id,
+              createdAt: new Date().toISOString(),
+              workout: {
+                id: data.workout.id,
+                title: result.title,
+                description: result.description,
+                durationSeconds: result.durationSeconds,
+                difficulty: "beginner",
+                format: "video",
+                sourceType: "youtube",
+                coverObjectKey: null,
+                youtubeVideoId: result.videoId,
+                equipment: [],
+                contraindications: [],
+                categories: [],
+                isFavorite: true as const,
+              },
+            }, ...favorites.items],
+          });
+        }
+      }
+      void qc.invalidateQueries({ queryKey: favoritesKey });
+      void qc.invalidateQueries({ queryKey: ["workouts"] });
+      void qc.invalidateQueries({ queryKey: youtubeKeys.search(filters) });
+    } catch {
+      patchYoutubeFavorite(qc, result.videoId, { isFavorite: Boolean(previous.isFavorite), workoutId: previous.workoutId });
+      setError(isFavorite ? "Не удалось убрать из избранного" : "Не удалось добавить в избранное");
+    } finally {
+      setPending(false);
+    }
+  };
+
+  const openWorkout = async () => {
+    try {
+      const data = await open.mutateAsync({ result, filters });
+      router.push(`/workouts/${data.workout.id}` as never);
+    } catch { /* card error */ }
+  };
+
   return <WorkoutMediaCard
     title={result.title}
     coverSrc={result.thumbnailUrl ?? ""}
@@ -50,9 +128,25 @@ function ResultCard({ result, filters, onPlay, initialSaved = false, eager = fal
     unoptimized
     onOpen={open.isPending ? undefined : () => void openWorkout()}
     onPlay={(trigger) => onPlay({ videoId: result.videoId, title: result.title, trigger })}
-    actions={<Button inline clear={!isSaved} tonal={isSaved} rounded disabled={save.isPending || isSaved} aria-busy={save.isPending || undefined} aria-label={isSaved ? `«${result.title}» сохранено` : `Сохранить «${result.title}»`} title={isSaved ? "Сохранено" : "Сохранить"} className={`h-11 w-11 min-w-11 p-0 ${focusRing}`} onClick={submit}>{save.isPending ? <Preloader className="size-4" /> : <Icon name={isSaved ? "check" : "bookmark"} />}<span className="sr-only" aria-live="polite">{isSaved ? "Сохранено" : "Сохранить"}</span></Button>}
+    actions={<Button
+      type="button"
+      inline
+      clear={!isFavorite}
+      tonal={isFavorite}
+      rounded
+      disabled={pending}
+      aria-busy={pending || undefined}
+      aria-pressed={isFavorite}
+      aria-label={label}
+      title={label}
+      className={`h-11 w-11 min-w-11 p-0 ${isFavorite ? "text-accent" : "text-text-muted"} ${focusRing}`}
+      onClick={(event) => { event.preventDefault(); event.stopPropagation(); void toggleFavorite(); }}
+    >
+      {pending ? <Preloader className="size-4" /> : <Icon name={isFavorite ? "bookmark-fill" : "bookmark"} className="size-5" />}
+      <span className="sr-only" aria-live="polite">{isFavorite ? "В избранном" : "Не в избранном"}</span>
+    </Button>}
     pending={open.isPending}
-    error={open.isError ? "Не удалось открыть тренировку" : save.isError ? "Не удалось сохранить" : undefined}
+    error={open.isError ? "Не удалось открыть тренировку" : error ?? (save.isError ? "Не удалось сохранить" : undefined)}
   />;
 }
 
@@ -96,10 +190,10 @@ export function YoutubeSearchScreen({ filters = {}, forced = null }: Props) {
 
       {isLoading ? <div className="grid min-h-48 place-items-center" role="status" aria-live="polite" aria-busy="true"><Preloader /><span className="sr-only">Загружаем видео</span></div> : isError ? <Card component="section" outline className="m-0 text-center" role="alert" contentWrapPadding="p-6 grid justify-items-center gap-3"><Icon name="triangle-alert" /><h2 className="m-0 text-lg font-semibold">YouTube-поиск недоступен</h2><p className="m-0 text-sm text-text-muted">Попробуйте позже. Введённые параметры сохранены.</p><Button large rounded className={focusRing} onClick={() => query.refetch()}>Повторить</Button></Card> : results.length === 0 ? <Card component="section" outline className="m-0 text-center" contentWrapPadding="p-6 grid justify-items-center gap-3"><Icon name="search-x" /><h2 className="m-0 text-lg font-semibold">Видео не найдены</h2><p className="m-0 text-sm text-text-muted">Попробуйте изменить запрос, длительность или сложность.</p><Button component={NextLink} href="/catalog" large rounded className={focusRing}>Вернуться в каталог</Button></Card> : <>
         <p className="m-0 text-sm font-semibold" aria-live="polite">{resultCountLabel(results.length)}</p>
-        <div className="grid gap-3">{results.map((result, index) => <ResultCard key={result.videoId} result={result} filters={searchFilters} onPlay={setPlayerVideo} initialSaved={forced === "saved" && index === 0} eager={index < 2} />)}</div>
+        <div className="grid gap-3">{results.map((result, index) => <ResultCard key={result.videoId} result={result} filters={searchFilters} onPlay={setPlayerVideo} eager={index < 2} />)}</div>
       </>}
       </main>
     </div>
-    <YoutubePlayerPopup video={playerVideo} backgroundRef={backgroundRef} onClose={closePlayer} />
+    <YoutubePlayerPopup video={playerVideo} onClose={closePlayer} backgroundRef={backgroundRef} />
   </div>;
 }

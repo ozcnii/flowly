@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "@flowly/ui";
 import { GlassIconButton } from "@/components/glass-icon-button";
-import { DisabledFavoriteButton } from "@/components/workouts/disabled-favorite-button";
+import { FavoriteButton } from "@/components/workouts/favorite-button";
 import { WorkoutMediaCard } from "@/components/workouts/workout-media-card";
 import type { CatalogWorkout } from "../model/catalog";
 import { DIFFICULTY, DURATION, FORMAT, SOURCE } from "../model/catalog";
@@ -36,7 +36,7 @@ function WorkoutCard({ workout, onOpen, eager }: { workout: CatalogWorkout; onOp
     eager={eager}
     unoptimized={workout.sourceType === "youtube"}
     onOpen={() => onOpen(workout.id)}
-    actions={<DisabledFavoriteButton title={workout.title} className="h-11 w-11 min-w-11 p-0" />}
+    actions={<FavoriteButton workoutId={workout.id} title={workout.title} isFavorite={Boolean(workout.isFavorite)} workout={workout} />}
   />;
 }
 

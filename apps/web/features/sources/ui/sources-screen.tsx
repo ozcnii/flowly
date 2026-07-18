@@ -5,7 +5,7 @@ import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { Icon } from "@flowly/ui";
 import { PrimaryNavbar } from "@/components/shell/primary-navbar";
-import { DisabledFavoriteButton } from "@/components/workouts/disabled-favorite-button";
+import { FavoriteButton } from "@/components/workouts/favorite-button";
 import { WorkoutMediaCard } from "@/components/workouts/workout-media-card";
 import type { CatalogWorkout } from "@/features/catalog/model/catalog";
 import { DIFFICULTY, FORMAT, minutes } from "@/features/catalog/model/catalog";
@@ -31,7 +31,7 @@ function WorkoutPreview({ workout, onOpen, eager }: { workout: CatalogWorkout; o
     eager={eager}
     unoptimized={workout.sourceType === "youtube"}
     onOpen={onOpen}
-    actions={<DisabledFavoriteButton title={workout.title} className="h-11 w-11 min-w-11 p-0" />}
+    actions={<FavoriteButton workoutId={workout.id} title={workout.title} isFavorite={Boolean(workout.isFavorite)} workout={workout} />}
     className="min-w-72 max-w-80 flex-none snap-start"
     headingLevel="h3"
   />;

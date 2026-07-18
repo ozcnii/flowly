@@ -553,6 +553,15 @@
 - **PRD:** §16, §44.13, §46 — scope preserved as future, not cancelled from product forever.
 - **Влияет на:** E2-D3-T03 (blocked); E2-D3-T05 DoD own-workout criteria N/A; E7-D8-T03 (own-workout share latent; habit share not blocked by T03 alone); E7-D8-T04/T07 notes (transitive / DoD N/A); PRD §16 preserved as future.
 
+### DEC-065 — Manual workout log moved to calendar stage (E6)
+
+- **Статус:** approved
+- **Дата:** 2026-07-19
+- **Решение:** ручная запись тренировки (§17, S-MA-044) **не** делается в этапе 2. Карточка **E2-D3-T04** перенесена в этап 6 как **E6-D7-T09**, с `depends_on` calendar API + month/week/day UI (E6-D7-T01/T02), entry с calendar day (S-MA-072). Stage-2 DoD (E2-D3-T05) **не** требует manual log. E6-D7-T01 больше не зависит от E2-D3-T04.
+- **Основание:** user 2026-07-19: перенести «когда дневник уже будет готов», не в stage 2.
+- **PRD:** §17, §28, §55.2/§55.6.
+- **Влияет на:** E2-D3-T04 (moved pointer), E2-D3-T05, E6-D7-T01/T03/T08/T09, HANDOFF/README stage counts.
+
 ## Открытые решения
 
 ### DEC-006 — Operational thresholds

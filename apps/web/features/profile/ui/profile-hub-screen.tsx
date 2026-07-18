@@ -9,7 +9,7 @@ import { useMeQuery } from "../model/me-queries";
 const sections = [
   { icon: "users", label: "Друзья", hint: "Друзья и приглашения" },
   { icon: "flag", label: "Челленджи", hint: "Совместные челленджи" },
-  { icon: "heart", label: "Избранное", hint: "Сохранённые тренировки" },
+  { icon: "bookmark", label: "Избранное", hint: "Сохранённые тренировки", to: "/favorites" },
   { icon: "chart-no-axes-column", label: "Отчёты", hint: "Недельные и месячные" },
   { icon: "settings", label: "Настройки", hint: "Имя, часовой пояс, тема и отчёты", to: "/settings" },
   { icon: "bell", label: "Уведомления", hint: "Напоминания и тишина" },

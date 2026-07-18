@@ -19,6 +19,10 @@ export type YoutubeResult = {
   viewCount: number | null;
   viewCountText: string | null;
   languageWarning: string | null;
+  /** Materialized private workout id if user already has one for this video. */
+  workoutId?: string | null;
+  /** Whether that workout is in the user's favorites (toggle target). */
+  isFavorite?: boolean;
 };
 
 export type YoutubeSearchResponse = {

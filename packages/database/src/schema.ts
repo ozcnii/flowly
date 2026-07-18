@@ -220,6 +220,23 @@ export const statusHistory = sqliteTable(
   (table) => [index("status_history_occurrence_idx").on(table.occurrenceId, table.createdAt)],
 );
 
+// §43.12 favorites
+export const favorites = sqliteTable(
+  "favorites",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.entityType, table.entityId] }),
+    index("favorites_user_created_idx").on(table.userId, table.createdAt),
+  ],
+);
+
 // §43.28 youtube_search_cache
 export const youtubeSearchCache = sqliteTable(
   "youtube_search_cache",

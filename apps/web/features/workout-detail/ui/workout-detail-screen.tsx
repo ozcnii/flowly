@@ -18,6 +18,7 @@ import { IMAGE_BLUR_DATA_URL } from "@/lib/image";
 import { ApiError } from "@/lib/api/client";
 import { latestPlaybackPosition, latestSessionSeconds } from "@/features/workout-session/model/local-checkpoint";
 import { formatSessionDuration, type ActiveSessionConflict } from "@/features/workout-session/model/workout-session";
+import { useToggleFavoriteMutation } from "@/features/favorites/model/favorites-queries";
 import { useActiveSessionQuery, useFinishWorkoutSessionMutation, useStartWorkoutSessionMutation } from "@/features/workout-session/model/workout-session-queries";
 
 type Forced = "loading" | "error" | "offline" | "hidden" | null;
@@ -65,10 +66,12 @@ function Exercises({ workout }: { workout: WorkoutDetail }) {
 }
 
 function ActionPanel({ workout, backgroundRef }: { workout: WorkoutDetail; backgroundRef: RefObject<HTMLElement | null> }) {
-  const router = useRouter(), activeQuery = useActiveSessionQuery(), active = activeQuery.data?.session ?? null, sameActive = active?.workoutId === workout.id, activeSeconds = useSyncExternalStore(noSubscription, () => active ? latestSessionSeconds(active) : 0, () => active?.accumulatedSeconds ?? 0), start = useStartWorkoutSessionMutation(), conflictSheetRef = useRef<HTMLElement>(null), [conflict, setConflict] = useState<ActiveSessionConflict | null>(null), [closed, setClosed] = useState(false), close = useFinishWorkoutSessionMutation(conflict?.activeSession.id ?? "");
+  const router = useRouter(), activeQuery = useActiveSessionQuery(), active = activeQuery.data?.session ?? null, sameActive = active?.workoutId === workout.id, activeSeconds = useSyncExternalStore(noSubscription, () => active ? latestSessionSeconds(active) : 0, () => active?.accumulatedSeconds ?? 0), start = useStartWorkoutSessionMutation(), favorite = useToggleFavoriteMutation(), conflictSheetRef = useRef<HTMLElement>(null), [conflict, setConflict] = useState<ActiveSessionConflict | null>(null), [closed, setClosed] = useState(false), close = useFinishWorkoutSessionMutation(conflict?.activeSession.id ?? "");
   const dismiss = () => { if (start.isPending || close.isPending) return; setConflict(null); setClosed(false); };
   useModalFocus(Boolean(conflict), conflictSheetRef, backgroundRef, dismiss);
   const future = (title: string, icon: string) => <ListItem key={title} media={<Icon name={icon} />} title={title} after={<Badge>Скоро</Badge>} aria-disabled="true" />;
+  const favoritePending = favorite.isPending && favorite.variables?.entityId === workout.id;
+  const favoriteTitle = workout.isFavorite ? "В избранном" : "Добавить в избранное";
   const continueCurrent = () => { const session = sameActive ? active : conflict?.activeSession; if (session) { setConflict(null); router.push(`/sessions/${session.id}` as never); } };
   const startSession = async () => {
     if (sameActive) { continueCurrent(); return; }
@@ -96,10 +99,23 @@ function ActionPanel({ workout, backgroundRef }: { workout: WorkoutDetail; backg
     <div className="grid gap-2">
       <BlockTitle component="h2" id="workout-actions-title" className="!m-0">Возможности</BlockTitle>
       <List strong inset dividers className="!m-0">
-        {future("Добавить в избранное", "bookmark")}
+        <ListItem
+          link
+          chevron={false}
+          linkComponent="button"
+          linkProps={{ type: "button", disabled: favoritePending || undefined, onClick: () => { if (!favoritePending) favorite.mutate({ entityType: "workout", entityId: workout.id, next: !workout.isFavorite, workout }); } }}
+          contentClassName="w-full"
+          innerClassName="text-left"
+          media={favoritePending ? <Preloader className="size-5" /> : <Icon name={workout.isFavorite ? "bookmark-fill" : "bookmark"} className={`size-5 ${workout.isFavorite ? "text-accent" : "text-text-muted"}`} />}
+          title={favoriteTitle}
+          subtitle={workout.isFavorite ? "Нажмите, чтобы убрать" : "Нажмите, чтобы сохранить"}
+          aria-busy={favoritePending || undefined}
+          aria-pressed={workout.isFavorite}
+        />
         {future("Поделиться", "share-2")}
         {workout.sourceType === "user" && <>{future("Пожаловаться", "triangle-alert")}{future("Скрыть", "eye-off")}</>}
       </List>
+      <div className="min-h-5" role="status" aria-live="polite">{favorite.isError ? <p className="m-0 text-sm text-danger">Не удалось обновить избранное.</p> : null}</div>
     </div>
     <ModalPortal>{conflict && <Sheet ref={conflictSheetRef} opened backdrop onBackdropClick={dismiss} className="flex max-h-[80dvh] flex-col" role="dialog" aria-modal="true" aria-labelledby="active-session-title">
       <Navbar title={<span id="active-session-title">{closed ? "Начать тренировку?" : "Уже идёт тренировка"}</span>} />
