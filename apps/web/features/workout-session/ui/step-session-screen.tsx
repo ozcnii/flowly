@@ -202,6 +202,8 @@ export function StepSessionScreen({ id }: { id: string }) {
 
   const toggleRun = () => {
     if (phase === "done") return;
+    // First gesture unlocks Web Audio inside Telegram iOS WebView (autoplay policy).
+    sounds.unlock();
     if (running) {
       setRunningSync(false);
       sounds.pause();
@@ -215,6 +217,7 @@ export function StepSessionScreen({ id }: { id: string }) {
   const plus30 = () => { if (!canPlus30) return; remainingRef.current += 30; setRemaining(remainingRef.current); };
   /** Next keeps rest phase then auto-runs; Skip jumps past exercise+rest and auto-runs. */
   const nextAction = () => {
+    sounds.unlock();
     if (phase === "rest") {
       sounds.nextExercise();
       gotoExercise(positionRef.current + 1, { autoContinue: true });
@@ -238,10 +241,13 @@ export function StepSessionScreen({ id }: { id: string }) {
     }
     if (positionRef.current > 0) gotoExercise(positionRef.current - 1);
   };
-  const skip = () => { sounds.nextExercise(); gotoExercise(positionRef.current + 1, { autoContinue: true }); };
+  const skip = () => { sounds.unlock(); sounds.nextExercise(); gotoExercise(positionRef.current + 1, { autoContinue: true }); };
   const resumeExercises = () => { if (exercises.length === 0) return; gotoExercise(Math.max(0, exercises.length - 1)); };
+  /** Mid-session finish still needs status chooser; full pipeline done already implies completed. */
   const openFinish = () => { finishingRef.current = true; setRunningSync(false); persist(accumulatedRef.current, positionRef.current, true); setFinishOpened(true); };
-  const submitFinish = async (status: FinalStatus, comment: string) => { if (checkpoint.isPending) return; try { await finish.mutateAsync({ accumulatedSeconds: accumulatedRef.current, playbackPositionSeconds: 0, finalStatus: status, comment: comment || undefined, baseUpdatedAt: tokenRef.current }); removeLocalCheckpoint(id); setFinishOpened(false); router.push(`/calendar` as never); } catch (error) { const body = conflictBody(error); if (body) { const local = readLocalCheckpoint(id) ?? persist(accumulatedRef.current, positionRef.current, true); if (local) { setFinishOpened(false); setConflict({ local, server: body.session }); } } } };
+  const submitFinish = async (status: FinalStatus, comment: string) => { if (checkpoint.isPending || finish.isPending) return; try { await finish.mutateAsync({ accumulatedSeconds: accumulatedRef.current, playbackPositionSeconds: 0, finalStatus: status, comment: comment || undefined, baseUpdatedAt: tokenRef.current }); removeLocalCheckpoint(id); setFinishOpened(false); router.push(`/calendar` as never); } catch (error) { const body = conflictBody(error); if (body) { const local = readLocalCheckpoint(id) ?? persist(accumulatedRef.current, positionRef.current, true); if (local) { setFinishOpened(false); setConflict({ local, server: body.session }); } } } };
+  /** Done screen: all steps already finished → save as completed without re-asking status. */
+  const finishCompletedDirect = () => { finishingRef.current = true; setRunningSync(false); persist(accumulatedRef.current, positionRef.current, true); void submitFinish("completed", ""); };
   const finishClose = useCallback(() => { finishingRef.current = false; setFinishOpened(false); void sync(true); }, [sync]);
   const useServer = () => { if (conflict) applyServer(conflict.server); };
   const selectDevice = async () => {
@@ -305,11 +311,11 @@ export function StepSessionScreen({ id }: { id: string }) {
             <p className="m-0 text-xl font-semibold">{celebrating ? "Ура! Молодцы!" : "Все упражнения пройдены"}</p>
             {celebrating && <p className="m-0 text-base font-medium text-accent">Тренировка пройдена до конца</p>}
             <p className="m-0 text-sm text-text-muted">Итог: {formatSessionDuration(accumulated)}</p>
-            <p className="m-0 max-w-xs text-sm leading-relaxed text-text-muted">Сохраните результат или вернитесь к шагам — сессия ещё открыта.</p>
+            <p className="m-0 max-w-xs text-sm leading-relaxed text-text-muted">Сохраним как выполненную. Можно вернуться к шагам — сессия ещё открыта.</p>
           </div>
-          {/* Primary = save result; secondary = resume steps. No calendar until finish creates occurrence. */}
-          <Button large rounded className={`w-full gap-2 ${focusRing}`} disabled={Boolean(conflict)} onClick={openFinish}><Icon name="circle-check" />Завершить тренировку</Button>
-          <Button large rounded tonal className={`w-full gap-2 ${focusRing}`} onClick={resumeExercises}><Icon name="chevron-left" />Вернуться к упражнениям</Button>
+          {/* Full pipeline done → completed directly (no redundant status sheet). Mid-session «Завершить» still opens sheet. */}
+          <Button large rounded className={`w-full gap-2 ${focusRing}`} disabled={Boolean(conflict) || finish.isPending || checkpoint.isPending} onClick={finishCompletedDirect}><Icon name="circle-check" />{finish.isPending ? "Сохраняем…" : "Сохранить результат"}</Button>
+          <Button large rounded tonal className={`w-full gap-2 ${focusRing}`} disabled={finish.isPending} onClick={resumeExercises}><Icon name="chevron-left" />Вернуться к упражнениям</Button>
           <Button clear rounded component={NextLink} href="/" className={focusRing}>На главную</Button>
         </div> : <>
           <div className="relative aspect-video bg-accent-soft">
