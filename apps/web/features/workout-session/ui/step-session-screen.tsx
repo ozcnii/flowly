@@ -1,12 +1,14 @@
 "use client";
 
 import { BlockTitle, Button, Card, Preloader } from "konsta/react";
+import Image from "next/image";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { Icon } from "@flowly/ui";
 import { PrimaryNavbar } from "@/components/shell/primary-navbar";
 import { ApiError } from "@/lib/api/client";
+import { IMAGE_BLUR_DATA_URL } from "@/lib/image";
 import { advanceLocalCheckpoint, readLocalCheckpoint, rebaseLocalCheckpoint, removeLocalCheckpoint, replaceLocalCheckpoint, type LocalCheckpoint } from "../model/local-checkpoint";
 import { FINAL_STATUS_LABELS, formatSessionDuration, type CheckpointConflict, type FinalStatus, type SessionExercise, type WorkoutSession } from "../model/workout-session";
 import { checkpointWorkoutSession, useCheckpointWorkoutSessionMutation, useFinishWorkoutSessionMutation, useWorkoutSessionQuery } from "../model/workout-session-queries";
@@ -319,8 +321,14 @@ export function StepSessionScreen({ id }: { id: string }) {
           <Button clear rounded component={NextLink} href="/" className={focusRing}>На главную</Button>
         </div> : <>
           <div className="relative aspect-video bg-accent-soft">
-            {/* Exercise media (image/GIF) ships with E2-D3-T03 own-workout uploads; until then a neutral placeholder avoids loading unshipped assets. */}
-            <div className="absolute inset-0 grid place-items-center"><Icon name={current?.mediaType === "gif" ? "play" : "dumbbell"} className="size-10 text-text-muted" /></div>
+            {current?.mediaObjectKey ? (
+              current.mediaType === "gif" || current.mediaObjectKey.endsWith(".gif")
+                // GIF must stay as raw img so animation is not frozen by next/image optimization.
+                ? <img src={`/media/${current.mediaObjectKey}`} alt={current.title} className="absolute inset-0 size-full object-cover" decoding="async" />
+                : <Image src={`/media/${current.mediaObjectKey}`} alt={current.title} fill sizes="(max-width: 430px) calc(100vw - 40px), 640px" className="object-cover" placeholder="blur" blurDataURL={IMAGE_BLUR_DATA_URL} decoding="async" />
+            ) : (
+              <div className="absolute inset-0 grid place-items-center"><Icon name="dumbbell" className="size-10 text-text-muted" /></div>
+            )}
             <div className="absolute left-4 top-4"><span className="rounded-full bg-black/55 px-3 py-1 text-sm font-medium text-white">{progressBadge}</span></div>
           </div>
           <div className="grid gap-3 p-4">
