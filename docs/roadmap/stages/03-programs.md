@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 5 | 0 | 0 | 1 | 1 |
+| 4 | 1 | 0 | 0 | 2 |
 
 ## Границы
 
@@ -39,21 +39,22 @@
 - **journal:** 2026-07-19 — plan approved; implement; filter UX iterations → Segmented + «N дн»; user: «хорошо» / «закрываем»; `review -> done`.
 
 ### E3-D4-T02 — Реализовать начало программы с выбранной даты
-- **status:** review · **priority:** high · **owner:** AI agent · **updated:** 2026-07-19
+- **status:** done · **priority:** high · **owner:** AI agent · **updated:** 2026-07-19
 - **prd_refs:** §20.3, §43.15, §44.6, §55.3 · **depends_on:** E3-D4-T01, E1-D1-T06 · **decisions:** DEC-016, DEC-019, DEC-022, DEC-024, DEC-029, DEC-035
 - **ui_slices:** S-MA-052
 - **scope:** enrollment, дата старта и вычисление календарных дат в timezone пользователя. Reminder/joint — later.
 - **acceptance:** [x] дата выбирается явно; [x] enrollment принадлежит пользователю; [x] day mapping воспроизводим.
-- **validation/evidence:** plan `.temp/E3-D4-T02/plan.md`; migration `0012_program_enrollments.sql` local PASS; HTTP enroll 201, day1=start day7=start+6, idempotent 200 same id, bad date 400, detail activeEnrollment; typecheck PASS.
-- **journal:** 2026-07-19 — user «стартуй»; implement schema/API/Sheet date + enrollment screen; `in_progress -> review`.
+- **validation/evidence:** plan `.temp/E3-D4-T02/plan.md`; migration `0012`; HTTP enroll matrix; date list 14 Radio (no native picker); commits `4dd0e87`, `0c560a8`.
+- **journal:** 2026-07-19 — implement + date UX fixes; user: ok → close done, next T03. No push without ask.
 
 ### E3-D4-T03 — Реализовать текущий день и прогресс
-- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §20.2–20.3, §55.3 · **depends_on:** E3-D4-T02, E2-D3-T01 · **decisions:** DEC-016, DEC-022, DEC-024, DEC-025, DEC-029
-- **ui_slices:** S-MA-053 — выполнять последовательно; approval каждого ID обязателен до следующего.
+- **status:** in_progress · **priority:** high · **owner:** AI agent · **updated:** 2026-07-19
+- **prd_refs:** §20.2–20.3, §55.3 · **depends_on:** E3-D4-T02, E2-D3-T01 · **decisions:** DEC-016, DEC-022, DEC-024, DEC-029, DEC-035
+- **ui_slices:** S-MA-053
 - **scope:** вычисление текущего дня, completed count и отображение прогресса.
 - **acceptance:** [ ] прогресс основан на фактических статусах; [ ] будущие дни не выполнены; [ ] границы timezone корректны.
-- **validation/evidence:** state matrix по датам и statuses.
+- **validation/evidence:** —
+- **journal:** 2026-07-19 — user: progress later ok; start T03 after T02 close.
 
 ### E3-D4-T04 — Обработать пропуск без сдвига программы
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
@@ -87,4 +88,4 @@
 
 ## Handoff этапа
 
-**E3-D4-T02** `review` — user check Start → date → calendar days.
+**E3-D4-T03** `in_progress` — progress from workout occurrences.
