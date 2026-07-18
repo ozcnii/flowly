@@ -98,7 +98,7 @@
 | §18 favorites workout/YouTube/UGC/program; no folders | S-MA-023; F03,F06 | covered |
 | §19.1 filter-built Russian YouTube query, no arbitrary query | S-MA-020–021; F03 | covered |
 | §19.2 Russian preference/language limitation communicated | S-MA-021; F03 | covered |
-| §19.3 result metadata/view/favorite/create workout | S-MA-021; F03,F05 | covered |
+| §19.3 result metadata/view/favorite/create workout | S-MA-021; F03,F05; DEC-063 | partial: metadata/play/save covered; materialized shared detail blocked E2-D2-T08 |
 | §19.4 identical request cache retained at least 24 hours | S-MA-020–024 contract; S-MA-021; F03 diagram | covered |
 | §19.4 cache key contains every selected filter | S-MA-020–024 contract; S-MA-021; F03 diagram | covered |
 | §19.4 quota makes cache mandatory and unavailability observable | S-MA-020–024 contract; S-MA-021; F03; DEC-011 | covered; exact external quota operation remains DEC-011 |
@@ -201,7 +201,7 @@
 | §30.4 habit percentage numerator is completed mandatory slots | S-MA-075 report contract; F09 | covered |
 | §30.4 denominator is elapsed mandatory slots including skipped/no-response | S-MA-075 report contract; F09 | covered |
 | §30.4 future slots excluded | S-MA-075 report contract; F09 | covered |
-| §30.4 yoga count/time separate and partial not full | S-MA-075 report contract; F09 | covered |
+| §30.4 yoga count/time separate and partial not full | S-MA-075 report contract; F09; DEC-063 source mapping | covered |
 | §30.4 joint statistics only for shared objects | S-MA-075 report contract; F09,F10 | covered |
 | §30.5 card excludes private/medical/comments/unconsented names; explicit field choice | S-MA-076; F09; DEC-018 | covered |
 | §31 no complex algorithm; inputs limited to listed categories/favorites/recent/duration/time/program/staleness/joint program | S-MA-010 Home contract; F02 | covered |

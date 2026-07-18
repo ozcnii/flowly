@@ -2,13 +2,14 @@
 
 import { Button, Card, Preloader, Searchbar } from "konsta/react";
 import NextLink from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "@flowly/ui";
 import { PrimaryNavbar } from "@/components/shell/primary-navbar";
 import { WorkoutMediaCard } from "@/components/workouts/workout-media-card";
 import { YoutubePlayerPopup, type YoutubePlayerVideo } from "@/components/youtube/youtube-player-popup";
 import type { YoutubeFilters, YoutubeResult } from "../model/youtube";
-import { useSaveYoutubeVideoMutation, useYoutubeSearchQuery } from "../model/youtube-queries";
+import { useCreateYoutubeWorkoutMutation, useSaveYoutubeVideoMutation, useYoutubeSearchQuery } from "../model/youtube-queries";
 
 type Forced = "loading" | "error" | "empty" | "stale" | "saved" | null;
 type Props = { filters?: YoutubeFilters; forced?: Forced };
@@ -35,10 +36,11 @@ const filterLabel = (key: string, value?: string) => {
 };
 
 function ResultCard({ result, filters, onPlay, initialSaved = false, eager = false }: { result: YoutubeResult; filters: YoutubeFilters; onPlay: (video: YoutubePlayerVideo) => void; initialSaved?: boolean; eager?: boolean }) {
-  const save = useSaveYoutubeVideoMutation();
+  const router = useRouter(), save = useSaveYoutubeVideoMutation(), open = useCreateYoutubeWorkoutMutation();
   const [saved, setSaved] = useState(false);
   const isSaved = saved || initialSaved;
   const submit = async () => { try { await save.mutateAsync({ result, filters }); setSaved(true); } catch { /* mutation state renders the inline error */ } };
+  const openWorkout = async () => { try { const data = await open.mutateAsync({ result, filters }); router.push(`/workouts/${data.workout.id}` as never); } catch { /* mutation state renders the inline error */ } };
   return <WorkoutMediaCard
     title={result.title}
     coverSrc={result.thumbnailUrl ?? ""}
@@ -46,9 +48,10 @@ function ResultCard({ result, filters, onPlay, initialSaved = false, eager = fal
     metadata={[result.channelTitle, viewsLabel(result.viewCount), publishedLabel(result.publishedAt)].filter(Boolean).join(" · ")}
     eager={eager}
     unoptimized
+    onOpen={open.isPending ? undefined : () => void openWorkout()}
     onPlay={(trigger) => onPlay({ videoId: result.videoId, title: result.title, trigger })}
     actions={<Button inline clear={!isSaved} tonal={isSaved} rounded disabled={save.isPending || isSaved} aria-busy={save.isPending || undefined} aria-label={isSaved ? `«${result.title}» сохранено` : `Сохранить «${result.title}»`} title={isSaved ? "Сохранено" : "Сохранить"} className={`h-11 w-11 min-w-11 p-0 ${focusRing}`} onClick={submit}>{save.isPending ? <Preloader className="size-4" /> : <Icon name={isSaved ? "check" : "bookmark"} />}<span className="sr-only" aria-live="polite">{isSaved ? "Сохранено" : "Сохранить"}</span></Button>}
-    status={save.isError ? <p className="m-0 text-sm text-danger" role="alert">Не удалось сохранить. Повторите позже.</p> : undefined}
+    status={open.isPending ? <p className="m-0 text-sm text-text-muted" role="status">Открываем тренировку…</p> : open.isError ? <p className="m-0 text-sm text-danger" role="alert">Не удалось открыть тренировку. Повторите позже.</p> : save.isError ? <p className="m-0 text-sm text-danger" role="alert">Не удалось сохранить. Повторите позже.</p> : undefined}
   />;
 }
 

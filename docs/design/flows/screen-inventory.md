@@ -16,8 +16,8 @@
 | S-MA-011 | Today action detail | complete/snooze/skip/rest where allowed | F02,F07,F08 | §11, §25–26 | occurrence owner | gap |
 | S-MA-012 | Open-session conflict | continue / close / cancel new launch | F02,F04 | §14.4 | session owner | partial: E2-D3-T01 |
 | S-MA-020 | Йога: catalog | mobile-only shared Navbar `Йога` (web hidden); shared YouTube-like 16:9 WorkoutMediaCard/two-line titles; search/filter/source/favorite/open (DEC-043/047/050/053) | F03 | §12 | public/entitled content | partial: catalog |
-| S-MA-021 | YouTube results | mobile-only internal Navbar `Поиск YouTube` (web hidden); shared Card + fullscreen in-app player/save, stale/saved/error states; create deferred (DEC-047/048/051/053) | F03,F05 | §19 | owner saves private copy | partial: search/save |
-| S-MA-022 | Workout detail | mobile-only internal Navbar `Тренировка` (web hidden); adaptive media-first Cover→H1→meta; real/disabled exercise states + compact future actions + explicit disclosure (DEC-047/048/051/054) | F03,F04,F10 | §13 | visibility checked; UGC warning | partial: detail |
+| S-MA-021 | YouTube results | mobile-only internal Navbar `Поиск YouTube` (web hidden); shared Card + fullscreen in-app player/save, stale/saved/error states; card→materialized workout planned by DEC-063/E2-D2-T08 (DEC-047/048/051/053) | F03,F05 | §19 | owner saves private copy | partial: search/save |
+| S-MA-022 | Workout detail | mobile-only internal Navbar `Тренировка` (web hidden); adaptive media-first Cover→H1→meta; real/disabled exercise states + compact future actions + explicit disclosure; generated empty YouTube detail omits Exercises/Details by DEC-063 (DEC-047/048/051/054) | F03,F04,F10 | §13 | visibility checked; UGC warning | partial: detail |
 | S-MA-023 | Favorites | workouts/videos/programs; no folders | F03,F06 | §18 | owner only | gap |
 | S-MA-024 | Author profile/public content | real user author by ID; inspect/block/unblock (source pseudo-authors forbidden by DEC-057) | F03,F10 | §13.2, §56.6 | public data only | gap |
 | S-MA-025 | Источники | one `/sources` overview; Flowly + YouTube independent 3-card previews; open detail / all via real source filter (DEC-057) | F03 | §12.1 | public/entitled content | partial: sources |
@@ -45,9 +45,9 @@
 | S-MA-065 | Habit lifecycle confirmation | future-only change; pause/resume/archive | F07 | §23, §26 | owner; history immutable | gap |
 | S-MA-070 | Календарь month | month cells/filter/select | F02,F09 | §28 | owner; scoped shared data | partial: month |
 | S-MA-071 | Calendar week | week/filter/select | F09 | §28 | owner | gap |
-| S-MA-072 | Calendar day | activities/add manual/edit status | F04,F05,F09 | §15, §17, §28 | owner | partial: day summary |
+| S-MA-072 | Calendar day | activities/add manual/edit status + explicit Flowly/YouTube source cue (DEC-063) | F04,F05,F09 | §15, §17, §28 | owner | partial: day summary |
 | S-MA-073 | Status correction | allowed status, confirm, optional comment/history | F04,F09 | §15, §26.2 | owner; audit retained | gap |
-| S-MA-074 | Reports index | weekly/monthly/current partial/history | F09 | §30 | owner | gap |
+| S-MA-074 | Reports index | weekly/monthly/current partial/history + YouTube source Badge (DEC-063) | F09 | §30 | owner | gap |
 | S-MA-075 | Report detail | metrics/comparison/shared-only joint stats | F09 | §30 | owner | gap |
 | S-MA-076 | Share-card consent | choose safe fields/generate/download/share | F09 | §30.5 | owner; privacy filter | gap |
 | S-MA-080 | Profile hub | mobile-Telegram-only action-free fixed/blurred title + native Telegram BackButton; profile + extra sections | F10,F11 | §9, §38 | owner | gap |

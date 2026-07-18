@@ -106,15 +106,15 @@ function ActionPanel({ workout, backgroundRef }: { workout: WorkoutDetail; backg
 }
 
 function Detail({ workout, forced, onPlay, backgroundRef }: { workout: WorkoutDetail; forced: Forced; onPlay: (video: YoutubePlayerVideo) => void; backgroundRef: RefObject<HTMLElement | null> }) {
-  const contraindications = workout.contraindications.length ? workout.contraindications : ["Нет специальных противопоказаний в каталоге. Ориентируйтесь на самочувствие."];
+  const contraindications = workout.contraindications.length ? workout.contraindications : ["Нет специальных противопоказаний в каталоге. Ориентируйтесь на самочувствие."], generatedYoutube = workout.sourceType === "youtube" && workout.exercises.length === 0;
   return <>
     <Hero workout={workout} onPlay={onPlay} />
     {forced === "offline" && <Card component="aside" outline className="m-0" role="status" contentWrapPadding="p-3 flex items-start gap-2"><Icon name="wifi-off" /><p className="m-0 text-sm text-text-muted">Офлайн: показываем уже загруженное описание. Новые действия временно недоступны.</p></Card>}
     {workout.sourceType === "user" && <Card component="section" outline className="m-0" contentWrapPadding="p-3 flex items-start gap-2"><Icon name="triangle-alert" /><p className="m-0 text-sm">Тренировка создана пользователем и не проверена Flowly.</p></Card>}
-    <Exercises workout={workout} />
+    {!generatedYoutube && <Exercises workout={workout} />}
     <ActionPanel workout={workout} backgroundRef={backgroundRef} />
 
-    <Card component="details" contentWrap={false} outline className="group m-0" aria-labelledby="workout-more-title">
+    {!generatedYoutube && <Card component="details" contentWrap={false} outline className="group m-0" aria-labelledby="workout-more-title">
       <summary id="workout-more-title" className={`flex min-h-16 cursor-pointer items-center gap-3 px-4 py-3 ${focusRing}`}>
         <Icon name="info" />
         <span className="min-w-0 flex-1"><span className="block font-semibold">Сведения</span><span className="block truncate text-sm text-text-muted">Противопоказания, источник и автор</span></span>
@@ -129,7 +129,7 @@ function Detail({ workout, forced, onPlay, backgroundRef }: { workout: WorkoutDe
         <p className="m-0 text-sm text-text-muted">Источник: {sourceLabel(workout.sourceType)} · Автор: {workout.author.name}</p>
         <Button component={NextLink} href="/sources" outline rounded className={focusRing}>Открыть источники</Button>
       </div>
-    </Card>
+    </Card>}
   </>;
 }
 

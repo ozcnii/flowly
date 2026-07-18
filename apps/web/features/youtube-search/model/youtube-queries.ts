@@ -21,10 +21,13 @@ export const useYoutubeSearchQuery = (filters: YoutubeFilters, enabled = true) =
   placeholderData: (previous) => previous,
 });
 
-export function useSaveYoutubeVideoMutation() {
+function useYoutubeWorkoutMutation(action: "save" | "create-workout") {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ result, filters }: { result: YoutubeResult; filters: YoutubeFilters }) => apiJson<SaveYoutubeResponse>(`/api/v1/youtube/videos/${encodeURIComponent(result.videoId)}/save`, { method: "POST", body: jsonBody({ result, filters }) }),
+    mutationFn: ({ result, filters }: { result: YoutubeResult; filters: YoutubeFilters }) => apiJson<SaveYoutubeResponse>(`/api/v1/youtube/videos/${encodeURIComponent(result.videoId)}/${action}`, { method: "POST", body: jsonBody({ result, filters }) }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["workouts"] }),
   });
 }
+
+export const useSaveYoutubeVideoMutation = () => useYoutubeWorkoutMutation("save");
+export const useCreateYoutubeWorkoutMutation = () => useYoutubeWorkoutMutation("create-workout");

@@ -104,7 +104,7 @@ export const workouts = sqliteTable("workouts", {
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
   publishedAt: text("published_at"),
-});
+}, (table) => [uniqueIndex("workouts_owner_youtube_video_unique").on(table.ownerId, table.sourceType, table.youtubeVideoId).where(sql`${table.ownerId} IS NOT NULL AND ${table.sourceType} = 'youtube' AND ${table.youtubeVideoId} IS NOT NULL`)]);
 
 // §43.8 workout_category_links
 export const workoutCategoryLinks = sqliteTable(

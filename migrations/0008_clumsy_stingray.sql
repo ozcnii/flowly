@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `workouts_owner_youtube_video_unique` ON `workouts` (`owner_id`,`source_type`,`youtube_video_id`) WHERE "workouts"."owner_id" IS NOT NULL AND "workouts"."source_type" = 'youtube' AND "workouts"."youtube_video_id" IS NOT NULL;

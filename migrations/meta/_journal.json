@@ -57,6 +57,13 @@
       "when": 1784289318574,
       "tag": "0007_married_wrecking_crew",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1784298097467,
+      "tag": "0008_clumsy_stingray",
+      "breakpoints": true
     }
   ]
 }

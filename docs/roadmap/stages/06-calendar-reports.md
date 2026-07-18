@@ -22,7 +22,7 @@
 
 - По `DEC-024` каждый указанный `ui_slices` screen slice выполняется строго по одному ID в реальном `apps/web`; все states/интеракции и явный approval обязательны до следующего ID.
 - По `DEC-035` Konsta UI 5.2.0 (`konsta/react`, `ios` theme) обязательна для current/future production UI; direct imports — default, `packages/ui` допустим только для Flowly-specific contracts, отсутствующих в Konsta.
-- Calendar correction предлагает только допустимые activity statuses, требует confirmation и сохраняет history (`DEC-015`, `DEC-017`).
+- Calendar correction предлагает только допустимые activity statuses, требует confirmation и сохраняет history (`DEC-015`, `DEC-017`). По `DEC-063` occurrence workout join возвращает `activitySource`; YouTube отображается явным text Badge, не только цветом, во всех calendar/report surfaces.
 - Weekly report: Monday 09:00; monthly: first day 09:00; timezone пользователя; current period marked partial (`DEC-018`).
 - Share-card retention — 30 дней (`DEC-018`, supersedes `DEC-009`); bot links открывают exact report target (`DEC-013`).
 - UI/state/privacy contracts заданы F09, `DEC-022` и [`docs/design/flows/`](../../design/flows/).
@@ -31,14 +31,14 @@
 
 ### E6-D7-T01 — Реализовать calendar API и агрегацию
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §28, §43.21, §44.9 · **depends_on:** E2-D3-T04, E3-D4-T06, E4-D5-T07 · **decisions:** DEC-015, DEC-017, DEC-029
+- **prd_refs:** §28, §43.21, §44.9 · **depends_on:** E2-D2-T08, E2-D3-T04, E3-D4-T06, E4-D5-T07 · **decisions:** DEC-015, DEC-017, DEC-029, DEC-063
 - **scope:** month/week/day ranges, общий источник occurrences и timezone boundaries.
-- **acceptance:** [ ] диапазоны не теряют/дублируют события; [ ] yoga/habits различимы; [ ] ownership соблюдён.
+- **acceptance:** [ ] диапазоны не теряют/дублируют события; [ ] yoga/habits различимы; [ ] Flowly/YouTube source mapping устойчив; [ ] ownership соблюдён.
 - **validation/evidence:** API range matrix вокруг timezone boundaries.
 
 ### E6-D7-T02 — Реализовать month/week/day UI
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §28.1–28.2, §28.4, §40 · **depends_on:** E6-D7-T01 · **decisions:** DEC-017, DEC-022, DEC-024, DEC-025, DEC-029
+- **prd_refs:** §28.1–28.2, §28.4, §40 · **depends_on:** E6-D7-T01 · **decisions:** DEC-017, DEC-022, DEC-024, DEC-025, DEC-029, DEC-063
 - **ui_slices:** S-MA-070, S-MA-071, S-MA-072 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** три режима, навигация по датам, loading/empty/error states.
 - **acceptance:** [ ] режимы согласованы; [ ] выбранный день доступен; [ ] responsive/keyboard states корректны.
@@ -46,7 +46,7 @@
 
 ### E6-D7-T03 — Реализовать фильтры и детали дня
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §28.3, §28.5–28.6, §55.6 · **depends_on:** E6-D7-T02 · **decisions:** DEC-015, DEC-017, DEC-022, DEC-024, DEC-025, DEC-029
+- **prd_refs:** §28.3, §28.5–28.6, §55.6 · **depends_on:** E6-D7-T02 · **decisions:** DEC-015, DEC-017, DEC-022, DEC-024, DEC-025, DEC-029, DEC-063
 - **ui_slices:** S-MA-070, S-MA-071, S-MA-072, S-MA-073 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** yoga/habit filters, icons/colors/statuses, details и ручное изменение статуса.
 - **acceptance:** [ ] filters не меняют данные; [ ] statuses различимы; [ ] ручная запись видна; [ ] изменение журналируется.
@@ -62,7 +62,7 @@
 
 ### E6-D7-T05 — Реализовать недельный отчёт
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §30.1–30.2, §30.4, §43.30, §44.10, §55.7 · **depends_on:** E6-D7-T01, E6-D7-T04 · **decisions:** DEC-018, DEC-022, DEC-024, DEC-025, DEC-029
+- **prd_refs:** §30.1–30.2, §30.4, §43.30, §44.10, §55.7 · **depends_on:** E6-D7-T01, E6-D7-T04 · **decisions:** DEC-018, DEC-022, DEC-024, DEC-025, DEC-029, DEC-063
 - **ui_slices:** S-MA-074, S-MA-075 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** generation/storage/UI report из calendar source.
 - **acceptance:** [ ] формулы §30.4 соблюдены; [ ] повторная генерация консистентна; [ ] данные приватны.
@@ -70,7 +70,7 @@
 
 ### E6-D7-T06 — Реализовать месячный отчёт
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §30.1, §30.3–30.4, §43.30, §44.10, §55.7 · **depends_on:** E6-D7-T05 · **decisions:** DEC-018, DEC-022, DEC-024, DEC-025, DEC-029
+- **prd_refs:** §30.1, §30.3–30.4, §43.30, §44.10, §55.7 · **depends_on:** E6-D7-T05 · **decisions:** DEC-018, DEC-022, DEC-024, DEC-025, DEC-029, DEC-063
 - **ui_slices:** S-MA-074, S-MA-075 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** monthly generation/storage/UI по тем же canonical formulas.
 - **acceptance:** [ ] month boundaries/timezone корректны; [ ] значения сверяются с календарём; [ ] empty month обработан.
