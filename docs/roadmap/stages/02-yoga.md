@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 5 | 0 | 0 | 1 | 8 |
+| 2 | 0 | 1 | 0 | 10 |
 
 ## Зависимости и инварианты
 
@@ -114,36 +114,38 @@
 - **journal:** 2026-07-16 — после закрытия E0-D0-T05 пользователь выбрал E2-D3-T01 как следующую карточку. Dependency E2-D2-T03 `done`; прочитаны PRD refs, DEC-015/016/022/024/025/029 и superseding DEC-035, F04/S-MA-012/030/033/034 contracts. Выполнен переход `backlog -> in_progress`; до plan approval runtime code не менять. 2026-07-17 — пользователь выбрал plan file `.temp/E2-D3-T01/plan.md`, подтвердил `/sessions/[id]`, IFrame API, occurrence persistence и server+offline checkpoint, затем approved implementation («да делай»); создан DEC-062. Реализованы schema/API/client/runtime/Home resume/detail conflict/navigation/player integration; local migration, canonical HTTP и focused browser checks PASS. Card остаётся `in_progress` до full build/deploy-check, user slice approval и real-device Telegram player check. 2026-07-17 — user review requested: replace cramped conflict UI; same-workout active detail must show current marker/Continue and route directly without modal; redesign finish UI; stabilize exercise spacing across widths; fix lost short playback/technical offline checkpoint UX; confirm when E2-D3-T02 non-video sessions follow. Existing implementation is not approved. Actual pre-fix repro captured 0:03→SPA Back→local/server 0. Post-fix muted controlled rerun `.temp/E2-D3-T01/checkpoint-postfix.json`: 0:03→local/server 3→restored 0:03; Pause keeps iframe Y/height and Card height exact while status changes only `Идёт тренировка`→`Пауза`. Home resume card compacted and uses shared unbounded `m:ss`/`h:mm:ss` active elapsed. Browser and mocked native Back exact prior-detail→Home→Continue→session→Back both return `/` with history index 1→0; reported workout-detail return not reproduced without the exact pre-Home sequence. Пользователь выбрал: other-active bottom Sheet; same-active Badge/time/direct Continue; final bottom Sheet с default `completed` и раскрываемым comment; duration под exercise title; unbounded PLAYING elapsed formatted `m:ss`/`h:mm:ss`; E2-D3-T02 сразу после acceptance T01. `.temp/E2-D3-T01/plan.md` обновлён до correction v2 (Plan confidence 96%, Implementation confidence 93%); пользователь явно re-approved. Corrections реализованы: StrictMode-safe monotonic restore, stable Pause, human sync copy, compact Home/full elapsed, same-active direct Continue, vertical conflict/final Sheets, default `completed`, responsive exercises. Final root typecheck/lint/build/OpenNext deploy-check/diff-check PASS. Карточка оставалась `in_progress` до user/real Telegram approval и уточнения невоспроизведённой browser-Back preceding sequence. User correction v3 explicitly approved: отдельно сохранять/seek-ить YouTube playback second, не смешивая её с active elapsed; при server/device elapsed delta `<1s` автоматически брать server и не показывать sync Sheet. Implemented migration `0007_married_wrecking_crew.sql`, schema/API/local snapshot/finish/player `seekTo`. HTTP evidence `.temp/E2-D3-T01/http/playback-{position,finish}.json`: start position0, checkpoint elapsed12/position37→position38, stale409 exposes position38, idempotent finish keeps position38/one occurrence. Muted browser `.temp/E2-D3-T01/playback-restore.json`: stale token/equal elapsed auto-server, dialog false, timer0:12, local rebase position38, `seekTo(38)`. Rolling-deploy compatibility `.temp/E2-D3-T01/http/playback-backward-compat.json`: old checkpoint/finish bodies without playback field remain 200 and preserve position44. Plan confidence 97%, implementation confidence 92%. Commit `b69e190` pushed; production deploy run `29579333079` PASS with remote migrations 0006/0007 and worker deploy. Production browser-UA smoke `/`=200, `/sessions/smoke`=200, unauth active API=401. Real iPhone final-Sheet follow-up: bottom controls nearly touched rounded edge and horizontal scroll appeared. Fix uses `pb-safe-6`, bounded/wrappable comment action, max-width/X clipping. Muted 200% `.temp/E2-D3-T01/sheet-spacing.json`: document/body/Sheet overflow 0, footer bottom gap 48px at doubled scale, console errors 0. Follow-up commit `85b9cc4`, production deploy run `29582336030` PASS. 2026-07-17 — пользователь явно выбрал «Закрыть как done» после production/device feedback; acceptance подтверждён, E2-D3-T01 `in_progress -> review -> done`. Browser-Back exact preceding sequence не воспроизведена и остаётся documented residual, не hidden blocker.
 
 ### E2-D3-T02 — Реализовать пошаговую и смешанную сессию
-- **status:** review · **priority:** high · **owner:** AI agent · **updated:** 2026-07-18
+- **status:** done · **priority:** high · **owner:** AI agent · **updated:** 2026-07-19
 - **prd_refs:** §14.2–14.4, §15 · **depends_on:** E2-D2-T03, E2-D3-T01 · **decisions:** DEC-015, DEC-016, DEC-022, DEC-024, DEC-025, DEC-029, DEC-035, DEC-053, DEC-062
-- **ui_slices:** S-MA-031 (step — НОВЫЙ), S-MA-032 (mixed chooser — НОВЫЙ); S-MA-012/033/034 approved в T01, regression-only.
-- **scope:** шаги, таймер, pause/resume, `+30 секунд`, mixed media и незавершённость как расширение того же DEC-062 `/sessions/[id]` runtime без параллельной session/player архитектуры.
-- **acceptance:** [x] переходы шагов корректны; [x] +30 не ломает состояние; [ ] mixed flow поддержан (S-MA-032 residual); [x] статус не автоматический.
-- **validation/evidence:** plan `.temp/E2-D3-T02/plan.md`; UX audit `.temp/E2-D3-T02/ux-audit-2026-07-18.md`; migration `0009_ordinary_annihilus.sql` (`workout_sessions.mode`); shared `FinishSessionSheet`/`SyncConflictSheet`; `StepSessionScreen` auto pipeline exercise→rest→next, last-5s countdown ticks, complete fanfare+confetti, last-step «К итогу»/✓, done return path; DEC-062 conflict parity (elapsed &lt;1s auto-server); typecheck/lint PASS; user real-device Telegram review pending after deploy.
-- **journal:** 2026-07-18 — plan approved; Slice 0 backend (mode, exercises payload, checkpoint position) + Slice 1 S-MA-031 step runtime implemented. User UX loop: transport buttons, auto-continue, celebration, last-step labels, conflict parity with video. `in_progress -> review` for production deploy + real-device pass. Residual: S-MA-032 mixed chooser not shipped; exercise media placeholder until E2-D3-T03.
+- **ui_slices:** S-MA-031 (step — shipped); S-MA-032 (mixed chooser — **deferred residual**, not required for close); S-MA-012/033/034 regression-only.
+- **scope:** шаги, таймер, pause/resume, `+30 секунд`, step media/VO/rest UX; mixed chooser S-MA-032 явно отложен.
+- **acceptance:** [x] переходы шагов корректны; [x] +30 не ломает состояние; [x] mixed flow — deferred (S-MA-032 out of this close, user approved S-MA-031 scope); [x] статус не автоматический.
+- **validation/evidence:** plan `.temp/E2-D3-T02/plan.md`; migration `0009`; `StepSessionScreen` intro→exercise→rest, VO, square MP4 media, done-screen actions; production deploy `e5b55bc` + remote catalog seed; user iterative UX approval on device/local.
+- **journal:** 2026-07-18 — plan approved; Slice 0+1 S-MA-031; `review` for deploy/device. Residual S-MA-032 mixed not shipped. 2026-07-19 — media/VO/rest/done UX loop + prod; user: close T02 (`review -> done`). S-MA-032 remains deferred residual (not blocking).
 
-### E2-D3-T06 — Seed ready-made exercise GIFs (external library)
-- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-18
+### E2-D3-T06 — Seed ready-made exercise media (user square MP4 pack)
+- **status:** done · **priority:** high · **owner:** AI agent · **updated:** 2026-07-19
 - **prd_refs:** §12.1, §14.2–14.4, §43.6–43.10, §55.2 · **depends_on:** E2-D3-T02 · **decisions:** DEC-016, DEC-029, DEC-053, DEC-062
-- **ui_slices:** regression S-MA-031 step media; no new surface ID until pilot approved.
-- **scope:** заменить самодельные/битые exercise media в step-каталоге на **готовые коммерчески/открыто лицензированные GIF** с внешнего источника. **Не** генерировать art через image_gen/ChatGPT collage. Pilot: **ровно 2** Flowly step-workout’а (локально + prod) с полным набором exercise GIF; дальше — пополнение из того же источника после user pick. Отдельная от E2-D3-T03 (UGC uploads) content-seed задача.
+- **ui_slices:** regression S-MA-031 step media.
+- **scope:** user-supplied square MP4 pack (46) → Flowly step catalog exercises + workouts; covers for new workouts; local+prod seed; step UI white 16:9 contain. Separate from E2-D3-T03 (UGC uploads).
 - **acceptance:**
-  - [ ] пользователь явно выбрал source/site (и понятен license path);
-  - [ ] pilot: 2 workouts, GIF на каждом exercise step, media доступны local + production;
-  - [ ] старые плохие custom GIFs для этих workouts вычищены (DB keys + `public/media` / R2 path);
-  - [ ] step session показывает GIF без layout-shift / object-cover clipping;
-  - [ ] license/attribution зафиксированы в seed/docs (если требуется источником);
-  - [ ] commit/push только по явной команде пользователя.
-- **validation/evidence:** browser step session на pilot workouts; SQL/media path check local+prod; source URL + license note in journal.
-- **journal:** 2026-07-18 — создана по запросу пользователя: текущие custom GIF «плохо нарезаны»; pivot на готовые библиотеки. Пока **не implement**: показать кандидатов source → user approval → pilot 2 workouts. Hard rule: no commit/push without explicit user command. 2026-07-19 — user supplied square MP4 pack in `.temp/assets` (46). Pilot 3 on `wo-step-test-short` approved («нравится»). Full local rebuild: 46 `ex-*-pose` video exercises, 21 step workouts re-composed, 3 YouTube kept; media under `public/media/catalog/exercises/*.mp4`; step UI white 16:9 + `object-contain` video. Local D1 reseeded. Prod/commit pending user command.
+  - [x] user source: own `.temp/assets` square MP4 pack (not Gym Visual scrape);
+  - [x] full catalog rebuild: 46 video exercises, 21 step workouts + 3 YouTube; pilot then full;
+  - [x] media in `public/media/catalog/exercises/*.mp4` + covers; prod deploy + remote D1 seed;
+  - [x] step session shows video without object-cover clipping (contain + white letterbox);
+  - [x] seed/docs/journal record pack path;
+  - [x] commit/push on explicit user command (`e5b55bc`).
+- **validation/evidence:** local+prod D1 `media_type=video` count 46; `wo-twists-15`/`wo-standing-18` covers; commit `e5b55bc` Deploy web PASS; remote seed 0002/0003/0006.
+- **journal:** 2026-07-18 — card created. 2026-07-19 — user MP4 pack; pilot approved; full catalog + prod; user: close (`backlog/work -> done`).
 
 ### E2-D3-T03 — Реализовать собственные тренировки и media uploads
-- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §13.2, §16, §43.7–43.11, §44.3–44.4, §44.13, §46 · **depends_on:** E1-D1-T05, E2-D2-T03 · **decisions:** DEC-016, DEC-019, DEC-022, DEC-024, DEC-025, DEC-029
+- **status:** blocked · **priority:** low · **owner:** unassigned · **updated:** 2026-07-19
+- **prd_refs:** §13.2, §16, §43.7–43.11, §44.3–44.4, §44.13, §46 · **depends_on:** E1-D1-T05, E2-D2-T03 · **decisions:** DEC-016, DEC-019, DEC-022, DEC-024, DEC-025, DEC-029, DEC-035, DEC-064
 - **ui_slices:** S-MA-040, S-MA-041, S-MA-042, S-MA-043, S-MA-045 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** private CRUD, упражнения, изображения/GIF через безопасный R2 flow.
+- **blocked_reason:** product deprioritized for current v1 path — Flowly catalog + YouTube + step sessions cover core use; own-workout constructor / R2 upload not needed until demand. Resume only on explicit user request.
 - **acceptance:** [ ] ownership обязателен; [ ] ограничения загрузки соблюдены; [ ] удаление/доступ корректны; [ ] публичность не включается скрыто.
 - **validation/evidence:** CRUD/upload cases и permission failures.
+- **journal:** 2026-07-19 — user: взять в работу. `backlog -> in_progress`. Analysis started. Same day user: functionality not needed for now («может когда-нибудь потом»). `in_progress -> blocked` (product defer, DEC-064). No implementation.
 
 ### E2-D3-T04 — Реализовать ручную запись тренировки
 - **status:** backlog · **priority:** normal · **owner:** unassigned · **updated:** 2026-07-13
@@ -154,12 +156,13 @@
 - **validation/evidence:** текущая/прошлая дата и timezone examples.
 
 ### E2-D3-T05 — Закрыть DoD этапа «Йога»
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §50, §55.2, §57 · **depends_on:** E2-D2-T01–T05, E2-D3-T01–T04 · **decisions:** DEC-003, DEC-011, DEC-015, DEC-016, DEC-019, DEC-021, DEC-022, DEC-029
-- **scope:** проверить все критерии §55.2 и инварианты §57.
-- **acceptance:** [ ] каждый критерий имеет evidence; [ ] privacy/security проверены; [ ] риски YouTube и user content записаны.
+- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-19
+- **prd_refs:** §50, §55.2, §57 · **depends_on:** E2-D2-T01–T05, E2-D3-T01–T04 · **decisions:** DEC-003, DEC-011, DEC-015, DEC-016, DEC-019, DEC-021, DEC-022, DEC-029, DEC-064
+- **scope:** проверить все критерии §55.2 и инварианты §57. **По DEC-064:** критерии §55.2 / §16 про *создание собственных тренировок и media upload* — **N/A / deferred**, пока E2-D3-T03 `blocked`; DoD закрывается без own-workout constructor.
+- **acceptance:** [ ] каждый критерий имеет evidence (или explicit N/A + DEC-064 для own-workout); [ ] privacy/security проверены; [ ] риски YouTube и user content записаны.
 - **validation/evidence:** итоговый checklist и ссылки на сценарии.
+- **journal:** 2026-07-19 — linked DEC-064: own-workout DoD items deferred with T03; stage can still close without user-built workouts.
 
 ## Handoff этапа
 
-Активна E2-D3-T02 `review`: step session S-MA-031 shipped for real-device Telegram verification after deploy; residual S-MA-032 mixed chooser. Новая content-задача **E2-D3-T06** `backlog`: ready-made exercise GIFs (external library), pilot 2 workouts после user pick source.
+**E2-D3-T03** `blocked` (2026-07-19, DEC-064): own workouts + R2 — product deferred until demand. Active stage work: pick next from T04 / stage polish / S-MA-032 residual.

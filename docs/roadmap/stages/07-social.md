@@ -47,20 +47,24 @@
 - **validation/evidence:** before/after authorization requests.
 
 ### E7-D8-T03 — Реализовать sharing привычек и тренировок
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §8.4, §33.1–33.2, §43.11, §43.18, §47.2 · **depends_on:** E2-D3-T03, E4-D5-T02, E7-D8-T01 · **decisions:** DEC-019, DEC-022, DEC-024, DEC-025, DEC-029
+- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-19
+- **prd_refs:** §8.4, §33.1–33.2, §43.11, §43.18, §47.2 · **depends_on:** E2-D3-T03, E4-D5-T02, E7-D8-T01 · **decisions:** DEC-019, DEC-022, DEC-024, DEC-025, DEC-029, DEC-064
 - **ui_slices:** S-MA-043, S-MA-064, S-MA-083, S-MA-084 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** явный per-object sharing только после создания.
+- **note (DEC-064):** share **own user-built workouts** (S-MA-043 path from editor) **blocked** until E2-D3-T03 resumes. Share **habits** / other objects after E4-D5-T02+E7-D8-T01 can still proceed without T03. Optionally split card later: habits-only vs own-workout share.
 - **acceptance:** [ ] default private; [ ] видны только разрешённые данные; [ ] public link не раскрывает owner/private fields; [ ] revoke работает.
 - **validation/evidence:** owner/friend/stranger access matrix.
+- **journal:** 2026-07-19 — marked partial block from E2-D3-T03/DEC-064: own-workout share latent; habit share not blocked by T03 alone.
 
 ### E7-D8-T04 — Реализовать совместные программы
-- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §20.6, §55.3, §55.8 · **depends_on:** E3-D4-T07, E7-D8-T01–T03 · **decisions:** DEC-002, DEC-019, DEC-020, DEC-022, DEC-024, DEC-025, DEC-029
+- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-19
+- **prd_refs:** §20.6, §55.3, §55.8 · **depends_on:** E3-D4-T07, E7-D8-T01–T03 · **decisions:** DEC-002, DEC-019, DEC-020, DEC-022, DEC-024, DEC-025, DEC-029, DEC-064
 - **ui_slices:** S-MA-052, S-MA-053, S-MA-054, S-MA-087 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** joint enrollment, участники и разрешённая видимость прогресса без сдвига программы.
+- **note (DEC-064):** depends on E7-D8-T03; if T03 is split to habits-only, joint programs can proceed without own-workout share. Not blocked solely by E2-D3-T03.
 - **acceptance:** [ ] участники явно согласны; [ ] индивидуальные статусы защищены; [ ] программа сохраняет инварианты этапа 3.
 - **validation/evidence:** two-user lifecycle and revoke case.
+- **journal:** 2026-07-19 — DEC-064 note: transitive T03 dependency only via full T03 share scope; programs/habits path can unblock without own-workout constructor.
 
 ### E7-D8-T05 — Реализовать челленджи
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
@@ -79,13 +83,17 @@
 - **validation/evidence:** reaction add/change/remove cases.
 
 ### E7-D8-T07 — Реализовать партнёрские напоминания и закрыть DoD
-- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §35, §50.1–50.3, §55.8 · **depends_on:** E5-D6-T08, E7-D8-T01–T06 · **decisions:** DEC-007, DEC-015, DEC-019, DEC-022, DEC-024, DEC-025, DEC-029
+- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-19
+- **prd_refs:** §35, §50.1–50.3, §55.8 · **depends_on:** E5-D6-T08, E7-D8-T01–T06 · **decisions:** DEC-007, DEC-015, DEC-019, DEC-022, DEC-024, DEC-025, DEC-029, DEC-064
 - **ui_slices:** S-MA-083, S-MA-087, S-BOT-007 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** ограниченные reminders между друзьями и полная проверка social permissions.
-- **acceptance:** [ ] отправитель/получатель связаны и имеют разрешение; [ ] лимиты применены; [ ] каждый пункт §55.8 имеет evidence; [ ] нерасшаренные данные недоступны.
+- **note (DEC-064):** stage-7 DoD §55.8 items about **sharing user-created workouts** — N/A until E2-D3-T03; rest of social DoD can still close with explicit N/A.
+- **acceptance:** [ ] отправитель/получатель связаны и имеют разрешение; [ ] лимиты применены; [ ] каждый пункт §55.8 имеет evidence (own-workout share N/A per DEC-064 if T03 still blocked); [ ] нерасшаренные данные недоступны.
 - **validation/evidence:** permission/E2E matrix и итоговый checklist.
+- **journal:** 2026-07-19 — DEC-064: own-workout social DoD criteria deferred with T03.
 
 ## Handoff этапа
 
 Фиксировать IDs двух тестовых пользователей, friendship/share state, конкретный permission matrix case и следующий запрос.
+
+**DEC-064 (2026-07-19):** E2-D3-T03 own-workout constructor deferred. **E7-D8-T03** own-workout *share* latent until T03; habit share / joint programs / challenges can still run without user-built workouts.

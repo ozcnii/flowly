@@ -544,6 +544,15 @@
 - **Verification:** migration 0008 local PASS; concurrent Save/Create returns one ID under DB unique index; generated detail/session/Finish PASS; occurrence join returns `source_type=youtube`; 360/390/430 generated detail has no empty Exercises/Details, overflow or small targets; full checks PASS. Production preflight/deploy and user UI approval pending.
 - **Влияет на:** DEC-029/053/054/062, E2-D2-T04/T08, E2-D3-T01/T05, E6-D7-T01/T02/T03/T05/T06, S-MA-020/022/030/072, WorkoutMediaCard, YouTube search/save, workout detail, calendar/report selectors.
 
+### DEC-064 — Own workouts constructor (E2-D3-T03) deferred until demand
+
+- **Статус:** approved
+- **Дата:** 2026-07-19
+- **Решение:** E2-D3-T03 (private own-workout CRUD, exercise editor, R2 media upload, S-MA-040…045) **не выполняется** в текущем v1 path. Карточка в статусе `blocked` с product reason: core product закрыт Flowly catalog + YouTube materialization + step/video sessions; user-built workouts/uploads не нужны, пока не появится явный спрос. Возобновление — только по явному запросу пользователя (`blocked -> in_progress`). Не удалять карточку и PRD §16; sharing/public (S-MA-043 / этап 7) остаётся зависимым от T03, если/когда T03 возобновят.
+- **Основание:** user 2026-07-19 после start T03: «функциональность нахуй не нужна… может когда-нибудь потом если появится потребность».
+- **PRD:** §16, §44.13, §46 — scope preserved as future, not cancelled from product forever.
+- **Влияет на:** E2-D3-T03 (blocked); E2-D3-T05 DoD own-workout criteria N/A; E7-D8-T03 (own-workout share latent; habit share not blocked by T03 alone); E7-D8-T04/T07 notes (transitive / DoD N/A); PRD §16 preserved as future.
+
 ## Открытые решения
 
 ### DEC-006 — Operational thresholds

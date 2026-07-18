@@ -294,11 +294,11 @@ export function StepSessionScreen({ id }: { id: string }) {
     advancePhase("exercise");
   };
   const back = () => {
-    if (phase === "rest" || phase === "intro") {
-      // Re-enter intro of current exercise paused (intentional resume).
-      const ex = exercises[positionRef.current];
+    sounds.unlock();
+    setRunningSync(false);
+    // Rest: return to the exercise we just finished (same position) as paused intro.
+    if (phase === "rest") {
       setPhase("intro");
-      setRunningSync(false);
       segmentUpRef.current = 0;
       setSegmentUp(0);
       remainingRef.current = INTRO_SECONDS;
@@ -306,7 +306,22 @@ export function StepSessionScreen({ id }: { id: string }) {
       persist(accumulatedRef.current, positionRef.current, true);
       return;
     }
-    if (positionRef.current > 0) gotoExercise(positionRef.current - 1);
+    // Intro or exercise: previous step (was broken for intro — re-entered same intro = no-op).
+    if (positionRef.current > 0) {
+      introAnnouncedRef.current = -1;
+      gotoExercise(positionRef.current - 1);
+      return;
+    }
+    // First step on exercise work → restart its intro (‹ not disabled only when phase===exercise && pos>0; pos0 exercise still enabled).
+    if (phase === "exercise") {
+      setPhase("intro");
+      segmentUpRef.current = 0;
+      setSegmentUp(0);
+      remainingRef.current = INTRO_SECONDS;
+      setRemaining(INTRO_SECONDS);
+      introAnnouncedRef.current = -1;
+      persist(accumulatedRef.current, 0, true);
+    }
   };
   const skip = () => {
     sounds.unlock();
@@ -470,7 +485,7 @@ export function StepSessionScreen({ id }: { id: string }) {
               On the last step that finishes the pipeline: Skip → «К итогу», › → check (not another chevron).
             */}
             <div className="flex items-center gap-2">
-              <Button large rounded tonal aria-label={phase === "rest" || phase === "intro" ? "К подготовке упражнения" : "Предыдущее упражнение"} className={focusRing} disabled={phase === "exercise" && position === 0} onClick={back}><Icon name="chevron-left" className="size-5" /></Button>
+              <Button large rounded tonal aria-label="Предыдущее упражнение" className={focusRing} disabled={position === 0 && phase === "intro"} onClick={back}><Icon name="chevron-left" className="size-5" /></Button>
               <Button large rounded tonal className={`min-h-11 flex-1 whitespace-nowrap ${focusRing}`} onClick={skip}>{skipLabel}</Button>
               <Button large rounded tonal className={focusRing} aria-label={nextAriaLabel} onClick={nextAction}>
                 <Icon name={nextCompletesSteps ? "circle-check" : "chevron-right"} className="size-5" />
