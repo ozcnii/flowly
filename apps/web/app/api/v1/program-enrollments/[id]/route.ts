@@ -5,7 +5,13 @@ import { getSessionUserId } from "@/lib/auth/session-user";
 import { getUser } from "@/lib/auth/users";
 import { getDb } from "@/lib/cloudflare";
 import { localDateInTimezone, scheduleLocalDate } from "@/features/programs/model/program-dates";
-import { currentDayNumber, dayProgressState, isWorkoutDoneStatus, isWorkoutSkippedStatus } from "@/features/programs/model/program-progress";
+import {
+  currentDayNumber,
+  dayProgressState,
+  isWorkoutDoneStatus,
+  isWorkoutSkippedStatus,
+  isWorkoutUserRestStatus,
+} from "@/features/programs/model/program-progress";
 
 const CATEGORY: Record<string, string> = {
   beginner: "Старт", back: "Спина", evening: "Вечер", morning: "Утро", mobility: "Мобильность", full: "Полный ритм",
@@ -36,32 +42,43 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     lte(schema.activityOccurrences.scheduledLocalDate, endLocalDate),
   ));
 
-  const doneKeys = new Set(
-    occurrences.filter((row) => isWorkoutDoneStatus(row.status)).map((row) => `${row.entityId}|${row.scheduledLocalDate}`),
-  );
-  const skipKeys = new Set(
-    occurrences.filter((row) => isWorkoutSkippedStatus(row.status)).map((row) => `${row.entityId}|${row.scheduledLocalDate}`),
-  );
+  const doneKeys = new Set(occurrences.filter((r) => isWorkoutDoneStatus(r.status)).map((r) => `${r.entityId}|${r.scheduledLocalDate}`));
+  const skipKeys = new Set(occurrences.filter((r) => isWorkoutSkippedStatus(r.status)).map((r) => `${r.entityId}|${r.scheduledLocalDate}`));
+  const restKeys = new Set(occurrences.filter((r) => isWorkoutUserRestStatus(r.status)).map((r) => `${r.entityId}|${r.scheduledLocalDate}`));
 
   let completedWorkoutDays = 0;
   let totalWorkoutDays = 0;
+  let plannedRestDays = 0;
+  let userRestDays = 0;
+  let skippedDays = 0;
   let todayWorkoutId: string | null = null;
   let todayDayNumber: number | null = null;
+  let todayIsPlannedRest = false;
 
   const mapped = days.map((day) => {
     const scheduledLocalDate = scheduleLocalDate(enrollment.startLocalDate, day.dayNumber);
     const key = day.workoutId ? `${day.workoutId}|${scheduledLocalDate}` : "";
     const workoutDone = Boolean(key && doneKeys.has(key));
     const workoutSkipped = Boolean(key && !workoutDone && skipKeys.has(key));
+    const workoutUserRest = Boolean(key && !workoutDone && !workoutSkipped && restKeys.has(key));
+    if (day.type === "rest") plannedRestDays += 1;
     if (day.type === "workout") {
       totalWorkoutDays += 1;
       if (workoutDone) completedWorkoutDays += 1;
+      if (workoutSkipped) skippedDays += 1;
+      if (workoutUserRest) userRestDays += 1;
     }
-    const state = dayProgressState(day.type, scheduledLocalDate, todayLocalDate, workoutDone, workoutSkipped);
-    if (state === "today" && day.workoutId && !workoutDone) {
+    const state = dayProgressState(day.type, scheduledLocalDate, todayLocalDate, {
+      done: workoutDone,
+      skipped: workoutSkipped,
+      userRest: workoutUserRest,
+    });
+    if (state === "today" && day.workoutId) {
       todayWorkoutId = day.workoutId;
       todayDayNumber = day.dayNumber;
     }
+    if (state === "rest_today") todayIsPlannedRest = true;
+    const resolved = workoutDone || workoutSkipped || workoutUserRest || (day.type === "rest" && scheduledLocalDate <= todayLocalDate);
     return {
       id: day.id,
       dayNumber: day.dayNumber,
@@ -71,9 +88,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       workoutId: day.workoutId,
       scheduledLocalDate,
       state,
-      done: workoutDone || workoutSkipped || (day.type === "rest" && scheduledLocalDate <= todayLocalDate),
+      done: resolved,
       skipped: workoutSkipped,
-      canSkip: day.type === "workout" && Boolean(day.workoutId) && !workoutDone && !workoutSkipped && scheduledLocalDate <= todayLocalDate,
+      userRest: workoutUserRest,
+      canSkip: day.type === "workout" && Boolean(day.workoutId) && !resolved && scheduledLocalDate <= todayLocalDate,
+      canRest: day.type === "workout" && Boolean(day.workoutId) && !resolved && scheduledLocalDate <= todayLocalDate,
     };
   });
 
@@ -94,9 +113,13 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         durationDays: program.durationDays,
         completedWorkoutDays,
         totalWorkoutDays,
+        plannedRestDays,
+        userRestDays,
+        skippedDays,
         percent: totalWorkoutDays ? Math.round(completedWorkoutDays / totalWorkoutDays * 100) : 0,
         todayWorkoutId,
         todayDayNumber,
+        todayIsPlannedRest,
       },
       program: {
         id: program.id,

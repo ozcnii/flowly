@@ -1,6 +1,15 @@
 import { differenceInCalendarDays, parseISO } from "date-fns";
 
-export type DayProgressState = "completed" | "skipped" | "today" | "upcoming" | "missed" | "rest" | "rest_today";
+/** planned rest = type rest; user_rest = workout day marked rest; skipped ≠ rest. */
+export type DayProgressState =
+  | "completed"
+  | "skipped"
+  | "user_rest"
+  | "today"
+  | "upcoming"
+  | "missed"
+  | "rest"
+  | "rest_today";
 
 const DONE = new Set(["completed", "partial"]);
 
@@ -15,12 +24,12 @@ export const dayProgressState = (
   type: string,
   scheduledLocalDate: string,
   todayLocalDate: string,
-  workoutDone: boolean,
-  workoutSkipped = false,
+  flags: { done?: boolean; skipped?: boolean; userRest?: boolean } = {},
 ): DayProgressState => {
   if (type === "rest") return scheduledLocalDate === todayLocalDate ? "rest_today" : "rest";
-  if (workoutDone) return "completed";
-  if (workoutSkipped) return "skipped";
+  if (flags.done) return "completed";
+  if (flags.skipped) return "skipped";
+  if (flags.userRest) return "user_rest";
   if (scheduledLocalDate === todayLocalDate) return "today";
   if (scheduledLocalDate > todayLocalDate) return "upcoming";
   return "missed";
@@ -28,10 +37,12 @@ export const dayProgressState = (
 
 export const isWorkoutDoneStatus = (status: string) => DONE.has(status);
 export const isWorkoutSkippedStatus = (status: string) => status === "skipped";
+export const isWorkoutUserRestStatus = (status: string) => status === "rest";
 
 export const DAY_STATE_LABEL: Record<DayProgressState, string> = {
   completed: "Сделано",
   skipped: "Пропущено",
+  user_rest: "Отдыхаю",
   today: "Сегодня",
   upcoming: "Скоро",
   missed: "Не отмечено",

@@ -13,14 +13,16 @@ export const programsKeys = {
 export const getPrograms = (duration = "", signal?: AbortSignal) => apiJson<ProgramsResponse>(`/api/v1/programs${duration ? `?duration=${encodeURIComponent(duration)}` : ""}`, { signal });
 export const getProgram = (id: string, signal?: AbortSignal) => apiJson<ProgramDetailResponse>(`/api/v1/programs/${encodeURIComponent(id)}`, { signal });
 export const postEnroll = (programId: string, startLocalDate: string) => apiJson<EnrollResponse>(`/api/v1/programs/${encodeURIComponent(programId)}/enroll`, { method: "POST", body: jsonBody({ startLocalDate }) });
-export type SkipDayResponse = {
+export type DayStatusResponse = {
   created: boolean;
   startLocalDate: string;
   scheduledLocalDate: string;
   occurrence: { id: string; status: string; scheduledLocalDate: string };
 };
 export const postSkipEnrollmentDay = (enrollmentId: string, dayNumber: number) =>
-  apiJson<SkipDayResponse>(`/api/v1/program-enrollments/${encodeURIComponent(enrollmentId)}/skip`, { method: "POST", body: jsonBody({ dayNumber }) });
+  apiJson<DayStatusResponse>(`/api/v1/program-enrollments/${encodeURIComponent(enrollmentId)}/skip`, { method: "POST", body: jsonBody({ dayNumber }) });
+export const postRestEnrollmentDay = (enrollmentId: string, dayNumber: number) =>
+  apiJson<DayStatusResponse>(`/api/v1/program-enrollments/${encodeURIComponent(enrollmentId)}/rest`, { method: "POST", body: jsonBody({ dayNumber }) });
 
 export const useProgramsQuery = (duration = "", enabled = true) => useQuery({ queryKey: programsKeys.list(duration), queryFn: ({ signal }) => getPrograms(duration, signal), enabled, staleTime: 5 * 60_000 });
 export const useProgramDetailQuery = (id: string, enabled = true) => useQuery({ queryKey: programsKeys.detail(id), queryFn: ({ signal }) => getProgram(id, signal), enabled: enabled && Boolean(id), staleTime: 30_000 });
@@ -36,12 +38,22 @@ export const useEnrollProgramMutation = (programId: string) => {
   });
 };
 
+const invalidateEnrollment = (qc: ReturnType<typeof useQueryClient>, enrollmentId: string) => {
+  void qc.invalidateQueries({ queryKey: programsKeys.enrollment(enrollmentId) });
+};
+
 export const useSkipEnrollmentDayMutation = (enrollmentId: string) => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (dayNumber: number) => postSkipEnrollmentDay(enrollmentId, dayNumber),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: programsKeys.enrollment(enrollmentId) });
-    },
+    onSuccess: () => invalidateEnrollment(qc, enrollmentId),
+  });
+};
+
+export const useRestEnrollmentDayMutation = (enrollmentId: string) => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (dayNumber: number) => postRestEnrollmentDay(enrollmentId, dayNumber),
+    onSuccess: () => invalidateEnrollment(qc, enrollmentId),
   });
 };

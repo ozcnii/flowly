@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 2 | 1 | 0 | 0 | 4 |
+| 1 | 1 | 0 | 0 | 5 |
 
 ## Границы
 
@@ -66,16 +66,16 @@
 - **journal:** 2026-07-19 — implement skip API/UI; user «переводи в done коммить пушь» → done.
 
 ### E3-D4-T05 — Реализовать дни отдыха
-- **status:** in_progress · **priority:** high · **owner:** agent · **updated:** 2026-07-19
+- **status:** done · **priority:** high · **owner:** agent · **updated:** 2026-07-19
 - **prd_refs:** §8.6, §20.5, §55.3 · **depends_on:** E3-D4-T02 · **decisions:** DEC-015, DEC-016, DEC-022, DEC-024, DEC-025, DEC-029
 - **ui_slices:** S-MA-051, S-MA-053 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** rest day как отдельный тип/статус, не равный skip.
-- **acceptance:** [ ] UI и данные различают rest/skip; [ ] rest не требует тренировки; [ ] серии/прогресс получают корректный сигнал.
-- **validation/evidence:** rest vs skip examples.
-- **journal:** 2026-07-19 — start after T04 done.
+- **acceptance:** [x] UI и данные различают rest/skip; [x] rest не требует тренировки; [x] серии/прогресс получают корректный сигнал.
+- **validation/evidence:** planned rest type≠skip; POST .../rest → status rest (user_rest state); vs skip 409; planned rest day POST rest → 400 not_workout; progress.userRestDays/skippedDays/plannedRestDays; percent ignores rest/skip; calendar fixed. typecheck PASS.
+- **journal:** 2026-07-19 — implement after T04; close done + commit/push with T04 batch workflow.
 
 ### E3-D4-T06 — Создать program occurrences
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
+- **status:** in_progress · **priority:** blocker · **owner:** agent · **updated:** 2026-07-19
 - **prd_refs:** §20, §26, §43.21 · **depends_on:** E3-D4-T02, E3-D4-T04, E3-D4-T05 · **decisions:** DEC-015, DEC-016, DEC-029
 - **scope:** backend lifecycle occurrences для дней программ до calendar UI этапа 6.
 - **acceptance:** [ ] occurrence уникален и связан с enrollment/day; [ ] UTC/timezone mapping устойчив; [ ] ручные статусы сохраняются.
@@ -90,4 +90,4 @@
 
 ## Handoff этапа
 
-**E3-D4-T04** `done`. **E3-D4-T05** `in_progress` — rest vs skip.
+**E3-D4-T05** `done`. **E3-D4-T06** `in_progress` — program occurrences lifecycle.

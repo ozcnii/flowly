@@ -9,7 +9,7 @@ import { apiJson } from "@/lib/api/client";
 import { formatRuDate } from "../model/program-dates";
 import { DAY_STATE_LABEL, type DayProgressState } from "../model/program-progress";
 import { DURATION_LABEL } from "../model/programs";
-import { programsKeys, useSkipEnrollmentDayMutation } from "../model/programs-queries";
+import { programsKeys, useRestEnrollmentDayMutation, useSkipEnrollmentDayMutation } from "../model/programs-queries";
 
 type EnrollmentResponse = {
   enrollment: {
@@ -23,9 +23,13 @@ type EnrollmentResponse = {
       durationDays: number;
       completedWorkoutDays: number;
       totalWorkoutDays: number;
+      plannedRestDays: number;
+      userRestDays: number;
+      skippedDays: number;
       percent: number;
       todayWorkoutId: string | null;
       todayDayNumber: number | null;
+      todayIsPlannedRest: boolean;
     };
     program: { id: string; title: string; durationDays: number; categoryLabel: string };
     days: Array<{
@@ -39,7 +43,9 @@ type EnrollmentResponse = {
       state: DayProgressState;
       done: boolean;
       skipped: boolean;
+      userRest: boolean;
       canSkip: boolean;
+      canRest: boolean;
     }>;
   };
 };
@@ -49,7 +55,9 @@ const focusRing = "focus-visible:ring-2 focus-visible:ring-inset focus-visible:r
 const stateBadge = (state: DayProgressState) => {
   if (state === "completed") return <Badge className="bg-primary text-white">Сделано</Badge>;
   if (state === "skipped") return <Badge className="opacity-80">Пропущено</Badge>;
-  if (state === "today" || state === "rest_today") return <Badge>Сегодня</Badge>;
+  if (state === "user_rest") return <Badge>Отдыхаю</Badge>;
+  if (state === "today") return <Badge>Сегодня</Badge>;
+  if (state === "rest_today") return <Badge>Отдых · сегодня</Badge>;
   if (state === "rest") return <Badge>Отдых</Badge>;
   if (state === "missed") return <Badge className="opacity-80">Не отмечено</Badge>;
   return undefined;
@@ -64,17 +72,16 @@ export function EnrollmentScreen({ id }: { id: string }) {
     staleTime: 15_000,
   });
   const skip = useSkipEnrollmentDayMutation(id);
+  const rest = useRestEnrollmentDayMutation(id);
   const enrollment = query.data?.enrollment;
   const loading = query.isPending && !enrollment;
   const error = query.isError && !enrollment;
   const progress = enrollment?.progress;
-  const skipBusy = skip.isPending;
-  const skipError = skip.isError ? "Не удалось пропустить день." : null;
+  const busy = skip.isPending || rest.isPending;
+  const actionError = skip.isError ? "Не удалось пропустить." : rest.isError ? "Не удалось отметить отдых." : null;
 
-  const skipDay = (dayNumber: number) => {
-    if (skipBusy) return;
-    skip.mutate(dayNumber);
-  };
+  const skipDay = (dayNumber: number) => { if (!busy) skip.mutate(dayNumber); };
+  const restDay = (dayNumber: number) => { if (!busy) rest.mutate(dayNumber); };
 
   return <div className="min-h-dvh">
     <PrimaryNavbar title={enrollment?.program.title ?? "Прохождение"} />
@@ -96,26 +103,38 @@ export function EnrollmentScreen({ id }: { id: string }) {
                   <p className="m-0 text-sm text-text-muted">{progress.completedWorkoutDays}/{progress.totalWorkoutDays} практик</p>
                 </div>
                 <Progressbar progress={progress.percent / 100} aria-label={`Прогресс: ${progress.percent}%`} />
+                <p className="m-0 text-xs text-text-muted">
+                  Отдых в плане: {progress.plannedRestDays}
+                  {progress.userRestDays || progress.skippedDays
+                    ? ` · отдыхаю ${progress.userRestDays} · пропуск ${progress.skippedDays}`
+                    : null}
+                </p>
               </div>
-              {progress.todayWorkoutId && progress.todayDayNumber
-                ? <div className="grid gap-2">
-                  <Button large rounded className={`min-h-12 font-semibold ${focusRing}`} onClick={() => router.push(`/workouts/${encodeURIComponent(progress.todayWorkoutId!)}` as never)}>Начать сегодняшнюю</Button>
-                  <Button large rounded clear className={`min-h-12 ${focusRing}`} disabled={skipBusy} onClick={() => skipDay(progress.todayDayNumber!)}>
-                    {skipBusy ? "Пропускаем…" : "Пропустить день"}
-                  </Button>
-                  {skipError ? <p className="m-0 min-h-5 text-center text-xs text-red-500" role="alert">{skipError}</p> : <p className="m-0 min-h-5 text-center text-xs text-text-muted">Пропуск не сдвигает даты следующих дней</p>}
-                </div>
-                : null}
+              {progress.todayIsPlannedRest
+                ? <p className="m-0 rounded-xl bg-accent-soft px-3 py-3 text-sm">Сегодня запланированный отдых — практика не нужна. Это не пропуск.</p>
+                : progress.todayWorkoutId && progress.todayDayNumber
+                  ? <div className="grid gap-2">
+                    <Button large rounded className={`min-h-12 font-semibold ${focusRing}`} onClick={() => router.push(`/workouts/${encodeURIComponent(progress.todayWorkoutId!)}` as never)}>Начать сегодняшнюю</Button>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button large rounded tonal className={`min-h-12 ${focusRing}`} disabled={busy} onClick={() => restDay(progress.todayDayNumber!)}>
+                        {rest.isPending ? "…" : "Сегодня отдыхаю"}
+                      </Button>
+                      <Button large rounded clear className={`min-h-12 ${focusRing}`} disabled={busy} onClick={() => skipDay(progress.todayDayNumber!)}>
+                        {skip.isPending ? "…" : "Пропустить"}
+                      </Button>
+                    </div>
+                    {actionError
+                      ? <p className="m-0 min-h-5 text-center text-xs text-red-500" role="alert">{actionError}</p>
+                      : <p className="m-0 min-h-5 text-center text-xs text-text-muted">Отдых ≠ пропуск. Даты следующих дней не сдвигаются.</p>}
+                  </div>
+                  : null}
             </Card>
 
             <section aria-labelledby="enrollment-days-title" className="grid gap-2">
               <BlockTitle component="h2" id="enrollment-days-title" className="!m-0">Календарь дней</BlockTitle>
               <List strong inset dividers className="!m-0">
                 {enrollment.days.map((day) => {
-                  const openWorkout = day.workoutId && (day.state === "today" || day.state === "completed" || day.state === "missed" || day.state === "upcoming" || day.state === "skipped");
-                  const media = day.state === "completed"
-                    ? <Icon name="circle-check" className="text-primary" />
-                    : <Badge>{day.dayNumber}</Badge>;
+                  const openWorkout = day.workoutId && (day.state === "today" || day.state === "completed" || day.state === "missed" || day.state === "upcoming" || day.state === "skipped" || day.state === "user_rest");
                   return <ListItem
                     key={day.id}
                     link={Boolean(openWorkout)}
@@ -123,9 +142,9 @@ export function EnrollmentScreen({ id }: { id: string }) {
                     linkProps={openWorkout ? { type: "button", onClick: () => router.push(`/workouts/${encodeURIComponent(day.workoutId!)}` as never) } : undefined}
                     contentClassName={openWorkout ? "w-full" : undefined}
                     innerClassName={openWorkout ? "text-left" : undefined}
-                    media={media}
+                    media={day.state === "completed" ? <Icon name="circle-check" className="text-primary" /> : <Badge>{day.dayNumber}</Badge>}
                     title={day.title || (day.type === "rest" ? "Отдых" : "Практика")}
-                    subtitle={`${formatRuDate(day.scheduledLocalDate)}${day.state === "today" || day.state === "rest_today" ? " · сейчас" : ""}`}
+                    subtitle={`${formatRuDate(day.scheduledLocalDate)}${day.state === "today" || day.state === "rest_today" ? " · сейчас" : day.type === "rest" ? " · в плане" : ""}`}
                     after={stateBadge(day.state) ?? (day.state === "upcoming" ? <span className="text-sm text-text-muted">{DAY_STATE_LABEL.upcoming}</span> : undefined)}
                   />;
                 })}
@@ -133,22 +152,25 @@ export function EnrollmentScreen({ id }: { id: string }) {
             </section>
 
             {enrollment.days.some((d) => d.canSkip && d.state === "missed")
-              ? <section aria-labelledby="missed-skip-title" className="grid gap-2">
-                <BlockTitle component="h2" id="missed-skip-title" className="!m-0">Неотмеченные дни</BlockTitle>
+              ? <section aria-labelledby="missed-actions-title" className="grid gap-2">
+                <BlockTitle component="h2" id="missed-actions-title" className="!m-0">Неотмеченные дни</BlockTitle>
                 <List strong inset dividers className="!m-0">
                   {enrollment.days.filter((d) => d.canSkip && d.state === "missed").map((day) => (
                     <ListItem
-                      key={`skip-${day.id}`}
+                      key={`miss-${day.id}`}
                       title={day.title || `День ${day.dayNumber}`}
                       subtitle={formatRuDate(day.scheduledLocalDate)}
-                      after={<Button small rounded clear className={focusRing} disabled={skipBusy} onClick={() => skipDay(day.dayNumber)}>Пропустить</Button>}
+                      footer={<div className="flex flex-wrap gap-2 pb-2">
+                        <Button small rounded tonal className={focusRing} disabled={busy} onClick={() => restDay(day.dayNumber)}>Отдыхаю</Button>
+                        <Button small rounded clear className={focusRing} disabled={busy} onClick={() => skipDay(day.dayNumber)}>Пропустить</Button>
+                      </div>}
                     />
                   ))}
                 </List>
               </section>
               : null}
 
-            <p className="m-0 text-xs text-text-muted">«Сделано» — после завершения практики. «Пропущено» — явная отметка; даты программы не меняются.</p>
+            <p className="m-0 text-xs text-text-muted">«Отдых» в плане — день без практики. «Отдыхаю» — ваш выбор в день практики. «Пропущено» — отдельно; ни то ни другое не сдвигает календарь.</p>
             <Button clear rounded className={`justify-self-start ${focusRing}`} onClick={() => router.push(`/programs/${enrollment.program.id}` as never)}>Описание программы</Button>
           </>}
     </main>
