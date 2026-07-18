@@ -85,6 +85,13 @@
       "when": 1784413000000,
       "tag": "0011_programs",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1784414000000,
+      "tag": "0012_program_enrollments",
+      "breakpoints": true
     }
   ]
 }

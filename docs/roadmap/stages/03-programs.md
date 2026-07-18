@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 6 | 0 | 0 | 0 | 1 |
+| 5 | 0 | 0 | 1 | 1 |
 
 ## Границы
 
@@ -39,12 +39,13 @@
 - **journal:** 2026-07-19 — plan approved; implement; filter UX iterations → Segmented + «N дн»; user: «хорошо» / «закрываем»; `review -> done`.
 
 ### E3-D4-T02 — Реализовать начало программы с выбранной даты
-- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §20.3, §43.15, §44.6, §55.3 · **depends_on:** E3-D4-T01, E1-D1-T06 · **decisions:** DEC-016, DEC-019, DEC-022, DEC-024, DEC-025, DEC-029
-- **ui_slices:** S-MA-052 — выполнять последовательно; approval каждого ID обязателен до следующего.
-- **scope:** enrollment, дата старта и вычисление календарных дат в timezone пользователя.
-- **acceptance:** [ ] дата выбирается явно; [ ] enrollment принадлежит пользователю; [ ] day mapping воспроизводим.
-- **validation/evidence:** date/timezone examples и stored enrollment.
+- **status:** review · **priority:** high · **owner:** AI agent · **updated:** 2026-07-19
+- **prd_refs:** §20.3, §43.15, §44.6, §55.3 · **depends_on:** E3-D4-T01, E1-D1-T06 · **decisions:** DEC-016, DEC-019, DEC-022, DEC-024, DEC-029, DEC-035
+- **ui_slices:** S-MA-052
+- **scope:** enrollment, дата старта и вычисление календарных дат в timezone пользователя. Reminder/joint — later.
+- **acceptance:** [x] дата выбирается явно; [x] enrollment принадлежит пользователю; [x] day mapping воспроизводим.
+- **validation/evidence:** plan `.temp/E3-D4-T02/plan.md`; migration `0012_program_enrollments.sql` local PASS; HTTP enroll 201, day1=start day7=start+6, idempotent 200 same id, bad date 400, detail activeEnrollment; typecheck PASS.
+- **journal:** 2026-07-19 — user «стартуй»; implement schema/API/Sheet date + enrollment screen; `in_progress -> review`.
 
 ### E3-D4-T03 — Реализовать текущий день и прогресс
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
@@ -86,4 +87,4 @@
 
 ## Handoff этапа
 
-**E3-D4-T01** `done`. Next: **E3-D4-T02** enroll (start date).
+**E3-D4-T02** `review` — user check Start → date → calendar days.

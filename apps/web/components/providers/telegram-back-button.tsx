@@ -37,6 +37,7 @@ const fallbackFor = (pathname: string) => {
   if (pathname === "/profile") return "/";
   if (pathname === "/catalog" || pathname === "/programs" || pathname === "/rhythm" || pathname === "/calendar") return "/";
   if (pathname.startsWith("/youtube") || pathname.startsWith("/workouts") || pathname.startsWith("/sessions") || pathname.startsWith("/sources") || pathname.startsWith("/authors") || pathname.startsWith("/safety")) return "/catalog";
+  if (pathname.startsWith("/programs/enrollments/")) return "/programs";
   if (pathname.startsWith("/programs/")) return "/programs";
   if (pathname.startsWith("/rhythm/")) return "/rhythm";
   if (pathname.startsWith("/calendar/")) return "/calendar";

@@ -266,6 +266,32 @@ export const programDays = sqliteTable(
   (table) => [uniqueIndex("program_days_program_day_unique").on(table.programId, table.dayNumber)],
 );
 
+// §43.15 program_enrollments
+export const programEnrollments = sqliteTable(
+  "program_enrollments",
+  {
+    id: text("id").primaryKey(),
+    programId: text("program_id")
+      .notNull()
+      .references(() => programs.id, { onDelete: "restrict" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    startLocalDate: text("start_local_date").notNull(),
+    reminderPolicyId: text("reminder_policy_id"),
+    reminderLocalTime: text("reminder_local_time"),
+    status: text("status").notNull(),
+    createdAt: text("created_at").notNull(),
+    completedAt: text("completed_at"),
+  },
+  (table) => [
+    uniqueIndex("program_enrollments_user_program_active_unique")
+      .on(table.userId, table.programId)
+      .where(sql`${table.status} = 'active'`),
+    index("program_enrollments_user_status_idx").on(table.userId, table.status),
+  ],
+);
+
 // §43.28 youtube_search_cache
 export const youtubeSearchCache = sqliteTable(
   "youtube_search_cache",

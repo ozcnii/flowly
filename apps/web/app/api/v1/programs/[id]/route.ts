@@ -1,7 +1,9 @@
-import { asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { schema } from "@flowly/database";
+import { getSessionUserId } from "@/lib/auth/session-user";
 import { getDb } from "@/lib/cloudflare";
+import { scheduleLocalDate } from "@/features/programs/model/program-dates";
 
 const CATEGORY: Record<string, string> = {
   beginner: "Старт",
@@ -12,8 +14,9 @@ const CATEGORY: Record<string, string> = {
   full: "Полный ритм",
 };
 
-export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const userId = await getSessionUserId(request).catch(() => null);
   try {
     const db = getDb();
     const program = (await db.select().from(schema.programs).where(eq(schema.programs.id, id)).limit(1))[0];
@@ -25,6 +28,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       ? await db.select({ id: schema.workouts.id, title: schema.workouts.title, durationSeconds: schema.workouts.durationSeconds, format: schema.workouts.format, difficulty: schema.workouts.difficulty }).from(schema.workouts).where(inArray(schema.workouts.id, workoutIds))
       : [];
     const byId = new Map(workouts.map((workout) => [workout.id, workout]));
+
+    const active = userId
+      ? (await db.select().from(schema.programEnrollments).where(and(eq(schema.programEnrollments.userId, userId), eq(schema.programEnrollments.programId, id), eq(schema.programEnrollments.status, "active"))).limit(1))[0] ?? null
+      : null;
 
     return NextResponse.json({
       program: {
@@ -44,11 +51,22 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
             type: day.type as "workout" | "rest",
             title: day.title,
             description: day.description,
+            scheduledLocalDate: active ? scheduleLocalDate(active.startLocalDate, day.dayNumber) : null,
             workout: workout ? { id: workout.id, title: workout.title, durationSeconds: workout.durationSeconds, format: workout.format, difficulty: workout.difficulty } : null,
           };
         }),
+        activeEnrollment: active
+          ? {
+              id: active.id,
+              startLocalDate: active.startLocalDate,
+              endLocalDate: scheduleLocalDate(active.startLocalDate, program.durationDays),
+              status: active.status,
+            }
+          : null,
         actions: {
-          start: { enabled: false, reason: "Старт программы с датой появится в следующем шаге." },
+          start: active
+            ? { enabled: false, reason: "Вы уже проходите эту программу." }
+            : { enabled: true, reason: "Выберите дату начала." },
         },
       },
     });
