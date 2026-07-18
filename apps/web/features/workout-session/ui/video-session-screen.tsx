@@ -107,7 +107,9 @@ export function VideoSessionScreen({ id }: { id: string }) {
   if (query.isError || !query.data?.session) return <Shell><Card component="section" outline role="alert" contentWrapPadding="grid justify-items-center gap-3 p-6 text-center"><Icon name="triangle-alert" /><h1 className="m-0 text-lg font-semibold">Сессия недоступна</h1><Button component={NextLink} href="/catalog" rounded>Открыть каталог</Button></Card></Shell>;
   const session = query.data.session;
   if (session.state === "closed") return <Shell><Card component="section" outline contentWrapPadding="grid justify-items-center gap-3 p-6 text-center"><Icon name="circle-check" /><h1 className="m-0 text-lg font-semibold">Сессия завершена</h1><p className="m-0 text-sm text-text-muted">{session.finalStatus ? FINAL_STATUS_LABELS[session.finalStatus] : "Результат сохранён"}</p><Button component={NextLink} href="/calendar" rounded>Открыть календарь</Button></Card></Shell>;
-  const statusText = playerError ? "Видео не загрузилось — тренировка останется открытой" : syncState === "storage-error" ? "Не удалось сохранить прогресс на устройстве. Не закрывайте тренировку" : syncState === "offline" ? "Нет связи · прогресс сохранён" : playing ? "Идёт тренировка" : ready ? "Пауза" : "Подключаем видео";
+  const notStarted = ready && !playing && seconds === 0;
+  const runLabel = playing ? "Пауза" : notStarted ? "Начать" : "Продолжить";
+  const statusText = playerError ? "Видео не загрузилось — тренировка останется открытой" : syncState === "storage-error" ? "Не удалось сохранить прогресс на устройстве. Не закрывайте тренировку" : syncState === "offline" ? "Нет связи · прогресс сохранён" : playing ? "Идёт тренировка" : !ready ? "Подключаем видео" : notStarted ? "Готово к старту" : "Пауза";
 
   return <>
     <Shell rootRef={backgroundRef}>
@@ -121,7 +123,7 @@ export function VideoSessionScreen({ id }: { id: string }) {
           <p className="m-0 text-center text-3xl font-semibold tabular-nums" aria-live="off">{formatSessionDuration(seconds)}</p>
           <p className="m-0 min-h-5 text-center text-sm text-text-muted" role="status" aria-live="polite">{statusText}</p>
           <div className="grid gap-2 sm:grid-cols-2">
-            <Button large rounded tonal className="gap-2" disabled={!ready || playerError || Boolean(conflict)} onClick={playing ? () => playerRef.current?.pause() : () => playerRef.current?.play()}><Icon name={playing ? "pause" : "play"} />{playing ? "Пауза" : "Продолжить"}</Button>
+            <Button large rounded tonal className="gap-2" disabled={!ready || playerError || Boolean(conflict)} onClick={playing ? () => playerRef.current?.pause() : () => playerRef.current?.play()}><Icon name={playing ? "pause" : "play"} />{runLabel}</Button>
             <Button large rounded outline colors={{ textIos: "text-danger", outlineBorderIos: "border-danger" }} className="gap-2" disabled={Boolean(conflict)} onClick={openFinish}><Icon name="square" />Завершить</Button>
           </div>
         </div>

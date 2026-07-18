@@ -275,7 +275,9 @@ export function StepSessionScreen({ id }: { id: string }) {
   const session = query.data.session;
   if (session.state === "closed") return <Shell><Card component="section" outline contentWrapPadding="grid justify-items-center gap-3 p-6 text-center"><Icon name="circle-check" /><h1 className="m-0 text-lg font-semibold">Сессия завершена</h1><p className="m-0 text-sm text-text-muted">{session.finalStatus ? FINAL_STATUS_LABELS[session.finalStatus] : "Результат сохранён"}</p><Button component={NextLink} href="/calendar" rounded>Открыть календарь</Button></Card></Shell>;
 
-  const statusText = syncState === "storage-error" ? "Не удалось сохранить прогресс на устройстве. Не закрывайте тренировку" : syncState === "offline" ? "Нет связи · прогресс сохранён" : phase === "done" ? "Все упражнения пройдены" : phase === "rest" ? "Отдых" : running ? "Идёт тренировка" : "Пауза";
+  const notStarted = !running && accumulated === 0 && position === 0 && phase === "exercise";
+  const runLabel = running ? "Пауза" : notStarted ? "Начать" : "Продолжить";
+  const statusText = syncState === "storage-error" ? "Не удалось сохранить прогресс на устройстве. Не закрывайте тренировку" : syncState === "offline" ? "Нет связи · прогресс сохранён" : phase === "done" ? "Все упражнения пройдены" : phase === "rest" ? "Отдых" : running ? "Идёт тренировка" : notStarted ? "Готово к старту" : "Пауза";
   const mainTimer = phase === "done" ? formatSessionDuration(accumulated) : phase === "rest" || (isCountdown && phase === "exercise") ? formatSessionDuration(remaining) : formatSessionDuration(segmentUp);
   const progressTotal = exercises.length;
   const isLastExercise = progressTotal > 0 && position === progressTotal - 1;
@@ -351,7 +353,7 @@ export function StepSessionScreen({ id }: { id: string }) {
             <p className="m-0 text-center text-5xl font-semibold tabular-nums" aria-live="off">{mainTimer}</p>
             <p className="m-0 min-h-[1.25rem] text-center text-sm text-text-muted" role="status" aria-live="polite">{statusText}</p>
             <p className="m-0 min-h-[3.75rem] text-center text-sm leading-relaxed text-text-muted [overflow-wrap:anywhere] line-clamp-3">{phase === "rest" ? (nextCompletesSteps ? "Отдышитесь — затем сохраним результат." : `Спокойно подышите. Следующее: ${exercises[position + 1]?.title ?? "завершение"}.`) : current?.description ?? ""}</p>
-            <Button large rounded className={`w-full gap-2 ${focusRing}`} onClick={toggleRun}><Icon name={running ? "pause" : "play"} />{running ? "Пауза" : "Продолжить"}</Button>
+            <Button large rounded className={`w-full gap-2 ${focusRing}`} onClick={toggleRun}><Icon name={running ? "pause" : "play"} />{runLabel}</Button>
             {/*
               Transport: ‹ · Skip · › on normal steps.
               On the last step that finishes the pipeline: Skip → «К итогу», › → check (not another chevron).
