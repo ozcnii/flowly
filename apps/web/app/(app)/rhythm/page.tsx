@@ -1,7 +1,10 @@
-"use client";
+import { RhythmScreen } from "@/features/rhythm/ui/rhythm-screen";
 
-import { BlockTitle, Card } from "konsta/react";
+type PageProps = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
-export default function RhythmPage() {
-  return <section className="flow-screen"><Card component="section" outline contentWrapPadding="grid gap-3 p-4"><BlockTitle component="h1" large className="!m-0 !p-0">Небольшие шаги каждый день</BlockTitle><p className="m-0 text-sm leading-relaxed text-text-muted">Здесь соберутся привычки и спокойный прогресс. Сейчас можно начать с короткой тренировки.</p></Card></section>;
+export default async function RhythmPage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  // Dev-only card/list preview (T01). Ignored in production — production always renders the empty state.
+  const demo = process.env.NODE_ENV !== "production" && typeof params.rhythm === "string" && params.rhythm === "demo";
+  return <RhythmScreen demo={demo} />;
 }

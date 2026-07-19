@@ -571,6 +571,16 @@
 - **PRD:** §14.3 — superseded for v1 execution by this DEC (text not deleted from PRD file).
 - **Влияет на:** E2-D3-T02 residual (closed); E2-D3-T05 DoD (no mixed requirement); design S-MA-032 inventory → cancelled; F04 diagram node S-MA-032 not product backlog; no depends_on elsewhere.
 
+### DEC-067 — Habit progress ring для карточки привычки (S-MA-060)
+
+- **Статус:** approved
+- **Дата:** 2026-07-19
+- **Решение:** карточка привычки (S-MA-060, `HabitCard`) использует **inline SVG progress-ring вокруг identity-иконки** привычки для визуализации сегодняшнего прогресса multi-slot привычек (сегодняшние выполнения из настроенных слотов, DEC-017). Это явное исключение из strict direct-Konsta contract DEC-035: Konsta UI 5.2.0 предоставляет только линейный `Progressbar` и не имеет circular progress/ring (тот же gap зафиксирован DEC-040 для Главной). Реализация — минимальный inline SVG `ring` (track + progress circle через `stroke-dasharray`/`strokeDashoffset`), без CSS Module, external dependency или shared wrapper; цвета только из Flowly semantic variables (`--color-accent`, `--color-text-muted`), значение clamp 0–1, non-color cue — текст «N из M» рядом с ring. Identity-иконка привычки (PRD §22.2) рендерится по центру ring; персональный цвет привычки (§22.3) подключается в T02. Quick-complete circle-check — отдельный icon-only Konsta `Button` (disabled в T01, активный в T05 при completion/occurrences).
+- **Основание:** пользователь отклонил layout с линейным `Progressbar` + левым отступом под иконкой (возникала пустота слева под identity-иконкой при многострочном контенте). Из трёх предложенных вариантов (ring / full-width bar / compact row) пользователь явно выбрал ring: «v1 самый лучший вариант берем его».
+- **PRD:** §21.3, §40, §55.4.
+- **Влияет на:** E4-D5-T01, S-MA-060, `apps/web/features/rhythm/ui/habit-card.tsx`, DEC-035 exception registry, roadmap/HANDOFF.
+- **Связано:** DEC-040 (Home `DayProgressRing` — тот же gap Konsta), DEC-017 (multi-slot completions).
+
 ## Открытые решения
 
 ### DEC-006 — Operational thresholds

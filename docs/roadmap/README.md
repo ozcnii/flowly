@@ -6,9 +6,9 @@
 
 ## Текущий фокус
 
-- **Активный этап:** 3. Программы.
-- **Активная задача:** none — **этап 3 (E3-D4) closed** T01–T07 `done`. Joint programs → stage 7.
-- **Следующее действие:** stage 4 (ритм/привычки) or backlog per user.
+- **Активный этап:** 4. Мой ритм.
+- **Активная задача:** E4-D5-T01 (экран «Ритм», slice S-MA-060), `review` — ждёт DEC-024 user approval.
+- **Следующее действие:** user review slice S-MA-060 → `done`; затем E4-D5-T02 (CRUD привычки + API GET/POST /habits + ownership).
 - **Latest E2-D3-T01 scope:** DEC-062 implementation draft добавил D1 sessions/occurrence/history, one-open API, `/sessions/[id]`, shared IFrame API player, checkpoint/final status, Home resume и detail Start. Local migration, HTTP lifecycle, five-status matrix, typecheck/lint/build/deploy-check и focused 360/390/430 browser pass успешны. Approved correction v3 implemented: post-fix controlled 0:03 playback persists local/server 3 and restores 0:03; independent YouTube playback position persists through migration 0007/checkpoint/finish/local snapshot and restores via `seekTo`; equal-elapsed stale token auto-selects server without conflict Sheet; Pause geometry stable; Home resume compact with unbounded `m:ss`/`h:mm:ss`; same-active direct Continue; vertical conflict/final Sheets; final default `completed`; responsive exercises. Browser and mocked native Back exact Home→Continue return Home; reported unrelated-detail target still needs exact preceding Home-entry sequence. Runtime commit `b69e190` deployed to production in successful run `29579333079` with remote migrations 0006/0007; browser-UA smoke passed. Task remains `in_progress` until user/real-device verification.
 - **Latest real-device scope:** DEC-046 removes Telegram avatar storage/proxy/rendering and D1 `photo_url`; DEC-047 owns fullscreen composed safe-area blur/title/actions geometry; Tabbar labels are 9px. Runtime commit `ce35676` deployed successfully in run 29395082940; follow-up `239ae28` removes all fixed primary Navbar actions, collapses its empty row, adds Home content header `Твой план` + Profile action and renames card title to `Прогресс на сегодня`; Deploy web run 29395715390 PASS. DEC-048 runtime `8633c9c` removes Profile/Settings web Back and uses official route-aware Telegram BackButton; `031de99` prevents internal-to-internal Close/X flicker by preserving native visibility during cleanup. Deploy runs 29396177091 and 29396563266 PASS; `045e0a2` inset-0 half-position was rejected after iPhone notch overlap; `429beb9` supersedes it: safe-area Navbar hidden on desktop/web, shown only on Telegram iOS/Android, mobile min inset 44px with title centered in its final 44px. Deploy web run 29398306357 PASS. DEC-052 supersedes fixed top-level hide: native Back follows session history on tab и child routes, direct entries use contextual parent replace, Home boundary enables closing confirmation; browser mock PASS, real-device Back/Close/X rerun pending.
 - **Latest production API fix:** DEC-049 replaced unavailable Invidious with no-key Piped. Runtime `286d597`, Deploy web 29402655934 PASS; canonical production search miss/hit returns 12 results, edge queries 12/10/6, warning null.
@@ -23,14 +23,14 @@
 | 0. UX/UI-контракты | done | 0 | 0 | 0 | 0 | 6 | [`00-design.md`](stages/00-design.md) |
 | 1. Основа | done | 0 | 0 | 0 | 0 | 13 | [`01-foundation.md`](stages/01-foundation.md) |
 | 2. Йога | done* | 0 | 0 | 1 | 0 | 12 | [`02-yoga.md`](stages/02-yoga.md) |
-| 3. Программы | **active** | 4 | 0 | 0 | 0 | 3 | [`03-programs.md`](stages/03-programs.md) |
-| 4. Мой ритм | backlog | 8 | 0 | 0 | 0 | 0 | [`04-my-rhythm.md`](stages/04-my-rhythm.md) |
+| 3. Программы | done | 0 | 0 | 0 | 0 | 7 | [`03-programs.md`](stages/03-programs.md) |
+| 4. Мой ритм | **active** | 7 | 0 | 0 | 1 | 0 | [`04-my-rhythm.md`](stages/04-my-rhythm.md) |
 | 5. Telegram | backlog | 8 | 0 | 0 | 0 | 0 | [`05-telegram.md`](stages/05-telegram.md) |
 | 6. Календарь и отчёты | backlog | 9 | 0 | 0 | 0 | 0 | [`06-calendar-reports.md`](stages/06-calendar-reports.md) |
 | 7. Социальные функции | backlog | 7 | 0 | 0 | 0 | 0 | [`07-social.md`](stages/07-social.md) |
 | 8. Стабилизация | backlog | 8 | 0 | 0 | 0 | 0 | [`08-stabilization.md`](stages/08-stabilization.md) |
 
-**Итого:** 47 backlog / 0 in progress / 1 blocked / 0 review / 30 done.  
+**Итого:** 39 backlog / 0 in progress / 1 blocked / 1 review / 38 done.
 \*Stage 2 DoD `done`; residual board: E2-D3-T03 blocked (DEC-064). S-MA-032 cancelled (DEC-066), not a card.
 
 ## Зависимости этапов
