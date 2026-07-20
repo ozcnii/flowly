@@ -127,24 +127,28 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
               title=""
               outline
               type="text"
-              label="Название"
               value={title}
-              placeholder="Например, выпить воды"
+              placeholder="Название привычки"
               onInput={(e) => setTitle((e.currentTarget as HTMLInputElement).value)}
               onBlur={() => setTouched(true)}
-              error={titleError ? "Введите название" : undefined}
+              aria-label="Название привычки"
             />
             <ListInput
               title=""
               outline
               type="textarea"
-              label="Описание"
               value={description}
-              placeholder="Необязательно"
+              placeholder="Описание (необязательно)"
               onInput={(e) => setDescription((e.currentTarget as HTMLTextAreaElement).value)}
               inputClassName="min-h-20"
+              aria-label="Описание"
             />
           </List>
+          {titleError ? (
+            <p className="m-0 px-8 -mt-1 text-sm text-danger" role="alert">
+              Введите название
+            </p>
+          ) : null}
 
           <section className="grid gap-2">
             <BlockTitle component="h2" className="!m-0 !px-4">
@@ -180,14 +184,17 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
             </div>
           </section>
 
+          <BlockTitle component="h2" className="!m-0 !px-4">
+            Дата начала
+          </BlockTitle>
           <List strong inset>
             <ListInput
               title=""
               outline
               type="date"
-              label="Дата начала"
               value={startLocalDate}
               onInput={(e) => setStartLocalDate((e.currentTarget as HTMLInputElement).value)}
+              aria-label="Дата начала"
             />
             <ListItem
               title="Разрешить пропуск"
