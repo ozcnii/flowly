@@ -128,10 +128,12 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
               outline
               type="text"
               value={title}
-              placeholder="Название привычки"
+              placeholder={titleError ? "Введите название" : "Название привычки"}
               onInput={(e) => setTitle((e.currentTarget as HTMLInputElement).value)}
               onBlur={() => setTouched(true)}
               aria-label="Название привычки"
+              aria-invalid={titleError || undefined}
+              inputClassName={titleError ? "placeholder:text-red-600 dark:placeholder:text-red-400" : undefined}
             />
             <ListInput
               title=""
@@ -144,13 +146,6 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
               aria-label="Описание"
             />
           </List>
-          <div className="grid min-h-5 px-8" aria-live="polite">
-            {titleError ? (
-              <p className="m-0 text-sm text-red-600 dark:text-red-400" role="alert">
-                Введите название
-              </p>
-            ) : null}
-          </div>
 
           <section className="grid gap-2">
             <BlockTitle component="h2" className="!m-0 !px-4">
