@@ -138,7 +138,7 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
               inputClassName={titleError ? "pr-12" : undefined}
             >
               {titleError ? (
-                <span className="pointer-events-none absolute right-4 top-1/2 z-10 -translate-y-1/2" aria-hidden="true">
+                <span className="pointer-events-none absolute right-8 top-1/2 z-10 -translate-y-1/2" aria-hidden="true">
                   <Icon name="triangle-alert" className="size-5 text-red-600 dark:text-red-400" aria-label="Заполни название" />
                 </span>
               ) : null}
