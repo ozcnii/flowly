@@ -126,6 +126,7 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
             <ListInput
               title=""
               outline
+              error={titleError}
               type="text"
               value={title}
               placeholder="Название привычки"
@@ -138,7 +139,7 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
             >
               {titleError ? (
                 <span className="pointer-events-none absolute right-4 top-1/2 z-10 -translate-y-1/2" aria-hidden="true">
-                  <Icon name="triangle-alert" className="size-5 text-red-600 dark:text-red-400" />
+                  <Icon name="triangle-alert" className="size-5 text-red-600 dark:text-red-400" aria-label="Заполни название" />
                 </span>
               ) : null}
             </ListInput>
@@ -221,7 +222,7 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
           ) : null}
 
           <footer className="grid gap-2 px-4 pb-2">
-            <Button type="submit" large rounded disabled={submitting} className={`w-full ${focusRing}`}>
+            <Button type="submit" large rounded disabled={submitting || title.trim().length === 0} className={`w-full ${focusRing}`}>
               <span className="inline-flex items-center gap-2">
                 <Icon name="check" className="size-5" />
                 {submitting ? "Сохраняем…" : mode === "create" ? "Создать привычку" : "Сохранить"}
