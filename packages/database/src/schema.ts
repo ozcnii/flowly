@@ -360,6 +360,30 @@ export const reminderJobs = sqliteTable(
   ],
 );
 
+// §43.16 habits (stage 4)
+export const habits = sqliteTable(
+  "habits",
+  {
+    id: text("id").primaryKey(),
+    ownerId: text("owner_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    description: text("description"),
+    icon: text("icon").notNull(),
+    color: text("color").notNull(),
+    startLocalDate: text("start_local_date").notNull(),
+    endLocalDate: text("end_local_date"),
+    allowSkip: integer("allow_skip", { mode: "boolean" }).notNull().default(true),
+    allowRest: integer("allow_rest", { mode: "boolean" }).notNull().default(false),
+    commentEnabled: integer("comment_enabled", { mode: "boolean" }).notNull().default(true),
+    status: text("status").notNull().default("active"),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (table) => [index("habits_owner_status_idx").on(table.ownerId, table.status)],
+);
+
 // §43.28 youtube_search_cache
 export const youtubeSearchCache = sqliteTable(
   "youtube_search_cache",
