@@ -128,13 +128,20 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
               outline
               type="text"
               value={title}
-              placeholder={titleError ? "Введите название" : "Название привычки"}
+              placeholder="Название привычки"
               onInput={(e) => setTitle((e.currentTarget as HTMLInputElement).value)}
               onBlur={() => setTouched(true)}
               aria-label="Название привычки"
               aria-invalid={titleError || undefined}
-              inputClassName={titleError ? "placeholder:text-red-600 dark:placeholder:text-red-400" : undefined}
-            />
+              style={{ position: "relative" }}
+              inputClassName={titleError ? "pr-12" : undefined}
+            >
+              {titleError ? (
+                <span className="pointer-events-none absolute right-4 top-1/2 z-10 -translate-y-1/2" aria-hidden="true">
+                  <Icon name="triangle-alert" className="size-5 text-red-600 dark:text-red-400" />
+                </span>
+              ) : null}
+            </ListInput>
             <ListInput
               title=""
               outline
