@@ -144,11 +144,13 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
               aria-label="Описание"
             />
           </List>
-          {titleError ? (
-            <p className="m-0 px-8 -mt-1 text-sm text-danger" role="alert">
-              Введите название
-            </p>
-          ) : null}
+          <div className="grid min-h-5 px-8" aria-live="polite">
+            {titleError ? (
+              <p className="m-0 text-sm text-red-600 dark:text-red-400" role="alert">
+                Введите название
+              </p>
+            ) : null}
+          </div>
 
           <section className="grid gap-2">
             <BlockTitle component="h2" className="!m-0 !px-4">
@@ -211,7 +213,7 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
           ) : null}
 
           {submitError ? (
-            <p className="mx-4 text-sm text-danger" role="alert">
+            <p className="mx-4 text-sm text-red-600 dark:text-red-400" role="alert">
               Не удалось сохранить. Проверьте связь и попробуйте ещё раз.
             </p>
           ) : null}
