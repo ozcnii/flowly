@@ -198,6 +198,7 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
               outline
               type="date"
               value={startLocalDate}
+              inputClassName="[&::-webkit-datetime-edit]:text-base [&::-webkit-date-and-time-value]:text-base"
               onInput={(e) => setStartLocalDate((e.currentTarget as HTMLInputElement).value)}
               aria-label="Дата начала"
             />
