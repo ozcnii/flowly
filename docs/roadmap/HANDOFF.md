@@ -6,8 +6,8 @@
 
 - **Обновлено:** 2026-07-20
 - **Текущий этап:** **4. Мой ритм**.
-- **Активная задача:** E4-D5-T02 (CRUD привычки + API /habits + icon/color + onboarding S-MA-004), `review` — ждёт user approval UI-концепции S-MA-061.
-- **Статус:** E4-D5-T02: API/DB/onboarding `review` без изменений; S-MA-061 — единая row-based форма. Последние правки (2026-07-21): фикс даты (native date-value был со сдвигом в TMA — скрыт + центрированный overlay `formatDateRu`), каталог иконок расширен до 25 (+pill/footprints/brain/book-open/coffee/apple/activity/droplet/wind/flame/zap/smile/pencil), добавлено поле `emoji` (migration 0016, отдельное от icon) с секцией эмодзи в Sheet и рендером в HabitCard. typecheck/lint/build PASS; migration 0016 applied (local D1); overflow 0 + targets ≥44 + 0 console errors в матрице. **commit/push не выполнялись** по прямому запрету пользователя.
+- **Активная задача:** E4-D5-T03 (расписание привычек), `backlog`; E4-D5-T02 завершена после user approval («мне все нравится»).
+- **Статус:** E4-D5-T02 `done`: API/DB/onboarding, единая row-based форма, emoji, иконки/цвета и новый Konsta Sheet-календарь с фиксированной шестинедельной сеткой. User approval получен («мне все нравится»). Typecheck/build PASS; commit `71360b3` pushed. Production deploy через GitHub Actions ожидает подтверждения.
 - **Активная задача:** E4-D5-T02 (CRUD привычки + API /habits + icon/color + onboarding S-MA-004), `review` — ждёт DEC-024 user approval.
 - **Статус:** E4-D5-T02 реализован (migration 0015 + habits API + create/edit form S-MA-061 + onboarding S-MA-004 real create) и верифицирован (HTTP CRUD matrix + browser create/edit flow + typecheck/lint/build PASS). E4-D5-T01 (экран «Ритм», slice S-MA-060) `done` (`52c71f4`).
 - **README sync:** исправлено расхождение — этап 3 в README теперь `done` (7), итоги пересчитаны (38 done / 1 blocked / 40 backlog), активный этап переключён на 4.

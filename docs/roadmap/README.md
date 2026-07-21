@@ -24,13 +24,13 @@
 | 1. Основа | done | 0 | 0 | 0 | 0 | 13 | [`01-foundation.md`](stages/01-foundation.md) |
 | 2. Йога | done* | 0 | 0 | 1 | 0 | 12 | [`02-yoga.md`](stages/02-yoga.md) |
 | 3. Программы | done | 0 | 0 | 0 | 0 | 7 | [`03-programs.md`](stages/03-programs.md) |
-| 4. Мой ритм | **active** | 6 | 0 | 0 | 1 | 1 | [`04-my-rhythm.md`](stages/04-my-rhythm.md) |
+| 4. Мой ритм | **active** | 5 | 0 | 0 | 0 | 2 | [`04-my-rhythm.md`](stages/04-my-rhythm.md) |
 | 5. Telegram | backlog | 8 | 0 | 0 | 0 | 0 | [`05-telegram.md`](stages/05-telegram.md) |
 | 6. Календарь и отчёты | backlog | 9 | 0 | 0 | 0 | 0 | [`06-calendar-reports.md`](stages/06-calendar-reports.md) |
 | 7. Социальные функции | backlog | 7 | 0 | 0 | 0 | 0 | [`07-social.md`](stages/07-social.md) |
 | 8. Стабилизация | backlog | 8 | 0 | 0 | 0 | 0 | [`08-stabilization.md`](stages/08-stabilization.md) |
 
-**Итого:** 38 backlog / 0 in progress / 1 blocked / 1 review / 39 done.
+**Итого:** 37 backlog / 0 in progress / 1 blocked / 0 review / 40 done.
 \*Stage 2 DoD `done`; residual board: E2-D3-T03 blocked (DEC-064). S-MA-032 cancelled (DEC-066), not a card.
 
 ## Зависимости этапов
