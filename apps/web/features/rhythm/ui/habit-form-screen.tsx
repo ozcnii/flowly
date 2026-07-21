@@ -234,7 +234,9 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
               innerClassName="text-left"
               linkProps={{ type: "button", onClick: () => { setVisibleMonth(new Date(`${startLocalDate}T00:00:00`)); setDatePickerOpen(true); } }}
               title="Дата начала"
-              subtitle={formatDateRu(startLocalDate)}
+              strongTitle={false}
+              titleWrapClassName="!min-h-11"
+              subtitle={<span className="text-base">{formatDateRu(startLocalDate)}</span>}
               aria-label={`Изменить дату начала. Сейчас ${formatDateRu(startLocalDate)}`}
             />
           </List>
@@ -272,7 +274,9 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
                   component="li"
                   className="relative"
                   title={`Время выполнения ${index + 1}`}
-                  subtitle={time}
+                  strongTitle={false}
+                  titleWrapClassName="!min-h-11"
+                  subtitle={<span className="text-base">{time}</span>}
                   onClick={(e) => { if ((e.target as HTMLElement).closest("button")) return; openTimePicker(`habit-time-${index}`); }}
                   after={<span className="relative z-10 flex items-center gap-1"><Icon name="clock-3" className="size-5" /><Button type="button" clear rounded disabled={items.length === 1} aria-label={items.length === 1 ? "Удалить время недоступно: необходимо оставить хотя бы одно время" : `Удалить время ${index + 1}`} className="!size-11 !min-w-11 !p-0" onClick={() => scheduleType === "exact_times" ? setScheduleTimes((values) => values.filter((_, i) => i !== index)) : setScheduleDayTimes((values) => values.filter((_, i) => i !== index))}><Icon name="trash-2" className="size-5" /></Button></span>}
                 ><ListInput component="span" inputId={`habit-time-${index}`} title="" type="time" value={time} style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none" }} onInput={(e) => { const next = (e.currentTarget as HTMLInputElement).value; if (scheduleType === "exact_times") setScheduleTimes((values) => values.map((value, i) => i === index ? next : value)); else setScheduleDayTimes((values) => values.map((value, i) => i === index ? next : value)); }} aria-label={`Изменить время ${index + 1}`} /></ListItem>)}
