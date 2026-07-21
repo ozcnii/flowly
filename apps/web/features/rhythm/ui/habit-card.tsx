@@ -25,7 +25,17 @@ export function HabitCard({ habit, onEdit }: { habit: HabitCardVM; onEdit?: () =
   const R = 20;
   const C = 2 * Math.PI * R;
   return (
-    <Card component="article" outline className="m-0" contentWrapPadding="p-4">
+    <Card
+      component="article"
+      outline
+      className={`m-0 ${onEdit ? "cursor-pointer" : ""}`}
+      contentWrapPadding="p-4"
+      role={onEdit ? "link" : undefined}
+      tabIndex={onEdit ? 0 : undefined}
+      aria-label={onEdit ? `Открыть привычку «${habit.title}»` : undefined}
+      onClick={onEdit}
+      onKeyDown={onEdit ? (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); onEdit(); } } : undefined}
+    >
       <div className="flex items-center gap-3">
         <span className="relative grid size-14 shrink-0 place-items-center" aria-hidden="true">
           <svg viewBox="0 0 48 48" className="absolute inset-0 size-14 -rotate-90">
@@ -58,7 +68,7 @@ export function HabitCard({ habit, onEdit }: { habit: HabitCardVM; onEdit?: () =
           {noSlots || habit.streak === 0 ? null : <p className="m-0 mt-0.5 text-xs text-text-muted">{streakText(habit)}</p>}
         </div>
         {onEdit ? (
-          <Button rounded inline className={`!size-11 !min-w-0 shrink-0 ${focusRing}`} aria-label={`Редактировать «${habit.title}»`} onClick={onEdit}>
+          <Button rounded inline className={`!size-11 !min-w-0 shrink-0 ${focusRing}`} aria-label={`Редактировать «${habit.title}»`} onClick={(event) => { event.stopPropagation(); onEdit(); }}>
             <Icon name="ellipsis" className="size-5" />
           </Button>
         ) : null}

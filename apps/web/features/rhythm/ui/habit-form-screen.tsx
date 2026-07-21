@@ -1,6 +1,6 @@
 "use client";
 
-import { BlockFooter, BlockTitle, Button, Card, List, ListInput, ListItem, Navbar, Preloader, Sheet, Toggle } from "konsta/react";
+import { BlockFooter, BlockTitle, Button, Card, List, ListInput, ListItem, Navbar, Preloader, Segmented, SegmentedButton, Sheet, Toggle } from "konsta/react";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@flowly/ui";
@@ -114,7 +114,7 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
   const [scheduleTimezone, setScheduleTimezone] = useState(initialSchedule?.timezone ?? (typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "UTC"));
   const [scheduleTimes, setScheduleTimes] = useState(initialSchedule?.ruleType === "exact_times" ? exactTimesConfig.parse(initialSchedule.configuration).times : ["09:00"]);
   const [scheduleDays, setScheduleDays] = useState<number[]>(initialSchedule?.ruleType === "weekdays" ? weekdaysConfig.parse(initialSchedule.configuration).days : [1, 3, 5]);
-  const [scheduleDayTime, setScheduleDayTime] = useState("18:00");
+  const [scheduleDayTimes, setScheduleDayTimes] = useState(() => initialSchedule?.ruleType === "weekdays" ? Object.values(weekdaysConfig.parse(initialSchedule.configuration).timesByDay)[0] ?? ["18:00"] : ["18:00"]);
 
   const [title, setTitle] = useState(initial.title);
   const [description, setDescription] = useState(initial.description);
@@ -143,7 +143,7 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
     setTouched(true);
     if (!hasTitle) return;
     const payload = { title: title.trim(), description: description.trim() || null, icon, color, emoji, startLocalDate, allowSkip };
-    const rule: ScheduleRule = { ruleType: scheduleType, timezone: scheduleTimezone, validFrom: startLocalDate, configuration: scheduleType === "exact_times" ? { times: scheduleTimes } : { days: scheduleDays, timesByDay: Object.fromEntries(scheduleDays.map((day) => [String(day), [scheduleDayTime]])) } };
+    const rule: ScheduleRule = { ruleType: scheduleType, timezone: scheduleTimezone, validFrom: startLocalDate, configuration: scheduleType === "exact_times" ? { times: scheduleTimes } : { days: scheduleDays, timesByDay: Object.fromEntries(scheduleDays.map((day) => [String(day), scheduleDayTimes])) } };
     if (mode === "create") createMut.mutate(payload, { onSuccess: async ({ habit }) => { await saveHabitSchedule(habit.id, rule); finish(); } });
     else updateMut.mutate(payload, { onSuccess: async () => { await scheduleMut.mutateAsync(rule); finish(); } });
   };
@@ -154,7 +154,7 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
       <main className="flow-screen pb-safe-4">
         <h1 className="sr-only">{mode === "create" ? "Новая привычка" : "Редактировать привычку"}</h1>
         <form className="contents" onSubmit={onSubmit} noValidate>
-          <BlockTitle component="h2" className="!m-0 !px-4">
+          <BlockTitle component="h2" className="!m-0 !p-0">
             Название и описание
           </BlockTitle>
           <List strong inset dividers>
@@ -182,7 +182,7 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
             />
           </List>
 
-          <BlockTitle component="h2" className="!m-0 !px-4">
+          <BlockTitle component="h2" className="!m-0 !p-0">
             Внешний вид
           </BlockTitle>
           <List strong inset>
@@ -206,7 +206,7 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
             />
           </List>
 
-          <BlockTitle component="h2" className="!m-0 !px-4">
+          <BlockTitle component="h2" className="!m-0 !p-0">
             Правила
           </BlockTitle>
           <List strong inset dividers>
@@ -222,29 +222,26 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
               aria-label={`Изменить дату начала. Сейчас ${formatDateRu(startLocalDate)}`}
             />
           </List>
-          <BlockTitle component="h3" className="!m-0 !px-4">Расписание</BlockTitle>
+          <BlockTitle component="h3" className="!m-0 !p-0">Как часто</BlockTitle>
+          <div className="grid gap-2 px-4">
+            <Segmented strong rounded role="radiogroup" aria-label="Тип расписания">
+              <SegmentedButton type="button" active={scheduleType === "exact_times"} aria-pressed={scheduleType === "exact_times"} onClick={() => setScheduleType("exact_times")}>Каждый день</SegmentedButton>
+              <SegmentedButton type="button" active={scheduleType === "weekdays"} aria-pressed={scheduleType === "weekdays"} onClick={() => setScheduleType("weekdays")}>По дням недели</SegmentedButton>
+            </Segmented>
+            <p className="m-0 text-sm text-text-muted">{scheduleType === "exact_times" ? "Привычка повторяется каждый день в выбранное время." : "Привычка повторяется только в отмеченные дни."}</p>
+          </div>
           <List strong inset dividers>
-            <ListItem title="Тип расписания" after={<span className="text-sm text-text-muted">{scheduleType === "exact_times" ? "Каждый день" : "Дни недели"}</span>} />
-            <ListItem
-              link
-              linkComponent="button"
-              contentClassName="w-full"
-              innerClassName="text-left"
-              linkProps={{ type: "button", onClick: () => setScheduleType((type) => type === "exact_times" ? "weekdays" : "exact_times") }}
-              title={scheduleType === "exact_times" ? `Время: ${scheduleTimes.join(", ")}` : `Дни: ${scheduleDays.map((day) => ["", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"][day]).join(", ")}`}
-              subtitle="Нажмите, чтобы переключить тип"
-            />
-            {scheduleType === "exact_times" ? <>{scheduleTimes.map((time, index) => <ListInput key={`${time}-${index}`} title={`Время ${index + 1}`} type="time" value={time} onInput={(e) => setScheduleTimes((items) => items.map((item, i) => i === index ? (e.currentTarget as HTMLInputElement).value : item))} aria-label={`Время привычки ${index + 1}`} />)}<Button clear rounded type="button" onClick={() => setScheduleTimes((items) => [...items, "21:00"])}>Добавить время</Button></> : <ListInput title="Время выбранных дней" type="time" value={scheduleDayTime} onInput={(e) => setScheduleDayTime((e.currentTarget as HTMLInputElement).value)} aria-label="Время выбранных дней" />}
-            {scheduleType === "weekdays" ? <div className="grid grid-cols-7 gap-1 px-2 py-2" role="group" aria-label="Дни недели">{[1, 2, 3, 4, 5, 6, 7].map((day) => <Button key={day} clear rounded type="button" aria-pressed={scheduleDays.includes(day)} onClick={() => setScheduleDays((days) => days.includes(day) ? days.filter((value) => value !== day) : [...days, day].sort((a, b) => a - b))} className="!min-h-11 !min-w-0 !p-0">{["", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"][day]}</Button>)}</div> : null}
+            {scheduleType === "exact_times" ? <>{scheduleTimes.map((time, index) => <ListInput key={`${time}-${index}`} title={`Время ${index + 1}`} type="time" value={time} onInput={(e) => setScheduleTimes((items) => items.map((item, i) => i === index ? (e.currentTarget as HTMLInputElement).value : item))} aria-label={`Время привычки ${index + 1}`} />)}<Button clear rounded type="button" onClick={() => setScheduleTimes((items) => [...items, "21:00"])}>Добавить время</Button></> : <>{scheduleDayTimes.map((time, index) => <ListInput key={`${time}-${index}`} title={`Время выбранных дней ${index + 1}`} type="time" value={time} onInput={(e) => setScheduleDayTimes((items) => items.map((item, i) => i === index ? (e.currentTarget as HTMLInputElement).value : item))} aria-label={`Время выбранных дней ${index + 1}`} />)}<Button clear rounded type="button" onClick={() => setScheduleDayTimes((items) => [...items, "21:00"])}>Добавить время</Button></>}
           </List>
+          {scheduleType === "weekdays" ? <div className="grid gap-2 px-4"><p className="m-0 text-sm text-text-muted">Отметьте дни выполнения:</p><div className="grid grid-cols-7 gap-2" role="group" aria-label="Дни недели">{[1, 2, 3, 4, 5, 6, 7].map((day) => { const selected = scheduleDays.includes(day); return <Button key={day} clear rounded type="button" aria-pressed={selected} onClick={() => setScheduleDays((days) => days.includes(day) ? days.filter((value) => value !== day) : [...days, day].sort((a, b) => a - b))} className={`!h-10 !w-10 !min-h-10 !min-w-0 !rounded-full !p-0 text-sm ${selected ? "!bg-accent-soft !text-accent !ring-1 !ring-accent" : "!bg-surface-subtle !text-text-muted"}`}>{["", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"][day]}</Button>; })}</div><p className="m-0 text-sm text-text-muted">Выбрано: {scheduleDays.map((day) => ["", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"][day]).join(", ") || "ни одного дня"}</p></div> : null}
           <TimezonePicker options={buildTimezoneOptions()} value={scheduleTimezone} onChange={setScheduleTimezone} />
           <List strong inset dividers>
             <ListItem
               title="Разрешить пропуск"
-              subtitle="Иначе только выполнение или отдых"
               after={<Toggle checked={allowSkip} onChange={() => setAllowSkip((v) => !v)} aria-label="Разрешить пропуск" />}
             />
           </List>
+          <p className="m-0 px-4 pt-2 text-sm leading-5 text-text-muted">Если пропустить запланированное выполнение, его можно будет отметить как пропущенное. Иначе остаются только выполнение и отдых.</p>
 
           {medical ? (
             <Card component="aside" outline className="mx-4" contentWrapPadding="flex gap-3 p-4">
