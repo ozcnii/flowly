@@ -1,4 +1,4 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { generateId, nowIso } from "@flowly/core";
 import { schema } from "@flowly/database";
@@ -9,6 +9,17 @@ import { getDb } from "@/lib/cloudflare";
 import { habitCreateSchema } from "@/features/rhythm/model/habits";
 
 const json = (body: unknown, init?: ResponseInit) => NextResponse.json(body, init);
+const DAY_LABELS = ["", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
+const scheduleLabel = (rule?: { ruleType: string; configurationJson: string }) => {
+  if (!rule) return "Расписание не настроено";
+  try {
+    const config = JSON.parse(rule.configurationJson) as { times?: string[]; days?: number[]; timesByDay?: Record<string, string[]> };
+    if (rule.ruleType === "exact_times") return `Каждый день · ${(config.times ?? []).join(" и ")}`;
+    const days = (config.days ?? []).map((day) => DAY_LABELS[day]).filter(Boolean).join(", ");
+    const times = [...new Set(Object.values(config.timesByDay ?? {}).flat())].sort().join(" и ");
+    return [days, times].filter(Boolean).join(" · ") || "Расписание не настроено";
+  } catch { return "Расписание не настроено"; }
+};
 
 /** GET /api/v1/habits — owner's active habits (§44.7). todayDone/todayTotal/streak are 0 until schedule(T03/T04)+occurrences(T07). */
 export async function GET(request: Request) {
@@ -21,6 +32,8 @@ export async function GET(request: Request) {
       .from(schema.habits)
       .where(and(eq(schema.habits.ownerId, userId), eq(schema.habits.status, "active")))
       .orderBy(asc(schema.habits.createdAt));
+    const rules = rows.length ? await db.select({ habitId: schema.habitScheduleRules.habitId, ruleType: schema.habitScheduleRules.ruleType, configurationJson: schema.habitScheduleRules.configurationJson }).from(schema.habitScheduleRules).where(and(inArray(schema.habitScheduleRules.habitId, rows.map((row) => row.id)), isNull(schema.habitScheduleRules.validUntil))) : [];
+    const rulesByHabit = new Map(rules.map((rule) => [rule.habitId, rule]));
     return json({
       habits: rows.map((row) => ({
         id: row.id,
@@ -34,6 +47,7 @@ export async function GET(request: Request) {
         todayDone: 0,
         todayTotal: 0,
         nextDueLabel: null,
+        scheduleLabel: scheduleLabel(rulesByHabit.get(row.id)),
         streak: 0,
       })),
     });

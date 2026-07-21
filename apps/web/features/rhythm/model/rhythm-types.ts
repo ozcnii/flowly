@@ -14,6 +14,7 @@ export interface HabitCardVM {
   todayDone: number;
   todayTotal: number; // configured slots for today (DEC-017); 0 until schedule (T03/T04) + occurrences (T07)
   nextDueLabel?: string | null; // localized, e.g. "сегодня в 21:00"
+  scheduleLabel: string;
   streak: number; // current consecutive-series count
   status: HabitStatus;
 }

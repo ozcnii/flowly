@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge, BlockTitle, Button, Card, Chip, Preloader } from "konsta/react";
+import { Badge, BlockTitle, Button, Card, Chip, List, Preloader } from "konsta/react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@flowly/ui";
 import { HabitCard } from "./habit-card";
@@ -15,9 +15,9 @@ const EXAMPLES = ["Выпить воду", "Витамины", "Таблетки
 
 // Dev-only preview of the card/list states. Mock only — never persisted.
 const DEMO_HABITS: HabitCardVM[] = [
-  { id: "demo-water", title: "Вода", icon: "glass-water", emoji: "💧", color: "sky", todayDone: 3, todayTotal: 4, nextDueLabel: "сегодня в 21:00", streak: 5, status: "partial" },
-  { id: "demo-sleep", title: "Сон вовремя", icon: "moon", emoji: null, color: "violet", todayDone: 1, todayTotal: 1, nextDueLabel: "до 23:00", streak: 12, status: "done" },
-  { id: "demo-walk", title: "Прогулка", icon: "leaf", emoji: "🐾", color: "emerald", todayDone: 0, todayTotal: 1, nextDueLabel: "завтра утром", streak: 0, status: "pending" },
+  { id: "demo-water", title: "Вода", icon: "glass-water", emoji: "💧", color: "sky", todayDone: 3, todayTotal: 4, nextDueLabel: "сегодня в 21:00", scheduleLabel: "Каждый день · 09:00 и 21:00", streak: 5, status: "partial" },
+  { id: "demo-sleep", title: "Сон вовремя", icon: "moon", emoji: null, color: "violet", todayDone: 1, todayTotal: 1, nextDueLabel: "до 23:00", scheduleLabel: "Каждый день · 23:00", streak: 12, status: "done" },
+  { id: "demo-walk", title: "Прогулка", icon: "leaf", emoji: "🐾", color: "emerald", todayDone: 0, todayTotal: 1, nextDueLabel: "завтра утром", scheduleLabel: "Пн, Ср, Пт · 18:00", streak: 0, status: "pending" },
 ];
 
 /**
@@ -42,11 +42,9 @@ export function RhythmScreen({ demo = false }: { demo?: boolean }) {
       ) : null}
 
       {demo || (!loading && !error && cards.length > 0) ? (
-        <div className="grid gap-3">
-          {cards.map((habit) => (
-            <HabitCard key={habit.id} habit={habit} onEdit={!demo ? () => router.push(`/rhythm/${encodeURIComponent(habit.id)}/edit` as never) : undefined} />
-          ))}
-        </div>
+        <List strong inset dividers className="!my-0">
+          {cards.map((habit) => <HabitCard key={habit.id} habit={habit} onEdit={!demo ? () => router.push(`/rhythm/${encodeURIComponent(habit.id)}/edit` as never) : undefined} />)}
+        </List>
       ) : null}
 
       {!demo && loading ? (

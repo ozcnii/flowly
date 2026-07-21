@@ -87,7 +87,8 @@ export interface HabitListItem {
   allowSkip: boolean;
   todayDone: number; // 0 until occurrences (T07)
   todayTotal: number; // 0 until schedule (T03/T04) + occurrences (T07)
-  nextDueLabel: string | null; // null until schedule (T03/T04)
+  nextDueLabel: string | null; // null until occurrences (T07)
+  scheduleLabel: string;
   streak: number; // 0 until occurrences (T07)
 }
 

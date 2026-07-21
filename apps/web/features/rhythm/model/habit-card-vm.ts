@@ -18,6 +18,7 @@ export function habitsToCards(habits: HabitListItem[] | undefined): HabitCardVM[
       todayDone: h.todayDone,
       todayTotal: h.todayTotal,
       nextDueLabel: noSlots ? null : h.nextDueLabel,
+      scheduleLabel: h.scheduleLabel,
       streak: h.streak,
       status,
     };
