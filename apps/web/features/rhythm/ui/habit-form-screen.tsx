@@ -235,7 +235,6 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
               linkProps={{ type: "button", onClick: () => { setVisibleMonth(new Date(`${startLocalDate}T00:00:00`)); setDatePickerOpen(true); } }}
               title="Дата начала"
               strongTitle={false}
-              titleWrapClassName="!min-h-11"
               subtitle={<span className="text-base">{formatDateRu(startLocalDate)}</span>}
               aria-label={`Изменить дату начала. Сейчас ${formatDateRu(startLocalDate)}`}
             />
@@ -329,7 +328,7 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
 
           <p className={`mx-4 min-h-5 text-sm text-red-600 dark:text-red-400 ${submitError ? "" : "invisible"}`} role={submitError ? "alert" : undefined} aria-hidden={!submitError}>{submitError ? "Не удалось сохранить. Проверьте связь и попробуйте ещё раз." : "\u00a0"}</p>
 
-          <footer className="mt-auto grid gap-2 px-4 pt-2 pb-1">
+          <footer className="grid gap-2 px-4 pt-2 pb-1">
             <Button type="submit" large rounded disabled={submitting || !hasTitle} className={`w-full ${focusRing}`}>
               <span className="inline-flex items-center gap-2">
                 <Icon name="check" className="size-5" />
