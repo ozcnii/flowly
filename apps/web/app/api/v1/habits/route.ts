@@ -13,8 +13,16 @@ const DAY_LABELS = ["", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 const scheduleLabel = (rule?: { ruleType: string; configurationJson: string }) => {
   if (!rule) return "Расписание не настроено";
   try {
-    const config = JSON.parse(rule.configurationJson) as { times?: string[]; days?: number[]; timesByDay?: Record<string, string[]> };
+    const config = JSON.parse(rule.configurationJson) as { target?: number; time?: string; every?: number; unit?: "hours" | "days" | "weeks"; anchorLocalDate?: string; anchorLocalTime?: string; times?: string[]; days?: number[]; timesByDay?: Record<string, string[]> };
     if (rule.ruleType === "exact_times") return `Каждый день · ${(config.times ?? []).join(" и ")}`;
+    if (rule.ruleType === "weekly_target") {
+      const days = (config.days ?? []).map((day) => DAY_LABELS[day]).filter(Boolean).join(", ");
+      return [`${config.target ?? 0} раз в неделю`, days, config.time].filter(Boolean).join(" · ");
+    }
+    if (rule.ruleType === "interval") {
+      const units = { hours: "ч", days: "дн", weeks: "нед" };
+      return [`Каждые ${config.every ?? 0} ${config.unit ? units[config.unit] : ""}`, `${config.anchorLocalDate ?? ""} ${config.anchorLocalTime ?? ""}`.trim()].filter(Boolean).join(" · ");
+    }
     const days = (config.days ?? []).map((day) => DAY_LABELS[day]).filter(Boolean).join(", ");
     const times = [...new Set(Object.values(config.timesByDay ?? {}).flat())].sort().join(" и ");
     return [days, times].filter(Boolean).join(" · ") || "Расписание не настроено";

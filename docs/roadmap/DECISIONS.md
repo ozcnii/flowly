@@ -581,6 +581,15 @@
 - **Влияет на:** E4-D5-T01, S-MA-060, `apps/web/features/rhythm/ui/habit-card.tsx`, DEC-035 exception registry, roadmap/HANDOFF.
 - **Связано:** DEC-040 (Home `DayProgressRing` — тот же gap Konsta), DEC-017 (multi-slot completions).
 
+### DEC-068 — Weekly target и interval schedule configuration contract
+
+- **Статус:** approved
+- **Дата:** 2026-07-21
+- **Решение:** `weekly_target` хранит `{ target: integer, days: [1..7], time: HH:mm }`: недельная цель, допустимые дни (понедельник=1, воскресенье=7) и одно preferred local time. `interval` хранит `{ every: positive integer, unit: "hours" | "days" | "weeks", anchorLocalDate: YYYY-MM-DD, anchorLocalTime: HH:mm }`; anchor явный и не выводится молча из `valid_from`. Interval expansion использует local calendar semantics в пользовательском IANA timezone; timezone/DST не должны переписывать уже подтверждённые выполнения. Indicator «обязательный сегодня» для weekly target откладывается до T07, когда появятся completion/occurrence data; T04 ограничен persistence/validation/helper и S-MA-062 UI.
+- **Основание:** пользователь утвердил canonical JSON, явный local anchor, локальную календарную семантику interval и границу T04 в ответах на deep plan E4-D5-T04.
+- **PRD:** §23.3–23.4, §27, §43.17.
+- **Влияет на:** E4-D5-T04/T05/T07, S-MA-062, `apps/web/features/rhythm/model/schedule.ts`, habit schedule API и downstream occurrence generation.
+
 ## Открытые решения
 
 ### DEC-006 — Operational thresholds

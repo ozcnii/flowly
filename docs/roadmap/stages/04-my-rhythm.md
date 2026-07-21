@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 6 | 0 | 0 | 1 | 1 |
+| 4 | 1 | 0 | 0 | 3 |
 
 ## Зависимости и инварианты
 
@@ -22,7 +22,7 @@
 
 - По `DEC-024` каждый указанный `ui_slices` screen slice выполняется строго по одному ID в реальном `apps/web`; все states/интеракции и явный approval обязательны до следующего ID.
 - По `DEC-035` Konsta UI 5.2.0 (`konsta/react`, `ios` theme) обязательна для current/future production UI; direct imports — default, `packages/ui` допустим только для Flowly-specific contracts, отсутствующих в Konsta.
-- Weekly target явно показывает «обязательный сегодня»; multiple completions считаются отдельными настроенными slots (`DEC-017`).
+- Weekly target явно показывает «обязательный сегодня»; multiple completions считаются отдельными настроенными slots (`DEC-017`). Для T04 canonical configs: `weekly_target={target,days,time}`, `interval={every,unit,anchorLocalDate,anchorLocalTime}`; interval uses local-calendar semantics, а mandatory-today indicator deferred to T07 (`DEC-068`).
 - Pause/schedule/timezone changes действуют только на future occurrences; history immutable; delete архивирует (`DEC-017`).
 - No response остаётся `no_response`; correction ограничена activity context и audit history (`DEC-015`).
 - Habit private by default, sharing/revoke follows `DEC-019`; UI states follows `DEC-022` и [`docs/design/flows/`](../../design/flows/).
@@ -58,16 +58,16 @@
 - **validation/evidence:** `.temp/E4-D5-T03/plan.md`; migration `0017_habit_schedule_rules.sql`; route `/api/v1/habits/[id]/schedule`; model `features/rhythm/model/schedule.ts`; browser `/rhythm/new` на localhost:3002 — переключение exact_times/weekdays, multiple time row, weekdays buttons, shared TimezonePicker. `typecheck` PASS; `lint` PASS с одним существующим warning `step-session-screen.tsx:449`; production `build` PASS; local D1 migration 0017 PASS. DST conversion remains a residual verification risk until dedicated scenario matrix is run. Production deploy `f0d84ab` / GitHub Actions `29843847723` PASS; real-device TMA time-picker interaction approved пользователем («очень круто») 2026-07-21, `review -> done`. Post-approval list cleanup: oversized outline HabitCard/progress placeholder/ellipsis/disabled completion removed; `/rhythm` uses compact direct Konsta List/ListItem rows with real exact-times/weekdays summary, full-row navigation, chevron, 44px identity circle for icon/emoji and two-line long-title clamp; 390px overflow 0, console errors 0, typecheck PASS.
 
 ### E4-D5-T04 — Реализовать недельную цель и интервальное расписание
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §23.3–23.4, §27, §43.17 · **depends_on:** E4-D5-T02 · **decisions:** DEC-017, DEC-022, DEC-024, DEC-025, DEC-029
+- **status:** in_progress · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-21
+- **prd_refs:** §23.3–23.4, §27, §43.17 · **depends_on:** E4-D5-T02 · **decisions:** DEC-017, DEC-022, DEC-024, DEC-025, DEC-029, DEC-068
 - **ui_slices:** S-MA-062 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** count-per-week и interval schedule согласно PRD.
-- **acceptance:** [ ] недельные границы корректны; [ ] interval anchor сохраняется; [ ] timezone не меняет уже подтверждённые выполнения.
-- **validation/evidence:** table-driven date examples.
+- **acceptance:** [x] недельные границы корректны; [x] interval anchor сохраняется; [ ] timezone не меняет уже подтверждённые выполнения — прямой mutation rerun не выполнен, occurrences остаются T07 scope.
+- **validation/evidence:** `.temp/E4-D5-T04/plan.md`; `DEC-068`; pure table-driven checks for Monday/Sunday week bounds, weekly candidates, remaining/mandatory facts and interval anchor; web typecheck/lint/build/diff-check PASS; browser repro `/rhythm/019f8082-2956-754c-84a2-5a319faf4533/edit` restores persisted `weekdays` selection; one shared Konsta List frequency block renders all four types; exact/weekdays time rows use compact labelled ListItems with separate clock/trash actions and no native-icon overlap; native picker click, add/delete behavior and disabled final trash slot verified; light/dark 360/390/430 matrix has four radios, exactly one selected, overflow 0, console errors 0; screenshot `.temp/E4-D5-T04/screenshots/time-compact-390-light.png`; schedule API static audit touches only `habits`/`habitScheduleRules`, and current repro habit has 0 occurrences. Direct timezone/history mutation rerun remains unperformed before `review`.
 
 ### E4-D5-T05 — Реализовать несколько выполнений и lifecycle привычки
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §23.5, §26, §43.21, §44.8 · **depends_on:** E4-D5-T03, E4-D5-T04 · **decisions:** DEC-015, DEC-017, DEC-022, DEC-024, DEC-025, DEC-029
+- **prd_refs:** §23.5, §26, §43.21, §44.8 · **depends_on:** E4-D5-T03, E4-D5-T04 · **decisions:** DEC-015, DEC-017, DEC-022, DEC-024, DEC-025, DEC-029, DEC-068
 - **ui_slices:** S-MA-011, S-MA-064, S-MA-065 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** несколько occurrences в день, completion/skip/rest/no_response, pause/resume.
 - **acceptance:** [ ] каждое выполнение независимо; [ ] 0/partial/full progress различим; [ ] ручное изменение журналируется.
@@ -83,7 +83,7 @@
 
 ### E4-D5-T07 — Генерировать occurrences и reminder jobs
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §26–27, §43.21–43.22, §45 · **depends_on:** E4-D5-T03–T06 · **decisions:** DEC-015, DEC-017, DEC-029
+- **prd_refs:** §26–27, §43.21–43.22, §45 · **depends_on:** E4-D5-T03–T06 · **decisions:** DEC-015, DEC-017, DEC-029, DEC-068
 - **scope:** идемпотентная генерация UTC occurrences/jobs без фактической Telegram delivery.
 - **acceptance:** [ ] повторный запуск не создаёт дублей; [ ] timezone changes обработаны явно; [ ] jobs связаны с policy steps.
 - **validation/evidence:** generation rerun и uniqueness evidence.
