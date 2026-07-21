@@ -13,7 +13,7 @@ export const habitsKeys = {
 // DEC-029: client reads/mutations via react-query. Raw fetch lives only in apiJson + route handlers.
 export const getHabits = (signal?: AbortSignal) => apiJson<{ habits: HabitListItem[] }>("/api/v1/habits", { signal });
 export const getHabit = (id: string, signal?: AbortSignal) => apiJson<{ habit: Habit }>(`/api/v1/habits/${encodeURIComponent(id)}`, { signal });
-export const createHabit = (input: HabitCreateInput) => apiJson<{ habit: Habit }>("/api/v1/habits", { method: "POST", body: jsonBody(input) });
+export const createHabit = (input: HabitCreateInput, schedule?: ScheduleRule) => apiJson<{ habit: Habit }>("/api/v1/habits", { method: "POST", body: jsonBody(schedule ? { ...input, schedule } : input) });
 export const updateHabit = (id: string, input: HabitUpdateInput) => apiJson<{ habit: Habit }>(`/api/v1/habits/${encodeURIComponent(id)}`, { method: "PATCH", body: jsonBody(input) });
 export const archiveHabit = (id: string) => apiJson<{ archived: true }>(`/api/v1/habits/${encodeURIComponent(id)}`, { method: "DELETE" });
 export const getHabitSchedule = (id: string, signal?: AbortSignal) => apiJson<{ schedule: (ScheduleRule & { id: string }) | null }>(`/api/v1/habits/${encodeURIComponent(id)}/schedule`, { signal });
@@ -36,7 +36,7 @@ const invalidateLists = (qc: ReturnType<typeof useQueryClient>) => {
 export const useCreateHabitMutation = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: HabitCreateInput) => createHabit(input),
+    mutationFn: ({ input, schedule }: { input: HabitCreateInput; schedule?: ScheduleRule }) => createHabit(input, schedule),
     onSuccess: () => invalidateLists(qc),
   });
 };

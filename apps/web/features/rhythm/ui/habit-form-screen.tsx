@@ -16,7 +16,7 @@ import {
   type HabitColor,
   type HabitIcon,
 } from "../model/habits";
-import { saveHabitSchedule, useCreateHabitMutation, useHabitQuery, useHabitScheduleQuery, useSaveHabitScheduleMutation, useUpdateHabitMutation } from "../model/habits-queries";
+import { useCreateHabitMutation, useHabitQuery, useHabitScheduleQuery, useSaveHabitScheduleMutation, useUpdateHabitMutation } from "../model/habits-queries";
 import { exactTimesConfig, intervalConfig, scheduleRuleSchema, weekdaysConfig, weeklyTargetConfig } from "../model/schedule";
 import type { ScheduleRule, ScheduleType } from "../model/schedule";
 
@@ -160,7 +160,7 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
           : { every: Number(intervalEvery), unit: intervalUnit, anchorLocalDate: intervalAnchorDate, anchorLocalTime: intervalAnchorTime };
     const rule: ScheduleRule = { ruleType: scheduleType, timezone: scheduleTimezone, validFrom: startLocalDate, configuration };
     if (!scheduleRuleSchema.safeParse(rule).success) { setScheduleError(true); return; }
-    if (mode === "create") createMut.mutate(payload, { onSuccess: async ({ habit }) => { await saveHabitSchedule(habit.id, rule); finish(); } });
+    if (mode === "create") createMut.mutate({ input: payload, schedule: rule }, { onSuccess: finish });
     else updateMut.mutate(payload, { onSuccess: async () => { await scheduleMut.mutateAsync(rule); finish(); } });
   };
 

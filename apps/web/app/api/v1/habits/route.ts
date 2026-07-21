@@ -7,8 +7,10 @@ import { isSafeOrigin } from "@/lib/auth/csrf";
 import { getSessionUserId } from "@/lib/auth/session-user";
 import { getDb } from "@/lib/cloudflare";
 import { habitCreateSchema } from "@/features/rhythm/model/habits";
+import { normalizeSchedule, scheduleRuleSchema } from "@/features/rhythm/model/schedule";
 
 const json = (body: unknown, init?: ResponseInit) => NextResponse.json(body, init);
+const habitCreateWithScheduleSchema = habitCreateSchema.extend({ schedule: scheduleRuleSchema.optional() });
 const DAY_LABELS = ["", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 const scheduleLabel = (rule?: { ruleType: string; configurationJson: string }) => {
   if (!rule) return "Расписание не настроено";
@@ -73,7 +75,7 @@ export async function POST(request: Request) {
   const userId = await getSessionUserId(request);
   if (!userId) return json({ error: "unauthorized" }, { status: 401 });
 
-  const parsed = habitCreateSchema.safeParse(await request.json().catch(() => ({})));
+  const parsed = habitCreateWithScheduleSchema.safeParse(await request.json().catch(() => ({})));
   if (!parsed.success) {
     return json({ error: "invalid", issues: parsed.error.issues }, { status: 400 });
   }
@@ -85,24 +87,31 @@ export async function POST(request: Request) {
   const id = generateId();
   const now = nowIso();
   const db = getDb();
+  const schedule = input.schedule ? normalizeSchedule(input.schedule) : undefined;
+  const habitRow = {
+    id,
+    ownerId: userId,
+    title: input.title,
+    description: input.description ?? null,
+    icon: input.icon,
+    color: input.color,
+    emoji: input.emoji ?? null,
+    startLocalDate: input.startLocalDate,
+    endLocalDate: input.endLocalDate ?? null,
+    allowSkip: input.allowSkip ?? true,
+    allowRest: false,
+    commentEnabled: true,
+    status: "active" as const,
+    createdAt: now,
+    updatedAt: now,
+  };
   try {
-    await db.insert(schema.habits).values({
-      id,
-      ownerId: userId,
-      title: input.title,
-      description: input.description ?? null,
-      icon: input.icon,
-      color: input.color,
-      emoji: input.emoji ?? null,
-      startLocalDate: input.startLocalDate,
-      endLocalDate: input.endLocalDate ?? null,
-      allowSkip: input.allowSkip ?? true,
-      allowRest: false,
-      commentEnabled: true,
-      status: "active",
-      createdAt: now,
-      updatedAt: now,
-    });
+    if (schedule) {
+      await db.batch([
+        db.insert(schema.habits).values(habitRow),
+        db.insert(schema.habitScheduleRules).values({ id: generateId(), habitId: id, ruleType: schedule.ruleType, timezone: schedule.timezone, configurationJson: JSON.stringify(schedule.configuration), validFrom: schedule.validFrom, validUntil: null, createdAt: now }),
+      ]);
+    } else await db.insert(schema.habits).values(habitRow);
   } catch (error) {
     audit("habit.create.error", { userId, error: String(error).slice(0, 200) });
     throw error;
