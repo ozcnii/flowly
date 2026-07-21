@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 4 | 0 | 0 | 1 | 3 |
+| 4 | 0 | 0 | 0 | 4 |
 
 ## Зависимости и инварианты
 
@@ -58,7 +58,7 @@
 - **validation/evidence:** `.temp/E4-D5-T03/plan.md`; migration `0017_habit_schedule_rules.sql`; route `/api/v1/habits/[id]/schedule`; model `features/rhythm/model/schedule.ts`; browser `/rhythm/new` на localhost:3002 — переключение exact_times/weekdays, multiple time row, weekdays buttons, shared TimezonePicker. `typecheck` PASS; `lint` PASS с одним существующим warning `step-session-screen.tsx:449`; production `build` PASS; local D1 migration 0017 PASS. DST conversion remains a residual verification risk until dedicated scenario matrix is run. Production deploy `f0d84ab` / GitHub Actions `29843847723` PASS; real-device TMA time-picker interaction approved пользователем («очень круто») 2026-07-21, `review -> done`. Post-approval list cleanup: oversized outline HabitCard/progress placeholder/ellipsis/disabled completion removed; `/rhythm` uses compact direct Konsta List/ListItem rows with real exact-times/weekdays summary, full-row navigation, chevron, 44px identity circle for icon/emoji and two-line long-title clamp; 390px overflow 0, console errors 0, typecheck PASS.
 
 ### E4-D5-T04 — Реализовать недельную цель и интервальное расписание
-- **status:** review · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-21
+- **status:** done · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-21
 - **prd_refs:** §23.3–23.4, §27, §43.17 · **depends_on:** E4-D5-T02 · **decisions:** DEC-017, DEC-022, DEC-024, DEC-025, DEC-029, DEC-068
 - **ui_slices:** S-MA-062 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** count-per-week и interval schedule согласно PRD.
