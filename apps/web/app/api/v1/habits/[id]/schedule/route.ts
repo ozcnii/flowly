@@ -24,9 +24,11 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   const body = await request.json().catch(() => null); const parsed = scheduleRuleSchema.safeParse(body);
   if (!parsed.success) return json({ error: "invalid_schedule", issues: parsed.error.flatten() }, { status: 400 });
   const rule = normalizeSchedule(parsed.data); const db = getDb(); const now = nowIso();
-  await db.update(schema.habitScheduleRules).set({ validUntil: now }).where(and(eq(schema.habitScheduleRules.habitId, id), isNull(schema.habitScheduleRules.validUntil)));
   const row = { id: generateId(), habitId: id, ruleType: rule.ruleType, timezone: rule.timezone, configurationJson: JSON.stringify(rule.configuration), validFrom: rule.validFrom, validUntil: null, createdAt: now };
-  await db.insert(schema.habitScheduleRules).values(row);
+  await db.batch([
+    db.update(schema.habitScheduleRules).set({ validUntil: now }).where(and(eq(schema.habitScheduleRules.habitId, id), isNull(schema.habitScheduleRules.validUntil))),
+    db.insert(schema.habitScheduleRules).values(row),
+  ]);
   return json({ schedule: { ...row, configuration: rule.configuration } });
 }
 
