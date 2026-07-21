@@ -385,6 +385,22 @@ export const habits = sqliteTable(
   (table) => [index("habits_owner_status_idx").on(table.ownerId, table.status)],
 );
 
+// §43.17 habit_schedule_rules
+export const habitScheduleRules = sqliteTable(
+  "habit_schedule_rules",
+  {
+    id: text("id").primaryKey(),
+    habitId: text("habit_id").notNull().references(() => habits.id, { onDelete: "cascade" }),
+    ruleType: text("rule_type").notNull(),
+    timezone: text("timezone").notNull(),
+    configurationJson: text("configuration_json").notNull(),
+    validFrom: text("valid_from").notNull(),
+    validUntil: text("valid_until"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [index("habit_schedule_rules_habit_idx").on(table.habitId), uniqueIndex("habit_schedule_rules_habit_current_unique").on(table.habitId, table.validUntil)],
+);
+
 // §43.28 youtube_search_cache
 export const youtubeSearchCache = sqliteTable(
   "youtube_search_cache",

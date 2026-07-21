@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@flowly/ui";
 import { PrimaryNavbar } from "@/components/shell/primary-navbar";
+import { TimezonePicker, buildTimezoneOptions } from "@/components/timezone-picker";
 import {
   COLOR_OPTIONS,
   EMOJI_OPTIONS,
@@ -15,7 +16,9 @@ import {
   type HabitColor,
   type HabitIcon,
 } from "../model/habits";
-import { useCreateHabitMutation, useHabitQuery, useUpdateHabitMutation } from "../model/habits-queries";
+import { saveHabitSchedule, useCreateHabitMutation, useHabitQuery, useHabitScheduleQuery, useSaveHabitScheduleMutation, useUpdateHabitMutation } from "../model/habits-queries";
+import { exactTimesConfig, weekdaysConfig } from "../model/schedule";
+import type { ScheduleRule } from "../model/schedule";
 
 const focusRing = "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent";
 const pickFocus = "focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas";
@@ -64,6 +67,7 @@ const localDate = (date: Date) => `${date.getFullYear()}-${String(date.getMonth(
  */
 export function HabitFormScreen({ mode, habitId, returnTo = "app" }: { mode: "create" | "edit"; habitId?: string; returnTo?: "app" | "onboarding" }) {
   const editHabit = useHabitQuery(habitId ?? "", mode === "edit");
+  const schedule = useHabitScheduleQuery(habitId ?? "", mode === "edit");
   const navbarTitle = mode === "create" ? "Новая привычка" : "Привычка";
 
   if (mode === "edit") {
@@ -96,15 +100,21 @@ export function HabitFormScreen({ mode, habitId, returnTo = "app" }: { mode: "cr
         </>
       );
     }
-    return <HabitFormInner key={editHabit.data.habit.id} mode="edit" habitId={habitId!} initial={createInitial(editHabit.data.habit)} returnTo={returnTo} />;
+    return <HabitFormInner key={editHabit.data.habit.id} mode="edit" habitId={habitId!} initial={createInitial(editHabit.data.habit)} initialSchedule={schedule.data?.schedule ?? undefined} returnTo={returnTo} />;
   }
   return <HabitFormInner mode="create" initial={createInitial(undefined)} returnTo={returnTo} />;
 }
 
-function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" | "edit"; habitId?: string; initial: Initial; returnTo: "app" | "onboarding" }) {
+function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: { mode: "create" | "edit"; habitId?: string; initial: Initial; initialSchedule?: ScheduleRule; returnTo: "app" | "onboarding" }) {
   const router = useRouter();
   const createMut = useCreateHabitMutation();
   const updateMut = useUpdateHabitMutation(habitId ?? "");
+  const scheduleMut = useSaveHabitScheduleMutation(habitId ?? "");
+  const [scheduleType, setScheduleType] = useState<"exact_times" | "weekdays">(initialSchedule?.ruleType ?? "exact_times");
+  const [scheduleTimezone, setScheduleTimezone] = useState(initialSchedule?.timezone ?? (typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "UTC"));
+  const [scheduleTimes, setScheduleTimes] = useState(initialSchedule?.ruleType === "exact_times" ? exactTimesConfig.parse(initialSchedule.configuration).times : ["09:00"]);
+  const [scheduleDays, setScheduleDays] = useState<number[]>(initialSchedule?.ruleType === "weekdays" ? weekdaysConfig.parse(initialSchedule.configuration).days : [1, 3, 5]);
+  const [scheduleDayTime, setScheduleDayTime] = useState("18:00");
 
   const [title, setTitle] = useState(initial.title);
   const [description, setDescription] = useState(initial.description);
@@ -133,8 +143,9 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
     setTouched(true);
     if (!hasTitle) return;
     const payload = { title: title.trim(), description: description.trim() || null, icon, color, emoji, startLocalDate, allowSkip };
-    if (mode === "create") createMut.mutate(payload, { onSuccess: finish });
-    else updateMut.mutate(payload, { onSuccess: finish });
+    const rule: ScheduleRule = { ruleType: scheduleType, timezone: scheduleTimezone, validFrom: startLocalDate, configuration: scheduleType === "exact_times" ? { times: scheduleTimes } : { days: scheduleDays, timesByDay: Object.fromEntries(scheduleDays.map((day) => [String(day), [scheduleDayTime]])) } };
+    if (mode === "create") createMut.mutate(payload, { onSuccess: async ({ habit }) => { await saveHabitSchedule(habit.id, rule); finish(); } });
+    else updateMut.mutate(payload, { onSuccess: async () => { await scheduleMut.mutateAsync(rule); finish(); } });
   };
 
   return (
@@ -211,6 +222,22 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
               aria-label={`Изменить дату начала. Сейчас ${formatDateRu(startLocalDate)}`}
             />
           </List>
+          <BlockTitle component="h3" className="!m-0 !px-4">Расписание</BlockTitle>
+          <List strong inset dividers>
+            <ListItem title="Тип расписания" after={<span className="text-sm text-text-muted">{scheduleType === "exact_times" ? "Каждый день" : "Дни недели"}</span>} />
+            <ListItem
+              link
+              linkComponent="button"
+              contentClassName="w-full"
+              innerClassName="text-left"
+              linkProps={{ type: "button", onClick: () => setScheduleType((type) => type === "exact_times" ? "weekdays" : "exact_times") }}
+              title={scheduleType === "exact_times" ? `Время: ${scheduleTimes.join(", ")}` : `Дни: ${scheduleDays.map((day) => ["", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"][day]).join(", ")}`}
+              subtitle="Нажмите, чтобы переключить тип"
+            />
+            {scheduleType === "exact_times" ? <>{scheduleTimes.map((time, index) => <ListInput key={`${time}-${index}`} title={`Время ${index + 1}`} type="time" value={time} onInput={(e) => setScheduleTimes((items) => items.map((item, i) => i === index ? (e.currentTarget as HTMLInputElement).value : item))} aria-label={`Время привычки ${index + 1}`} />)}<Button clear rounded type="button" onClick={() => setScheduleTimes((items) => [...items, "21:00"])}>Добавить время</Button></> : <ListInput title="Время выбранных дней" type="time" value={scheduleDayTime} onInput={(e) => setScheduleDayTime((e.currentTarget as HTMLInputElement).value)} aria-label="Время выбранных дней" />}
+            {scheduleType === "weekdays" ? <div className="grid grid-cols-7 gap-1 px-2 py-2" role="group" aria-label="Дни недели">{[1, 2, 3, 4, 5, 6, 7].map((day) => <Button key={day} clear rounded type="button" aria-pressed={scheduleDays.includes(day)} onClick={() => setScheduleDays((days) => days.includes(day) ? days.filter((value) => value !== day) : [...days, day].sort((a, b) => a - b))} className="!min-h-11 !min-w-0 !p-0">{["", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"][day]}</Button>)}</div> : null}
+          </List>
+          <TimezonePicker options={buildTimezoneOptions()} value={scheduleTimezone} onChange={setScheduleTimezone} />
           <List strong inset dividers>
             <ListItem
               title="Разрешить пропуск"

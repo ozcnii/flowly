@@ -6,8 +6,8 @@
 
 - **Обновлено:** 2026-07-20
 - **Текущий этап:** **4. Мой ритм**.
-- **Активная задача:** E4-D5-T03 (расписание привычек), `backlog`; E4-D5-T02 завершена после user approval («мне все нравится»).
-- **Статус:** E4-D5-T02 `done`: API/DB/onboarding, единая row-based форма, emoji, иконки/цвета и новый Konsta Sheet-календарь с фиксированной шестинедельной сеткой. User approval получен («мне все нравится»). Typecheck/build PASS; commit `71360b3` pushed. Production deploy через GitHub Actions ожидает подтверждения.
+- **Активная задача:** E4-D5-T03 (расписание привычек), `review`; S-MA-062 реализован, ожидает user approval. E4-D5-T02 завершена после user approval («мне все нравится»).
+- **Статус:** E4-D5-T02 `done`. E4-D5-T03 S-MA-062 реализован и переведён в `review`: migration 0017, schedule API, exact_times/weekdays config/validation/expansion, timezone picker и form states. План `.temp/E4-D5-T03/plan.md`; решения: T03 не материализует occurrences, slot identity остаётся для T05/T07. Typecheck/build PASS; lint PASS с существующим warning в step-session-screen; local D1 migration PASS; localhost:3002 browser smoke PASS. Нужен user approval screen slice.
 - **Активная задача:** E4-D5-T02 (CRUD привычки + API /habits + icon/color + onboarding S-MA-004), `review` — ждёт DEC-024 user approval.
 - **Статус:** E4-D5-T02 реализован (migration 0015 + habits API + create/edit form S-MA-061 + onboarding S-MA-004 real create) и верифицирован (HTTP CRUD matrix + browser create/edit flow + typecheck/lint/build PASS). E4-D5-T01 (экран «Ритм», slice S-MA-060) `done` (`52c71f4`).
 - **README sync:** исправлено расхождение — этап 3 в README теперь `done` (7), итоги пересчитаны (38 done / 1 blocked / 40 backlog), активный этап переключён на 4.
