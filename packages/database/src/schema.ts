@@ -372,6 +372,7 @@ export const habits = sqliteTable(
     description: text("description"),
     icon: text("icon").notNull(),
     color: text("color").notNull(),
+    emoji: text("emoji"),
     startLocalDate: text("start_local_date").notNull(),
     endLocalDate: text("end_local_date"),
     allowSkip: integer("allow_skip", { mode: "boolean" }).notNull().default(true),

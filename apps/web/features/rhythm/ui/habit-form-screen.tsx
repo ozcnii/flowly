@@ -1,12 +1,13 @@
 "use client";
 
-import { BlockFooter, BlockTitle, Button, Card, List, ListInput, ListItem, Preloader, Toggle } from "konsta/react";
+import { BlockFooter, BlockTitle, Button, Card, List, ListInput, ListItem, Navbar, Preloader, Sheet, Toggle } from "konsta/react";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@flowly/ui";
 import { PrimaryNavbar } from "@/components/shell/primary-navbar";
 import {
   COLOR_OPTIONS,
+  EMOJI_OPTIONS,
   ICON_OPTIONS,
   MEDICAL_WARNING_TEXT,
   isMedicalHint,
@@ -17,6 +18,7 @@ import {
 import { useCreateHabitMutation, useHabitQuery, useUpdateHabitMutation } from "../model/habits-queries";
 
 const focusRing = "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent";
+const pickFocus = "focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas";
 
 const todayLocal = () => {
   const d = new Date();
@@ -28,6 +30,7 @@ interface Initial {
   description: string;
   icon: HabitIcon;
   color: HabitColor;
+  emoji: string | null;
   startLocalDate: string;
   allowSkip: boolean;
 }
@@ -37,13 +40,27 @@ const createInitial = (h?: Habit): Initial => ({
   description: h?.description ?? "",
   icon: h && (ICON_OPTIONS as readonly string[]).includes(h.icon) ? (h.icon as HabitIcon) : ICON_OPTIONS[0],
   color: h && h.color in COLOR_OPTIONS ? (h.color as HabitColor) : "sage",
+  emoji: h?.emoji ?? null,
   startLocalDate: h?.startLocalDate ?? todayLocal(),
   allowSkip: h ? Boolean(h.allowSkip) : true,
 });
 
+const formatDateRu = (iso: string) => new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${iso}T00:00:00`));
+const monthLabel = (date: Date) => `${new Intl.DateTimeFormat("ru-RU", { month: "long" }).format(date)} ${date.getFullYear()}`;
+const monthDays = (date: Date) => {
+  const first = new Date(date.getFullYear(), date.getMonth(), 1);
+  const offset = (first.getDay() + 6) % 7;
+  const days = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  const cells = [...Array(offset).fill(null), ...Array.from({ length: days }, (_, i) => new Date(date.getFullYear(), date.getMonth(), i + 1))];
+  return [...cells, ...Array(42 - cells.length).fill(null)];
+};
+const localDate = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
 /**
- * S-MA-061 — habit create/edit form (PRD §22). Private by default (§8.4); no share UI at create (§22.1).
- * Schedule types and reminder policies are OUT of T02 (T03/T04/T06). Medical §39 warning is a keyword heuristic.
+ * S-MA-061 — habit create/edit form (PRD §22). Row-based editor: title/description are direct List rows,
+ * icon+color open a real Konsta Sheet from a «Внешний вид» row, date + allow-skip live in «Правила».
+ * Private by default (§8.4); no share UI at create (§22.1). Schedule types and reminder policies are OUT of T02
+ * (T03/T04/T06). Medical §39 warning is a keyword heuristic (does not block).
  */
 export function HabitFormScreen({ mode, habitId, returnTo = "app" }: { mode: "create" | "edit"; habitId?: string; returnTo?: "app" | "onboarding" }) {
   const editHabit = useHabitQuery(habitId ?? "", mode === "edit");
@@ -93,28 +110,32 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
   const [description, setDescription] = useState(initial.description);
   const [icon, setIcon] = useState<HabitIcon>(initial.icon);
   const [color, setColor] = useState<HabitColor>(initial.color);
+  const [emoji, setEmoji] = useState<string | null>(initial.emoji);
   const [startLocalDate, setStartLocalDate] = useState(initial.startLocalDate);
   const [allowSkip, setAllowSkip] = useState(initial.allowSkip);
   const [touched, setTouched] = useState(false);
+  const [appearanceOpen, setAppearanceOpen] = useState(false);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [visibleMonth, setVisibleMonth] = useState(() => new Date(`${initial.startLocalDate}T00:00:00`));
 
-  const medical = useMemo(() => isMedicalHint(title), [title]);
   const titleError = touched && title.trim().length === 0;
+  const medical = useMemo(() => isMedicalHint(title), [title]);
+  const hasTitle = title.trim().length > 0;
   const mutate = mode === "create" ? createMut : updateMut;
   const submitting = mutate.isPending;
   const submitError = mutate.isError;
+  const ctaLabel = submitting ? "Сохраняем…" : mode === "create" ? "Создать привычку" : "Сохранить";
+  const navbarTitle = mode === "create" ? "Новая привычка" : "Привычка";
 
   const finish = () => router.replace(returnTo === "onboarding" ? "/onboarding/bot" : "/rhythm");
-
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setTouched(true);
-    if (title.trim().length === 0) return;
-    const payload = { title: title.trim(), description: description.trim() || null, icon, color, startLocalDate, allowSkip };
+    if (!hasTitle) return;
+    const payload = { title: title.trim(), description: description.trim() || null, icon, color, emoji, startLocalDate, allowSkip };
     if (mode === "create") createMut.mutate(payload, { onSuccess: finish });
     else updateMut.mutate(payload, { onSuccess: finish });
   };
-
-  const navbarTitle = mode === "create" ? "Новая привычка" : "Привычка";
 
   return (
     <>
@@ -122,27 +143,22 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
       <main className="flow-screen pb-safe-4">
         <h1 className="sr-only">{mode === "create" ? "Новая привычка" : "Редактировать привычку"}</h1>
         <form className="contents" onSubmit={onSubmit} noValidate>
-          <List strong inset>
+          <BlockTitle component="h2" className="!m-0 !px-4">
+            Название и описание
+          </BlockTitle>
+          <List strong inset dividers>
             <ListInput
               title=""
               outline
-              error={titleError}
               type="text"
               value={title}
               placeholder="Название привычки"
               onInput={(e) => setTitle((e.currentTarget as HTMLInputElement).value)}
               onBlur={() => setTouched(true)}
+              error={titleError ? "Заполните название привычки" : false}
               aria-label="Название привычки"
               aria-invalid={titleError || undefined}
-              style={{ position: "relative" }}
-              inputClassName={titleError ? "pr-12" : undefined}
-            >
-              {titleError ? (
-                <span className="pointer-events-none absolute right-8 top-1/2 z-10 -translate-y-1/2" aria-hidden="true">
-                  <Icon name="triangle-alert" className="size-5 text-red-600 dark:text-red-400" aria-label="Заполни название" />
-                </span>
-              ) : null}
-            </ListInput>
+            />
             <ListInput
               title=""
               outline
@@ -150,58 +166,52 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
               value={description}
               placeholder="Описание (необязательно)"
               onInput={(e) => setDescription((e.currentTarget as HTMLTextAreaElement).value)}
-              inputClassName="min-h-20"
+              inputClassName="min-h-16"
               aria-label="Описание"
             />
           </List>
 
-          <section className="grid gap-2">
-            <BlockTitle component="h2" className="!m-0 !px-4">
-              Иконка
-            </BlockTitle>
-            <div role="group" aria-label="Иконка привычки" className="grid grid-cols-4 gap-2 px-4 py-1">
-              {ICON_OPTIONS.map((name) => {
-                const selected = icon === name;
-                return (
-                  <Button key={name} clear rounded type="button" aria-pressed={selected} aria-label={name} onClick={() => setIcon(name)} className={`!aspect-square !rounded-2xl ${focusRing} ${selected ? "!bg-accent-soft !text-accent" : "!text-text"}`}>
-                    <Icon name={name} className="size-6" />
-                  </Button>
-                );
-              })}
-            </div>
-          </section>
-
-          <section className="grid gap-2">
-            <BlockTitle component="h2" className="!m-0 !px-4">
-              Цвет
-            </BlockTitle>
-            <div role="group" aria-label="Цвет привычки" className="grid grid-cols-4 gap-2 px-4 py-1">
-              {(Object.keys(COLOR_OPTIONS) as HabitColor[]).map((key) => {
-                const selected = color === key;
-                return (
-                  <Button key={key} clear rounded type="button" aria-pressed={selected} aria-label={COLOR_OPTIONS[key].label} onClick={() => setColor(key)} className={`!aspect-square !rounded-2xl ${focusRing} ${selected ? "!ring-2 !ring-accent" : ""}`}>
-                    <span className={`grid size-8 place-items-center rounded-full ${COLOR_OPTIONS[key].cell}`}>
-                      <Icon name="check" className={`size-4 ${selected ? "" : "opacity-0"}`} />
-                    </span>
-                  </Button>
-                );
-              })}
-            </div>
-          </section>
-
           <BlockTitle component="h2" className="!m-0 !px-4">
-            Дата начала
+            Внешний вид
           </BlockTitle>
           <List strong inset>
-            <ListInput
-              title=""
-              outline
-              type="date"
-              value={startLocalDate}
-              inputClassName="[&::-webkit-datetime-edit]:text-base [&::-webkit-date-and-time-value]:text-base"
-              onInput={(e) => setStartLocalDate((e.currentTarget as HTMLInputElement).value)}
-              aria-label="Дата начала"
+            <ListItem
+              link
+              chevron
+              linkComponent="button"
+              contentClassName="w-full"
+              innerClassName="text-left"
+              linkProps={{ type: "button", onClick: () => setAppearanceOpen(true) }}
+              media={
+                emoji ? (
+                  <span className="grid size-8 place-items-center text-2xl leading-none">{emoji}</span>
+                ) : (
+                  <span className={`grid size-8 place-items-center rounded-full ${COLOR_OPTIONS[color].cell}`}><Icon name={icon} className="size-4" /></span>
+                )
+              }
+              title="Иконка, цвет и эмодзи"
+              subtitle={emoji ? `Эмодзи ${emoji} · цвет ${COLOR_OPTIONS[color].label}` : `Иконка ${icon} · цвет ${COLOR_OPTIONS[color].label}`}
+              aria-label={`Изменить иконку, цвет и эмодзи. Сейчас: ${emoji ? `эмодзи ${emoji}` : `иконка ${icon}`}, цвет ${COLOR_OPTIONS[color].label}`}
             />
+          </List>
+
+          <BlockTitle component="h2" className="!m-0 !px-4">
+            Правила
+          </BlockTitle>
+          <List strong inset dividers>
+            <ListItem
+              link
+              chevron
+              linkComponent="button"
+              contentClassName="w-full"
+              innerClassName="text-left"
+              linkProps={{ type: "button", onClick: () => { setVisibleMonth(new Date(`${startLocalDate}T00:00:00`)); setDatePickerOpen(true); } }}
+              title="Дата начала"
+              subtitle={formatDateRu(startLocalDate)}
+              aria-label={`Изменить дату начала. Сейчас ${formatDateRu(startLocalDate)}`}
+            />
+          </List>
+          <List strong inset dividers>
             <ListItem
               title="Разрешить пропуск"
               subtitle="Иначе только выполнение или отдых"
@@ -222,11 +232,11 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
             </p>
           ) : null}
 
-          <footer className="grid gap-2 px-4 pb-2">
-            <Button type="submit" large rounded disabled={submitting || title.trim().length === 0} className={`w-full ${focusRing}`}>
+          <footer className="mt-auto grid gap-2 px-4 pt-2 pb-1">
+            <Button type="submit" large rounded disabled={submitting || !hasTitle} className={`w-full ${focusRing}`}>
               <span className="inline-flex items-center gap-2">
                 <Icon name="check" className="size-5" />
-                {submitting ? "Сохраняем…" : mode === "create" ? "Создать привычку" : "Сохранить"}
+                {ctaLabel}
               </span>
             </Button>
             <Button type="button" large rounded clear className={focusRing} onClick={() => router.back()}>
@@ -236,6 +246,141 @@ function HabitFormInner({ mode, habitId, initial, returnTo }: { mode: "create" |
           <BlockFooter className="px-4">Приватная привычка. Расписание, напоминания и выполнения появятся в следующих обновлениях.</BlockFooter>
         </form>
       </main>
+
+      {datePickerOpen ? (
+        <Sheet
+          opened
+          backdrop
+          onBackdropClick={() => setDatePickerOpen(false)}
+          className="flex max-h-[86dvh] flex-col"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="date-picker-title"
+        >
+          <Navbar
+            title="Дата начала"
+            right={<Button inline clear rounded={false} onClick={() => setDatePickerOpen(false)}>Готово</Button>}
+          />
+          <div className="grid gap-4 overflow-auto px-4 py-4 pb-[calc(var(--component-safe-area-bottom)+1rem)]">
+            <h2 id="date-picker-title" className="sr-only">Выберите дату начала</h2>
+            <div className="grid grid-cols-[44px_1fr_44px] items-center gap-2">
+              <Button clear rounded className="!min-h-11 !min-w-11 !p-0" aria-label="Предыдущий месяц" onClick={() => setVisibleMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1))}>‹</Button>
+              <strong className="min-w-0 whitespace-nowrap text-center text-lg leading-6 capitalize">{monthLabel(visibleMonth)}</strong>
+              <Button clear rounded className="!min-h-11 !min-w-11 !p-0" aria-label="Следующий месяц" onClick={() => setVisibleMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1))}>›</Button>
+            </div>
+            <div className="grid grid-cols-7 gap-1 text-center text-xs text-text-muted" aria-hidden="true">
+              {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map((day) => <span key={day}>{day}</span>)}
+            </div>
+            <div className="grid grid-cols-7 grid-rows-6 gap-1">
+              {monthDays(visibleMonth).map((date, index) => date ? (
+                <Button
+                  key={localDate(date)}
+                  clear
+                  rounded
+                  type="button"
+                  aria-label={formatDateRu(localDate(date))}
+                  aria-pressed={startLocalDate === localDate(date)}
+                  onClick={() => { setStartLocalDate(localDate(date)); setDatePickerOpen(false); }}
+                  className={`!min-h-11 !min-w-0 !p-0 ${startLocalDate === localDate(date) ? "!bg-accent-soft !text-accent" : ""}`}
+                >{date.getDate()}</Button>
+              ) : <span key={`empty-${index}`} aria-hidden="true" />)}
+            </div>
+          </div>
+        </Sheet>
+      ) : null}
+
+      {appearanceOpen ? (
+        <Sheet
+          opened
+          backdrop
+          onBackdropClick={() => setAppearanceOpen(false)}
+          className="flex h-[min(86dvh,40rem)] flex-col"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="appearance-sheet-title"
+        >
+          <Navbar title="Внешний вид" right={<Button inline clear rounded={false} onClick={() => setAppearanceOpen(false)}>Готово</Button>} />
+          <div className="min-h-0 grid gap-4 overflow-auto px-4 py-3 pb-[calc(var(--component-safe-area-bottom)+1rem)]">
+            <div id="appearance-sheet-title" className="sr-only">Иконка и цвет привычки</div>
+            <div className="grid gap-2">
+              <span className="text-xs uppercase tracking-wide text-text-muted">Иконка</span>
+              <div role="group" aria-label="Иконка привычки" className="grid grid-cols-4 gap-2">
+                {ICON_OPTIONS.map((name) => {
+                  const selected = icon === name;
+                  return (
+                    <Button
+                      key={name}
+                      clear
+                      rounded
+                      type="button"
+                      aria-pressed={selected}
+                      aria-label={name}
+                      onClick={() => setIcon(name)}
+                      className={`!aspect-square !min-w-0 ${pickFocus} ${selected ? "!bg-accent-soft !text-accent" : "!text-text-muted"}`}
+                    >
+                      <Icon name={name} className="size-6" />
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <span className="text-xs uppercase tracking-wide text-text-muted">Цвет</span>
+              <div role="group" aria-label="Цвет привычки" className="grid grid-cols-4 gap-2">
+                {(Object.keys(COLOR_OPTIONS) as HabitColor[]).map((key) => {
+                  const selected = color === key;
+                  return (
+                    <Button
+                      key={key}
+                      clear
+                      rounded
+                      type="button"
+                      aria-pressed={selected}
+                      aria-label={COLOR_OPTIONS[key].label}
+                      onClick={() => setColor(key)}
+                      className={`!aspect-square !min-w-0 ${pickFocus}`}
+                    >
+                      <span className={`grid size-9 place-items-center rounded-full ${COLOR_OPTIONS[key].cell} ${selected ? "ring-2 ring-accent ring-offset-2 ring-offset-transparent" : ""}`}>
+                        {selected ? <Icon name="check" className="size-4" /> : null}
+                      </span>
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <span className="text-xs uppercase tracking-wide text-text-muted">Эмодзи</span>
+              <div role="group" aria-label="Эмодзи привычки" className="grid grid-cols-6 gap-1">
+                {EMOJI_OPTIONS.map((em) => {
+                  const selected = emoji === em;
+                  return (
+                    <Button
+                      key={em}
+                      clear
+                      rounded
+                      type="button"
+                      aria-pressed={selected}
+                      aria-label={em}
+                      onClick={() => setEmoji(selected ? null : em)}
+                      className={`!aspect-square !min-w-0 text-xl ${pickFocus} ${selected ? "!bg-accent-soft" : ""}`}
+                    >
+                      <span aria-hidden="true">{em}</span>
+                    </Button>
+                  );
+                })}
+              </div>
+              {emoji ? (
+                <Button clear rounded type="button" className={`!min-h-11 self-start ${pickFocus}`} onClick={() => setEmoji(null)}>
+                  <span className="inline-flex items-center gap-2 text-sm text-text-muted">
+                    <Icon name="x" className="size-4" />
+                    Без эмодзи
+                  </span>
+                </Button>
+              ) : null}
+            </div>
+          </div>
+        </Sheet>
+      ) : null}
     </>
   );
 }

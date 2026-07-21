@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// PRD §22.2 — system icon (Lucide). Subset of the local sprite (DEC-037); emoji picker is out of T02 scope.
+// PRD §22.2 — system icon (Lucide). Subset of the local sprite (DEC-037).
 export const ICON_OPTIONS = [
   "glass-water",
   "moon",
@@ -14,8 +14,30 @@ export const ICON_OPTIONS = [
   "sparkles",
   "user-round",
   "house",
+  "pill",
+  "footprints",
+  "brain",
+  "book-open",
+  "coffee",
+  "apple",
+  "activity",
+  "droplet",
+  "wind",
+  "flame",
+  "zap",
+  "smile",
+  "pencil",
 ] as const;
 export type HabitIcon = (typeof ICON_OPTIONS)[number];
+
+// PRD §22.2 — optional user emoji identity (stored separately from the Lucide icon). Curated wellness set.
+export const EMOJI_OPTIONS = [
+  "💊", "💧", "🌙", "🧘", "🏃", "🚶", "🏋️", "🚴", "🧠", "📖",
+  "☕", "🍎", "🥦", "🥗", "😴", "☀️", "🔋", "🎯", "🏆", "❤️",
+  "🩺", "✏️", "🎵", "🧹", "🐈", "🐶", "🌿", "🔥", "⚡", "🙂",
+  "🛏️", "🚿", "🦷", "🧴", "🧃", "🍵", "🌻", "⭐",
+] as const;
+export type HabitEmoji = (typeof EMOJI_OPTIONS)[number];
 
 // PRD §22.3 — user-chosen identity color. Static Tailwind className strings (JIT-safe); NOT a status cue.
 // Non-color status cue (progress text + check glyph) is preserved in HabitCard.
@@ -42,6 +64,7 @@ export interface Habit {
   description: string | null;
   icon: string;
   color: string;
+  emoji: string | null;
   startLocalDate: string;
   endLocalDate: string | null;
   allowSkip: boolean;
@@ -58,6 +81,7 @@ export interface HabitListItem {
   title: string;
   icon: string;
   color: string;
+  emoji: string | null;
   status: HabitStatus;
   startLocalDate: string;
   allowSkip: boolean;
@@ -74,6 +98,7 @@ export const habitCreateSchema = z.object({
   description: z.string().trim().max(500).optional().nullable(),
   icon: z.enum(ICON_OPTIONS),
   color: z.enum(Object.keys(COLOR_OPTIONS) as [HabitColor, ...HabitColor[]]),
+  emoji: z.string().trim().max(16).optional().nullable(),
   startLocalDate: z.string().regex(LOCAL_DATE),
   endLocalDate: z.string().regex(LOCAL_DATE).optional().nullable(),
   allowSkip: z.boolean().optional(),

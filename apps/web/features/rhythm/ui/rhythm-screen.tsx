@@ -15,9 +15,9 @@ const EXAMPLES = ["Выпить воду", "Витамины", "Таблетки
 
 // Dev-only preview of the card/list states. Mock only — never persisted.
 const DEMO_HABITS: HabitCardVM[] = [
-  { id: "demo-water", title: "Вода", icon: "glass-water", color: "sky", todayDone: 3, todayTotal: 4, nextDueLabel: "сегодня в 21:00", streak: 5, status: "partial" },
-  { id: "demo-sleep", title: "Сон вовремя", icon: "moon", color: "violet", todayDone: 1, todayTotal: 1, nextDueLabel: "до 23:00", streak: 12, status: "done" },
-  { id: "demo-walk", title: "Прогулка", icon: "leaf", color: "emerald", todayDone: 0, todayTotal: 1, nextDueLabel: "завтра утром", streak: 0, status: "pending" },
+  { id: "demo-water", title: "Вода", icon: "glass-water", emoji: "💧", color: "sky", todayDone: 3, todayTotal: 4, nextDueLabel: "сегодня в 21:00", streak: 5, status: "partial" },
+  { id: "demo-sleep", title: "Сон вовремя", icon: "moon", emoji: null, color: "violet", todayDone: 1, todayTotal: 1, nextDueLabel: "до 23:00", streak: 12, status: "done" },
+  { id: "demo-walk", title: "Прогулка", icon: "leaf", emoji: "🐾", color: "emerald", todayDone: 0, todayTotal: 1, nextDueLabel: "завтра утром", streak: 0, status: "pending" },
 ];
 
 /**

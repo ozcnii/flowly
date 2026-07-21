@@ -4,8 +4,10 @@
 
 ## Текущее состояние
 
-- **Обновлено:** 2026-07-19
+- **Обновлено:** 2026-07-20
 - **Текущий этап:** **4. Мой ритм**.
+- **Активная задача:** E4-D5-T02 (CRUD привычки + API /habits + icon/color + onboarding S-MA-004), `review` — ждёт user approval UI-концепции S-MA-061.
+- **Статус:** E4-D5-T02: API/DB/onboarding `review` без изменений; S-MA-061 — единая row-based форма. Последние правки (2026-07-21): фикс даты (native date-value был со сдвигом в TMA — скрыт + центрированный overlay `formatDateRu`), каталог иконок расширен до 25 (+pill/footprints/brain/book-open/coffee/apple/activity/droplet/wind/flame/zap/smile/pencil), добавлено поле `emoji` (migration 0016, отдельное от icon) с секцией эмодзи в Sheet и рендером в HabitCard. typecheck/lint/build PASS; migration 0016 applied (local D1); overflow 0 + targets ≥44 + 0 console errors в матрице. **commit/push не выполнялись** по прямому запрету пользователя.
 - **Активная задача:** E4-D5-T02 (CRUD привычки + API /habits + icon/color + onboarding S-MA-004), `review` — ждёт DEC-024 user approval.
 - **Статус:** E4-D5-T02 реализован (migration 0015 + habits API + create/edit form S-MA-061 + onboarding S-MA-004 real create) и верифицирован (HTTP CRUD matrix + browser create/edit flow + typecheck/lint/build PASS). E4-D5-T01 (экран «Ритм», slice S-MA-060) `done` (`52c71f4`).
 - **README sync:** исправлено расхождение — этап 3 в README теперь `done` (7), итоги пересчитаны (38 done / 1 blocked / 40 backlog), активный этап переключён на 4.
@@ -159,6 +161,42 @@ Roadmap migration / bootstrap verification:
 - [x] remote Chromium: scheduler `/health`, web `/`, web `/ui-kit` = 200; production Workers untouched.
 
 ## Журнал handoff
+
+### 2026-07-21 — E4-D5-T02 S-MA-061: фикс даты + расширение иконок + поле emoji
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** E4-D5-T02 `review` (API/DB/onboarding без структурных изменений, кроме новой колонки).
+- **User feedback → сделано:**
+  - **Date fix:** native `<input type=date>` value в Telegram Mini App был со сдвигом (Chromium/WebKit не позволяет позиционировать `::-webkit-date-and-time-value` через CSS — padding/line-height/display/appearance проверены и игнорируются). Значение input теперь прозрачное (`!text-transparent` + скрытый `calendar-picker-indicator`), поверх — центрированный overlay-текст `formatDateRu` («21 июля 2026 г.»); DOM-замер подтвердил совпадение центра overlay и строки input. Дата вынесена в отдельный `List` внутри `relative`-обёртки.
+  - **Icon catalog +12:** в спрайт DEC-037 добавлены точные Lucide-пути (`pill, footprints, brain, book-open, coffee, apple, activity, droplet, wind, flame, zap, smile, pencil`); `ICON_OPTIONS` теперь 25.
+  - **Emoji identity (user decision: отдельное поле + миграция):** `habits.emoji TEXT` + migration `0016_habits_emoji.sql`; schema/zod/POST/PATCH/GET/list обновлены; `EMOJI_OPTIONS` (38 wellness-эмодзи); `HabitCardVM.emoji` + HabitCard рендерит emoji вместо Lucide-иконки когда задан; Sheet «Внешний вид» получил секцию «Эмодзи» (grid 6-col + «Без эмодзи»), row media/subtitle/aria-label отражают выбор.
+- **Проверки:** typecheck PASS; eslint `features/rhythm/` + `app/api/v1/habits` PASS; production build PASS; migration 0016 applied (local D1, 2 commands OK); browser create→list с emoji 💊 PASS (тестовая привычка удалена); overflow 0 + min target ≥44 (base 48 / Sheet-open 44) + 0 console errors в матрице 360/390/430 × light/dark. Audits: 0 raw interactive HTML, 0 raw `fetch` (только `lib/api/client.ts`), 0 CSS modules, `@flowly/ui` только approved Icon.
+- **Residual:** real-device/Telegram WebView проверка фикса даты и emoji-рендера не выполнялась (головной Chromium — вебките-подобный, но реальный TMA может отличаться в рендере emoji/шрифтов); emoji хранится как string (без валидации набора — любой эмодзи ≤16 char проходит через API, UI предлагает curated `EMOJI_OPTIONS`). **commit/push не выполнялись** по прямому запрету пользователя.
+- **Следующее точное действие:** user review даты/иконок/emoji → approval → `done` + commit/push по разрешению; затем E4-D5-T03.
+
+### 2026-07-20 — E4-D5-T02 S-MA-061: user выбрал V3 без preview → единая production-форма
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** E4-D5-T02 `review` (API/DB/onboarding без изменений); экран S-MA-061 теперь единый.
+- **Решение user:** из 3 концепций выбран **V3** (row-based editor + Konsta Sheet), preview-карточка отклонена («зачем предпросмотр — он не нужен»).
+- **Сделано:** удалены `habit-form-compact.tsx` (V1), `habit-form-guided.tsx` (V2), `habit-form-shared.ts` и `?variant=` из роутов; V3 без preview слит в единый `habit-form-screen.tsx` (inline `todayLocal`/`createInitial`/`focusRing` + edit loading/error wrapper + row-based форма + Konsta Sheet для icon/color). Роуты `/rhythm/new` и `/rhythm/[id]/edit` — без `?variant`.
+- **Проверки:** typecheck PASS; targeted lint PASS; production build PASS; **overflow = 0 и targets ≥48px** во всex 6 комбинациях ({360,390,430} × {light,dark}); **0 console errors**; Sheet open→select→close, title→CTA enable, medical §39 warning по keywords проверены в browser. Audits: 0 raw interactive HTML, 0 raw `fetch` (только `lib/api/client.ts`), 0 CSS modules, `@flowly/ui` только approved Icon. Konsta `ListInput title=""` workaround применён. Screenshot: `.temp/E4-D5-T02/screenshots/habit-form-final.png` (390px light, DPR 1).
+- **Residual:** real-device/Telegram WebView проверка не выполнялась; edit-mode prefill работает через общий `createInitial`; полный create→list→edit flow уже верифицирован ранее (HTTP + browser). **commit/push не выполнялись** по прямому запрету пользователя.
+- **Следующее точное действие:** user review единой формы → approval → `done` + commit/push по разрешению; затем E4-D5-T03.
+
+### 2026-07-20 — E4-D5-T02 S-MA-061: 3 UI-концепции формы привычки
+
+- **От кого / кому:** AI agent → пользователь / следующий агент.
+- **Статус задачи:** E4-D5-T02 остаётся `review` (API/DB/onboarding без изменений); экран S-MA-061 перепроектирован в 3 разные концепции.
+- **Сделано:** одна форма заменена тремя концепциями с разной информационной архитектурой, композицией, приоритетами и interaction model:
+  - **V1 Compact iOS Form** (`habit-form-compact.tsx`, `?variant=1`) — классическая grouped iOS-форма: 4 BlockTitle-секции (Основное / Иконка / Цвет / Дата и правило), title+description в одной List-группе, icon/color как компактные inline горизонтальные scroll-полоски (одна строка, snap), один primary CTA внизу.
+  - **V2 Guided Flow** (`habit-form-guided.tsx`, `?variant=2`) — пошаговый wizard: один вопрос на шаг (title → icon → color → details → review), виден только текущий шаг, Progressbar + «Шаг N из 5», Continue/Back/Done с локальной per-step validation, крупные selection tiles (не inline strips), live HabitCard-preview перед созданием.
+  - **V3 Preview-first** (`habit-form-preview.tsx`, `?variant=3`) — composition вокруг live preview: живой HabitCard-preview сверху (обновляется при изменении title/icon/color), title/description как List rows, icon/color через настоящий Konsta Sheet (открывается из row «Внешний вид»), «Правила» (date + allowSkip) отдельно, CTA «Создать «{title}»».
+  - Роуты `/rhythm/new` и `/rhythm/[id]/edit` читают `?variant=1|2|3` (default 1). Business-логика/submit/redirect вынесены в `habit-form-shared.ts` (`useHabitFormSubmit`, `buildPayload`, `createInitial`, `focusRing`, `todayLocal`); `habit-form-screen.tsx` — dispatcher + edit loading/error. Ни API, ни DB, ни schedule/occurrences/reminders/sharing не затронуты.
+- **Проверки:** typecheck PASS; targeted lint PASS (7 файлов); production build PASS (`/rhythm/new`, `/rhythm/[id]/edit` ƒ dynamic); **0 console errors** во всex вариантах; **overflow = 0 и min target ≥44px** во всex 18 комбинациях (3 variants × {360,390,430} × {light,dark}); validation states (CTA disabled до заполнения, Konsta-native error border+text после blur, medical §39 warning по keywords, выбранные icon/color) проверены в browser; V2 wizard transition step 1→5 + Back и V3 Sheet open/select/close + live-preview update проверены. Audits: 0 raw interactive HTML, 0 raw `fetch` в client (только `lib/api/client.ts`), 0 CSS modules, `@flowly/ui` только approved Icon (DEC-037). Konsta `ListInput title=""` workaround применён во всex 3 вариантах. Screenshots: `.temp/E4-D5-T02/screenshots/form-variant-{1,2,3}.png` (390px light, DPR 1).
+- **Residual risks / notes:** (1) Playwright actionability давал ложные click-timeout на Continue (V2) и icon-in-Sheet (V3) из-за nested `<main>` (shell + flow-screen — существующий паттерн) + Konsta transitions; `elementFromPoint` подтверждает корректный top-элемент, реальные клики работают через evaluate. (2) edit-mode во V2 стартует с шага title (предсказуемо); во всех вариантах edit prefill работает через общий `createInitial`. (3) Real device/Telegram WebView проверка не выполнялась. (4) Все 3 концепции используют одни mutation/API/ownership contracts.
+- **Открытые вопросы для user review:** какая из трёх концепций становится production (или нужна доработка конкретного варианта). Выбор определяет, какие файлы остаются; остальные можно удалить после approval.
+- **Следующее точное действие:** user review 3 концепций → approval одной → оставить её как единственную S-MA-061 (удалить switcher/остальные варианты) → `done` + commit/push по разрешению; затем E4-D5-T03.
 
 ### 2026-07-19 — E4-D5-T02 CRUD привычки реализован → `review`
 

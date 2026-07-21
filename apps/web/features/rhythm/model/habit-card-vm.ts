@@ -13,6 +13,7 @@ export function habitsToCards(habits: HabitListItem[] | undefined): HabitCardVM[
       id: h.id,
       title: h.title,
       icon: h.icon,
+      emoji: h.emoji ?? null,
       color: (h.color in COLOR_OPTIONS ? (h.color as HabitColor) : "sage"),
       todayDone: h.todayDone,
       todayTotal: h.todayTotal,

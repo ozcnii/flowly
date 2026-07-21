@@ -42,9 +42,13 @@ export function HabitCard({ habit, onEdit }: { habit: HabitCardVM; onEdit?: () =
               strokeDashoffset={C * (1 - progress)}
             />
           </svg>
-          <span className={`relative grid size-7 place-items-center rounded-full ${cellClass}`}>
-            <Icon name={habit.icon} className="size-4" />
-          </span>
+          {habit.emoji ? (
+            <span className="relative grid size-8 place-items-center text-2xl leading-none">{habit.emoji}</span>
+          ) : (
+            <span className={`relative grid size-7 place-items-center rounded-full ${cellClass}`}>
+              <Icon name={habit.icon} className="size-4" />
+            </span>
+          )}
         </span>
         <div className="min-w-0 flex-1">
           <h2 className="m-0 text-base font-semibold leading-tight">{habit.title}</h2>

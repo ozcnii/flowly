@@ -55,6 +55,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (input.description !== undefined) patch.description = input.description ?? null;
   if (input.icon !== undefined) patch.icon = input.icon;
   if (input.color !== undefined) patch.color = input.color;
+  if (input.emoji !== undefined) patch.emoji = input.emoji ? input.emoji.trim().slice(0, 16) : null;
   if (input.startLocalDate !== undefined) patch.startLocalDate = input.startLocalDate;
   if (input.endLocalDate !== undefined) patch.endLocalDate = input.endLocalDate ?? null;
   if (input.allowSkip !== undefined) patch.allowSkip = input.allowSkip;
