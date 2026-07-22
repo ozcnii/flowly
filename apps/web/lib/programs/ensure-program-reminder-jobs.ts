@@ -64,6 +64,7 @@ export async function ensureProgramReminderJobs(
     const baseDue = localDateTimeToUtcIso(occ.scheduledLocalDate, reminderLocalTime, input.timezone);
     const baseMs = Date.parse(baseDue);
     for (const step of ordered) {
+      if (step.delayMinutes === null) continue; // Habit final-at-local-time policies are resolved by T07.
       const dueAtUtc = new Date(baseMs + step.delayMinutes * 60_000).toISOString();
       const idempotencyKey = `${occ.id}:${step.stepNumber}:${dueAtUtc}`;
       if (existingKeys.has(idempotencyKey)) continue;

@@ -7,6 +7,7 @@ import { isSafeOrigin } from "@/lib/auth/csrf";
 import { getSessionUserId } from "@/lib/auth/session-user";
 import { getDb } from "@/lib/cloudflare";
 import { habitUpdateSchema } from "@/features/rhythm/model/habits";
+import { visiblePolicy } from "@/lib/reminders/policies";
 
 const json = (body: unknown, init?: ResponseInit) => NextResponse.json(body, init);
 
@@ -49,6 +50,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   const db = getDb();
   const existing = await loadOwned(db, id, userId);
   if (!existing || existing.status === "archived") return json({ error: "not_found" }, { status: 404 });
+  if (input.reminderPolicyId !== undefined && !(await visiblePolicy(db, input.reminderPolicyId, userId))) return json({ error: "invalid_reminder_policy" }, { status: 400 });
 
   const patch: Record<string, unknown> = { updatedAt: nowIso() };
   if (input.title !== undefined) patch.title = input.title;
@@ -59,6 +61,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (input.startLocalDate !== undefined) patch.startLocalDate = input.startLocalDate;
   if (input.endLocalDate !== undefined) patch.endLocalDate = input.endLocalDate ?? null;
   if (input.allowSkip !== undefined) patch.allowSkip = input.allowSkip;
+  if (input.allowRest !== undefined) patch.allowRest = input.allowRest;
+  if (input.reminderPolicyId !== undefined) patch.reminderPolicyId = input.reminderPolicyId;
 
   await db.update(schema.habits).set(patch).where(eq(schema.habits.id, id));
   audit("habit.update", { userId, habitId: id });

@@ -69,6 +69,7 @@ export interface Habit {
   endLocalDate: string | null;
   allowSkip: boolean;
   allowRest: boolean;
+  reminderPolicyId: string | null;
   commentEnabled: boolean;
   status: HabitStatus;
   createdAt: string;
@@ -85,8 +86,11 @@ export interface HabitListItem {
   status: HabitStatus;
   startLocalDate: string;
   allowSkip: boolean;
-  todayDone: number; // 0 until occurrences (T07)
-  todayTotal: number; // 0 until schedule (T03/T04) + occurrences (T07)
+  allowRest: boolean;
+  reminderPolicyId: string | null;
+  todayDone: number; // completed slots today
+  todayPartial: number; // partially completed slots today
+  todayTotal: number; // generated slots for today (T07)
   nextDueLabel: string | null; // null until occurrences (T07)
   scheduleLabel: string;
   streak: number; // 0 until occurrences (T07)
@@ -103,6 +107,8 @@ export const habitCreateSchema = z.object({
   startLocalDate: z.string().regex(LOCAL_DATE),
   endLocalDate: z.string().regex(LOCAL_DATE).optional().nullable(),
   allowSkip: z.boolean().optional(),
+  allowRest: z.boolean().optional(),
+  reminderPolicyId: z.string().trim().min(1).max(80).optional(),
 });
 export type HabitCreateInput = z.infer<typeof habitCreateSchema>;
 

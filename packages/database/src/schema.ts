@@ -181,6 +181,7 @@ export const activityOccurrences = sqliteTable(
       table.entityType,
       table.entityId,
       table.scheduledLocalDate,
+      table.scheduledLocalTime,
     ),
   ],
 );
@@ -322,7 +323,7 @@ export const reminderPolicySteps = sqliteTable(
       .notNull()
       .references(() => reminderPolicies.id, { onDelete: "cascade" }),
     stepNumber: integer("step_number").notNull(),
-    delayMinutes: integer("delay_minutes").notNull(),
+    delayMinutes: integer("delay_minutes"),
     messageType: text("message_type").notNull(),
   },
   (table) => [uniqueIndex("reminder_policy_steps_policy_step_unique").on(table.policyId, table.stepNumber)],
@@ -377,12 +378,13 @@ export const habits = sqliteTable(
     endLocalDate: text("end_local_date"),
     allowSkip: integer("allow_skip", { mode: "boolean" }).notNull().default(true),
     allowRest: integer("allow_rest", { mode: "boolean" }).notNull().default(false),
+    reminderPolicyId: text("reminder_policy_id").references(() => reminderPolicies.id, { onDelete: "restrict" }),
     commentEnabled: integer("comment_enabled", { mode: "boolean" }).notNull().default(true),
     status: text("status").notNull().default("active"),
     createdAt: text("created_at").notNull(),
     updatedAt: text("updated_at").notNull(),
   },
-  (table) => [index("habits_owner_status_idx").on(table.ownerId, table.status)],
+  (table) => [index("habits_owner_status_idx").on(table.ownerId, table.status), index("habits_reminder_policy_idx").on(table.reminderPolicyId)],
 );
 
 // §43.17 habit_schedule_rules

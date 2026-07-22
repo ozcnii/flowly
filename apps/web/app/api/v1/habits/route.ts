@@ -8,6 +8,9 @@ import { getSessionUserId } from "@/lib/auth/session-user";
 import { getDb } from "@/lib/cloudflare";
 import { habitCreateSchema } from "@/features/rhythm/model/habits";
 import { normalizeSchedule, scheduleRuleSchema } from "@/features/rhythm/model/schedule";
+import { localDateInTimezone } from "@/features/programs/model/program-dates";
+import { DEFAULT_HABIT_REMINDER_POLICY_ID } from "@/features/rhythm/model/reminder-policies";
+import { visiblePolicy } from "@/lib/reminders/policies";
 
 const json = (body: unknown, init?: ResponseInit) => NextResponse.json(body, init);
 const habitCreateWithScheduleSchema = habitCreateSchema.extend({ schedule: scheduleRuleSchema.optional() });
@@ -31,7 +34,7 @@ const scheduleLabel = (rule?: { ruleType: string; configurationJson: string }) =
   } catch { return "Расписание не настроено"; }
 };
 
-/** GET /api/v1/habits — owner's active habits (§44.7). todayDone/todayTotal/streak are 0 until schedule(T03/T04)+occurrences(T07). */
+/** GET /api/v1/habits — owner's active/paused habits with current generated-slot progress (§44.7). */
 export async function GET(request: Request) {
   const userId = await getSessionUserId(request);
   if (!userId) return json({ error: "unauthorized" }, { status: 401 });
@@ -40,26 +43,50 @@ export async function GET(request: Request) {
     const rows = await db
       .select()
       .from(schema.habits)
-      .where(and(eq(schema.habits.ownerId, userId), eq(schema.habits.status, "active")))
+      .where(and(eq(schema.habits.ownerId, userId), inArray(schema.habits.status, ["active", "paused"])))
       .orderBy(asc(schema.habits.createdAt));
     const rules = rows.length ? await db.select({ habitId: schema.habitScheduleRules.habitId, ruleType: schema.habitScheduleRules.ruleType, configurationJson: schema.habitScheduleRules.configurationJson }).from(schema.habitScheduleRules).where(and(inArray(schema.habitScheduleRules.habitId, rows.map((row) => row.id)), isNull(schema.habitScheduleRules.validUntil))) : [];
+    const user = (await db.select({ timezone: schema.users.timezone }).from(schema.users).where(eq(schema.users.id, userId)).limit(1))[0];
+    const today = localDateInTimezone(user?.timezone ?? "Europe/Moscow");
+    const occurrences = rows.length ? await db.select({
+      id: schema.activityOccurrences.id,
+      entityId: schema.activityOccurrences.entityId,
+      scheduledLocalTime: schema.activityOccurrences.scheduledLocalTime,
+      status: schema.activityOccurrences.status,
+    }).from(schema.activityOccurrences).where(and(
+      eq(schema.activityOccurrences.userId, userId),
+      eq(schema.activityOccurrences.entityType, "habit"),
+      eq(schema.activityOccurrences.scheduledLocalDate, today),
+      inArray(schema.activityOccurrences.entityId, rows.map((row) => row.id)),
+    )) : [];
     const rulesByHabit = new Map(rules.map((rule) => [rule.habitId, rule]));
+    const occurrencesByHabit = new Map<string, typeof occurrences>();
+    for (const occurrence of occurrences) occurrencesByHabit.set(occurrence.entityId, [...(occurrencesByHabit.get(occurrence.entityId) ?? []), occurrence]);
     return json({
-      habits: rows.map((row) => ({
-        id: row.id,
-        title: row.title,
-        icon: row.icon,
-        color: row.color,
-        emoji: row.emoji,
-        status: row.status,
-        startLocalDate: row.startLocalDate,
-        allowSkip: Boolean(row.allowSkip),
-        todayDone: 0,
-        todayTotal: 0,
-        nextDueLabel: null,
-        scheduleLabel: scheduleLabel(rulesByHabit.get(row.id)),
-        streak: 0,
-      })),
+      habits: rows.map((row) => {
+        const todayOccurrences = occurrencesByHabit.get(row.id) ?? [];
+        const completed = todayOccurrences.filter((occurrence) => occurrence.status === "completed").length;
+        const partial = todayOccurrences.filter((occurrence) => occurrence.status === "partial").length;
+        const pending = todayOccurrences.filter((occurrence) => ["scheduled", "due", "notified", "snoozed"].includes(occurrence.status)).sort((a, b) => a.scheduledLocalTime.localeCompare(b.scheduledLocalTime));
+        return {
+          id: row.id,
+          title: row.title,
+          icon: row.icon,
+          color: row.color,
+          emoji: row.emoji,
+          status: row.status,
+          startLocalDate: row.startLocalDate,
+          allowSkip: Boolean(row.allowSkip),
+          allowRest: Boolean(row.allowRest),
+          reminderPolicyId: row.reminderPolicyId,
+          todayDone: completed,
+          todayPartial: partial,
+          todayTotal: todayOccurrences.length,
+          nextDueLabel: pending[0] ? `сегодня в ${pending[0].scheduledLocalTime}` : null,
+          scheduleLabel: scheduleLabel(rulesByHabit.get(row.id)),
+          streak: 0,
+        };
+      }),
     });
   } catch (error) {
     if (process.env.NODE_ENV === "production") throw error;
@@ -87,6 +114,8 @@ export async function POST(request: Request) {
   const id = generateId();
   const now = nowIso();
   const db = getDb();
+  const reminderPolicyId = input.reminderPolicyId ?? DEFAULT_HABIT_REMINDER_POLICY_ID;
+  if (!(await visiblePolicy(db, reminderPolicyId, userId))) return json({ error: "invalid_reminder_policy" }, { status: 400 });
   const schedule = input.schedule ? normalizeSchedule(input.schedule) : undefined;
   const habitRow = {
     id,
@@ -99,7 +128,8 @@ export async function POST(request: Request) {
     startLocalDate: input.startLocalDate,
     endLocalDate: input.endLocalDate ?? null,
     allowSkip: input.allowSkip ?? true,
-    allowRest: false,
+    allowRest: input.allowRest ?? false,
+    reminderPolicyId,
     commentEnabled: true,
     status: "active" as const,
     createdAt: now,

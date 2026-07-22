@@ -15,9 +15,9 @@ const EXAMPLES = ["Выпить воду", "Витамины", "Таблетки
 
 // Dev-only preview of the card/list states. Mock only — never persisted.
 const DEMO_HABITS: HabitCardVM[] = [
-  { id: "demo-water", title: "Вода", icon: "glass-water", emoji: "💧", color: "sky", todayDone: 3, todayTotal: 4, nextDueLabel: "сегодня в 21:00", scheduleLabel: "Каждый день · 09:00 и 21:00", streak: 5, status: "partial" },
-  { id: "demo-sleep", title: "Сон вовремя", icon: "moon", emoji: null, color: "violet", todayDone: 1, todayTotal: 1, nextDueLabel: "до 23:00", scheduleLabel: "Каждый день · 23:00", streak: 12, status: "done" },
-  { id: "demo-walk", title: "Прогулка", icon: "leaf", emoji: "🐾", color: "emerald", todayDone: 0, todayTotal: 1, nextDueLabel: "завтра утром", scheduleLabel: "Пн, Ср, Пт · 18:00", streak: 0, status: "pending" },
+  { id: "demo-water", title: "Вода", icon: "glass-water", emoji: "💧", color: "sky", todayDone: 3, todayPartial: 0, todayTotal: 4, nextDueLabel: "сегодня в 21:00", scheduleLabel: "Каждый день · 09:00 и 21:00", streak: 5, status: "partial" },
+  { id: "demo-sleep", title: "Сон вовремя", icon: "moon", emoji: null, color: "violet", todayDone: 1, todayPartial: 0, todayTotal: 1, nextDueLabel: "до 23:00", scheduleLabel: "Каждый день · 23:00", streak: 12, status: "done" },
+  { id: "demo-walk", title: "Прогулка", icon: "leaf", emoji: "🐾", color: "emerald", todayDone: 0, todayPartial: 0, todayTotal: 1, nextDueLabel: "завтра утром", scheduleLabel: "Пн, Ср, Пт · 18:00", streak: 0, status: "pending" },
 ];
 
 /**
@@ -43,7 +43,7 @@ export function RhythmScreen({ demo = false }: { demo?: boolean }) {
 
       {demo || (!loading && !error && cards.length > 0) ? (
         <List strong inset dividers className="!my-0">
-          {cards.map((habit) => <HabitCard key={habit.id} habit={habit} onEdit={!demo ? () => router.push(`/rhythm/${encodeURIComponent(habit.id)}/edit` as never) : undefined} />)}
+          {cards.map((habit) => <HabitCard key={habit.id} habit={habit} onEdit={!demo ? () => router.push(`/rhythm/${encodeURIComponent(habit.id)}` as never) : undefined} />)}
         </List>
       ) : null}
 

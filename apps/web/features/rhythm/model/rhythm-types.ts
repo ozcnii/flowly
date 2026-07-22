@@ -3,7 +3,7 @@
 
 import type { HabitColor } from "./habits";
 
-export type HabitStatus = "done" | "partial" | "pending";
+export type HabitStatus = "done" | "partial" | "pending" | "paused";
 
 export interface HabitCardVM {
   id: string;
@@ -12,7 +12,8 @@ export interface HabitCardVM {
   emoji: string | null; // optional user emoji identity; rendered instead of the Lucide icon when set
   color: HabitColor; // identity color (§22.3); NOT a status cue
   todayDone: number;
-  todayTotal: number; // configured slots for today (DEC-017); 0 until schedule (T03/T04) + occurrences (T07)
+  todayPartial: number;
+  todayTotal: number; // configured slots for today (DEC-017); 0 until occurrences (T07)
   nextDueLabel?: string | null; // localized, e.g. "сегодня в 21:00"
   scheduleLabel: string;
   streak: number; // current consecutive-series count

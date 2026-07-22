@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Icon } from "@flowly/ui";
 import { PrimaryNavbar } from "@/components/shell/primary-navbar";
 import { TimezonePicker, buildTimezoneOptions } from "@/components/timezone-picker";
+import { ReminderPolicySheet } from "./reminder-policy-sheet";
 import {
   COLOR_OPTIONS,
   EMOJI_OPTIONS,
@@ -16,7 +17,8 @@ import {
   type HabitColor,
   type HabitIcon,
 } from "../model/habits";
-import { useCreateHabitMutation, useHabitQuery, useHabitScheduleQuery, useSaveHabitScheduleMutation, useUpdateHabitMutation } from "../model/habits-queries";
+import { useCreateHabitMutation, useHabitQuery, useHabitScheduleQuery, useReminderPoliciesQuery, useSaveHabitScheduleMutation, useUpdateHabitMutation } from "../model/habits-queries";
+import { DEFAULT_HABIT_REMINDER_POLICY_ID } from "../model/reminder-policies";
 import { exactTimesConfig, intervalConfig, scheduleRuleSchema, weekdaysConfig, weeklyTargetConfig } from "../model/schedule";
 import type { ScheduleRule, ScheduleType } from "../model/schedule";
 
@@ -36,6 +38,8 @@ interface Initial {
   emoji: string | null;
   startLocalDate: string;
   allowSkip: boolean;
+  allowRest: boolean;
+  reminderPolicyId: string | null;
 }
 
 const createInitial = (h?: Habit): Initial => ({
@@ -46,6 +50,8 @@ const createInitial = (h?: Habit): Initial => ({
   emoji: h?.emoji ?? null,
   startLocalDate: h?.startLocalDate ?? todayLocal(),
   allowSkip: h ? Boolean(h.allowSkip) : true,
+  allowRest: h ? Boolean(h.allowRest) : false,
+  reminderPolicyId: h?.reminderPolicyId ?? DEFAULT_HABIT_REMINDER_POLICY_ID,
 });
 
 const formatDateRu = (iso: string) => new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${iso}T00:00:00`));
@@ -62,8 +68,8 @@ const localDate = (date: Date) => `${date.getFullYear()}-${String(date.getMonth(
 /**
  * S-MA-061 — habit create/edit form (PRD §22). Row-based editor: title/description are direct List rows,
  * icon+color open a real Konsta Sheet from a «Внешний вид» row, date + allow-skip live in «Правила».
- * Private by default (§8.4); no share UI at create (§22.1). Schedule types and reminder policies are OUT of T02
- * (T03/T04/T06). Medical §39 warning is a keyword heuristic (does not block).
+ * Private by default (§8.4); no share UI at create (§22.1). Schedule types and reminder policies use the T03/T04/T06 contracts.
+ * Medical §39 warning is a keyword heuristic (does not block).
  */
 export function HabitFormScreen({ mode, habitId, returnTo = "app" }: { mode: "create" | "edit"; habitId?: string; returnTo?: "app" | "onboarding" }) {
   const editHabit = useHabitQuery(habitId ?? "", mode === "edit");
@@ -110,6 +116,7 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
   const createMut = useCreateHabitMutation();
   const updateMut = useUpdateHabitMutation(habitId ?? "");
   const scheduleMut = useSaveHabitScheduleMutation(habitId ?? "");
+  const policies = useReminderPoliciesQuery();
   const initialWeekly = initialSchedule?.ruleType === "weekly_target" ? weeklyTargetConfig.parse(initialSchedule.configuration) : undefined;
   const initialInterval = initialSchedule?.ruleType === "interval" ? intervalConfig.parse(initialSchedule.configuration) : undefined;
   const [scheduleType, setScheduleType] = useState<ScheduleType>(initialSchedule?.ruleType ?? "exact_times");
@@ -131,6 +138,9 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
   const [emoji, setEmoji] = useState<string | null>(initial.emoji);
   const [startLocalDate, setStartLocalDate] = useState(initial.startLocalDate);
   const [allowSkip, setAllowSkip] = useState(initial.allowSkip);
+  const [allowRest, setAllowRest] = useState(initial.allowRest);
+  const [selectedPolicyId, setSelectedPolicyId] = useState(initial.reminderPolicyId ?? DEFAULT_HABIT_REMINDER_POLICY_ID);
+  const [policyOpen, setPolicyOpen] = useState(false);
   const [touched, setTouched] = useState(false);
   const [scheduleError, setScheduleError] = useState(false);
   const [appearanceOpen, setAppearanceOpen] = useState(false);
@@ -143,6 +153,7 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
   const mutate = mode === "create" ? createMut : updateMut;
   const submitting = mutate.isPending || scheduleMut.isPending;
   const submitError = mutate.isError || scheduleMut.isError;
+  const selectedPolicy = policies.data?.policies.find((policy) => policy.id === selectedPolicyId);
   const ctaLabel = submitting ? "Сохраняем…" : mode === "create" ? "Создать привычку" : "Сохранить";
   const navbarTitle = mode === "create" ? "Новая привычка" : "Привычка";
 
@@ -153,7 +164,7 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
     setTouched(true);
     setScheduleError(false);
     if (!hasTitle) return;
-    const payload = { title: title.trim(), description: description.trim() || null, icon, color, emoji, startLocalDate, allowSkip };
+    const payload = { title: title.trim(), description: description.trim() || null, icon, color, emoji, startLocalDate, allowSkip, allowRest, reminderPolicyId: selectedPolicyId };
     const configuration = scheduleType === "exact_times" ? { times: scheduleTimes }
       : scheduleType === "weekdays" ? { days: scheduleDays, timesByDay: Object.fromEntries(scheduleDays.map((day) => [String(day), scheduleDayTimes])) }
         : scheduleType === "weekly_target" ? { target: Number(weeklyTarget), days: scheduleDays, time: weeklyTime }
@@ -316,9 +327,28 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
               title="Разрешить пропуск"
               after={<Toggle checked={allowSkip} onChange={() => setAllowSkip((v) => !v)} aria-label="Разрешить пропуск" />}
             />
+            <ListItem
+              title="Разрешить отдых"
+              after={<Toggle checked={allowRest} onChange={() => setAllowRest((v) => !v)} aria-label="Разрешить отдых" />}
+            />
           </List>
-          <p className="m-0 px-4 pt-2 text-sm leading-5 text-text-muted">Если пропустить запланированное выполнение, его можно будет отметить как пропущенное. Иначе остаются только выполнение и отдых.</p>
+          <p className="m-0 px-4 pt-2 text-sm leading-5 text-text-muted">Пропуск и отдых отмечаются отдельно и не меняют будущие даты расписания.</p>
 
+          <BlockTitle component="h3" className="!m-0 !p-0">Напоминания</BlockTitle>
+          <List strong inset>
+            <ListItem
+              link
+              chevron
+              linkComponent="button"
+              contentClassName="w-full"
+              innerClassName="text-left"
+              linkProps={{ type: "button", onClick: () => policies.isError ? void policies.refetch() : setPolicyOpen(true) }}
+              media={<Icon name="bell" className="size-5" />}
+              title="Политика напоминаний"
+              subtitle={policies.isPending ? "Загружаем варианты…" : policies.isError ? "Нажмите, чтобы повторить загрузку" : selectedPolicy ? `${selectedPolicy.name} · ${selectedPolicy.maxMessages} сообщ.` : "Выберите политику"}
+              aria-label={`Изменить политику напоминаний. Сейчас: ${selectedPolicy?.name ?? "не выбрана"}`}
+            />
+          </List>
           {medical ? (
             <Card component="aside" outline className="mx-4" contentWrapPadding="flex gap-3 p-4">
               <Icon name="triangle-alert" className="mt-0.5 size-5 shrink-0 text-amber-500" />
@@ -326,9 +356,10 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
             </Card>
           ) : null}
 
-          <p className={`mx-4 min-h-5 text-sm text-red-600 dark:text-red-400 ${submitError ? "" : "invisible"}`} role={submitError ? "alert" : undefined} aria-hidden={!submitError}>{submitError ? "Не удалось сохранить. Проверьте связь и попробуйте ещё раз." : "\u00a0"}</p>
-
-          <footer className="grid gap-2 px-4 pt-2 pb-1">
+          <footer className="grid gap-2 px-4 pb-1">
+            <p className={`m-0 min-h-5 text-sm text-danger ${policies.isError || submitError ? "" : "invisible"}`} role={policies.isError || submitError ? "alert" : undefined} aria-hidden={!policies.isError && !submitError}>
+              {policies.isError ? "Не удалось загрузить политики напоминаний." : submitError ? "Не удалось сохранить. Проверьте связь и попробуйте ещё раз." : "\u00a0"}
+            </p>
             <Button type="submit" large rounded disabled={submitting || !hasTitle} className={`w-full ${focusRing}`}>
               <span className="inline-flex items-center gap-2">
                 <Icon name="check" className="size-5" />
@@ -339,9 +370,11 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
               Отмена
             </Button>
           </footer>
-          <BlockFooter className="px-4">Приватная привычка. Расписание, напоминания и выполнения появятся в следующих обновлениях.</BlockFooter>
+          <BlockFooter className="px-4">Приватная привычка. Выбранная политика напоминаний сохраняется вместе с привычкой.</BlockFooter>
         </form>
       </main>
+
+      {policyOpen ? <ReminderPolicySheet opened policies={policies.data?.policies ?? []} selectedId={selectedPolicyId} onSelect={(id) => { setSelectedPolicyId(id); setPolicyOpen(false); }} onClose={() => setPolicyOpen(false)} /> : null}
 
       {datePickerOpen ? (
         <Sheet
