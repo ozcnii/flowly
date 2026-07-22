@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 0 | 0 | 0 | 1 | 7 |
+| 0 | 0 | 0 | 0 | 8 |
 
 ## Зависимости и инварианты
 
@@ -93,12 +93,12 @@
 - **journal:** 2026-07-22 — `backlog -> in_progress`; deep analysis and approved plan `.temp/E4-D5-T07/plan.md`. Implemented profile-timezone schedule contract, daily habit occurrence/job generation, idempotent D1 inserts and scheduler Cron preparation. Deep review found and fixed the temporary read-side-effect mismatch with the approved plan (generation now runs on habit/schedule mutations and scheduler, reads remain read-only) and optimized old interval anchors. Re-ran typecheck/lint/build/deploy-check and scheduler Cron D1 repro. Fixed lint warning in `apps/web/features/workout-session/ui/step-session-screen.tsx:449` by using `next/image` with `unoptimized` for GIF media. User confirmed closure: `review -> done`; critical/high findings: none. Residual risks: no production deploy/real-device scheduler run; Telegram delivery remains E5.
 
 ### E4-D5-T08 — Закрыть DoD привычек
-- **status:** review · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-22
+- **status:** done · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-22
 - **prd_refs:** §50.1, §55.4, §57 · **depends_on:** E4-D5-T01–T07 · **decisions:** DEC-003, DEC-015, DEC-017, DEC-019, DEC-022, DEC-029
 - **scope:** проверить четыре schedule типа, multiple completions, privacy, skip policy, icons/colors.
 - **acceptance:** [x] каждый пункт §55.4 имеет evidence; [x] применимые проверки расписаний выполнены по явному запросу; [x] остаточные timezone/DST риски записаны.
 - **validation/evidence:** Pure schedule + DST matrix PASS: exact times, weekdays, weekly target, interval hours/days/weeks, summer/winter New York conversion and old interval anchor. Authenticated HTTP/D1 matrix PASS: exact with multiple slots, weekdays today/next, weekly target, interval; repeat GET kept counts unchanged; completed+partial slots remained independent; repeated status was idempotent; `allowSkip/allowRest=false` returned 400 without mutation; allowed skip/rest returned 200 and cancelled pending jobs; foreign habit/schedule/status access returned 404 and foreign list excluded the habit; icon/color/emoji persisted; invalid icon returned 400. Scheduler test D1 Cron twice returned HTTP 200 and produced 2 occurrences, 6 jobs, 6 unique keys. Browser `/rhythm/new`: all four schedule options, icon/color/emoji sheet and relevant form states reachable; 360/390/430 light/dark overflow 0 and console errors 0. Root typecheck/lint/build/deploy-check PASS with 0 lint diagnostics. All fixtures and local users removed.
-- **journal:** 2026-07-22 — dependencies T03–T07 confirmed done; `backlog -> in_progress`; roadmap/HANDOFF/card, PRD refs and DEC-003/015/017/019/022/029 read. Verification-first plan `.temp/E4-D5-T08/plan.md` prepared, then user requested execution without deep-plan gate. Completed scenario matrix without runtime changes or defects; `in_progress -> review`. Residual: production/real-device Cron and downstream Telegram delivery remain outside local T08 evidence.
+- **journal:** 2026-07-22 — dependencies T03–T07 confirmed done; `backlog -> in_progress`; roadmap/HANDOFF/card, PRD refs and DEC-003/015/017/019/022/029 read. Verification-first plan `.temp/E4-D5-T08/plan.md` prepared, then user requested execution without deep-plan gate. Completed scenario matrix without runtime changes or defects; `in_progress -> review`. User confirmed closure: `review -> done`. Residual: production/real-device Cron and downstream Telegram delivery remain outside local T08 evidence.
 
 ## Handoff этапа
 
