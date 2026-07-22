@@ -31,7 +31,7 @@
 | 7. Социальные функции | backlog | 7 | 0 | 0 | 0 | 0 | [`07-social.md`](stages/07-social.md) |
 | 8. Стабилизация | backlog | 8 | 0 | 0 | 0 | 0 | [`08-stabilization.md`](stages/08-stabilization.md) |
 
-**Итого:** 31 backlog / 0 in progress / 1 blocked / 0 review / 46 done.
+**Итого:** 32 backlog / 0 in progress / 1 blocked / 0 review / 46 done.
 \*Stage 2 DoD `done`; residual board: E2-D3-T03 blocked (DEC-064). S-MA-032 cancelled (DEC-066), not a card.
 
 ## Зависимости этапов

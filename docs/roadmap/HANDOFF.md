@@ -9,7 +9,7 @@
 - **Текущая задача:** следующая карточка этапа 5 не начата.
 - **Последняя закрытая задача:** E4-D5-T08 — DoD привычек; acceptance и scenario matrix закрыты.
 - **Статус:** E4-D5-T01/T02/T03/T04/T05/T06/T07/T08 `done`. T03 S-MA-062 завершила migration 0017, schedule API, exact_times/weekdays config/validation/expansion; DEC-069 теперь делает profile timezone единственным источником для habit generation. T07 материализует текущие локальные slots и policy jobs без Telegram delivery; slot identity реализован и проверен в T05.
-- **README sync:** активный этап 5; task counts синхронизированы: 46 done / 1 blocked / 31 backlog / 0 in_progress / 0 review.
+- **README sync:** активный этап 5; task counts синхронизированы: 46 done / 1 blocked / 32 backlog / 0 in_progress / 0 review.
 - **DEC-068:** canonical `weekly_target={target,days,time}` и `interval={every,unit,anchorLocalDate,anchorLocalTime}` и local-calendar semantics остаются действующими; timezone ownership portion superseded DEC-069.
 - **DEC-069:** пользователь 2026-07-22 утвердил: habit не хранит/не показывает отдельный timezone; новые slots/jobs используют `users.timezone`, уже созданные occurrence rows сохраняют timezone snapshot и history immutable. T07 должен провести совместимый schema/API/UI cleanup.
 - **План:** `.temp/E4-D5-T05/plan.md`, plan confidence 91%, implementation confidence 90%; scope ограничен T05 и screen slices S-MA-011, S-MA-064, S-MA-065.
