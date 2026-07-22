@@ -92,14 +92,13 @@ export function ReminderPolicySheet({ opened, policies, selectedId, onSelect, on
           <p className="m-0 px-4 pt-3 text-sm leading-5 text-text-muted">Период тишины задаётся отдельно в настройках уведомлений. Изменение своей политики затронет привычки, которые её используют.</p>
         </div>
       ) : (
-        <div className="min-h-0 overflow-auto px-4 py-3 pb-[calc(var(--component-safe-area-bottom)+1rem)]">
-          <BlockTitle component="h2" className="!m-0 !p-0">Основное</BlockTitle>
+        <div className="min-h-0 overflow-auto px-0 py-3 pb-[calc(var(--component-safe-area-bottom)+1rem)]">
+          <BlockTitle component="h2" className="!m-0 !p-0 !px-4">Основное</BlockTitle>
           <List className="!my-0" strong inset dividers>
             <ListInput title="Название" type="text" value={draft.name} onInput={(e) => setDraft({ ...draft, name: (e.currentTarget as HTMLInputElement).value })} aria-label="Название политики" inputClassName="!min-h-11" />
             <ListInput title="Лимит сообщений" type="number" min={1} max={10} value={String(draft.maxMessages)} onInput={(e) => setDraft({ ...draft, maxMessages: Number((e.currentTarget as HTMLInputElement).value) })} aria-label="Лимит сообщений" inputClassName="!min-h-11" />
           </List>
-          <BlockTitle component="h3" className="!m-0 !mt-4 !p-0">Шаги</BlockTitle>
-          <p className="m-0 px-4 text-sm leading-5 text-text-muted">Повторы считаются от времени основного сообщения.</p>
+          <BlockTitle component="h3" className="!m-0 !mt-4 !p-0 !px-4">Шаги</BlockTitle>
           <List className="!my-0" strong inset dividers>
             {draft.steps.map((step, index) => step.messageType === "primary" ? (
               <ListItem key={`${step.stepNumber}-${step.messageType}`} title="1. Основное" subtitle="Сразу после времени" />
@@ -132,13 +131,13 @@ export function ReminderPolicySheet({ opened, policies, selectedId, onSelect, on
             <Button clear rounded type="button" className={focusRing} onClick={addRepeat}>Добавить повтор</Button>
             {!draft.steps.some((step) => step.messageType === "final") ? <Button clear rounded type="button" className={focusRing} onClick={addFinal}>Добавить финал</Button> : null}
           </div> : null}
-          <BlockTitle component="h3" className="!m-0 !mt-4 !p-0">Дополнительно</BlockTitle>
+          <BlockTitle component="h3" className="!m-0 !mt-4 !p-0 !px-4">Дополнительно</BlockTitle>
           <List className="!my-0" strong inset dividers>
             <ListItem title="Разрешить пользовательское откладывание" after={<Toggle checked={draft.allowCustomSnooze} onChange={() => setDraft({ ...draft, allowCustomSnooze: !draft.allowCustomSnooze })} aria-label="Разрешить пользовательское откладывание" />} />
           </List>
           <div className="grid gap-2 px-4 pt-4"><p className="m-0 text-sm text-text-muted">Период тишины</p><Segmented strong rounded role="radiogroup" aria-label="Поведение в период тишины"><SegmentedButton type="button" active={draft.quietHoursBehavior === "defer"} aria-pressed={draft.quietHoursBehavior === "defer"} onClick={() => setDraft({ ...draft, quietHoursBehavior: "defer" })}>Перенести</SegmentedButton><SegmentedButton type="button" active={draft.quietHoursBehavior === "skip"} aria-pressed={draft.quietHoursBehavior === "skip"} onClick={() => setDraft({ ...draft, quietHoursBehavior: "skip" })}>Пропустить</SegmentedButton></Segmented></div>
           <p className={`m-0 min-h-5 px-4 pt-3 text-sm text-danger ${error ? "" : "invisible"}`} role={error ? "alert" : undefined}>{error || "\u00a0"}</p>
-          <Button rounded large disabled={busy} className={`mt-3 w-full ${focusRing}`} onClick={save}>{busy ? "Сохраняем…" : "Сохранить политику"}</Button>
+          <Button rounded large disabled={busy} className={`mx-4 mt-3 w-[calc(100%_-_2rem)] ${focusRing}`} onClick={save}>{busy ? "Сохраняем…" : "Сохранить политику"}</Button>
         </div>
       )}
     </Sheet>
