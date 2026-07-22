@@ -394,7 +394,6 @@ export const habitScheduleRules = sqliteTable(
     id: text("id").primaryKey(),
     habitId: text("habit_id").notNull().references(() => habits.id, { onDelete: "cascade" }),
     ruleType: text("rule_type").notNull(),
-    timezone: text("timezone").notNull(),
     configurationJson: text("configuration_json").notNull(),
     validFrom: text("valid_from").notNull(),
     validUntil: text("valid_until"),

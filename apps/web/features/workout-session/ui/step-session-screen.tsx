@@ -446,7 +446,7 @@ export function StepSessionScreen({ id }: { id: string }) {
                 isVideo
                   ? <video key={mediaKey} src={`/media/${mediaKey}`} className={`absolute inset-0 size-full object-contain ${phase === "rest" ? "opacity-45" : ""}`} autoPlay loop muted playsInline preload="auto" aria-label={media?.title ?? ""} />
                   : isGif
-                    ? <img src={`/media/${mediaKey}`} alt={media?.title ?? ""} className={`absolute inset-0 size-full object-contain ${phase === "rest" ? "opacity-45" : ""}`} decoding="async" />
+                    ? <Image src={`/media/${mediaKey}`} alt={media?.title ?? ""} fill sizes="(max-width: 430px) calc(100vw - 40px), 640px" unoptimized className={`object-contain ${phase === "rest" ? "opacity-45" : ""}`} decoding="async" />
                     : <Image src={`/media/${mediaKey}`} alt={media?.title ?? ""} fill sizes="(max-width: 430px) calc(100vw - 40px), 640px" className={`object-contain ${phase === "rest" ? "opacity-45" : ""}`} placeholder="blur" blurDataURL={IMAGE_BLUR_DATA_URL} decoding="async" />
               ) : (
                 <div className="absolute inset-0 grid place-items-center bg-accent-soft"><Icon name="dumbbell" className="size-10 text-text-muted" /></div>

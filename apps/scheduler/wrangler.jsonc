@@ -7,12 +7,28 @@
   "observability": {
     "enabled": true
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "flowly-db",
+      "database_id": "b9b982f5-120b-47b4-91f4-2945f15796f2",
+      "migrations_dir": "../../migrations"
+    }
+  ],
   "triggers": {
     "crons": ["* * * * *"]
   },
   "env": {
     "test": {
       "name": "flowly-scheduler-test",
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "flowly-db-test",
+          "database_id": "fddacf32-9e98-436e-a689-72dc1ae460db",
+          "migrations_dir": "../../migrations"
+        }
+      ],
       "triggers": {
         "crons": ["* * * * *"]
       }

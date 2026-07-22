@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 2 | 0 | 0 | 1 | 5 |
+| 1 | 0 | 0 | 0 | 7 |
 
 ## Зависимости и инварианты
 
@@ -23,7 +23,7 @@
 - По `DEC-024` каждый указанный `ui_slices` screen slice выполняется строго по одному ID в реальном `apps/web`; все states/интеракции и явный approval обязательны до следующего ID.
 - По `DEC-035` Konsta UI 5.2.0 (`konsta/react`, `ios` theme) обязательна для current/future production UI; direct imports — default, `packages/ui` допустим только для Flowly-specific contracts, отсутствующих в Konsta.
 - Weekly target явно показывает «обязательный сегодня»; multiple completions считаются отдельными настроенными slots (`DEC-017`). Для T04 canonical configs: `weekly_target={target,days,time}`, `interval={every,unit,anchorLocalDate,anchorLocalTime}`; interval uses local-calendar semantics, а mandatory-today indicator deferred to T07 (`DEC-068`).
-- Pause/schedule/timezone changes действуют только на future occurrences; history immutable; delete архивирует (`DEC-017`).
+- Pause/schedule/profile-timezone changes действуют только на future occurrences; history immutable; delete архивирует (`DEC-017`, `DEC-069`).
 - No response остаётся `no_response`; correction ограничена activity context и audit history (`DEC-015`).
 - Habit private by default, sharing/revoke follows `DEC-019`; UI states follows `DEC-022` и [`docs/design/flows/`](../../design/flows/).
 
@@ -53,13 +53,13 @@
 - **status:** done · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-21
 - **prd_refs:** §23.1–23.2, §27, §43.17 · **depends_on:** E4-D5-T02 · **decisions:** DEC-017, DEC-022, DEC-024, DEC-025, DEC-029
 - **ui_slices:** S-MA-062 — выполнять последовательно; approval каждого ID обязателен до следующего.
-- **scope:** два schedule rule типа с пользовательским timezone.
-- **acceptance:** [x] exact_times/weekdays rules сохраняются с timezone и нормализованными слотами; [x] нужные локальные даты/время расширяются детерминированно; [x] редактирование закрывает прежнее правило и создаёт одну текущую версию без скрытых дублей; [x] occurrences не материализуются до T07, история не переписывается.
-- **validation/evidence:** `.temp/E4-D5-T03/plan.md`; migration `0017_habit_schedule_rules.sql`; route `/api/v1/habits/[id]/schedule`; model `features/rhythm/model/schedule.ts`; browser `/rhythm/new` на localhost:3002 — переключение exact_times/weekdays, multiple time row, weekdays buttons, shared TimezonePicker. `typecheck` PASS; `lint` PASS с одним существующим warning `step-session-screen.tsx:449`; production `build` PASS; local D1 migration 0017 PASS. DST conversion remains a residual verification risk until dedicated scenario matrix is run. Production deploy `f0d84ab` / GitHub Actions `29843847723` PASS; real-device TMA time-picker interaction approved пользователем («очень круто») 2026-07-21, `review -> done`. Post-approval list cleanup: oversized outline HabitCard/progress placeholder/ellipsis/disabled completion removed; `/rhythm` uses compact direct Konsta List/ListItem rows with real exact-times/weekdays summary, full-row navigation, chevron, 44px identity circle for icon/emoji and two-line long-title clamp; 390px overflow 0, console errors 0, typecheck PASS.
+- **scope:** два schedule rule типа с timezone профиля пользователя; rule не хранит отдельный timezone (DEC-069).
+- **acceptance:** [x] exact_times/weekdays rules сохраняются с локальными слотами, timezone берётся из профиля при генерации; [x] нужные локальные даты/время расширяются детерминированно; [x] редактирование закрывает прежнее правило и создаёт одну текущую версию без скрытых дублей; [x] occurrences не материализуются до T07, история не переписывается.
+- **validation/evidence:** `.temp/E4-D5-T03/plan.md`; migration `0017_habit_schedule_rules.sql`; route `/api/v1/habits/[id]/schedule`; model `features/rhythm/model/schedule.ts`; browser `/rhythm/new` на localhost:3002 — переключение exact_times/weekdays, multiple time row и weekdays buttons. Исторический TimezonePicker был заменён DEC-069: профильный timezone используется генератором T07. `typecheck` PASS; `lint` PASS с одним существующим warning `step-session-screen.tsx:449`; production `build` PASS; local D1 migration 0017 PASS. DST conversion remains a residual verification risk until dedicated scenario matrix is run; profile-timezone migration/generator cleanup is T07. Production deploy `f0d84ab` / GitHub Actions `29843847723` PASS; real-device TMA time-picker interaction approved пользователем («очень круто») 2026-07-21, `review -> done`. Post-approval list cleanup: oversized outline HabitCard/progress placeholder/ellipsis/disabled completion removed; `/rhythm` uses compact direct Konsta List/ListItem rows with real exact-times/weekdays summary, full-row navigation, chevron, 44px identity circle for icon/emoji and two-line long-title clamp; 390px overflow 0, console errors 0, typecheck PASS.
 
 ### E4-D5-T04 — Реализовать недельную цель и интервальное расписание
 - **status:** done · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-21
-- **prd_refs:** §23.3–23.4, §27, §43.17 · **depends_on:** E4-D5-T02 · **decisions:** DEC-017, DEC-022, DEC-024, DEC-025, DEC-029, DEC-068
+- **prd_refs:** §23.3–23.4, §27, §43.17 · **depends_on:** E4-D5-T02 · **decisions:** DEC-017, DEC-022, DEC-024, DEC-025, DEC-029, DEC-068, DEC-069
 - **ui_slices:** S-MA-062 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** count-per-week и interval schedule согласно PRD.
 - **acceptance:** [x] недельные границы корректны; [x] interval anchor сохраняется; [x] timezone change не переписывает подтверждённое выполнение — локальный fixture mutation rerun сохранит все occurrence fields, fixture удалён; occurrences остаются T07 scope.
@@ -67,7 +67,7 @@
 
 ### E4-D5-T05 — Реализовать несколько выполнений и lifecycle привычки
 - **status:** done · **priority:** high · **owner:** AI agent · **updated:** 2026-07-21
-- **prd_refs:** §23.5, §26, §43.21, §44.8 · **depends_on:** E4-D5-T03, E4-D5-T04 · **decisions:** DEC-015, DEC-017, DEC-022, DEC-024, DEC-025, DEC-029, DEC-068
+- **prd_refs:** §23.5, §26, §43.21, §44.8 · **depends_on:** E4-D5-T03, E4-D5-T04 · **decisions:** DEC-015, DEC-017, DEC-022, DEC-024, DEC-025, DEC-029, DEC-068, DEC-069
 - **ui_slices:** S-MA-011, S-MA-064, S-MA-065 — выполнены последовательно; user approval получен.
 - **scope:** несколько occurrences в день, completion/skip/rest/no_response, pause/resume.
 - **acceptance:** [x] разные local-time slots одной даты хранятся независимо; [x] 0/partial/full progress различим текстом и progressbar; [x] ручное изменение журналируется в status_history; [x] completion/skip/rest/no_response и policy-disabled actions имеют явные состояния; [x] pause/resume/archive подтверждаются отдельным Sheet, история не меняется.
@@ -85,11 +85,12 @@
 - **journal:** 2026-07-21 — `backlog -> in_progress`; user approved policy↔habit linkage, reusable custom policies, global quiet-hours boundary, gentle default and persistent final-by-local-time. Deep plan created and two self-review passes completed. 2026-07-22 — implemented migration/API/React Query/Konsta S-MA-063, applied local D1 and completed checks; `in_progress -> review`, awaiting user review. User feedback then returned T06 to `in_progress`; UI/UX correction completed and returned to `review` with `.temp/E4-D5-T06/ui-review.md` evidence. Additional user feedback identified duplicated invisible error reserve between reminder policy and CTA; consolidated stable status slot inside footer and returned T06 to `review` after verification. New screenshot review confirmed fragmented step/delete rows; after user approval implemented one-row Konsta steps editor with inline values and destructive actions, reran browser matrix. Final user feedback identified doubled horizontal inset in policy list; removed nested content padding, verified list/CTA 16px inset and returned T06 `review -> done`. Post-done user feedback identified the same doubled inset in editor plus redundant step explanation; reopened T06, removed the extra editor padding/copy, reran final matrix and returned T06 `in_progress -> done`.
 
 ### E4-D5-T07 — Генерировать occurrences и reminder jobs
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
-- **prd_refs:** §26–27, §43.21–43.22, §45 · **depends_on:** E4-D5-T03–T06 · **decisions:** DEC-015, DEC-017, DEC-029, DEC-068
-- **scope:** идемпотентная генерация UTC occurrences/jobs без фактической Telegram delivery.
-- **acceptance:** [ ] повторный запуск не создаёт дублей; [ ] timezone changes обработаны явно; [ ] jobs связаны с policy steps.
-- **validation/evidence:** generation rerun и uniqueness evidence.
+- **status:** done · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-22
+- **prd_refs:** §26–27, §43.21–43.22, §45 · **depends_on:** E4-D5-T03–T06 · **decisions:** DEC-015, DEC-017, DEC-029, DEC-068, DEC-069
+- **scope:** идемпотентная генерация UTC occurrences/jobs без фактической Telegram delivery; profile timezone — единственный timezone source, legacy per-rule timezone contract удаляется совместимым migration/API/UI pass.
+- **acceptance:** [x] повторный запуск не создаёт дублей; [x] timezone changes обработаны явно через profile timezone и immutable occurrence snapshot; [x] jobs связаны с policy steps.
+- **validation/evidence:** migration `0020_habit_schedule_profile_timezone.sql` clean local reset/apply PASS; `habit_schedule_rules` больше не содержит timezone, schedule API/UI не передают per-rule timezone; pure schedule matrix exact/weekdays/weekly-target/interval + New York summer/winter UTC conversion + old interval anchor PASS; authenticated HTTP matrix создал exact (duplicate time normalized to 2 occurrences), weekday current (1), weekday next (0), weekly target (1) and interval (1); repeat GET `/api/v1/habits` и `/api/v1/occurrences` оставил counts unchanged; terminal skip cancelled 3 pending jobs and repeated status was idempotent; invalid schedule returned HTTP 400 and created 0 rows; profile timezone `UTC -> America/New_York` для новой привычки дал `09:00 -> 13:00Z`, старые rows remained unchanged; fixture removed and profile restored. Browser `/rhythm/new` showed the schedule form without a habit timezone picker and 0 console errors. Scheduler local scheduled event twice returned HTTP 200 and produced 2 occurrences, 6 jobs, 6 unique keys; fixture removed. Scheduler typecheck/lint/deploy-check PASS; web/core/database typecheck PASS; web lint PASS with 0 warnings after fixing `step-session-screen.tsx:449`; web build PASS; `git diff --check` PASS.
+- **journal:** 2026-07-22 — `backlog -> in_progress`; deep analysis and approved plan `.temp/E4-D5-T07/plan.md`. Implemented profile-timezone schedule contract, daily habit occurrence/job generation, idempotent D1 inserts and scheduler Cron preparation. Deep review found and fixed the temporary read-side-effect mismatch with the approved plan (generation now runs on habit/schedule mutations and scheduler, reads remain read-only) and optimized old interval anchors. Re-ran typecheck/lint/build/deploy-check and scheduler Cron D1 repro. Fixed lint warning in `apps/web/features/workout-session/ui/step-session-screen.tsx:449` by using `next/image` with `unoptimized` for GIF media. User confirmed closure: `review -> done`; critical/high findings: none. Residual risks: no production deploy/real-device scheduler run; Telegram delivery remains E5.
 
 ### E4-D5-T08 — Закрыть DoD привычек
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13

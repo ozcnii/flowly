@@ -11,6 +11,7 @@ import { normalizeSchedule, scheduleRuleSchema } from "@/features/rhythm/model/s
 import { localDateInTimezone } from "@/features/programs/model/program-dates";
 import { DEFAULT_HABIT_REMINDER_POLICY_ID } from "@/features/rhythm/model/reminder-policies";
 import { visiblePolicy } from "@/lib/reminders/policies";
+import { ensureHabitScheduleForToday } from "@/lib/habits/ensure-habit-schedule";
 
 const json = (body: unknown, init?: ResponseInit) => NextResponse.json(body, init);
 const habitCreateWithScheduleSchema = habitCreateSchema.extend({ schedule: scheduleRuleSchema.optional() });
@@ -139,13 +140,14 @@ export async function POST(request: Request) {
     if (schedule) {
       await db.batch([
         db.insert(schema.habits).values(habitRow),
-        db.insert(schema.habitScheduleRules).values({ id: generateId(), habitId: id, ruleType: schedule.ruleType, timezone: schedule.timezone, configurationJson: JSON.stringify(schedule.configuration), validFrom: schedule.validFrom, validUntil: null, createdAt: now }),
+        db.insert(schema.habitScheduleRules).values({ id: generateId(), habitId: id, ruleType: schedule.ruleType, configurationJson: JSON.stringify(schedule.configuration), validFrom: schedule.validFrom, validUntil: null, createdAt: now }),
       ]);
     } else await db.insert(schema.habits).values(habitRow);
   } catch (error) {
     audit("habit.create.error", { userId, error: String(error).slice(0, 200) });
     throw error;
   }
+  if (schedule) await ensureHabitScheduleForToday(db, userId);
   audit("habit.create", { userId, habitId: id });
   const row = (await db.select().from(schema.habits).where(eq(schema.habits.id, id)).limit(1))[0];
   return json({ habit: row }, { status: 201 });

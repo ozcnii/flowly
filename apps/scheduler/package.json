@@ -13,6 +13,9 @@
     "deploy:production": "wrangler deploy",
     "cf-typegen": "wrangler types --env test --env-interface CloudflareEnv --include-runtime false worker-configuration.d.ts"
   },
+  "dependencies": {
+    "@flowly/core": "*"
+  },
   "devDependencies": {
     "@cloudflare/workers-types": "5.20260713.1",
     "@eslint/js": "9.39.5",

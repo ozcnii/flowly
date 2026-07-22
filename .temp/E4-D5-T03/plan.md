@@ -1,5 +1,7 @@
 # Deep plan: E4-D5-T03 — расписание «конкретное время» и дни недели
 
+> Post-approval contract note (DEC-069, 2026-07-22): habit schedule no longer stores or edits a per-rule timezone; future expansion uses profile timezone and existing occurrence rows keep their timezone snapshot. T07 owns the compatibility migration/API/UI cleanup.
+
 ## Problem statement
 
 После CRUD привычки (`E4-D5-T02`) Flowly умеет сохранять только базовую дату начала и не умеет задавать повторяемое расписание. Нужно добавить два PRD-типа расписания: exact times и weekdays, сохраняя пользовательский timezone и не переписывая историю.

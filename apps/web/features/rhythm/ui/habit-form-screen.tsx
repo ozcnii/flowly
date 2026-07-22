@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icon } from "@flowly/ui";
 import { PrimaryNavbar } from "@/components/shell/primary-navbar";
-import { TimezonePicker, buildTimezoneOptions } from "@/components/timezone-picker";
 import { ReminderPolicySheet } from "./reminder-policy-sheet";
 import {
   COLOR_OPTIONS,
@@ -120,7 +119,6 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
   const initialWeekly = initialSchedule?.ruleType === "weekly_target" ? weeklyTargetConfig.parse(initialSchedule.configuration) : undefined;
   const initialInterval = initialSchedule?.ruleType === "interval" ? intervalConfig.parse(initialSchedule.configuration) : undefined;
   const [scheduleType, setScheduleType] = useState<ScheduleType>(initialSchedule?.ruleType ?? "exact_times");
-  const [scheduleTimezone, setScheduleTimezone] = useState(initialSchedule?.timezone ?? (typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "UTC"));
   const [scheduleTimes, setScheduleTimes] = useState(initialSchedule?.ruleType === "exact_times" ? exactTimesConfig.parse(initialSchedule.configuration).times : ["09:00"]);
   const [scheduleDays, setScheduleDays] = useState<number[]>(initialSchedule?.ruleType === "weekdays" ? weekdaysConfig.parse(initialSchedule.configuration).days : initialWeekly?.days ?? [1, 3, 5]);
   const [scheduleDayTimes, setScheduleDayTimes] = useState(() => initialSchedule?.ruleType === "weekdays" ? Object.values(weekdaysConfig.parse(initialSchedule.configuration).timesByDay)[0] ?? ["18:00"] : ["18:00"]);
@@ -169,7 +167,7 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
       : scheduleType === "weekdays" ? { days: scheduleDays, timesByDay: Object.fromEntries(scheduleDays.map((day) => [String(day), scheduleDayTimes])) }
         : scheduleType === "weekly_target" ? { target: Number(weeklyTarget), days: scheduleDays, time: weeklyTime }
           : { every: Number(intervalEvery), unit: intervalUnit, anchorLocalDate: intervalAnchorDate, anchorLocalTime: intervalAnchorTime };
-    const rule: ScheduleRule = { ruleType: scheduleType, timezone: scheduleTimezone, validFrom: startLocalDate, configuration };
+    const rule: ScheduleRule = { ruleType: scheduleType, validFrom: startLocalDate, configuration };
     if (!scheduleRuleSchema.safeParse(rule).success) { setScheduleError(true); return; }
     if (mode === "create") createMut.mutate({ input: payload, schedule: rule }, { onSuccess: finish });
     else updateMut.mutate(payload, { onSuccess: async () => { await scheduleMut.mutateAsync(rule); finish(); } });
@@ -321,7 +319,6 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
           ) : null}
           {scheduleType === "weekdays" || scheduleType === "weekly_target" ? <div className="grid gap-2 px-4"><p className="m-0 text-sm text-text-muted">Отметьте дни выполнения:</p><div className="grid grid-cols-7 gap-2" role="group" aria-label="Дни недели">{[1, 2, 3, 4, 5, 6, 7].map((day) => { const selected = scheduleDays.includes(day); return <Button key={day} clear rounded type="button" aria-pressed={selected} onClick={() => setScheduleDays((days) => days.includes(day) ? days.filter((value) => value !== day) : [...days, day].sort((a, b) => a - b))} className={`!h-11 !w-11 !min-h-11 !min-w-0 !rounded-full !p-0 text-sm ${selected ? "!bg-accent-soft !text-accent !ring-1 !ring-accent" : "!bg-surface-subtle !text-text-muted"}`}>{["", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"][day]}</Button>; })}</div><p className="m-0 text-sm text-text-muted">Выбрано: {scheduleDays.map((day) => ["", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"][day]).join(", ") || "ни одного дня"}</p></div> : null}
           <p className={`m-0 min-h-5 px-4 text-sm text-red-600 dark:text-red-400 ${scheduleError ? "" : "invisible"}`} role={scheduleError ? "alert" : undefined} aria-hidden={!scheduleError}>{scheduleError ? "Проверьте параметры расписания." : "\u00a0"}</p>
-          <TimezonePicker options={buildTimezoneOptions()} value={scheduleTimezone} onChange={setScheduleTimezone} />
           <List strong inset dividers>
             <ListItem
               title="Разрешить пропуск"

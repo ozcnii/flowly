@@ -585,12 +585,21 @@
 
 - **Статус:** approved
 - **Дата:** 2026-07-21
-- **Решение:** `weekly_target` хранит `{ target: integer, days: [1..7], time: HH:mm }`: недельная цель, допустимые дни (понедельник=1, воскресенье=7) и одно preferred local time. `interval` хранит `{ every: positive integer, unit: "hours" | "days" | "weeks", anchorLocalDate: YYYY-MM-DD, anchorLocalTime: HH:mm }`; anchor явный и не выводится молча из `valid_from`. Interval expansion использует local calendar semantics в пользовательском IANA timezone; timezone/DST не должны переписывать уже подтверждённые выполнения. Indicator «обязательный сегодня» для weekly target откладывается до T07, когда появятся completion/occurrence data; T04 ограничен persistence/validation/helper и S-MA-062 UI.
+- **Решение:** `weekly_target` хранит `{ target: integer, days: [1..7], time: HH:mm }`: недельная цель, допустимые дни (понедельник=1, воскресенье=7) и одно preferred local time. `interval` хранит `{ every: positive integer, unit: "hours" | "days" | "weeks", anchorLocalDate: YYYY-MM-DD, anchorLocalTime: HH:mm }`; anchor явный и не выводится молча из `valid_from`. Interval expansion использует local calendar semantics в timezone профиля пользователя; timezone/DST не должны переписывать уже подтверждённые выполнения. Indicator «обязательный сегодня» для weekly target откладывается до T07, когда появятся completion/occurrence data; T04 ограничен persistence/validation/helper и S-MA-062 UI. Отдельное хранение timezone на schedule rule superseded DEC-069.
 - **Основание:** пользователь утвердил canonical JSON, явный local anchor, локальную календарную семантику interval и границу T04 в ответах на deep plan E4-D5-T04.
 - **PRD:** §23.3–23.4, §27, §43.17.
 - **Влияет на:** E4-D5-T04/T05/T07, S-MA-062, `apps/web/features/rhythm/model/schedule.ts`, habit schedule API и downstream occurrence generation.
+- **Частично superseded:** ownership timezone для habit schedule заменён DEC-069; canonical weekly/interval JSON и local-calendar semantics остаются актуальными.
 
-## Открытые решения
+### DEC-069 — Timezone привычки следует timezone профиля
+
+- **Статус:** approved
+- **Дата:** 2026-07-22
+- **Решение:** habit schedule не имеет отдельного timezone-поля и не показывает отдельный timezone control. Все новые local slots и reminder due times рассчитываются в `users.timezone`; при смене профиля будущая генерация использует новую timezone. Уже созданные `activity_occurrences` сохраняют timezone snapshot, `scheduled_local_*`, `scheduled_at_utc`, statuses и history неизменными. Удаление rule timezone из schema/API/UI выполняется совместимым migration pass в E4-D5-T07.
+- **Основание:** явное решение пользователя при старте E4-D5-T07 2026-07-22.
+- **PRD:** §23, §26–27, §43.17/§43.21.
+- **Влияет на:** E4-D5-T03/T04/T07, S-MA-062, `apps/web/features/rhythm/model/schedule.ts`, habit schedule API/UI, occurrence generation и HANDOFF.
+- **Заменяет:** только timezone ownership часть DEC-068 и ранее согласованный per-rule timezone contract T03; weekly/interval configuration из DEC-068 сохраняется.
 
 ### DEC-006 — Operational thresholds
 

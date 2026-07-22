@@ -1,8 +1,8 @@
+import { expandHabitSlots } from "@flowly/core";
 import { z } from "zod";
 
 export const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
-const timezoneValid = (value: string) => { try { new Intl.DateTimeFormat("en-US", { timeZone: value }).format(); return true; } catch { return false; } };
 const dateValid = (value: string) => { const date = new Date(`${value}T00:00:00Z`); return date.toISOString().slice(0, 10) === value; };
 const localDate = z.string().regex(DATE, "Дата должна быть в формате YYYY-MM-DD").refine(dateValid, "Укажите корректную дату");
 const time = z.string().regex(TIME, "Время должно быть в формате HH:MM");
@@ -21,7 +21,6 @@ export const intervalConfig = z.object({
 
 export const scheduleRuleSchema = z.object({
   ruleType: z.enum(["exact_times", "weekdays", "weekly_target", "interval"]),
-  timezone: z.string().refine(timezoneValid, "Укажите корректный часовой пояс"),
   validFrom: localDate,
   configuration: z.unknown(),
 }).superRefine((value, ctx) => {
@@ -50,7 +49,6 @@ export const normalizeSchedule = (rule: ScheduleRule) => {
 
 const dateAtUtc = (value: string) => new Date(`${value}T00:00:00Z`);
 const dateString = (value: Date) => value.toISOString().slice(0, 10);
-const timeString = (value: Date) => value.toISOString().slice(11, 16);
 const weekday = (value: string) => dateAtUtc(value).getUTCDay() || 7;
 
 export const weekBounds = (value: string) => {
@@ -68,31 +66,5 @@ export const weeklyTargetFacts = (config: WeeklyTargetConfig, value: string, com
   return { ...weekBounds(value), completed, remaining, remainingAllowedDays, isTodayAllowed: config.days.includes(day), mandatoryRemaining: remaining > 0 && remainingAllowedDays <= remaining };
 };
 
-const addInterval = (value: Date, config: IntervalConfig) => {
-  const minutes = config.every * (config.unit === "hours" ? 60 : config.unit === "days" ? 1440 : 10080);
-  return new Date(value.getTime() + minutes * 60_000);
-};
-
-const slot = (localDate: string, localTime: string, timezone: string): LocalSlot => ({ localDate, localTime, timezone });
-
-export const expandLocalSlots = (rule: ScheduleRule, from: string, to: string): LocalSlot[] => {
-  if (from > to) return [];
-  const out: LocalSlot[] = [];
-  const start = dateAtUtc(from), end = dateAtUtc(to);
-  if (rule.ruleType === "interval") {
-    const config = intervalConfig.parse(rule.configuration);
-    for (let cursor = new Date(`${config.anchorLocalDate}T${config.anchorLocalTime}:00Z`), limit = new Date(`${to}T23:59:59.999Z`); cursor <= limit; cursor = addInterval(cursor, config)) {
-      const localDate = dateString(cursor);
-      if (localDate >= from) out.push(slot(localDate, timeString(cursor), rule.timezone));
-    }
-    return out;
-  }
-  for (let date = new Date(start); date <= end; date.setUTCDate(date.getUTCDate() + 1)) {
-    const localDate = dateString(date), day = weekday(localDate);
-    const slotTimes = rule.ruleType === "exact_times" ? exactTimesConfig.parse(rule.configuration).times
-      : rule.ruleType === "weekdays" ? (() => { const config = weekdaysConfig.parse(rule.configuration); return config.days.includes(day) ? config.timesByDay[String(day)] ?? [] : []; })()
-        : (() => { const config = weeklyTargetConfig.parse(rule.configuration); return config.days.includes(day) ? [config.time] : []; })();
-    for (const localTime of slotTimes) out.push(slot(localDate, localTime, rule.timezone));
-  }
-  return out;
-};
+export const expandLocalSlots = (rule: ScheduleRule, from: string, to: string, timezone: string): LocalSlot[] =>
+  expandHabitSlots(rule, from, to).map((slot) => ({ ...slot, timezone }));
