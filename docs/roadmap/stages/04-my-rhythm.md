@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 1 | 0 | 0 | 0 | 7 |
+| 0 | 1 | 0 | 0 | 7 |
 
 ## Зависимости и инварианты
 
@@ -93,11 +93,12 @@
 - **journal:** 2026-07-22 — `backlog -> in_progress`; deep analysis and approved plan `.temp/E4-D5-T07/plan.md`. Implemented profile-timezone schedule contract, daily habit occurrence/job generation, idempotent D1 inserts and scheduler Cron preparation. Deep review found and fixed the temporary read-side-effect mismatch with the approved plan (generation now runs on habit/schedule mutations and scheduler, reads remain read-only) and optimized old interval anchors. Re-ran typecheck/lint/build/deploy-check and scheduler Cron D1 repro. Fixed lint warning in `apps/web/features/workout-session/ui/step-session-screen.tsx:449` by using `next/image` with `unoptimized` for GIF media. User confirmed closure: `review -> done`; critical/high findings: none. Residual risks: no production deploy/real-device scheduler run; Telegram delivery remains E5.
 
 ### E4-D5-T08 — Закрыть DoD привычек
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
+- **status:** in_progress · **priority:** blocker · **owner:** AI agent · **updated:** 2026-07-22
 - **prd_refs:** §50.1, §55.4, §57 · **depends_on:** E4-D5-T01–T07 · **decisions:** DEC-003, DEC-015, DEC-017, DEC-019, DEC-022, DEC-029
 - **scope:** проверить четыре schedule типа, multiple completions, privacy, skip policy, icons/colors.
 - **acceptance:** [ ] каждый пункт §55.4 имеет evidence; [ ] применимые проверки расписаний выполнены по явному запросу; [ ] остаточные timezone/DST риски записаны.
 - **validation/evidence:** итоговый checklist и scenario matrix.
+- **journal:** 2026-07-22 — dependencies T03–T07 confirmed done; `backlog -> in_progress`; roadmap/HANDOFF/card, PRD refs and DEC-003/015/017/019/022/029 read. Deep plan `.temp/E4-D5-T08/plan.md` prepared with verification-first scenario matrix, confidence 92%/90%; implementation awaits user plan approval.
 
 ## Handoff этапа
 
