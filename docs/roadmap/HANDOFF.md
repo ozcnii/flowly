@@ -6,14 +6,12 @@
 
 - **Обновлено:** 2026-07-27
 - **Текущий этап:** **7. Социальные** (этап 6 calendar done).
-- **Текущая задача:** не начата.
+- **Текущая задача:** E7-D8-T01 (`review`) — invites/friendships.
 - **Последняя закрытая задача:** E6-D7-T01–T09 (`done`) — calendar + reports + manual log.
-- **Статус:** user autonomy 2026-07-27: stage 6 implemented; dates pure PASS; typecheck/lint web+scheduler PASS.
-- **README sync:** 63 done / 1 blocked / 15 backlog / 0 in_progress / 0 review.
-- **E6 files:** `apps/web/lib/calendar/**`, `apps/web/features/calendar/**`, `app/api/v1/calendar/**`, `app/api/v1/reports/**`, `apps/scheduler/src/reports-delivery.ts`.
-- **Evidence:** `.temp/E5-stage5/evidence.md` — HTTP 14/14; delivery claimed/sent; quiet defer; typecheck/lint web+scheduler PASS.
-- **Key code:** `apps/web/lib/telegram/**`, `apps/web/lib/occurrences/complete.ts`, `apps/scheduler/src/{delivery,no-response,index}.ts`, webhook route, migration 0021.
-- **Следующее точное действие:** этап 6 calendar/reports; ops deploy secrets (`TELEGRAM_WEBHOOK_SECRET`, scheduler `TELEGRAM_BOT_TOKEN`/`FLOWLY_WEB_URL`/`TELEGRAM_MODE`).
+- **Статус:** T01 implemented: migration 0022, friends service (atomic invite claim), API, UI `/friends` + accept, onboarding invite live, bot `/start invite_<code>`, profile link. typecheck/lint PASS. Deep review `.temp/E7-D8-T01/deep-review.md`.
+- **README sync:** 63 done / 1 blocked / 14 backlog / 0 in_progress / 1 review.
+- **E7 files:** `migrations/0022_friendships.sql`, `packages/database/src/schema.ts` friendships/inviteLinks, `apps/web/lib/friends/service.ts`, `apps/web/app/api/v1/friends/**`, `apps/web/features/friends/**`, onboarding/profile/bot wiring.
+- **Следующее точное действие:** user smoke T01 (two accounts invite accept/reject/remove) → done; deploy 0022; then E7-D8-T02.
 - **Production ops 2026-07-27:** code on `main` (`3e3d1da`); Deploy web GHA PASS (migrations 0021); bot `@getflowlybot`; `TELEGRAM_WEBHOOK_SECRET` on web prod/test + scheduler; `setWebhook` → `https://flowly-web.getflowly.workers.dev/api/v1/telegram/webhook` (secret_token set, last_error null); real send PASS (`outbound` message_id + `/app` webhook status ok); scheduler deployed `flowly-scheduler.getflowly.workers.dev` cron `* * * * *` with `FLOWLY_WEB_URL`/`TELEGRAM_MODE`/`TELEGRAM_WEBHOOK_SECRET` (send via web outbound proxy). Residual: no_response heuristic; DEC-007 rate limits stage 8; local `.dev.vars` bot token still invalid (prod CF secret is valid).
 - **DEC-068:** canonical `weekly_target={target,days,time}` и `interval={every,unit,anchorLocalDate,anchorLocalTime}` и local-calendar semantics остаются действующими; timezone ownership portion superseded DEC-069.
 - **DEC-069:** пользователь 2026-07-22 утвердил: habit не хранит/не показывает отдельный timezone; новые slots/jobs используют `users.timezone`, уже созданные occurrence rows сохраняют timezone snapshot и history immutable. T07 должен провести совместимый schema/API/UI cleanup.

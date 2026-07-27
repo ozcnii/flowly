@@ -7,7 +7,7 @@ import { PrimaryNavbar } from "@/components/shell/primary-navbar";
 import { useMeQuery } from "../model/me-queries";
 
 const sections = [
-  { icon: "users", label: "Друзья", hint: "Друзья и приглашения" },
+  { icon: "users", label: "Друзья", hint: "Друзья и приглашения", to: "/friends" },
   { icon: "flag", label: "Челленджи", hint: "Совместные челленджи" },
   { icon: "bookmark", label: "Избранное", hint: "Сохранённые тренировки", to: "/favorites" },
   { icon: "chart-no-axes-column", label: "Отчёты", hint: "Недельные и месячные" },

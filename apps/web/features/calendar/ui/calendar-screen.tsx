@@ -18,6 +18,7 @@ import {
 
 type Mode = "month" | "week" | "day";
 
+/** Fallback until API returns user timezone day; prefer server `asOf`/day date. */
 const todayIso = () => {
   const d = new Date();
   return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);

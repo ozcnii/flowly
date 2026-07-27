@@ -71,6 +71,45 @@ export const authSessions = sqliteTable(
   (table) => [uniqueIndex("auth_sessions_token_hash_unique").on(table.tokenHash)],
 );
 
+// §43.4 friendships (stage 7)
+export const friendships = sqliteTable(
+  "friendships",
+  {
+    id: text("id").primaryKey(),
+    requesterId: text("requester_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    addresseeId: text("addressee_id").references(() => users.id, { onDelete: "cascade" }),
+    status: text("status").notNull(), // pending | accepted | rejected | removed | blocked
+    inviteCode: text("invite_code"),
+    createdAt: text("created_at").notNull(),
+    acceptedAt: text("accepted_at"),
+    removedAt: text("removed_at"),
+  },
+  (table) => [
+    index("friendships_requester_idx").on(table.requesterId),
+    index("friendships_addressee_idx").on(table.addresseeId),
+    index("friendships_status_idx").on(table.status),
+  ],
+);
+
+// §43.5 invite_links
+export const inviteLinks = sqliteTable(
+  "invite_links",
+  {
+    id: text("id").primaryKey(),
+    ownerId: text("owner_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    code: text("code").notNull(),
+    expiresAt: text("expires_at").notNull(),
+    maxUses: integer("max_uses").notNull(),
+    useCount: integer("use_count").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [uniqueIndex("invite_links_code_unique").on(table.code), index("invite_links_owner_idx").on(table.ownerId)],
+);
+
 // §43.6 workout_categories
 export const workoutCategories = sqliteTable(
   "workout_categories",
