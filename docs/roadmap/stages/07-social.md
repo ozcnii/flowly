@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 5 | 0 | 0 | 1 | 1 |
+| 4 | 1 | 0 | 0 | 2 |
 
 ## Зависимости и инварианты
 
@@ -41,24 +41,24 @@
 - **journal:** 2026-07-27 — implemented; user smoke OK → done.
 
 ### E7-D8-T02 — Реализовать удаление друга и отзыв доступа
-- **status:** review · **priority:** blocker · **owner:** agent · **updated:** 2026-07-27
+- **status:** done · **priority:** blocker · **owner:** agent · **updated:** 2026-07-27
 - **prd_refs:** §32.4, §33.3, §55.8 · **depends_on:** E7-D8-T01 · **decisions:** DEC-019, DEC-022, DEC-024, DEC-025, DEC-029
 - **ui_slices:** S-MA-081, S-MA-083, S-MA-084 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** disconnect/revoke semantics и немедленная проверка доступа.
 - **acceptance:** [x] remove friend + cascade revoke habit/workout shares; [x] owner data untouched; [x] activeHabitShare/activeWorkoutShare gate GET; revoke sets revoked_at (stale link 404).
-- **validation/evidence:** migration 0023 local PASS; typecheck PASS; share POST/DELETE APIs; friends remove confirm Sheet; habit GET shared subset.
-- **residual:** full S-MA-083/084 share editor UI deferred to T03 (API+access path ready); rich habit share toggles UI in T03.
-- **journal:** 2026-07-27 — started after T01 user OK; implemented revoke stack → review.
+- **validation/evidence:** migration 0023 local+prod; typecheck/lint; HTTP base + edge 32/32 (`scripts/friends-edge-http-test.mjs`); share POST/DELETE; friends remove Sheet.
+- **residual:** S-MA-083/084 rich editor completed in T03.
+- **journal:** 2026-07-27 — review → done after edge matrix PASS.
 
 ### E7-D8-T03 — Реализовать sharing привычек и тренировок
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-19
+- **status:** in_progress · **priority:** blocker · **owner:** agent · **updated:** 2026-07-27
 - **prd_refs:** §8.4, §33.1–33.2, §43.11, §43.18, §47.2 · **depends_on:** E2-D3-T03, E4-D5-T02, E7-D8-T01 · **decisions:** DEC-019, DEC-022, DEC-024, DEC-025, DEC-029, DEC-064
 - **ui_slices:** S-MA-043, S-MA-064, S-MA-083, S-MA-084 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** явный per-object sharing только после создания.
-- **note (DEC-064):** share **own user-built workouts** (S-MA-043 path from editor) **blocked** until E2-D3-T03 resumes. Share **habits** / other objects after E4-D5-T02+E7-D8-T01 can still proceed without T03. Optionally split card later: habits-only vs own-workout share.
+- **note (DEC-064):** share **own user-built workouts** (S-MA-043) **N/A** until E2-D3-T03; T03 scope = **habits** share UI + shared read + revoke (workout API already exists).
 - **acceptance:** [ ] default private; [ ] видны только разрешённые данные; [ ] public link не раскрывает owner/private fields; [ ] revoke работает.
 - **validation/evidence:** owner/friend/stranger access matrix.
-- **journal:** 2026-07-19 — marked partial block from E2-D3-T03/DEC-064: own-workout share latent; habit share not blocked by T03 alone.
+- **journal:** 2026-07-19 — DEC-064; 2026-07-27 — in_progress after T02 done.
 
 ### E7-D8-T04 — Реализовать совместные программы
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-19
