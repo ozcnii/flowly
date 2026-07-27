@@ -1,6 +1,7 @@
 import { generateHabitDataForToday } from "./habit-generation";
 import { processDueReminderJobs } from "./delivery";
 import { closeNoResponseForYesterday } from "./no-response";
+import { deliverDueReports } from "./reports-delivery";
 
 type Env = {
   DB: D1Database;
@@ -34,6 +35,7 @@ export default {
         await generateHabitDataForToday(env.DB);
         await processDueReminderJobs(env);
         await closeNoResponseForYesterday(env.DB);
+        await deliverDueReports(env);
       })(),
     );
   },

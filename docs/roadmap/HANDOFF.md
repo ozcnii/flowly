@@ -5,11 +5,12 @@
 ## Текущее состояние
 
 - **Обновлено:** 2026-07-27
-- **Текущий этап:** **6. Календарь и отчёты** (этап 5 закрыт).
+- **Текущий этап:** **7. Социальные** (этап 6 calendar done).
 - **Текущая задача:** не начата.
-- **Последняя закрытая задача:** E5-D6-T01–T08 (`done`) — полный Telegram pipeline.
-- **Статус:** user maximum autonomy 2026-07-27: T02–T08 implemented + verified local mock; stage 5 8/8 done.
-- **README sync:** 54 done / 1 blocked / 24 backlog / 0 in_progress / 0 review.
+- **Последняя закрытая задача:** E6-D7-T01–T09 (`done`) — calendar + reports + manual log.
+- **Статус:** user autonomy 2026-07-27: stage 6 implemented; dates pure PASS; typecheck/lint web+scheduler PASS.
+- **README sync:** 63 done / 1 blocked / 15 backlog / 0 in_progress / 0 review.
+- **E6 files:** `apps/web/lib/calendar/**`, `apps/web/features/calendar/**`, `app/api/v1/calendar/**`, `app/api/v1/reports/**`, `apps/scheduler/src/reports-delivery.ts`.
 - **Evidence:** `.temp/E5-stage5/evidence.md` — HTTP 14/14; delivery claimed/sent; quiet defer; typecheck/lint web+scheduler PASS.
 - **Key code:** `apps/web/lib/telegram/**`, `apps/web/lib/occurrences/complete.ts`, `apps/scheduler/src/{delivery,no-response,index}.ts`, webhook route, migration 0021.
 - **Следующее точное действие:** этап 6 calendar/reports; ops deploy secrets (`TELEGRAM_WEBHOOK_SECRET`, scheduler `TELEGRAM_BOT_TOKEN`/`FLOWLY_WEB_URL`/`TELEGRAM_MODE`).
@@ -127,9 +128,9 @@
 
 ## Что делать следующим
 
-1. Начать **этап 6** (calendar/reports) — первая карточка из `06-calendar-reports.md`.
-2. Production ops: webhook secret + setWebhook; scheduler secrets + deploy.
-3. Residual real-device Telegram delivery check.
+1. Начать **этап 7** (social) или polish calendar on device.
+2. Residual: share-card is text-only (no R2 PNG); report Telegram summaries are simplified SQL.
+3. E2-D3-T03 still blocked (DEC-064) if needed.
 
 ## Открытые блокеры
 
