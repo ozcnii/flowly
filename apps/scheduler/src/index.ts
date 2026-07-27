@@ -4,6 +4,7 @@ import { closeNoResponseForYesterday } from "./no-response";
 
 type Env = {
   DB: D1Database;
+  WEB?: Fetcher;
   TELEGRAM_BOT_TOKEN?: string;
   TELEGRAM_MODE?: string;
   FLOWLY_WEB_URL?: string;

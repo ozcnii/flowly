@@ -6,6 +6,8 @@ const TERMINAL = new Set(["completed", "partially_completed", "rest", "skipped",
 
 type Env = {
   DB: D1Database;
+  /** Service binding to flowly-web (Worker-to-Worker; public workers.dev fetch returns 404). */
+  WEB?: Fetcher;
   TELEGRAM_BOT_TOKEN?: string;
   TELEGRAM_MODE?: string;
   FLOWLY_WEB_URL?: string;
@@ -34,19 +36,20 @@ async function sendTelegram(env: Env, chatId: string, text: string, replyMarkup:
     return { ok: true, messageId: `mock_${Date.now()}` };
   }
 
-  // Prefer proxy through web worker (shares TELEGRAM_BOT_TOKEN secret).
-  const base = (env.FLOWLY_WEB_URL || "https://flowly-web.getflowly.workers.dev").replace(/\/$/, "");
-  if (base && env.TELEGRAM_WEBHOOK_SECRET) {
+  // Prefer service binding to web (public workers.dev subrequest returns 404 on OpenNext).
+  if (env.WEB && env.TELEGRAM_WEBHOOK_SECRET) {
     try {
-      const res = await fetch(`${base}/api/v1/telegram/outbound`, {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "x-telegram-bot-api-secret-token": env.TELEGRAM_WEBHOOK_SECRET,
-          accept: "application/json",
-        },
-        body: JSON.stringify({ chat_id: chatId, text, reply_markup: replyMarkup }),
-      });
+      const res = await env.WEB.fetch(
+        new Request("https://flowly-web.internal/api/v1/telegram/outbound", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-telegram-bot-api-secret-token": env.TELEGRAM_WEBHOOK_SECRET,
+            accept: "application/json",
+          },
+          body: JSON.stringify({ chat_id: chatId, text, reply_markup: replyMarkup }),
+        }),
+      );
       const raw = await res.text();
       let body: { ok?: boolean; code?: string; message_id?: string; error?: string } = {};
       try {
@@ -55,13 +58,13 @@ async function sendTelegram(env: Env, chatId: string, text: string, replyMarkup:
         body = {};
       }
       if (!res.ok || !body.ok) {
-        // 404 is transient during web deploys; never permanent.
         const code = body.code || body.error || `proxy_http_${res.status}`;
-        console.log(JSON.stringify({ event: "telegram.delivery.proxy_fail", status: res.status, code, base }));
+        console.log(JSON.stringify({ event: "telegram.delivery.proxy_fail", status: res.status, code, via: "service_binding" }));
         return { ok: false, code, permanent: permanent(code) || res.status === 403 };
       }
       return { ok: true, messageId: body.message_id };
     } catch (e) {
+      console.log(JSON.stringify({ event: "telegram.delivery.proxy_error", error: e instanceof Error ? e.message : "proxy_network" }));
       return { ok: false, code: e instanceof Error ? e.message : "proxy_network", permanent: false };
     }
   }
