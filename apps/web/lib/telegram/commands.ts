@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { schema, type Database } from "@flowly/database";
+import { acceptInvite } from "@/lib/friends/service";
 import { appHomeUrl, openFlowlyKeyboard, sendMessage, type ChatId } from "./outbound";
 
 /** Bot command without bot username suffix: `/app@Bot` → `/app`. */
@@ -31,6 +32,13 @@ function appInviteUrl(request: Request, code: string): string {
   return url.toString();
 }
 
+function appFriendsUrl(request: Request): string {
+  const url = new URL("/friends", request.url);
+  url.searchParams.set("tg", "1");
+  url.searchParams.set("v", Date.now().toString(36));
+  return url.toString();
+}
+
 /** S-BOT-001/002 + S-BOT-007 invite deep link. */
 export async function handleBotCommand(
   chatId: ChatId,
@@ -44,28 +52,49 @@ export async function handleBotCommand(
     const code = payload.slice("invite_".length).toUpperCase();
     if (!code) return "ignored";
 
-    // Inviter opened own link → don't say "you were invited"
     if (db && telegramUserId != null) {
       const invite = (
         await db.select().from(schema.inviteLinks).where(eq(schema.inviteLinks.code, code)).limit(1)
       )[0];
-      if (invite) {
-        const owner = (
-          await db.select().from(schema.users).where(eq(schema.users.id, invite.ownerId)).limit(1)
-        )[0];
-        if (owner && String(owner.telegramId) === String(telegramUserId)) {
+      const user = (
+        await db
+          .select()
+          .from(schema.users)
+          .where(eq(schema.users.telegramId, String(telegramUserId)))
+          .limit(1)
+      )[0];
+
+      if (invite && user && invite.ownerId === user.id) {
+        await sendMessage(
+          chatId,
+          "Это ваша пригласительная ссылка. Отправьте её другу — не открывайте сами. В приложении: Профиль → Друзья → Отправить.",
+          { inline_keyboard: openFlowlyKeyboard(appHomeUrl(request)) },
+        );
+        return "ok";
+      }
+
+      // Already known user → accept immediately on deep link (no extra tap).
+      if (invite && user && invite.ownerId !== user.id) {
+        const result = await acceptInvite(db, code, user.id);
+        if (result.kind === "ok") {
           await sendMessage(
             chatId,
-            "Это ваша пригласительная ссылка. Отправьте её другу — не открывайте сами. В приложении: Профиль → Друзья → Отправить.",
-            { inline_keyboard: openFlowlyKeyboard(appHomeUrl(request)) },
+            result.idempotent ? "Вы уже друзья в Flowly." : "Готово — вы теперь друзья в Flowly.",
+            { inline_keyboard: [[{ text: "Друзья", web_app: { url: appFriendsUrl(request) } }]] },
           );
           return "ok";
         }
+        const failMsg = result.kind === "invalid" ? result.message : "Не удалось принять приглашение.";
+        await sendMessage(chatId, failMsg, {
+          inline_keyboard: openFlowlyKeyboard(appInviteUrl(request, code)),
+        });
+        return "ok";
       }
     }
 
-    await sendMessage(chatId, "Вас пригласили в друзья в Flowly. Откройте приложение, чтобы принять или отклонить.", {
-      inline_keyboard: openFlowlyKeyboard(appInviteUrl(request, code)),
+    // New user (no D1 row yet) → open Mini App invite; page auto-accepts after auth.
+    await sendMessage(chatId, "Вас пригласили в друзья в Flowly. Откройте приложение — приглашение примется автоматически.", {
+      inline_keyboard: [[{ text: "Принять приглашение", web_app: { url: appInviteUrl(request, code) } }]],
     });
     return "ok";
   }
