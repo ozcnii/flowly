@@ -11,6 +11,14 @@ import { useAcceptInviteMutation, useRejectInviteMutation } from "../model/frien
 
 const focusRing = "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent";
 
+function errorMessage(e: unknown) {
+  if (e instanceof ApiError) {
+    const body = e.body as { message?: string } | null;
+    return body?.message ?? (e.status === 404 ? "Приглашение не найдено." : "Не удалось принять.");
+  }
+  return "Ошибка сети.";
+}
+
 /** S-MA-082 — open invite deep link → auto-accept once session ready (PRD §32.1). */
 export function InviteAcceptScreen({ code }: { code: string }) {
   const router = useRouter();
@@ -19,37 +27,43 @@ export function InviteAcceptScreen({ code }: { code: string }) {
   const reject = useRejectInviteMutation();
   const [done, setDone] = useState<"accepted" | "rejected" | null>(null);
   const [error, setError] = useState("");
-  const tried = useRef(false);
-  const busy = accept.isPending || reject.isPending || (!done && !error && me.isPending);
+  const [phase, setPhase] = useState<"idle" | "auto" | "manual">("idle");
+  const started = useRef(false);
 
   useEffect(() => {
-    if (tried.current || done || !code) return;
+    if (started.current || done || !code) return;
     if (me.isPending || me.isError || !me.data?.user) return;
-    tried.current = true;
-    void (async () => {
+    started.current = true;
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      setPhase("auto");
       setError("");
-      try {
-        await accept.mutateAsync(code);
-        setDone("accepted");
-      } catch (e) {
-        if (e instanceof ApiError) {
-          const body = e.body as { message?: string; error?: string } | null;
-          setError(body?.message ?? (e.status === 404 ? "Приглашение не найдено." : "Не удалось принять."));
-        } else setError("Ошибка сети.");
-      }
-    })();
+      void accept
+        .mutateAsync(code)
+        .then(() => {
+          if (!cancelled) setDone("accepted");
+        })
+        .catch((e) => {
+          if (!cancelled) {
+            setError(errorMessage(e));
+            setPhase("manual");
+          }
+        });
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [me.isPending, me.isError, me.data?.user, code, done, accept]);
 
   const onAccept = async () => {
+    setPhase("manual");
     setError("");
     try {
       await accept.mutateAsync(code);
       setDone("accepted");
     } catch (e) {
-      if (e instanceof ApiError) {
-        const body = e.body as { message?: string; error?: string } | null;
-        setError(body?.message ?? (e.status === 404 ? "Приглашение не найдено." : "Не удалось принять."));
-      } else setError("Ошибка сети.");
+      setError(errorMessage(e));
     }
   };
 
@@ -59,12 +73,19 @@ export function InviteAcceptScreen({ code }: { code: string }) {
       await reject.mutateAsync(code);
       setDone("rejected");
     } catch (e) {
-      if (e instanceof ApiError) {
-        const body = e.body as { message?: string } | null;
-        setError(body?.message ?? "Не удалось отклонить.");
-      } else setError("Ошибка сети.");
+      setError(errorMessage(e));
     }
   };
+
+  const busy = accept.isPending || reject.isPending || (phase === "auto" && !done && !error);
+  const title =
+    done === "accepted"
+      ? "Вы теперь друзья"
+      : done === "rejected"
+        ? "Приглашение отклонено"
+        : busy
+          ? "Принимаем приглашение…"
+          : "Приглашение в Flowly";
 
   return (
     <div className="min-h-dvh">
@@ -77,15 +98,7 @@ export function InviteAcceptScreen({ code }: { code: string }) {
           contentWrapPadding="p-6 grid justify-items-center gap-4 text-center"
         >
           <Icon name="users" className="size-12 text-accent" />
-          <h1 className="m-0 text-2xl font-semibold leading-tight">
-            {done === "accepted"
-              ? "Вы теперь друзья"
-              : done === "rejected"
-                ? "Приглашение отклонено"
-                : accept.isPending || (!tried.current && me.isPending)
-                  ? "Принимаем приглашение…"
-                  : "Приглашение в Flowly"}
-          </h1>
+          <h1 className="m-0 text-2xl font-semibold leading-tight">{title}</h1>
           <p className="m-0 text-sm leading-relaxed text-text-muted">
             {done === "accepted"
               ? "Можно открыть список друзей."
