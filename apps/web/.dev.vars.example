@@ -6,6 +6,10 @@ NEXTJS_ENV=development
 # is never committed. Required by /api/v1/auth/telegram to verify initData.
 TELEGRAM_BOT_TOKEN=
 
+# Telegram Bot API webhook secret_token (E5-D6-T01). Must match setWebhook secret_token.
+# Sent as header X-Telegram-Bot-Api-Secret-Token. Separate from bot token. Required for POST webhook.
+TELEGRAM_WEBHOOK_SECRET=
+
 # Optional: enable dev-only Telegram user emulation (PRD §10.3) for `next dev`.
 # When set to 1, local GET /me creates a mock user session without Telegram.
 # NEVER enable in production.

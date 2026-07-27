@@ -4,12 +4,16 @@
 
 ## Текущее состояние
 
-- **Обновлено:** 2026-07-22
-- **Текущий этап:** **5. Telegram**.
-- **Текущая задача:** следующая карточка этапа 5 не начата.
-- **Последняя закрытая задача:** E4-D5-T08 — DoD привычек; acceptance и scenario matrix закрыты.
-- **Статус:** E4-D5-T01/T02/T03/T04/T05/T06/T07/T08 `done`. T03 S-MA-062 завершила migration 0017, schedule API, exact_times/weekdays config/validation/expansion; DEC-069 теперь делает profile timezone единственным источником для habit generation. T07 материализует текущие локальные slots и policy jobs без Telegram delivery; slot identity реализован и проверен в T05.
-- **README sync:** активный этап 5; task counts синхронизированы: 46 done / 1 blocked / 32 backlog / 0 in_progress / 0 review.
+- **Обновлено:** 2026-07-27
+- **Текущий этап:** **6. Календарь и отчёты** (этап 5 закрыт).
+- **Текущая задача:** не начата.
+- **Последняя закрытая задача:** E5-D6-T01–T08 (`done`) — полный Telegram pipeline.
+- **Статус:** user maximum autonomy 2026-07-27: T02–T08 implemented + verified local mock; stage 5 8/8 done.
+- **README sync:** 54 done / 1 blocked / 24 backlog / 0 in_progress / 0 review.
+- **Evidence:** `.temp/E5-stage5/evidence.md` — HTTP 14/14; delivery claimed/sent; quiet defer; typecheck/lint web+scheduler PASS.
+- **Key code:** `apps/web/lib/telegram/**`, `apps/web/lib/occurrences/complete.ts`, `apps/scheduler/src/{delivery,no-response,index}.ts`, webhook route, migration 0021.
+- **Следующее точное действие:** этап 6 calendar/reports; ops deploy secrets (`TELEGRAM_WEBHOOK_SECRET`, scheduler `TELEGRAM_BOT_TOKEN`/`FLOWLY_WEB_URL`/`TELEGRAM_MODE`).
+- **Residual stage 5:** real Telegram API; production Cron; no_response “yesterday” heuristic; DEC-007 rate limits stage 8.
 - **DEC-068:** canonical `weekly_target={target,days,time}` и `interval={every,unit,anchorLocalDate,anchorLocalTime}` и local-calendar semantics остаются действующими; timezone ownership portion superseded DEC-069.
 - **DEC-069:** пользователь 2026-07-22 утвердил: habit не хранит/не показывает отдельный timezone; новые slots/jobs используют `users.timezone`, уже созданные occurrence rows сохраняют timezone snapshot и history immutable. T07 должен провести совместимый schema/API/UI cleanup.
 - **План:** `.temp/E4-D5-T05/plan.md`, plan confidence 91%, implementation confidence 90%; scope ограничен T05 и screen slices S-MA-011, S-MA-064, S-MA-065.
@@ -123,8 +127,9 @@
 
 ## Что делать следующим
 
-1. Провести deep review T07 и проверить residual risks.
-2. После review получить user confirmation для перехода `review -> done`.
+1. Начать **этап 6** (calendar/reports) — первая карточка из `06-calendar-reports.md`.
+2. Production ops: webhook secret + setWebhook; scheduler secrets + deploy.
+3. Residual real-device Telegram delivery check.
 
 ## Открытые блокеры
 

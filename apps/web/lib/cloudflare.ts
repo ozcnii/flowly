@@ -15,6 +15,8 @@ interface WebEnv {
   DB?: AnyD1Database;
   STORAGE?: R2Bucket;
   TELEGRAM_BOT_TOKEN?: string;
+  /** Bot API setWebhook secret_token; header X-Telegram-Bot-Api-Secret-Token (E5-D6-T01). */
+  TELEGRAM_WEBHOOK_SECRET?: string;
   TELEGRAM_MODE?: string;
   PIPED_BASE_URL?: string;
   NODE_ENV?: string;
@@ -38,6 +40,12 @@ export function getBotToken(): string {
   const token = webEnv().TELEGRAM_BOT_TOKEN;
   if (!token) throw new Error("TELEGRAM_BOT_TOKEN secret is not configured");
   return token;
+}
+
+/** Webhook secret_token; null/empty → fail-closed at route (503 misconfigured). */
+export function getWebhookSecret(): string | null {
+  const value = webEnv().TELEGRAM_WEBHOOK_SECRET?.trim();
+  return value || null;
 }
 
 export function getPipedBaseUrl(): string | null {

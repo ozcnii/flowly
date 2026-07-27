@@ -414,3 +414,12 @@ export const youtubeSearchCache = sqliteTable(
   },
   (table) => [index("youtube_search_cache_expires_at_idx").on(table.expiresAt)],
 );
+
+// §43.31 processed_telegram_updates — stage 5 webhook journal (E5-D6-T01)
+// update_id is Telegram's integer id (not app UUIDv7). result_status: ok|ignored|error.
+// Redelivery does not insert a second row; HTTP responds duplicate:true (first wins).
+export const processedTelegramUpdates = sqliteTable("processed_telegram_updates", {
+  updateId: integer("update_id").primaryKey(),
+  processedAt: text("processed_at").notNull(),
+  resultStatus: text("result_status").notNull(),
+});

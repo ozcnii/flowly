@@ -80,6 +80,7 @@ npm run deploy:test
 | Web | `DB` | D1 | E1-D1-T04 |
 | Web | `STORAGE` | R2 | E1-D1-T05 |
 | Web | Telegram/YouTube secrets | Worker secrets | E1-D1-T06 и downstream integration cards |
+| Web | `TELEGRAM_WEBHOOK_SECRET` | Worker secret (`setWebhook` secret_token) | E5-D6-T01 |
 | Scheduler | `DB` | D1 | E1-D1-T04 |
 | Scheduler | `TELEGRAM_BOT_TOKEN` | Worker secret | E1-D1-T06 |
 
@@ -147,6 +148,19 @@ npm run preview                                       # default env (D1 binding)
 ```
 
 Dev-эмуляция Telegram-пользователя (PRD §10.3) для `next dev` — флаг `FLOWLY_DEV_EMULATION=1`; **никогда не включать в production**.
+
+### Telegram webhook (E5-D6-T01)
+
+- `POST /api/v1/telegram/webhook` — Bot API updates (PRD §36.3–36.4, §44.14).
+- Обязательный secret: Cloudflare secret `TELEGRAM_WEBHOOK_SECRET` = `secret_token` в `setWebhook`; Telegram шлёт его в `X-Telegram-Bot-Api-Secret-Token`.
+- Неверный/отсутствующий header → `401`; secret не настроен → `503 misconfigured` (fail-closed).
+- Идемпотентность: D1 `processed_telegram_updates` по `update_id` (повтор → `200 { duplicate: true }`).
+- T01 handlers: только `/start` (Mini App button); остальное `ignored` до T02+.
+
+```bash
+# local: TELEGRAM_WEBHOOK_SECRET=test-secret в apps/web/.dev.vars
+# production: wrangler secret put TELEGRAM_WEBHOOK_SECRET + setWebhook secret_token=<same>
+```
 
 ## Среды и режимы (environments)
 

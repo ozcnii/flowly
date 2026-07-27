@@ -1,17 +1,38 @@
 import { generateHabitDataForToday } from "./habit-generation";
+import { processDueReminderJobs } from "./delivery";
+import { closeNoResponseForYesterday } from "./no-response";
+
+type Env = {
+  DB: D1Database;
+  TELEGRAM_BOT_TOKEN?: string;
+  TELEGRAM_MODE?: string;
+  FLOWLY_WEB_URL?: string;
+};
 
 /**
- * DEC-001: this worker prepares habit reminder_jobs in D1; Telegram delivery is stage 5.
- * The scheduled handler never sends Telegram messages or claims jobs.
+ * Stage 5: habit generation + delivery batch=50 + no_response day close.
  */
 export default {
-  fetch(request) {
+  fetch(request: Request, env: Env) {
     const { pathname } = new URL(request.url);
-    return pathname === "/health"
-      ? Response.json({ service: "flowly-scheduler", status: "ok", delivery: "deferred_to_stage_5", generation: "habit_schedule" })
-      : new Response("Not Found", { status: 404 });
+    if (pathname === "/health") {
+      return Response.json({
+        service: "flowly-scheduler",
+        status: "ok",
+        delivery: "enabled",
+        generation: "habit_schedule",
+        mode: env.TELEGRAM_MODE ?? "production",
+      });
+    }
+    return new Response("Not Found", { status: 404 });
   },
-  scheduled(_controller, env, context) {
-    context.waitUntil(generateHabitDataForToday(env.DB));
+  scheduled(_controller: ScheduledController, env: Env, context: ExecutionContext) {
+    context.waitUntil(
+      (async () => {
+        await generateHabitDataForToday(env.DB);
+        await processDueReminderJobs(env);
+        await closeNoResponseForYesterday(env.DB);
+      })(),
+    );
   },
-} satisfies ExportedHandler<CloudflareEnv>;
+};
