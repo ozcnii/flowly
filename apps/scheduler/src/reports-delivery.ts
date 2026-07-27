@@ -58,8 +58,6 @@ export async function deliverDueReports(env: Env): Promise<{ weekly: number; mon
 }
 
 async function weekSummary(db: D1Database, userId: string, today: string) {
-  // last 7 local dates approximate via scheduled_local_date string compare
-  const from = today; // simplified: current week will be refined by app report API
   const row = await db
     .prepare(
       `SELECT
