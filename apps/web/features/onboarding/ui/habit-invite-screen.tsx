@@ -5,18 +5,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Icon } from "@flowly/ui";
 import { ApiError } from "@/lib/api/client";
+import { shareInviteLink } from "@/lib/friends/share-invite";
 import { useCreateInviteMutation } from "@/features/friends/model/friends-queries";
 
 const focusRing = "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent";
-
-function openBotDeepLink(url: string) {
-  const tg = window.Telegram?.WebApp as unknown as { openTelegramLink?: (u: string) => void } | undefined;
-  if (tg?.openTelegramLink) {
-    tg.openTelegramLink(url);
-    return;
-  }
-  window.open(url, "_blank", "noopener,noreferrer");
-}
 
 /**
  * S-MA-004 — First habit / invite prompts (onboarding §10.1 step 8/10).
@@ -31,8 +23,14 @@ export function HabitInviteScreen() {
     setNotice("");
     try {
       const res = await createInvite.mutateAsync();
-      setNotice("Ссылка создана — отправьте другу.");
-      openBotDeepLink(res.botDeepLink);
+      const mode = shareInviteLink(res.botDeepLink);
+      setNotice(
+        mode === "share"
+          ? "Выберите чат и отправьте ссылку другу."
+          : mode === "clipboard"
+            ? "Ссылка скопирована — вставьте в чат другу."
+            : "Ссылка создана — отправьте другу.",
+      );
     } catch (e) {
       setNotice(e instanceof ApiError ? "Не удалось создать приглашение." : "Ошибка сети.");
     }

@@ -6,6 +6,7 @@ import { Icon } from "@flowly/ui";
 import { ModalPortal } from "@/components/modal-portal";
 import { PrimaryNavbar } from "@/components/shell/primary-navbar";
 import { ApiError } from "@/lib/api/client";
+import { copyInviteLink, inviteBotLink, shareInviteLink } from "@/lib/friends/share-invite";
 import {
   useCreateInviteMutation,
   useFriendsQuery,
@@ -17,19 +18,10 @@ const focusRing = "focus-visible:ring-2 focus-visible:ring-inset focus-visible:r
 
 function peerLabel(row: FriendRow) {
   if (row.peer) return row.peer.username ? `${row.peer.firstName} (@${row.peer.username})` : row.peer.firstName;
-  return row.inviteCode ? `Код ${row.inviteCode}` : "Ожидает";
+  return row.inviteCode ? `Код ${row.inviteCode}` : "Ссылка";
 }
 
-function openBotDeepLink(url: string) {
-  const tg = window.Telegram?.WebApp as unknown as { openTelegramLink?: (u: string) => void } | undefined;
-  if (tg?.openTelegramLink) {
-    tg.openTelegramLink(url);
-    return;
-  }
-  window.open(url, "_blank", "noopener,noreferrer");
-}
-
-/** S-MA-081 — Friends list / invite / pending / remove with revoke confirm. */
+/** S-MA-081 — Friends list / invite share / remove. */
 export function FriendsScreen() {
   const query = useFriendsQuery();
   const createInvite = useCreateInviteMutation();
@@ -40,20 +32,41 @@ export function FriendsScreen() {
   const [pendingRemove, setPendingRemove] = useState<FriendRow | null>(null);
   const friends = query.data?.friends ?? [];
   const accepted = friends.filter((f) => f.status === "accepted");
-  const pending = friends.filter((f) => f.status === "pending");
+  // Open invite links (owner, no peer yet) — not "waiting friend", just unused links.
+  const openLinks = friends.filter((f) => f.status === "pending" && !f.peer && f.role === "requester");
   const loading = query.isPending && !query.data;
   const error = query.isError && !query.data;
+  const empty = !loading && !error && accepted.length === 0 && openLinks.length === 0;
 
   const onInvite = async () => {
     setNotice("");
     try {
       const res = await createInvite.mutateAsync();
       setLastLink(res.botDeepLink);
-      setNotice("Ссылка готова — отправьте другу в Telegram.");
-      openBotDeepLink(res.botDeepLink);
+      const mode = shareInviteLink(res.botDeepLink);
+      setNotice(
+        mode === "share"
+          ? "Выберите чат и отправьте ссылку другу."
+          : mode === "clipboard"
+            ? "Ссылка скопирована — вставьте в чат другу."
+            : "Ссылка готова — отправьте другу.",
+      );
     } catch (e) {
       setNotice(e instanceof ApiError ? "Не удалось создать приглашение." : "Ошибка сети.");
     }
+  };
+
+  const onShareAgain = (code: string) => {
+    const link = inviteBotLink(code);
+    setLastLink(link);
+    const mode = shareInviteLink(link);
+    setNotice(mode === "share" ? "Выберите чат и отправьте ссылку другу." : "Ссылка готова.");
+  };
+
+  const onCopy = async (code: string) => {
+    const link = inviteBotLink(code);
+    setLastLink(link);
+    setNotice((await copyInviteLink(link)) ? "Ссылка скопирована." : "Скопируйте ссылку вручную ниже.");
   };
 
   const confirmRemove = async () => {
@@ -61,7 +74,7 @@ export function FriendsScreen() {
     setNotice("");
     try {
       await remove.mutateAsync(pendingRemove.id);
-      setNotice("Связь удалена. Доступ к общим объектам отозван.");
+      setNotice(pendingRemove.peer ? "Связь удалена. Доступ отозван." : "Ссылка отменена.");
       setPendingRemove(null);
     } catch {
       setNotice("Не удалось удалить.");
@@ -74,7 +87,7 @@ export function FriendsScreen() {
       <main className="flow-screen gap-3">
         <h1 className="sr-only">Друзья</h1>
         <p className="m-0 min-h-5 text-sm leading-5 text-text-muted" aria-live="polite">
-          {notice || "Приглашение одноразовое, действует 7 дней."}
+          {notice || "Ссылка одноразовая, 7 дней. Отправьте её другу — не открывайте сами."}
         </p>
         <Button
           large
@@ -84,7 +97,7 @@ export function FriendsScreen() {
           aria-busy={createInvite.isPending || undefined}
           onClick={() => void onInvite()}
         >
-          {createInvite.isPending ? <Preloader /> : <Icon name="users" />}
+          {createInvite.isPending ? <Preloader /> : <Icon name="share-2" />}
           Пригласить друга
         </Button>
         {lastLink ? (
@@ -113,7 +126,7 @@ export function FriendsScreen() {
               Повторить
             </Button>
           </Card>
-        ) : friends.length === 0 ? (
+        ) : empty ? (
           <Card
             component="section"
             outline
@@ -122,7 +135,7 @@ export function FriendsScreen() {
           >
             <Icon name="users" />
             <h2 className="m-0 text-lg font-semibold">Пока нет друзей</h2>
-            <p className="m-0 text-sm text-text-muted">Создайте приглашение и отправьте ссылку в Telegram.</p>
+            <p className="m-0 text-sm text-text-muted">Создайте ссылку и отправьте её другу в Telegram.</p>
           </Card>
         ) : (
           <>
@@ -143,15 +156,28 @@ export function FriendsScreen() {
                 ))}
               </List>
             ) : null}
-            {pending.length > 0 ? (
+            {openLinks.length > 0 ? (
               <List strong inset dividers>
-                {pending.map((row) => (
+                {openLinks.map((row) => (
                   <ListItem
                     key={row.id}
-                    media={<Icon name="clock-3" className="size-6 text-text-muted" />}
-                    title={peerLabel(row)}
-                    subtitle="Ожидает"
-                    after={<Badge>Ожидает</Badge>}
+                    media={<Icon name="share-2" className="size-6 text-text-muted" />}
+                    title={row.inviteCode ? `Код ${row.inviteCode}` : "Ссылка"}
+                    subtitle="Не использована — отправьте другу"
+                    after={<Badge>Ссылка</Badge>}
+                    footer={
+                      <div className="flex flex-wrap gap-2 pb-2">
+                        <Button small rounded className={focusRing} onClick={() => onShareAgain(row.inviteCode!)}>
+                          Отправить
+                        </Button>
+                        <Button small rounded tonal className={focusRing} onClick={() => void onCopy(row.inviteCode!)}>
+                          Копировать
+                        </Button>
+                        <Button small rounded tonal className={focusRing} disabled={remove.isPending} onClick={() => setPendingRemove(row)}>
+                          Отменить
+                        </Button>
+                      </div>
+                    }
                   />
                 ))}
               </List>
@@ -172,10 +198,12 @@ export function FriendsScreen() {
             aria-modal="true"
             aria-labelledby="remove-friend-title"
           >
-            <Navbar title="Удалить друга" titleFontSizeIos="17" />
+            <Navbar title={pendingRemove.peer ? "Удалить друга" : "Отменить ссылку"} titleFontSizeIos="17" />
             <div className="grid gap-3 p-4 pb-safe-4">
               <p id="remove-friend-title" className="m-0 text-sm leading-5 text-text-muted">
-                {peerLabel(pendingRemove)} больше не увидит расшаренные привычки и тренировки. Ваши данные сохранятся.
+                {pendingRemove.peer
+                  ? `${peerLabel(pendingRemove)} больше не увидит расшаренные данные. Ваши данные сохранятся.`
+                  : "Ссылка перестанет работать. Уже принятые друзья не затронуты."}
               </p>
               <Button
                 large
@@ -186,10 +214,10 @@ export function FriendsScreen() {
                 onClick={() => void confirmRemove()}
               >
                 {remove.isPending ? <Preloader /> : <Icon name="trash-2" />}
-                Удалить и отозвать доступ
+                {pendingRemove.peer ? "Удалить и отозвать доступ" : "Отменить ссылку"}
               </Button>
               <Button large rounded tonal className={`w-full ${focusRing}`} disabled={remove.isPending} onClick={() => setPendingRemove(null)}>
-                Отмена
+                Назад
               </Button>
             </div>
           </Sheet>

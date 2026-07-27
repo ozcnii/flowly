@@ -1,3 +1,5 @@
+import { eq } from "drizzle-orm";
+import { schema, type Database } from "@flowly/database";
 import { appHomeUrl, openFlowlyKeyboard, sendMessage, type ChatId } from "./outbound";
 
 /** Bot command without bot username suffix: `/app@Bot` → `/app`. */
@@ -29,12 +31,39 @@ function appInviteUrl(request: Request, code: string): string {
   return url.toString();
 }
 
-/** S-BOT-001/002 + S-BOT-007 invite deep link: /start, /app, /today, /start invite_<code>. */
-export async function handleBotCommand(chatId: ChatId, text: string, request: Request): Promise<"ok" | "ignored"> {
+/** S-BOT-001/002 + S-BOT-007 invite deep link. */
+export async function handleBotCommand(
+  chatId: ChatId,
+  text: string,
+  request: Request,
+  db?: Database,
+  telegramUserId?: string | number | null,
+): Promise<"ok" | "ignored"> {
   const payload = parseStartPayload(text);
   if (payload?.startsWith("invite_")) {
     const code = payload.slice("invite_".length).toUpperCase();
     if (!code) return "ignored";
+
+    // Inviter opened own link → don't say "you were invited"
+    if (db && telegramUserId != null) {
+      const invite = (
+        await db.select().from(schema.inviteLinks).where(eq(schema.inviteLinks.code, code)).limit(1)
+      )[0];
+      if (invite) {
+        const owner = (
+          await db.select().from(schema.users).where(eq(schema.users.id, invite.ownerId)).limit(1)
+        )[0];
+        if (owner && String(owner.telegramId) === String(telegramUserId)) {
+          await sendMessage(
+            chatId,
+            "Это ваша пригласительная ссылка. Отправьте её другу — не открывайте сами. В приложении: Профиль → Друзья → Отправить.",
+            { inline_keyboard: openFlowlyKeyboard(appHomeUrl(request)) },
+          );
+          return "ok";
+        }
+      }
+    }
+
     await sendMessage(chatId, "Вас пригласили в друзья в Flowly. Откройте приложение, чтобы принять или отклонить.", {
       inline_keyboard: openFlowlyKeyboard(appInviteUrl(request, code)),
     });

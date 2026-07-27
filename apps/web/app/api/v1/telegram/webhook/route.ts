@@ -14,6 +14,7 @@ const updateSchema = z
     message: z
       .object({
         chat: z.object({ id: z.union([z.number(), z.string()]) }).passthrough().optional(),
+        from: z.object({ id: z.number().int() }).passthrough().optional(),
         text: z.string().optional(),
       })
       .passthrough()
@@ -93,7 +94,7 @@ export async function POST(request: Request) {
       const chatId = parsed.data.message?.chat?.id;
       const text = parsed.data.message?.text ?? "";
       if (chatId != null && text.trim()) {
-        const handled = await handleBotCommand(chatId, text, request);
+        const handled = await handleBotCommand(chatId, text, request, db, parsed.data.message?.from?.id);
         if (handled === "ok") status = "ok";
       }
     }
