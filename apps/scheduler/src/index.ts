@@ -7,6 +7,7 @@ type Env = {
   TELEGRAM_BOT_TOKEN?: string;
   TELEGRAM_MODE?: string;
   FLOWLY_WEB_URL?: string;
+  TELEGRAM_WEBHOOK_SECRET?: string;
 };
 
 /**

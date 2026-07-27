@@ -9,6 +9,8 @@ type Env = {
   TELEGRAM_BOT_TOKEN?: string;
   TELEGRAM_MODE?: string;
   FLOWLY_WEB_URL?: string;
+  /** Same as web TELEGRAM_WEBHOOK_SECRET — auth for /api/v1/telegram/outbound proxy. */
+  TELEGRAM_WEBHOOK_SECRET?: string;
 };
 
 type JobRow = {
@@ -27,8 +29,36 @@ const permanent = (code: string) =>
 
 async function sendTelegram(env: Env, chatId: string, text: string, replyMarkup: unknown): Promise<{ ok: true; messageId?: string } | { ok: false; code: string; permanent: boolean }> {
   const mode = (env.TELEGRAM_MODE || "production").toLowerCase();
-  if (mode === "mock" || !env.TELEGRAM_BOT_TOKEN) {
+  if (mode === "mock") {
     console.log(JSON.stringify({ event: "telegram.delivery.mock", chatId, text: text.slice(0, 120) }));
+    return { ok: true, messageId: `mock_${Date.now()}` };
+  }
+
+  // Prefer proxy through web worker (shares TELEGRAM_BOT_TOKEN secret).
+  const base = (env.FLOWLY_WEB_URL || "").replace(/\/$/, "");
+  if (base && env.TELEGRAM_WEBHOOK_SECRET) {
+    try {
+      const res = await fetch(`${base}/api/v1/telegram/outbound`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-telegram-bot-api-secret-token": env.TELEGRAM_WEBHOOK_SECRET,
+        },
+        body: JSON.stringify({ chat_id: chatId, text, reply_markup: replyMarkup }),
+      });
+      const body = (await res.json().catch(() => ({}))) as { ok?: boolean; code?: string; message_id?: string };
+      if (!res.ok || !body.ok) {
+        const code = body.code || `proxy_http_${res.status}`;
+        return { ok: false, code, permanent: permanent(code) || res.status === 403 };
+      }
+      return { ok: true, messageId: body.message_id };
+    } catch (e) {
+      return { ok: false, code: e instanceof Error ? e.message : "proxy_network", permanent: false };
+    }
+  }
+
+  if (!env.TELEGRAM_BOT_TOKEN) {
+    console.log(JSON.stringify({ event: "telegram.delivery.mock_no_token", chatId, text: text.slice(0, 120) }));
     return { ok: true, messageId: `mock_${Date.now()}` };
   }
   try {
