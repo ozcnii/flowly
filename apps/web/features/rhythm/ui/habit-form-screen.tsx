@@ -144,6 +144,10 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
   const [appearanceOpen, setAppearanceOpen] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [visibleMonth, setVisibleMonth] = useState(() => new Date(`${initial.startLocalDate}T00:00:00`));
+  /** Custom time sheet — Telegram WebView does not open native type=time pickers reliably. */
+  const [timeEdit, setTimeEdit] = useState<null | { kind: "exact" | "weekday" | "weekly" | "interval"; index?: number }>(null);
+  const [draftHour, setDraftHour] = useState(9);
+  const [draftMinute, setDraftMinute] = useState(0);
 
   const titleError = touched && title.trim().length === 0;
   const medical = useMemo(() => isMedicalHint(title), [title]);
@@ -156,6 +160,26 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
   const navbarTitle = mode === "create" ? "Новая привычка" : "Привычка";
 
   const finish = () => router.replace(returnTo === "onboarding" ? "/onboarding/bot" : "/rhythm");
+  const parseHm = (value: string) => {
+    const [h, m] = value.split(":").map((part) => Number(part));
+    return { hour: Number.isFinite(h) ? Math.min(23, Math.max(0, h!)) : 9, minute: Number.isFinite(m) ? Math.min(59, Math.max(0, m!)) : 0 };
+  };
+  const formatHm = (hour: number, minute: number) => `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+  const openTimeEdit = (kind: "exact" | "weekday" | "weekly" | "interval", current: string, index?: number) => {
+    const { hour, minute } = parseHm(current || "09:00");
+    setDraftHour(hour);
+    setDraftMinute(minute);
+    setTimeEdit({ kind, index });
+  };
+  const commitTimeEdit = () => {
+    if (!timeEdit) return;
+    const next = formatHm(draftHour, draftMinute);
+    if (timeEdit.kind === "exact" && timeEdit.index != null) setScheduleTimes((values) => values.map((value, i) => (i === timeEdit.index ? next : value)));
+    else if (timeEdit.kind === "weekday" && timeEdit.index != null) setScheduleDayTimes((values) => values.map((value, i) => (i === timeEdit.index ? next : value)));
+    else if (timeEdit.kind === "weekly") setWeeklyTime(next);
+    else if (timeEdit.kind === "interval") setIntervalAnchorTime(next);
+    setTimeEdit(null);
+  };
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setTouched(true);
@@ -292,49 +316,42 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
               <BlockTitle component="h4" className="!m-0 !p-0">Время выполнения</BlockTitle>
               <List strong inset dividers>
                 {(scheduleType === "exact_times" ? scheduleTimes : scheduleDayTimes).map((time, index, items) => (
-                  <li key={`${time}-${index}`} className="relative list-none">
-                    {/* Full-row native time control: works in Telegram WebView (showPicker + pointer-events:none does not). */}
-                    <input
-                      type="time"
-                      value={time}
-                      aria-label={`Время выполнения ${index + 1}`}
-                      className="absolute inset-0 z-20 h-full w-[calc(100%-3.5rem)] cursor-pointer opacity-0"
-                      style={{ fontSize: 16 }}
-                      onChange={(e) => {
-                        const next = e.currentTarget.value;
-                        if (!next) return;
-                        if (scheduleType === "exact_times") setScheduleTimes((values) => values.map((value, i) => (i === index ? next : value)));
-                        else setScheduleDayTimes((values) => values.map((value, i) => (i === index ? next : value)));
-                      }}
-                    />
-                    <ListItem
-                      component="div"
-                      title={`Время выполнения ${index + 1}`}
-                      strongTitle={false}
-                      titleWrapClassName="!min-h-11"
-                      subtitle={<span className="text-base tabular-nums">{time || "—:—"}</span>}
-                      after={
-                        <span className="relative z-30 flex items-center gap-1">
-                          <Icon name="clock-3" className="pointer-events-none size-5 opacity-70" aria-hidden />
-                          <Button
-                            type="button"
-                            clear
-                            rounded
-                            disabled={items.length === 1}
-                            aria-label={items.length === 1 ? "Удалить время недоступно: необходимо оставить хотя бы одно время" : `Удалить время ${index + 1}`}
-                            className="!size-11 !min-w-11 !p-0"
-                            onClick={() =>
-                              scheduleType === "exact_times"
-                                ? setScheduleTimes((values) => values.filter((_, i) => i !== index))
-                                : setScheduleDayTimes((values) => values.filter((_, i) => i !== index))
-                            }
-                          >
-                            <Icon name="trash-2" className="size-5" />
-                          </Button>
-                        </span>
-                      }
-                    />
-                  </li>
+                  <ListItem
+                    key={`${scheduleType}-${index}`}
+                    link
+                    linkComponent="button"
+                    contentClassName="w-full"
+                    innerClassName="text-left"
+                    linkProps={{
+                      type: "button",
+                      onClick: () => openTimeEdit(scheduleType === "exact_times" ? "exact" : "weekday", time, index),
+                    }}
+                    title={`Время выполнения ${index + 1}`}
+                    strongTitle={false}
+                    titleWrapClassName="!min-h-11"
+                    subtitle={<span className="text-base tabular-nums">{time || "—:—"}</span>}
+                    after={
+                      <span className="flex items-center gap-1">
+                        <Icon name="clock-3" className="size-5 opacity-70" aria-hidden />
+                        <Button
+                          type="button"
+                          clear
+                          rounded
+                          disabled={items.length === 1}
+                          aria-label={items.length === 1 ? "Удалить время недоступно: необходимо оставить хотя бы одно время" : `Удалить время ${index + 1}`}
+                          className="!size-11 !min-w-11 !p-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (scheduleType === "exact_times") setScheduleTimes((values) => values.filter((_, i) => i !== index));
+                            else setScheduleDayTimes((values) => values.filter((_, i) => i !== index));
+                          }}
+                        >
+                          <Icon name="trash-2" className="size-5" />
+                        </Button>
+                      </span>
+                    }
+                    aria-label={`Изменить время ${index + 1}. Сейчас ${time}`}
+                  />
                 ))}
                 <div className="px-4 py-2">
                   <Button
@@ -359,7 +376,18 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
               <BlockTitle component="h4" className="!m-0 !p-0">Параметры цели</BlockTitle>
               <List strong inset dividers>
                 <ListInput title="Цель в неделю" type="number" min={1} value={weeklyTarget} onInput={(e) => setWeeklyTarget((e.currentTarget as HTMLInputElement).value)} aria-label="Цель в неделю" inputStyle={{ fontSize: 16 }} />
-                <ListInput title="Предпочтительное время" type="time" value={weeklyTime} onInput={(e) => setWeeklyTime((e.currentTarget as HTMLInputElement).value)} aria-label="Предпочтительное время" inputStyle={{ fontSize: 16 }} />
+                <ListItem
+                  link
+                  chevron
+                  linkComponent="button"
+                  contentClassName="w-full"
+                  innerClassName="text-left"
+                  linkProps={{ type: "button", onClick: () => openTimeEdit("weekly", weeklyTime) }}
+                  title="Предпочтительное время"
+                  strongTitle={false}
+                  subtitle={<span className="text-base tabular-nums">{weeklyTime}</span>}
+                  aria-label={`Изменить предпочтительное время. Сейчас ${weeklyTime}`}
+                />
               </List>
             </>
           ) : null}
@@ -369,7 +397,18 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
               <List strong inset dividers>
                 <ListInput title="Повторять каждые" type="number" min={1} value={intervalEvery} onInput={(e) => setIntervalEvery((e.currentTarget as HTMLInputElement).value)} aria-label="Повторять каждые" inputStyle={{ fontSize: 16 }} />
                 <ListInput title="Дата точки отсчёта" type="date" value={intervalAnchorDate} onInput={(e) => setIntervalAnchorDate((e.currentTarget as HTMLInputElement).value)} aria-label="Дата точки отсчёта" inputStyle={{ fontSize: 16 }} />
-                <ListInput title="Время точки отсчёта" type="time" value={intervalAnchorTime} onInput={(e) => setIntervalAnchorTime((e.currentTarget as HTMLInputElement).value)} aria-label="Время точки отсчёта" inputStyle={{ fontSize: 16 }} />
+                <ListItem
+                  link
+                  chevron
+                  linkComponent="button"
+                  contentClassName="w-full"
+                  innerClassName="text-left"
+                  linkProps={{ type: "button", onClick: () => openTimeEdit("interval", intervalAnchorTime) }}
+                  title="Время точки отсчёта"
+                  strongTitle={false}
+                  subtitle={<span className="text-base tabular-nums">{intervalAnchorTime}</span>}
+                  aria-label={`Изменить время точки отсчёта. Сейчас ${intervalAnchorTime}`}
+                />
               </List>
               <div className="grid gap-2 px-4">
                 <p className="m-0 text-sm text-text-muted">Единица интервала</p>
@@ -498,6 +537,70 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
                 ),
               )}
             </div>
+          </div>
+        </Sheet>
+      ) : null}
+
+      {timeEdit ? (
+        <Sheet
+          opened
+          backdrop
+          onBackdropClick={() => setTimeEdit(null)}
+          className="!z-[200] flex max-h-[86dvh] flex-col"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="time-picker-title"
+        >
+          <Navbar
+            title="Время"
+            left={<Button inline clear rounded={false} type="button" onClick={() => setTimeEdit(null)}>Отмена</Button>}
+            right={<Button inline clear rounded={false} type="button" onClick={commitTimeEdit}>Готово</Button>}
+          />
+          <div className="grid gap-3 overflow-hidden px-4 py-3 pb-[calc(var(--component-safe-area-bottom)+1rem)]">
+            <h2 id="time-picker-title" className="m-0 text-center text-3xl font-semibold tabular-nums tracking-tight">
+              {formatHm(draftHour, draftMinute)}
+            </h2>
+            <div className="grid min-h-0 grid-cols-2 gap-3">
+              <div className="grid min-h-0 gap-2">
+                <p className="m-0 text-center text-xs uppercase tracking-wide text-text-muted">Час</p>
+                <div className="grid max-h-[50dvh] grid-cols-4 gap-1 overflow-auto overscroll-contain p-0.5" role="listbox" aria-label="Час">
+                  {Array.from({ length: 24 }, (_, hour) => (
+                    <Button
+                      key={hour}
+                      type="button"
+                      clear
+                      rounded
+                      aria-pressed={draftHour === hour}
+                      onClick={() => setDraftHour(hour)}
+                      className={`!min-h-11 !min-w-0 !p-0 tabular-nums ${draftHour === hour ? "!bg-accent-soft !text-accent" : ""}`}
+                    >
+                      {String(hour).padStart(2, "0")}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div className="grid min-h-0 gap-2">
+                <p className="m-0 text-center text-xs uppercase tracking-wide text-text-muted">Минута</p>
+                <div className="grid max-h-[50dvh] grid-cols-4 gap-1 overflow-auto overscroll-contain p-0.5" role="listbox" aria-label="Минута">
+                  {Array.from({ length: 60 }, (_, minute) => (
+                    <Button
+                      key={minute}
+                      type="button"
+                      clear
+                      rounded
+                      aria-pressed={draftMinute === minute}
+                      onClick={() => setDraftMinute(minute)}
+                      className={`!min-h-11 !min-w-0 !p-0 tabular-nums ${draftMinute === minute ? "!bg-accent-soft !text-accent" : ""}`}
+                    >
+                      {String(minute).padStart(2, "0")}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <Button type="button" large rounded className={focusRing} onClick={commitTimeEdit}>
+              Выбрать {formatHm(draftHour, draftMinute)}
+            </Button>
           </div>
         </Sheet>
       ) : null}
