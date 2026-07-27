@@ -5,13 +5,13 @@
 ## Текущее состояние
 
 - **Обновлено:** 2026-07-27
-- **Текущий этап:** **7. Социальные** (этап 6 calendar done).
-- **Текущая задача:** E7-D8-T01 (`review`) — invites/friendships.
-- **Последняя закрытая задача:** E6-D7-T01–T09 (`done`) — calendar + reports + manual log.
-- **Статус:** T01 implemented: migration 0022, friends service (atomic invite claim), API, UI `/friends` + accept, onboarding invite live, bot `/start invite_<code>`, profile link. typecheck/lint PASS. Deep review `.temp/E7-D8-T01/deep-review.md`.
-- **README sync:** 63 done / 1 blocked / 14 backlog / 0 in_progress / 1 review.
-- **E7 files:** `migrations/0022_friendships.sql`, `packages/database/src/schema.ts` friendships/inviteLinks, `apps/web/lib/friends/service.ts`, `apps/web/app/api/v1/friends/**`, `apps/web/features/friends/**`, onboarding/profile/bot wiring.
-- **Следующее точное действие:** user smoke T01 (two accounts invite accept/reject/remove) → done; deploy 0022; then E7-D8-T02.
+- **Текущий этап:** **7. Социальные**.
+- **Текущая задача:** E7-D8-T02 (`review`) — remove friend + share revoke.
+- **Последняя закрытая задача:** E7-D8-T01 (`done`) — invites/friendships; user smoke OK.
+- **Статус:** T02: migration 0023 habit_shares/workout_shares; share service; POST/DELETE share APIs; friend remove cascade revoke; habit GET shared subset; workout share access; friends confirm Sheet. typecheck PASS.
+- **README sync:** 64 done / 1 blocked / 13 backlog / 0 in_progress / 1 review.
+- **E7 files:** + `migrations/0023_shares.sql`, `apps/web/lib/shares/service.ts`, share routes under habits/workouts, friends remove Sheet.
+- **Следующее точное действие:** smoke T02 (share → friend GET → remove → 404); then T03 share UI.
 - **Production ops 2026-07-27:** code on `main` (`3e3d1da`); Deploy web GHA PASS (migrations 0021); bot `@getflowlybot`; `TELEGRAM_WEBHOOK_SECRET` on web prod/test + scheduler; `setWebhook` → `https://flowly-web.getflowly.workers.dev/api/v1/telegram/webhook` (secret_token set, last_error null); real send PASS (`outbound` message_id + `/app` webhook status ok); scheduler deployed `flowly-scheduler.getflowly.workers.dev` cron `* * * * *` with `FLOWLY_WEB_URL`/`TELEGRAM_MODE`/`TELEGRAM_WEBHOOK_SECRET` (send via web outbound proxy). Residual: no_response heuristic; DEC-007 rate limits stage 8; local `.dev.vars` bot token still invalid (prod CF secret is valid).
 - **DEC-068:** canonical `weekly_target={target,days,time}` и `interval={every,unit,anchorLocalDate,anchorLocalTime}` и local-calendar semantics остаются действующими; timezone ownership portion superseded DEC-069.
 - **DEC-069:** пользователь 2026-07-22 утвердил: habit не хранит/не показывает отдельный timezone; новые slots/jobs используют `users.timezone`, уже созданные occurrence rows сохраняют timezone snapshot и history immutable. T07 должен провести совместимый schema/API/UI cleanup.

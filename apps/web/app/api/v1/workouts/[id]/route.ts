@@ -40,7 +40,15 @@ const actionsFor = (sourceType: string, format: string, youtubeVideoId: string |
 async function loadFromD1(id: string, userId: string | null): Promise<WorkoutDetail | null> {
   const db = getDb();
   const workout = (await db.select().from(schema.workouts).where(eq(schema.workouts.id, id)).limit(1))[0];
-  if (!workout || workout.status !== "published" || (workout.visibility !== "public" && workout.ownerId !== userId)) return null;
+  if (!workout || workout.status !== "published") return null;
+  const isOwner = Boolean(userId && workout.ownerId === userId);
+  const isPublic = workout.visibility === "public";
+  let isShared = false;
+  if (!isOwner && !isPublic && userId) {
+    const { activeWorkoutShare } = await import("@/lib/shares/service");
+    isShared = Boolean(await activeWorkoutShare(db, id, userId));
+  }
+  if (!isOwner && !isPublic && !isShared) return null;
 
   const [categories, links, exerciseLinks, exercises, favoriteRow] = await Promise.all([
     db.select().from(schema.workoutCategories),

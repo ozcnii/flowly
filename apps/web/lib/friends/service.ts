@@ -200,5 +200,10 @@ export async function removeFriendship(db: Database, friendshipId: string, userI
     .update(schema.friendships)
     .set({ status: "removed", removedAt: nowIso() })
     .where(eq(schema.friendships.id, friendshipId));
+  // Immediate access revoke (PRD §32.4 / §33.3 / DEC-019)
+  if (row.addresseeId) {
+    const { revokeAllSharesBetween } = await import("@/lib/shares/service");
+    await revokeAllSharesBetween(db, row.requesterId, row.addresseeId);
+  }
   return { kind: "ok" as const, idempotent: false };
 }

@@ -8,6 +8,7 @@ import { getSessionUserId } from "@/lib/auth/session-user";
 import { getDb } from "@/lib/cloudflare";
 import { habitUpdateSchema } from "@/features/rhythm/model/habits";
 import { visiblePolicy } from "@/lib/reminders/policies";
+import { activeHabitShare } from "@/lib/shares/service";
 
 const json = (body: unknown, init?: ResponseInit) => NextResponse.json(body, init);
 
@@ -20,15 +21,35 @@ async function loadOwned(db: ReturnType<typeof getDb>, id: string, userId: strin
     .limit(1))[0];
 }
 
-/** GET /api/v1/habits/[id] — owner detail (§44.7). */
+/** GET /api/v1/habits/[id] — owner full detail or shared read-only (§44.7, §33.1). */
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const userId = await getSessionUserId(request);
   if (!userId) return json({ error: "unauthorized" }, { status: 401 });
   const { id } = await params;
   const db = getDb();
-  const row = await loadOwned(db, id, userId);
+  const owned = await loadOwned(db, id, userId);
+  if (owned && owned.status !== "archived") return json({ habit: owned, access: "owner" as const });
+
+  const share = await activeHabitShare(db, id, userId);
+  if (!share) return json({ error: "not_found" }, { status: 404 });
+  const row = (await db.select().from(schema.habits).where(eq(schema.habits.id, id)).limit(1))[0];
   if (!row || row.status === "archived") return json({ error: "not_found" }, { status: 404 });
-  return json({ habit: row });
+  // Shared: read-only original fields only (DEC-019); no owner private controls.
+  return json({
+    access: "shared" as const,
+    habit: {
+      id: row.id,
+      title: row.title,
+      description: row.description,
+      icon: row.icon,
+      color: row.color,
+      emoji: row.emoji,
+      startLocalDate: row.startLocalDate,
+      endLocalDate: row.endLocalDate,
+      status: row.status,
+    },
+    share: { showStreak: share.showStreak, showHistory: share.showHistory },
+  });
 }
 
 /** PATCH /api/v1/habits/[id] — edit (§44.7, ownership). */

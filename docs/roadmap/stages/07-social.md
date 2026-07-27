@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 6 | 0 | 0 | 1 | 0 |
+| 5 | 0 | 0 | 1 | 1 |
 
 ## Зависимости и инварианты
 
@@ -31,22 +31,24 @@
 ## Deliverable E7-D8 — Социальный контур
 
 ### E7-D8-T01 — Реализовать приглашения и friendships
-- **status:** review · **priority:** blocker · **owner:** agent · **updated:** 2026-07-27
+- **status:** done · **priority:** blocker · **owner:** agent · **updated:** 2026-07-27
 - **prd_refs:** §10.1, §32.1–32.3, §43.4–43.5, §44.11, §55.8 · **depends_on:** E1-D1-T06, E1-D1-T13 · **decisions:** DEC-013, DEC-019, DEC-022, DEC-024, DEC-025, DEC-029, DEC-034
 - **ui_slices:** S-MA-004, S-MA-081, S-MA-082, S-BOT-001, S-BOT-007 — production onboarding control S-MA-004 включается только вместе с реальной invite mutation; остальные выполнять последовательно, approval каждого ID обязателен до следующего.
 - **scope:** create/accept/reject invite, несколько друзей и состояния связи; заменить disabled invite control в production onboarding E1-D1-T13 на реальное приглашение без fake success.
 - **acceptance:** [x] invite уникален/безопасен (8-char alphabet, unique index, 7d TTL, maxUses=1, atomic claim); [x] состояния pending/accepted/rejected/removed; [x] нельзя принять своё / истёкшее / used; [x] несколько друзей (list + multi pending); [x] onboarding S-MA-004 real createInvite mutation.
-- **validation/evidence:** migration 0022 local PASS; web typecheck/lint PASS; deep-review `.temp/E7-D8-T01/deep-review.md` (race claim fixed); API GET/POST/DELETE friends; UI `/friends`, `/friends/invite/[code]`; bot `/start invite_<code>`; profile → Друзья.
-- **residual:** two-user device matrix; reciprocal open-code merge; block API (status reserved); bot username hardcoded `getflowlybot`.
-- **journal:** 2026-07-27 — implemented schema+API+UI+bot; review for user smoke.
+- **validation/evidence:** migration 0022 local+prod PASS; web typecheck/lint PASS; deep-review `.temp/E7-D8-T01/deep-review.md`; user smoke 2026-07-27 OK.
+- **residual:** reciprocal open-code merge; block API (status reserved); bot username hardcoded `getflowlybot`.
+- **journal:** 2026-07-27 — implemented; user smoke OK → done.
 
 ### E7-D8-T02 — Реализовать удаление друга и отзыв доступа
-- **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-13
+- **status:** review · **priority:** blocker · **owner:** agent · **updated:** 2026-07-27
 - **prd_refs:** §32.4, §33.3, §55.8 · **depends_on:** E7-D8-T01 · **decisions:** DEC-019, DEC-022, DEC-024, DEC-025, DEC-029
 - **ui_slices:** S-MA-081, S-MA-083, S-MA-084 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** disconnect/revoke semantics и немедленная проверка доступа.
-- **acceptance:** [ ] удалённый друг теряет доступ; [ ] владелец сохраняет данные; [ ] stale links не обходят revoke.
-- **validation/evidence:** before/after authorization requests.
+- **acceptance:** [x] remove friend + cascade revoke habit/workout shares; [x] owner data untouched; [x] activeHabitShare/activeWorkoutShare gate GET; revoke sets revoked_at (stale link 404).
+- **validation/evidence:** migration 0023 local PASS; typecheck PASS; share POST/DELETE APIs; friends remove confirm Sheet; habit GET shared subset.
+- **residual:** full S-MA-083/084 share editor UI deferred to T03 (API+access path ready); rich habit share toggles UI in T03.
+- **journal:** 2026-07-27 — started after T01 user OK; implemented revoke stack → review.
 
 ### E7-D8-T03 — Реализовать sharing привычек и тренировок
 - **status:** backlog · **priority:** blocker · **owner:** unassigned · **updated:** 2026-07-19

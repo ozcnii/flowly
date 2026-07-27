@@ -441,6 +441,50 @@ export const habitScheduleRules = sqliteTable(
   (table) => [index("habit_schedule_rules_habit_idx").on(table.habitId), uniqueIndex("habit_schedule_rules_habit_current_unique").on(table.habitId, table.validUntil)],
 );
 
+// §43.11 workout_shares (stage 7; revoke-on-unfriend)
+export const workoutShares = sqliteTable(
+  "workout_shares",
+  {
+    workoutId: text("workout_id")
+      .notNull()
+      .references(() => workouts.id, { onDelete: "cascade" }),
+    sharedByUserId: text("shared_by_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    sharedWithUserId: text("shared_with_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: text("created_at").notNull(),
+    revokedAt: text("revoked_at"),
+  },
+  (table) => [
+    primaryKey({ columns: [table.workoutId, table.sharedWithUserId] }),
+    index("workout_shares_with_idx").on(table.sharedWithUserId),
+    index("workout_shares_by_idx").on(table.sharedByUserId),
+  ],
+);
+
+// §43.18 habit_shares
+export const habitShares = sqliteTable(
+  "habit_shares",
+  {
+    habitId: text("habit_id")
+      .notNull()
+      .references(() => habits.id, { onDelete: "cascade" }),
+    sharedWithUserId: text("shared_with_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    showStreak: integer("show_streak", { mode: "boolean" }).notNull(),
+    showHistory: integer("show_history", { mode: "boolean" }).notNull(),
+    createdAt: text("created_at").notNull(),
+    revokedAt: text("revoked_at"),
+  },
+  (table) => [
+    primaryKey({ columns: [table.habitId, table.sharedWithUserId] }),
+    index("habit_shares_with_idx").on(table.sharedWithUserId),
+  ],
+);
+
 // §43.28 youtube_search_cache
 export const youtubeSearchCache = sqliteTable(
   "youtube_search_cache",

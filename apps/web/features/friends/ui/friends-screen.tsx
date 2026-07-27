@@ -1,8 +1,9 @@
 "use client";
 
-import { Badge, Button, Card, List, ListItem, Preloader } from "konsta/react";
-import { useState } from "react";
+import { Badge, Button, Card, List, ListItem, Navbar, Preloader, Sheet } from "konsta/react";
+import { useRef, useState } from "react";
 import { Icon } from "@flowly/ui";
+import { ModalPortal } from "@/components/modal-portal";
 import { PrimaryNavbar } from "@/components/shell/primary-navbar";
 import { ApiError } from "@/lib/api/client";
 import {
@@ -28,13 +29,15 @@ function openBotDeepLink(url: string) {
   window.open(url, "_blank", "noopener,noreferrer");
 }
 
-/** S-MA-081 — Friends list / invite / pending / remove. */
+/** S-MA-081 — Friends list / invite / pending / remove with revoke confirm. */
 export function FriendsScreen() {
   const query = useFriendsQuery();
   const createInvite = useCreateInviteMutation();
   const remove = useRemoveFriendMutation();
+  const sheetRef = useRef<HTMLElement>(null);
   const [notice, setNotice] = useState("");
   const [lastLink, setLastLink] = useState<string | null>(null);
+  const [pendingRemove, setPendingRemove] = useState<FriendRow | null>(null);
   const friends = query.data?.friends ?? [];
   const accepted = friends.filter((f) => f.status === "accepted");
   const pending = friends.filter((f) => f.status === "pending");
@@ -53,11 +56,13 @@ export function FriendsScreen() {
     }
   };
 
-  const onRemove = async (id: string) => {
+  const confirmRemove = async () => {
+    if (!pendingRemove) return;
     setNotice("");
     try {
-      await remove.mutateAsync(id);
-      setNotice("Связь удалена.");
+      await remove.mutateAsync(pendingRemove.id);
+      setNotice("Связь удалена. Доступ к общим объектам отозван.");
+      setPendingRemove(null);
     } catch {
       setNotice("Не удалось удалить.");
     }
@@ -130,13 +135,7 @@ export function FriendsScreen() {
                     title={peerLabel(row)}
                     subtitle="Друг"
                     after={
-                      <Button
-                        small
-                        tonal
-                        className={focusRing}
-                        disabled={remove.isPending}
-                        onClick={() => void onRemove(row.id)}
-                      >
+                      <Button small tonal className={focusRing} disabled={remove.isPending} onClick={() => setPendingRemove(row)}>
                         Удалить
                       </Button>
                     }
@@ -160,6 +159,42 @@ export function FriendsScreen() {
           </>
         )}
       </main>
+
+      <ModalPortal>
+        {pendingRemove ? (
+          <Sheet
+            ref={sheetRef}
+            opened
+            backdrop
+            onBackdropClick={() => !remove.isPending && setPendingRemove(null)}
+            className="flex flex-col"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="remove-friend-title"
+          >
+            <Navbar title="Удалить друга" titleFontSizeIos="17" />
+            <div className="grid gap-3 p-4 pb-safe-4">
+              <p id="remove-friend-title" className="m-0 text-sm leading-5 text-text-muted">
+                {peerLabel(pendingRemove)} больше не увидит расшаренные привычки и тренировки. Ваши данные сохранятся.
+              </p>
+              <Button
+                large
+                rounded
+                className={`w-full gap-2 ${focusRing}`}
+                disabled={remove.isPending}
+                aria-busy={remove.isPending || undefined}
+                onClick={() => void confirmRemove()}
+              >
+                {remove.isPending ? <Preloader /> : <Icon name="trash-2" />}
+                Удалить и отозвать доступ
+              </Button>
+              <Button large rounded tonal className={`w-full ${focusRing}`} disabled={remove.isPending} onClick={() => setPendingRemove(null)}>
+                Отмена
+              </Button>
+            </div>
+          </Sheet>
+        ) : null}
+      </ModalPortal>
     </div>
   );
 }
