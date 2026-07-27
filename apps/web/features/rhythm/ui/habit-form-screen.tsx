@@ -156,7 +156,6 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
   const navbarTitle = mode === "create" ? "Новая привычка" : "Привычка";
 
   const finish = () => router.replace(returnTo === "onboarding" ? "/onboarding/bot" : "/rhythm");
-  const openTimePicker = (id: string) => { const input = document.getElementById(id) as (HTMLInputElement & { showPicker?: () => void }) | null; if (input?.showPicker) input.showPicker(); else input?.click(); };
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setTouched(true);
@@ -241,11 +240,26 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
               linkComponent="button"
               contentClassName="w-full"
               innerClassName="text-left"
-              linkProps={{ type: "button", onClick: () => { setVisibleMonth(new Date(`${startLocalDate}T00:00:00`)); setDatePickerOpen(true); } }}
+              linkProps={{
+                type: "button",
+                onClick: () => {
+                  setVisibleMonth(new Date(`${startLocalDate}T00:00:00`));
+                  setDatePickerOpen(true);
+                },
+              }}
               title="Дата начала"
               strongTitle={false}
               subtitle={<span className="text-base">{formatDateRu(startLocalDate)}</span>}
               aria-label={`Изменить дату начала. Сейчас ${formatDateRu(startLocalDate)}`}
+            />
+            {/* Native fallback: Telegram WebView sometimes blocks custom sheet taps */}
+            <ListInput
+              title="Или выберите дату"
+              type="date"
+              value={startLocalDate}
+              onInput={(e) => setStartLocalDate((e.currentTarget as HTMLInputElement).value)}
+              aria-label="Дата начала (системный выбор)"
+              inputStyle={{ fontSize: 16 }}
             />
           </List>
           <BlockTitle component="h3" className="!m-0 !p-0">Как часто</BlockTitle>
@@ -277,18 +291,66 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
             <>
               <BlockTitle component="h4" className="!m-0 !p-0">Время выполнения</BlockTitle>
               <List strong inset dividers>
-                {(scheduleType === "exact_times" ? scheduleTimes : scheduleDayTimes).map((time, index, items) => <ListItem
-                  key={`${time}-${index}`}
-                  component="li"
-                  className="relative"
-                  title={`Время выполнения ${index + 1}`}
-                  strongTitle={false}
-                  titleWrapClassName="!min-h-11"
-                  subtitle={<span className="text-base">{time}</span>}
-                  onClick={(e) => { if ((e.target as HTMLElement).closest("button")) return; openTimePicker(`habit-time-${index}`); }}
-                  after={<span className="relative z-10 flex items-center gap-1"><Button type="button" clear rounded aria-label={`Изменить время ${index + 1}`} className="!size-11 !min-w-11 !p-0" onClick={() => openTimePicker(`habit-time-${index}`)}><Icon name="clock-3" className="size-5" /></Button><Button type="button" clear rounded disabled={items.length === 1} aria-label={items.length === 1 ? "Удалить время недоступно: необходимо оставить хотя бы одно время" : `Удалить время ${index + 1}`} className="!size-11 !min-w-11 !p-0" onClick={() => scheduleType === "exact_times" ? setScheduleTimes((values) => values.filter((_, i) => i !== index)) : setScheduleDayTimes((values) => values.filter((_, i) => i !== index))}><Icon name="trash-2" className="size-5" /></Button></span>}
-                ><ListInput component="span" inputId={`habit-time-${index}`} title="" type="time" value={time} tabIndex={-1} aria-hidden="true" inputStyle={{ width: 1, height: 1, opacity: 0 }} style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none" }} onInput={(e) => { const next = (e.currentTarget as HTMLInputElement).value; if (scheduleType === "exact_times") setScheduleTimes((values) => values.map((value, i) => i === index ? next : value)); else setScheduleDayTimes((values) => values.map((value, i) => i === index ? next : value)); }} /></ListItem>)}
-                <Button clear rounded type="button" onClick={() => scheduleType === "exact_times" ? setScheduleTimes((items) => [...items, "21:00"]) : setScheduleDayTimes((items) => [...items, "21:00"])}>Добавить время</Button>
+                {(scheduleType === "exact_times" ? scheduleTimes : scheduleDayTimes).map((time, index, items) => (
+                  <li key={`${time}-${index}`} className="relative list-none">
+                    {/* Full-row native time control: works in Telegram WebView (showPicker + pointer-events:none does not). */}
+                    <input
+                      type="time"
+                      value={time}
+                      aria-label={`Время выполнения ${index + 1}`}
+                      className="absolute inset-0 z-20 h-full w-[calc(100%-3.5rem)] cursor-pointer opacity-0"
+                      style={{ fontSize: 16 }}
+                      onChange={(e) => {
+                        const next = e.currentTarget.value;
+                        if (!next) return;
+                        if (scheduleType === "exact_times") setScheduleTimes((values) => values.map((value, i) => (i === index ? next : value)));
+                        else setScheduleDayTimes((values) => values.map((value, i) => (i === index ? next : value)));
+                      }}
+                    />
+                    <ListItem
+                      component="div"
+                      title={`Время выполнения ${index + 1}`}
+                      strongTitle={false}
+                      titleWrapClassName="!min-h-11"
+                      subtitle={<span className="text-base tabular-nums">{time || "—:—"}</span>}
+                      after={
+                        <span className="relative z-30 flex items-center gap-1">
+                          <Icon name="clock-3" className="pointer-events-none size-5 opacity-70" aria-hidden />
+                          <Button
+                            type="button"
+                            clear
+                            rounded
+                            disabled={items.length === 1}
+                            aria-label={items.length === 1 ? "Удалить время недоступно: необходимо оставить хотя бы одно время" : `Удалить время ${index + 1}`}
+                            className="!size-11 !min-w-11 !p-0"
+                            onClick={() =>
+                              scheduleType === "exact_times"
+                                ? setScheduleTimes((values) => values.filter((_, i) => i !== index))
+                                : setScheduleDayTimes((values) => values.filter((_, i) => i !== index))
+                            }
+                          >
+                            <Icon name="trash-2" className="size-5" />
+                          </Button>
+                        </span>
+                      }
+                    />
+                  </li>
+                ))}
+                <div className="px-4 py-2">
+                  <Button
+                    clear
+                    rounded
+                    type="button"
+                    className="!min-h-11"
+                    onClick={() =>
+                      scheduleType === "exact_times"
+                        ? setScheduleTimes((items) => [...items, "21:00"])
+                        : setScheduleDayTimes((items) => [...items, "21:00"])
+                    }
+                  >
+                    Добавить время
+                  </Button>
+                </div>
               </List>
             </>
           ) : null}
@@ -296,8 +358,8 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
             <>
               <BlockTitle component="h4" className="!m-0 !p-0">Параметры цели</BlockTitle>
               <List strong inset dividers>
-                <ListInput title="Цель в неделю" type="number" min={1} value={weeklyTarget} onInput={(e) => setWeeklyTarget((e.currentTarget as HTMLInputElement).value)} aria-label="Цель в неделю" />
-                <ListInput title="Предпочтительное время" type="time" value={weeklyTime} onInput={(e) => setWeeklyTime((e.currentTarget as HTMLInputElement).value)} aria-label="Предпочтительное время" />
+                <ListInput title="Цель в неделю" type="number" min={1} value={weeklyTarget} onInput={(e) => setWeeklyTarget((e.currentTarget as HTMLInputElement).value)} aria-label="Цель в неделю" inputStyle={{ fontSize: 16 }} />
+                <ListInput title="Предпочтительное время" type="time" value={weeklyTime} onInput={(e) => setWeeklyTime((e.currentTarget as HTMLInputElement).value)} aria-label="Предпочтительное время" inputStyle={{ fontSize: 16 }} />
               </List>
             </>
           ) : null}
@@ -305,9 +367,9 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
             <>
               <BlockTitle component="h4" className="!m-0 !p-0">Параметры интервала</BlockTitle>
               <List strong inset dividers>
-                <ListInput title="Повторять каждые" type="number" min={1} value={intervalEvery} onInput={(e) => setIntervalEvery((e.currentTarget as HTMLInputElement).value)} aria-label="Повторять каждые" />
-                <ListInput title="Дата точки отсчёта" type="date" value={intervalAnchorDate} onInput={(e) => setIntervalAnchorDate((e.currentTarget as HTMLInputElement).value)} aria-label="Дата точки отсчёта" />
-                <ListInput title="Время точки отсчёта" type="time" value={intervalAnchorTime} onInput={(e) => setIntervalAnchorTime((e.currentTarget as HTMLInputElement).value)} aria-label="Время точки отсчёта" />
+                <ListInput title="Повторять каждые" type="number" min={1} value={intervalEvery} onInput={(e) => setIntervalEvery((e.currentTarget as HTMLInputElement).value)} aria-label="Повторять каждые" inputStyle={{ fontSize: 16 }} />
+                <ListInput title="Дата точки отсчёта" type="date" value={intervalAnchorDate} onInput={(e) => setIntervalAnchorDate((e.currentTarget as HTMLInputElement).value)} aria-label="Дата точки отсчёта" inputStyle={{ fontSize: 16 }} />
+                <ListInput title="Время точки отсчёта" type="time" value={intervalAnchorTime} onInput={(e) => setIntervalAnchorTime((e.currentTarget as HTMLInputElement).value)} aria-label="Время точки отсчёта" inputStyle={{ fontSize: 16 }} />
               </List>
               <div className="grid gap-2 px-4">
                 <p className="m-0 text-sm text-text-muted">Единица интервала</p>
@@ -378,38 +440,63 @@ function HabitFormInner({ mode, habitId, initial, initialSchedule, returnTo }: {
           opened
           backdrop
           onBackdropClick={() => setDatePickerOpen(false)}
-          className="flex max-h-[86dvh] flex-col"
+          className="!z-[200] flex max-h-[86dvh] flex-col"
           role="dialog"
           aria-modal="true"
           aria-labelledby="date-picker-title"
         >
           <Navbar
             title="Дата начала"
-            right={<Button inline clear rounded={false} onClick={() => setDatePickerOpen(false)}>Готово</Button>}
+            right={<Button inline clear rounded={false} type="button" onClick={() => setDatePickerOpen(false)}>Готово</Button>}
           />
           <div className="grid gap-4 overflow-auto px-4 py-4 pb-[calc(var(--component-safe-area-bottom)+1rem)]">
             <h2 id="date-picker-title" className="sr-only">Выберите дату начала</h2>
+            <List strong inset>
+              <ListInput
+                title="Дата"
+                type="date"
+                value={startLocalDate}
+                onInput={(e) => {
+                  const next = (e.currentTarget as HTMLInputElement).value;
+                  if (next) {
+                    setStartLocalDate(next);
+                    setDatePickerOpen(false);
+                  }
+                }}
+                inputStyle={{ fontSize: 16 }}
+                aria-label="Дата начала"
+              />
+            </List>
             <div className="grid grid-cols-[44px_1fr_44px] items-center gap-2">
-              <Button clear rounded className="!min-h-11 !min-w-11 !p-0" aria-label="Предыдущий месяц" onClick={() => setVisibleMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1))}>‹</Button>
+              <Button type="button" clear rounded className="!min-h-11 !min-w-11 !p-0" aria-label="Предыдущий месяц" onClick={() => setVisibleMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1))}>‹</Button>
               <strong className="min-w-0 whitespace-nowrap text-center text-lg leading-6 capitalize">{monthLabel(visibleMonth)}</strong>
-              <Button clear rounded className="!min-h-11 !min-w-11 !p-0" aria-label="Следующий месяц" onClick={() => setVisibleMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1))}>›</Button>
+              <Button type="button" clear rounded className="!min-h-11 !min-w-11 !p-0" aria-label="Следующий месяц" onClick={() => setVisibleMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1))}>›</Button>
             </div>
             <div className="grid grid-cols-7 gap-1 text-center text-xs text-text-muted" aria-hidden="true">
-              {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map((day) => <span key={day}>{day}</span>)}
+              {["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"].map((day) => <span key={day}>{day}</span>)}
             </div>
             <div className="grid grid-cols-7 grid-rows-6 gap-1">
-              {monthDays(visibleMonth).map((date, index) => date ? (
-                <Button
-                  key={localDate(date)}
-                  clear
-                  rounded
-                  type="button"
-                  aria-label={formatDateRu(localDate(date))}
-                  aria-pressed={startLocalDate === localDate(date)}
-                  onClick={() => { setStartLocalDate(localDate(date)); setDatePickerOpen(false); }}
-                  className={`!min-h-11 !min-w-0 !p-0 ${startLocalDate === localDate(date) ? "!bg-accent-soft !text-accent" : ""}`}
-                >{date.getDate()}</Button>
-              ) : <span key={`empty-${index}`} aria-hidden="true" />)}
+              {monthDays(visibleMonth).map((date, index) =>
+                date ? (
+                  <Button
+                    key={localDate(date)}
+                    clear
+                    rounded
+                    type="button"
+                    aria-label={formatDateRu(localDate(date))}
+                    aria-pressed={startLocalDate === localDate(date)}
+                    onClick={() => {
+                      setStartLocalDate(localDate(date));
+                      setDatePickerOpen(false);
+                    }}
+                    className={`!min-h-11 !min-w-0 !p-0 ${startLocalDate === localDate(date) ? "!bg-accent-soft !text-accent" : ""}`}
+                  >
+                    {date.getDate()}
+                  </Button>
+                ) : (
+                  <span key={`empty-${index}`} aria-hidden="true" />
+                ),
+              )}
             </div>
           </div>
         </Sheet>

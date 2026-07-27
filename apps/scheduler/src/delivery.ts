@@ -35,7 +35,7 @@ async function sendTelegram(env: Env, chatId: string, text: string, replyMarkup:
   }
 
   // Prefer proxy through web worker (shares TELEGRAM_BOT_TOKEN secret).
-  const base = (env.FLOWLY_WEB_URL || "").replace(/\/$/, "");
+  const base = (env.FLOWLY_WEB_URL || "https://flowly-web.getflowly.workers.dev").replace(/\/$/, "");
   if (base && env.TELEGRAM_WEBHOOK_SECRET) {
     try {
       const res = await fetch(`${base}/api/v1/telegram/outbound`, {
@@ -43,12 +43,21 @@ async function sendTelegram(env: Env, chatId: string, text: string, replyMarkup:
         headers: {
           "content-type": "application/json",
           "x-telegram-bot-api-secret-token": env.TELEGRAM_WEBHOOK_SECRET,
+          accept: "application/json",
         },
         body: JSON.stringify({ chat_id: chatId, text, reply_markup: replyMarkup }),
       });
-      const body = (await res.json().catch(() => ({}))) as { ok?: boolean; code?: string; message_id?: string };
+      const raw = await res.text();
+      let body: { ok?: boolean; code?: string; message_id?: string; error?: string } = {};
+      try {
+        body = JSON.parse(raw) as typeof body;
+      } catch {
+        body = {};
+      }
       if (!res.ok || !body.ok) {
-        const code = body.code || `proxy_http_${res.status}`;
+        // 404 is transient during web deploys; never permanent.
+        const code = body.code || body.error || `proxy_http_${res.status}`;
+        console.log(JSON.stringify({ event: "telegram.delivery.proxy_fail", status: res.status, code, base }));
         return { ok: false, code, permanent: permanent(code) || res.status === 403 };
       }
       return { ok: true, messageId: body.message_id };
