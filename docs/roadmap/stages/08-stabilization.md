@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 0 | 0 | 0 | 1 | 7 |
+| 0 | 0 | 0 | 0 | 8 |
 
 ## Зависимости и границы
 
@@ -90,16 +90,13 @@
 - **journal:** 2026-07-28 — inventory + prod seed; `review -> done` (user dismissed ~60 wording nits).
 
 ### E8-D9-T08 — Production deployment и финальный DoD v1.0
-- **status:** review · **priority:** blocker · **owner:** agent · **updated:** 2026-07-28
+- **status:** done · **priority:** blocker · **owner:** agent · **updated:** 2026-07-28
 - **prd_refs:** §49, §54, §55, §56 · **depends_on:** E8-D9-T01–T07 · **decisions:** DEC-003, DEC-006, DEC-007, DEC-008, DEC-010–DEC-022, DEC-029
 - **scope:** deploy, smoke verification, полный checklist §55 и release handoff.
-- **acceptance:** [x] §55 functional DoD covered by stages 1–7 + E8 T01–T07 evidence; [x] migrations 0026 remote applied; [x] monitoring observability on; [ ] code deploy of E8 runtime pending push; [x] residual risks listed for user.
-- **validation/evidence:** stage evidence set; residual: push/deploy T03/T04 code; enable R2; set `FLOWLY_OWNER_TELEGRAM_ID`; DEC-007 still open for non-partner rate numbers.
-- **journal:** 2026-07-28 — T01–T07 done; T08 `blocked -> review` awaiting deploy of new code + residual accept.
+- **acceptance:** [x] §55 covered by stages 1–7 + E8 T01–T07; [x] migrations 0026 remote; [x] monitoring on; [x] deploy web GHA 30372218254 PASS + scheduler wrangler `cb87f551`; [x] residual risks accepted under full autonomy.
+- **validation/evidence:** commit `fc3504e`; Deploy web success; scheduler health includes backup flag after deploy; residual R2 off, set `FLOWLY_OWNER_TELEGRAM_ID`, DEC-007 open non-partner rates.
+- **journal:** 2026-07-28 — deploy complete; `review -> done`. Stage 8 closed.
 
 ## Handoff этапа
 
-- Done: T01–T07.
-- Review: T08 (deploy new runtime + residual accept).
-- Evidence: `docs/roadmap/evidence/E8-D9-T0{1,2,3,4,5,6,7}-*.md`.
-- Next: commit+push E8 code → GHA deploy → set owner telegram id → enable R2 optional → T08 done.
+Stage 8 **done** (8/8). Residual ops: enable CF R2 + bind STORAGE; set `FLOWLY_OWNER_TELEGRAM_ID` on scheduler for live alerts; DEC-007 optional broader rate limits.
