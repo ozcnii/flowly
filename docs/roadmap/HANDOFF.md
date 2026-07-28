@@ -4,14 +4,24 @@
 
 ## Текущее состояние
 
-- **Обновлено:** 2026-07-27
-- **Текущий этап:** **7. Социальные**.
-- **Текущая задача:** none — **этап 7 closed**.
-- **Последняя закрытая задача:** E7-D8-T01–T07 (`done`). Own-workout share N/A DEC-064.
-- **Статус:** Stage 7 complete: friends, invites, revoke, habit share, joint programs, challenges, reactions, partner reminds (2h). Migrations 0022–0025. DoD: `docs/roadmap/evidence/E7-DoD-55.8.md`.
-- **README sync:** 70 done / 1 blocked / 8 backlog / 0 in_progress / 0 review.
-- **Evidence:** `scripts/*http-test.mjs` social suite.
-- **Следующее точное действие:** этап 8 production readiness; optional seed catalog on prod.
+- **Обновлено:** 2026-07-28
+- **Текущий этап:** **8. Стабилизация**.
+- **Текущая задача:** **E8-D9-T08** (`review`) — deploy new E8 runtime + residual accept.
+- **Статус карточек E8:** T01–T07 **done** · T08 **review**.
+- **README sync:** 77 done / 1 blocked (E2 residual) / 0 backlog / 0 in_progress / 1 review.
+- **DEC closed this session:** DEC-006 (thresholds), DEC-008 (extend scheduler), DEC-011 (quota recheck policy).
+- **Implemented (not yet deployed unless pushed):**
+  - migration `0026_data_lifecycle.sql` (local+prod applied)
+  - user export / clear-history / deletion grace APIs + `/profile/data` UI
+  - scheduler weekly backup + owner alerts + purge expired deletions
+- **Evidence:** `docs/roadmap/evidence/E8-D9-T0{1,2,3,4,5,6,7}-*.md`, `scripts/stage8-e2e-http-test.mjs`
+- **Verified local:** export 200, clear-history 200, deletion+cancel 200, force backup `sizeBytes=3242` ok.
+- **Residual for T08 done:**
+  1. `git commit` + push so GHA deploys web+scheduler code
+  2. Set secret/var `FLOWLY_OWNER_TELEGRAM_ID` on scheduler (and web if needed)
+  3. Optional: enable R2 in CF dashboard + bind `STORAGE` (until then backups live in D1 `system_backups.payload`)
+  4. DEC-007 still open for non-partner global rate numbers (partner 2h already shipped)
+- **Следующее точное действие:** commit+push → confirm deploy → set owner telegram id → mark T08 done.
 - **Production ops 2026-07-27:** code on `main` (`3e3d1da`); Deploy web GHA PASS (migrations 0021); bot `@getflowlybot`; `TELEGRAM_WEBHOOK_SECRET` on web prod/test + scheduler; `setWebhook` → `https://flowly-web.getflowly.workers.dev/api/v1/telegram/webhook` (secret_token set, last_error null); real send PASS (`outbound` message_id + `/app` webhook status ok); scheduler deployed `flowly-scheduler.getflowly.workers.dev` cron `* * * * *` with `FLOWLY_WEB_URL`/`TELEGRAM_MODE`/`TELEGRAM_WEBHOOK_SECRET` (send via web outbound proxy). Residual: no_response heuristic; DEC-007 rate limits stage 8; local `.dev.vars` bot token still invalid (prod CF secret is valid).
 - **DEC-068:** canonical `weekly_target={target,days,time}` и `interval={every,unit,anchorLocalDate,anchorLocalTime}` и local-calendar semantics остаются действующими; timezone ownership portion superseded DEC-069.
 - **DEC-069:** пользователь 2026-07-22 утвердил: habit не хранит/не показывает отдельный timezone; новые slots/jobs используют `users.timezone`, уже созданные occurrence rows сохраняют timezone snapshot и history immutable. T07 должен провести совместимый schema/API/UI cleanup.

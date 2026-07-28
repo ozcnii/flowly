@@ -24,3 +24,4 @@ TELEGRAM_MODE=
 # Optional: Piped API base URL for no-key YouTube search (DEC-049).
 # If empty, /api/v1/youtube/search returns the controlled unavailable/stale state.
 PIPED_BASE_URL=https://api.piped.private.coffee
+FLOWLY_OWNER_TELEGRAM_ID=

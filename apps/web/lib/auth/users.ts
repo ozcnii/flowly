@@ -13,6 +13,8 @@ export interface PublicUser {
   timezone: string;
   locale: string;
   onboardingCompleted: boolean;
+  deletedAt: string | null;
+  deletionPurgeAt: string | null;
 }
 
 export function publicUser(user: {
@@ -25,7 +27,9 @@ export function publicUser(user: {
   weekStartsOn: number;
   locale: string;
   onboardingCompletedAt: string | null;
+  deletedAt?: string | null;
 }): PublicUser {
+  const deletedAt = user.deletedAt ?? null;
   return {
     id: user.id,
     telegramId: user.telegramId,
@@ -35,6 +39,8 @@ export function publicUser(user: {
     timezone: user.timezone,
     locale: user.locale,
     onboardingCompleted: user.onboardingCompletedAt !== null,
+    deletedAt,
+    deletionPurgeAt: deletedAt ? new Date(Date.parse(deletedAt) + 7 * 24 * 60 * 60 * 1000).toISOString() : null,
   };
 }
 
@@ -64,9 +70,13 @@ export async function findOrCreateUser(
     .where(eq(schema.users.telegramId, String(tg.id)))
     .limit(1);
   if (existing[0]) {
+    const row = (await db.select().from(schema.users).where(eq(schema.users.id, existing[0].id)).limit(1))[0];
+    // DEC-020: re-auth during 7-day grace cancels account deletion.
+    const cancelDeletion =
+      row?.deletedAt && Date.now() < Date.parse(row.deletedAt) + 7 * 24 * 60 * 60 * 1000 ? { deletedAt: null as string | null } : {};
     await db
       .update(schema.users)
-      .set({ username: tg.username ?? null, weekStartsOn: 1, updatedAt: nowIso() })
+      .set({ username: tg.username ?? null, weekStartsOn: 1, updatedAt: nowIso(), ...cancelDeletion })
       .where(eq(schema.users.id, existing[0].id));
     return { id: existing[0].id, isNew: false };
   }

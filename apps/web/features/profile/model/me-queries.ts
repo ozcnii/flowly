@@ -12,6 +12,8 @@ export type PublicUser = {
   timezone: string;
   locale: string;
   onboardingCompleted: boolean;
+  deletedAt: string | null;
+  deletionPurgeAt: string | null;
 };
 export type ReportSettings = { weeklyReportEnabled: boolean; monthlyReportEnabled: boolean };
 export type MePatch = Partial<Pick<PublicUser, "firstName" | "timezone" | "locale"> & ReportSettings>;

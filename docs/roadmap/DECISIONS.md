@@ -603,11 +603,11 @@
 
 ### DEC-006 — Operational thresholds
 
-- **Статус:** open
-- **Вопрос:** какие численные пороги ошибок, D1/R2 usage и owner alerts использовать?
-- **Почему нельзя предположить:** PRD требует уведомлять при превышении установленного порога, но не задаёт числа.
+- **Статус:** approved
+- **Дата:** 2026-07-28
+- **Решение:** (user: «сам реши») owner Telegram alerts через `FLOWLY_OWNER_TELEGRAM_ID` + bot send. Пороги v1: (1) scheduler uncaught fail streak ≥ **3** consecutive runs; (2) reminder delivery batch: `claimed ≥ 10` и `failed/claimed ≥ 0.5` **или** `failed ≥ 20` in one run; (3) backup job failure — **always** notify; (4) Telegram bot send permanent fail streak ≥ **5**; (5) D1/R2 hard CF-dashboard quotas not auto-metered in Worker — alert if backup payload > **40 MB** or R2 put fails (capacity signal). Debounce same alert key **60 min**.
 - **PRD:** §52.3, §56.1.
-- **Блокирует:** финальную конфигурацию E8-D9-T04.
+- **Влияет на:** E8-D9-T04, `apps/scheduler` owner-alerts.
 
 ### DEC-007 — Retry и rate limits
 
@@ -615,13 +615,15 @@
 - **Вопрос:** какие точные retry limits и rate limits использовать там, где PRD не задаёт чисел?
 - **PRD:** §35, §45.4, §47.1.
 - **Блокирует:** финальную настройку E5-D6-T06 и E7-D8-T07.
+- **Note 2026-07-28:** partner remind 2h already shipped stage 7; broader DEC-007 remains open only for unspecified numeric policies.
 
 ### DEC-008 — Механизм backup schedule
 
-- **Статус:** open
-- **Вопрос:** использовать отдельный Cron handler/deployment или расширить scheduler?
+- **Статус:** approved
+- **Дата:** 2026-07-28
+- **Решение:** (user: «расширить») weekly D1 backup runs inside existing `flowly-scheduler` Cron (`* * * * *` gate: **Sunday 03:00–03:04 UTC**). Snapshot = JSON dump of all application tables → R2 `STORAGE` key `backups/d1/YYYY-MM-DD.json` (kind exports); retain **last 4** weekly objects; owner notify success/fail. No separate backup Worker.
 - **PRD:** §41.4, §51.1.
-- **Блокирует:** E8-D9-T03.
+- **Влияет на:** E8-D9-T03, `apps/scheduler` backup module.
 
 ### DEC-009 — Retention share-cards
 
@@ -642,10 +644,11 @@
 
 ### DEC-011 — Актуальные внешние квоты
 
-- **Статус:** open
-- **Вопрос:** когда и по каким официальным источникам перепроверять Cloudflare free tier и YouTube API quota перед инфраструктурным планированием?
+- **Статус:** approved
+- **Дата:** 2026-07-28
+- **Решение:** перед каждым stage-8 / release smoke перепроверять Cloudflare Workers/D1 free limits на official docs (`developers.cloudflare.com/workers/platform/{limits,pricing}`) и Piped/YouTube provider notes (DEC-049, no Google YT Data API key). Snapshot 2026-07-28 зафиксирован в `E8-D9-T06-performance-quotas.md`.
 - **PRD:** §42, §56.1–56.2.
-- **Блокирует:** production validation E8-D9-T06.
+- **Влияет на:** E8-D9-T06/T08.
 
 ## Шаблон нового решения
 

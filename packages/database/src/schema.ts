@@ -605,3 +605,41 @@ export const processedTelegramUpdates = sqliteTable("processed_telegram_updates"
   processedAt: text("processed_at").notNull(),
   resultStatus: text("result_status").notNull(),
 });
+
+// E8-D9-T03/T04 — backups, ops alerts, user export jobs
+export const systemBackups = sqliteTable(
+  "system_backups",
+  {
+    id: text("id").primaryKey(),
+    createdAt: text("created_at").notNull(),
+    sizeBytes: integer("size_bytes").notNull(),
+    tableCount: integer("table_count").notNull(),
+    storageKey: text("storage_key"),
+    status: text("status").notNull(),
+    error: text("error"),
+    payload: text("payload"),
+  },
+  (table) => [index("system_backups_created_at_idx").on(table.createdAt)],
+);
+
+export const opsState = sqliteTable("ops_state", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const userExportJobs = sqliteTable(
+  "user_export_jobs",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    status: text("status").notNull(),
+    createdAt: text("created_at").notNull(),
+    completedAt: text("completed_at"),
+    sizeBytes: integer("size_bytes"),
+    error: text("error"),
+  },
+  (table) => [index("user_export_jobs_user_idx").on(table.userId)],
+);

@@ -13,8 +13,7 @@ const sections = [
   { icon: "chart-no-axes-column", label: "Отчёты", hint: "Недельные и месячные" },
   { icon: "settings", label: "Настройки", hint: "Имя, часовой пояс, тема и отчёты", to: "/settings" },
   { icon: "bell", label: "Уведомления", hint: "Напоминания и тишина" },
-  { icon: "download", label: "Экспорт данных", hint: "Скачать архив" },
-  { icon: "trash-2", label: "Удалить аккаунт", hint: "Удаление с периодом восстановления" },
+  { icon: "download", label: "Данные", hint: "Экспорт, история, удаление", to: "/profile/data" },
 ] as const;
 
 export function ProfileHubScreen() {
