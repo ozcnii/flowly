@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 4 | 0 | 0 | 1 | 2 |
+| 2 | 0 | 0 | 0 | 5 |
 
 ## Зависимости и инварианты
 
@@ -51,14 +51,14 @@
 - **journal:** 2026-07-27 — review → done after edge matrix PASS.
 
 ### E7-D8-T03 — Реализовать sharing привычек и тренировок
-- **status:** review · **priority:** blocker · **owner:** agent · **updated:** 2026-07-27
+- **status:** done · **priority:** blocker · **owner:** agent · **updated:** 2026-07-28
 - **prd_refs:** §8.4, §33.1–33.2, §43.11, §43.18, §47.2 · **depends_on:** E2-D3-T03, E4-D5-T02, E7-D8-T01 · **decisions:** DEC-019, DEC-022, DEC-024, DEC-025, DEC-029, DEC-064
 - **ui_slices:** S-MA-043, S-MA-064, S-MA-083, S-MA-084 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** явный per-object sharing только после создания.
-- **note (DEC-064):** share **own user-built workouts** (S-MA-043) **N/A** until E2-D3-T03; T03 scope = **habits** share UI + shared read + revoke (workout share API remains for later UI).
-- **acceptance:** [x] default private (share opt-in); [x] friend shared read-only + toggles streak/history; [x] stranger 404; [x] revoke + unfriend cascade.
-- **validation/evidence:** GET/POST/DELETE share APIs; GET /habits/shared; HabitShareSheet; detail owner/shared UI; typecheck/lint PASS.
-- **journal:** 2026-07-19 — DEC-064; 2026-07-27 — habits share UI → review.
+- **note (DEC-064):** share **own user-built workouts** (S-MA-043) **N/A** until E2-D3-T03; T03 = habits share.
+- **acceptance:** [x] default private; [x] friend read-only + toggles; [x] stranger 404; [x] revoke + cascade; [x] shared occurrences gated.
+- **validation/evidence:** HTTP habit-share 41/41; deep reviews #1–#2; occurrence least-privilege for streak-only.
+- **journal:** 2026-07-28 — review + deep review + fix → done (user autonomy).
 
 ### E7-D8-T04 — Реализовать совместные программы
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-19
@@ -71,20 +71,22 @@
 - **journal:** 2026-07-19 — DEC-064 note: transitive T03 dependency only via full T03 share scope; programs/habits path can unblock without own-workout constructor.
 
 ### E7-D8-T05 — Реализовать челленджи
-- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-13
+- **status:** done · **priority:** high · **owner:** agent · **updated:** 2026-07-28
 - **prd_refs:** §34, §43.25–43.26, §44.12, §55.8 · **depends_on:** E7-D8-T01, E4-D5-T05 · **decisions:** DEC-019, DEC-020, DEC-022, DEC-024, DEC-025, DEC-029
 - **ui_slices:** S-MA-085, S-MA-086, S-MA-087 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** создание, типы, membership и результаты по PRD.
-- **acceptance:** [ ] membership/ownership проверяются; [ ] результаты основаны на occurrences; [ ] unauthorized data скрыты.
-- **validation/evidence:** challenge lifecycle and access matrix.
+- **acceptance:** [x] membership/ownership (invite/join/leave/owner); [x] progress from occurrences/sessions; [x] stranger 404.
+- **validation/evidence:** migration 0024; HTTP challenges matrix PASS; UI /challenges.
+- **journal:** 2026-07-28 — autonomy implement + HTTP PASS → done.
 
 ### E7-D8-T06 — Реализовать реакции
-- **status:** backlog · **priority:** normal · **owner:** unassigned · **updated:** 2026-07-13
+- **status:** done · **priority:** normal · **owner:** agent · **updated:** 2026-07-28
 - **prd_refs:** §34.3, §43.27, §55.8 · **depends_on:** E7-D8-T05 · **decisions:** DEC-019, DEC-022, DEC-024, DEC-025, DEC-029
 - **ui_slices:** S-MA-087 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** разрешённые реакции на доступные социальные результаты.
-- **acceptance:** [ ] реакция требует доступа; [ ] повторное действие детерминировано; [ ] revoke исключает дальнейшее взаимодействие.
-- **validation/evidence:** reaction add/change/remove cases.
+- **acceptance:** [x] reaction requires challenge membership; [x] toggle add/change/remove deterministic; [x] stranger forbidden.
+- **validation/evidence:** POST /challenges/:id/reactions HTTP + UI emoji row on detail.
+- **journal:** 2026-07-28 — shipped with T05.
 
 ### E7-D8-T07 — Реализовать партнёрские напоминания и закрыть DoD
 - **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-19

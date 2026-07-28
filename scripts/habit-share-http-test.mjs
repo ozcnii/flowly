@@ -156,7 +156,7 @@ r = await api(b.cookie, "GET", `/api/v1/occurrences?habitId=${encodeURIComponent
 check("B occurrences after toggles → 200", r.status === 200, r);
 check("B occurrences has summary", r.data && typeof r.data.summary?.total === "number", r.data);
 
-// streak-only still allows occurrences read (progress)
+// streak-only: summary yes, list empty (least privilege)
 r = await api(a.cookie, "POST", `/api/v1/habits/${hid}/share`, {
   userId: b.userId,
   showStreak: true,
@@ -165,6 +165,7 @@ r = await api(a.cookie, "POST", `/api/v1/habits/${hid}/share`, {
 check("toggles streak only → 200", r.status === 200, r);
 r = await api(b.cookie, "GET", `/api/v1/occurrences?habitId=${encodeURIComponent(hid)}`);
 check("B occurrences with streak-only → 200", r.status === 200, r);
+check("B streak-only empty list", Array.isArray(r.data?.occurrences) && r.data.occurrences.length === 0, r.data);
 
 // history+streak both off again → 404
 r = await api(a.cookie, "POST", `/api/v1/habits/${hid}/share`, {

@@ -485,6 +485,66 @@ export const habitShares = sqliteTable(
   ],
 );
 
+// §43.25 challenges (stage 7)
+export const challenges = sqliteTable(
+  "challenges",
+  {
+    id: text("id").primaryKey(),
+    ownerId: text("owner_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    goalType: text("goal_type").notNull(), // workout_count | daily | habit_count | total_time
+    goalValue: integer("goal_value").notNull(),
+    startsOn: text("starts_on").notNull(),
+    endsOn: text("ends_on").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [index("challenges_owner_idx").on(table.ownerId)],
+);
+
+// §43.26 challenge_members
+export const challengeMembers = sqliteTable(
+  "challenge_members",
+  {
+    challengeId: text("challenge_id")
+      .notNull()
+      .references(() => challenges.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    status: text("status").notNull(), // owner | invited | accepted | left | declined
+    joinedAt: text("joined_at").notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.challengeId, table.userId] }),
+    index("challenge_members_user_idx").on(table.userId),
+  ],
+);
+
+// §43.27 reactions
+export const reactions = sqliteTable(
+  "reactions",
+  {
+    id: text("id").primaryKey(),
+    senderId: text("sender_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    recipientId: text("recipient_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id").notNull(),
+    emoji: text("emoji").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [
+    index("reactions_entity_idx").on(table.entityType, table.entityId),
+    uniqueIndex("reactions_sender_entity_unique").on(table.senderId, table.entityType, table.entityId),
+  ],
+);
+
 // §43.28 youtube_search_cache
 export const youtubeSearchCache = sqliteTable(
   "youtube_search_cache",

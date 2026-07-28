@@ -20,6 +20,7 @@ export async function GET(request: Request) {
 
   // Occurrence rows belong to habit owner. Friends may read when share toggles allow.
   let occurrenceUserId = userId;
+  let listBody = true;
   if (habitId) {
     const owned = await loadOwnedHabit(db, userId, habitId);
     if (!owned) {
@@ -34,6 +35,8 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: "not_found" }, { status: 404 });
       }
       occurrenceUserId = habit.ownerId;
+      // Least privilege: streak-only → summary without occurrence rows.
+      listBody = Boolean(share.showHistory);
     }
   }
 
@@ -43,7 +46,7 @@ export async function GET(request: Request) {
   ];
   if (habitId) conditions.push(eq(schema.activityOccurrences.entityId, habitId));
   if (date) conditions.push(eq(schema.activityOccurrences.scheduledLocalDate, date));
-  const occurrences = await db
+  const rows = await db
     .select()
     .from(schema.activityOccurrences)
     .where(and(...conditions))
@@ -51,7 +54,7 @@ export async function GET(request: Request) {
       asc(schema.activityOccurrences.scheduledLocalDate),
       asc(schema.activityOccurrences.scheduledLocalTime),
     );
-  const summary = occurrences.reduce(
+  const summary = rows.reduce(
     (result, occurrence) => {
       if (occurrence.status === "completed") result.completed += 1;
       else if (occurrence.status === "partial") result.partial += 1;
@@ -61,7 +64,7 @@ export async function GET(request: Request) {
       else if (PENDING.has(occurrence.status)) result.pending += 1;
       return result;
     },
-    { total: occurrences.length, completed: 0, partial: 0, pending: 0, rest: 0, skipped: 0, noResponse: 0 },
+    { total: rows.length, completed: 0, partial: 0, pending: 0, rest: 0, skipped: 0, noResponse: 0 },
   );
-  return NextResponse.json({ occurrences, summary });
+  return NextResponse.json({ occurrences: listBody ? rows : [], summary });
 }

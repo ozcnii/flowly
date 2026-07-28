@@ -8,7 +8,7 @@ import { useMeQuery } from "../model/me-queries";
 
 const sections = [
   { icon: "users", label: "Друзья", hint: "Друзья и приглашения", to: "/friends" },
-  { icon: "flag", label: "Челленджи", hint: "Совместные челленджи" },
+  { icon: "flag", label: "Челленджи", hint: "Совместные челленджи", to: "/challenges" },
   { icon: "bookmark", label: "Избранное", hint: "Сохранённые тренировки", to: "/favorites" },
   { icon: "chart-no-axes-column", label: "Отчёты", hint: "Недельные и месячные" },
   { icon: "settings", label: "Настройки", hint: "Имя, часовой пояс, тема и отчёты", to: "/settings" },
