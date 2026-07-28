@@ -97,8 +97,8 @@ export async function findOrCreateUser(
     weeklyReportDay: null,
     weeklyReportTime: null,
     monthlyReportEnabled: false,
-    friendNotificationsEnabled: false,
-    partnerRemindersEnabled: false,
+    friendNotificationsEnabled: true,
+    partnerRemindersEnabled: true,
   });
   return { id, isNew: true };
 }

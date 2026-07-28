@@ -340,6 +340,45 @@ export const programEnrollments = sqliteTable(
   ],
 );
 
+/** Joint program invite: anchored on owner enrollment (E7-D8-T04). */
+export const programEnrollmentShares = sqliteTable(
+  "program_enrollment_shares",
+  {
+    enrollmentId: text("enrollment_id")
+      .notNull()
+      .references(() => programEnrollments.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    status: text("status").notNull(), // invited | accepted | left | revoked
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.enrollmentId, table.userId] }),
+    index("program_enrollment_shares_user_idx").on(table.userId),
+  ],
+);
+
+/** Partner remind journal (E7-D8-T07, PRD §35 — 2h limit per object pair). */
+export const partnerReminds = sqliteTable(
+  "partner_reminds",
+  {
+    id: text("id").primaryKey(),
+    senderId: text("sender_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    recipientId: text("recipient_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [
+    index("partner_reminds_pair_entity_idx").on(table.senderId, table.recipientId, table.entityType, table.entityId, table.createdAt),
+  ],
+);
+
 // §43.19 reminder_policies
 export const reminderPolicies = sqliteTable("reminder_policies", {
   id: text("id").primaryKey(),

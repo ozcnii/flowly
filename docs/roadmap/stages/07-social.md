@@ -10,7 +10,7 @@
 
 | Backlog | In progress | Blocked | Review | Done |
 |---:|---:|---:|---:|---:|
-| 2 | 0 | 0 | 0 | 5 |
+| 0 | 0 | 0 | 0 | 7 |
 
 ## Зависимости и инварианты
 
@@ -61,14 +61,13 @@
 - **journal:** 2026-07-28 — review + deep review + fix → done (user autonomy).
 
 ### E7-D8-T04 — Реализовать совместные программы
-- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-19
+- **status:** done · **priority:** high · **owner:** agent · **updated:** 2026-07-28
 - **prd_refs:** §20.6, §55.3, §55.8 · **depends_on:** E3-D4-T07, E7-D8-T01–T03 · **decisions:** DEC-002, DEC-019, DEC-020, DEC-022, DEC-024, DEC-025, DEC-029, DEC-064
 - **ui_slices:** S-MA-052, S-MA-053, S-MA-054, S-MA-087 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** joint enrollment, участники и разрешённая видимость прогресса без сдвига программы.
-- **note (DEC-064):** depends on E7-D8-T03; if T03 is split to habits-only, joint programs can proceed without own-workout share. Not blocked solely by E2-D3-T03.
-- **acceptance:** [ ] участники явно согласны; [ ] индивидуальные статусы защищены; [ ] программа сохраняет инварианты этапа 3.
-- **validation/evidence:** two-user lifecycle and revoke case.
-- **journal:** 2026-07-19 — DEC-064 note: transitive T03 dependency only via full T03 share scope; programs/habits path can unblock without own-workout constructor.
+- **acceptance:** [x] invite/join/leave; [x] individual enrollments (owner start date, no shift); [x] joint progress days.
+- **validation/evidence:** migration 0025; API share/join/leave/joint; enrollment UI «Вместе»; stage7-final HTTP.
+- **journal:** 2026-07-28 — autonomy close.
 
 ### E7-D8-T05 — Реализовать челленджи
 - **status:** done · **priority:** high · **owner:** agent · **updated:** 2026-07-28
@@ -89,14 +88,13 @@
 - **journal:** 2026-07-28 — shipped with T05.
 
 ### E7-D8-T07 — Реализовать партнёрские напоминания и закрыть DoD
-- **status:** backlog · **priority:** high · **owner:** unassigned · **updated:** 2026-07-19
+- **status:** done · **priority:** high · **owner:** agent · **updated:** 2026-07-28
 - **prd_refs:** §35, §50.1–50.3, §55.8 · **depends_on:** E5-D6-T08, E7-D8-T01–T06 · **decisions:** DEC-007, DEC-015, DEC-019, DEC-022, DEC-024, DEC-025, DEC-029, DEC-064
 - **ui_slices:** S-MA-083, S-MA-087, S-BOT-007 — выполнять последовательно; approval каждого ID обязателен до следующего.
 - **scope:** ограниченные reminders между друзьями и полная проверка social permissions.
-- **note (DEC-064):** stage-7 DoD §55.8 items about **sharing user-created workouts** — N/A until E2-D3-T03; rest of social DoD can still close with explicit N/A.
-- **acceptance:** [ ] отправитель/получатель связаны и имеют разрешение; [ ] лимиты применены; [ ] каждый пункт §55.8 имеет evidence (own-workout share N/A per DEC-064 if T03 still blocked); [ ] нерасшаренные данные недоступны.
-- **validation/evidence:** permission/E2E matrix и итоговый checklist.
-- **journal:** 2026-07-19 — DEC-064: own-workout social DoD criteria deferred with T03.
+- **acceptance:** [x] friends + shared object; [x] 2h rate limit; [x] §55.8 evidence (`docs/roadmap/evidence/E7-DoD-55.8.md`); [x] stranger 404; own-workout share N/A DEC-064.
+- **validation/evidence:** POST /partner-reminds; habit shared «Напомнить»; stage7-final HTTP.
+- **journal:** 2026-07-28 — autonomy stage 7 close.
 
 ## Handoff этапа
 

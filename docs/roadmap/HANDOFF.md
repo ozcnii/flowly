@@ -6,12 +6,12 @@
 
 - **Обновлено:** 2026-07-27
 - **Текущий этап:** **7. Социальные**.
-- **Текущая задача:** E7-D8-T04 (backlog) joint programs; E7-D8-T07 partner reminds/DoD.
-- **Последняя закрытая задача:** E7-D8-T01–T03, T05, T06 (`done`).
-- **Статус:** Social: friends/invites/share/habit share/challenges/reactions shipped. migration 0024. HTTP: friends edge 32, habit-share 42, challenges PASS. Remaining: T04 joint programs, T07 partner remind + §55.8 DoD. Own-workout share N/A DEC-064.
-- **README sync:** 68 done / 1 blocked / 10 backlog / 0 in_progress / 0 review.
-- **Evidence:** `scripts/{friends-invite,friends-edge,habit-share,challenges}-http-test.mjs`.
-- **Следующее точное действие:** T04 or T07; seed catalog if prod empty for demos.
+- **Текущая задача:** none — **этап 7 closed**.
+- **Последняя закрытая задача:** E7-D8-T01–T07 (`done`). Own-workout share N/A DEC-064.
+- **Статус:** Stage 7 complete: friends, invites, revoke, habit share, joint programs, challenges, reactions, partner reminds (2h). Migrations 0022–0025. DoD: `docs/roadmap/evidence/E7-DoD-55.8.md`.
+- **README sync:** 70 done / 1 blocked / 8 backlog / 0 in_progress / 0 review.
+- **Evidence:** `scripts/*http-test.mjs` social suite.
+- **Следующее точное действие:** этап 8 production readiness; optional seed catalog on prod.
 - **Production ops 2026-07-27:** code on `main` (`3e3d1da`); Deploy web GHA PASS (migrations 0021); bot `@getflowlybot`; `TELEGRAM_WEBHOOK_SECRET` on web prod/test + scheduler; `setWebhook` → `https://flowly-web.getflowly.workers.dev/api/v1/telegram/webhook` (secret_token set, last_error null); real send PASS (`outbound` message_id + `/app` webhook status ok); scheduler deployed `flowly-scheduler.getflowly.workers.dev` cron `* * * * *` with `FLOWLY_WEB_URL`/`TELEGRAM_MODE`/`TELEGRAM_WEBHOOK_SECRET` (send via web outbound proxy). Residual: no_response heuristic; DEC-007 rate limits stage 8; local `.dev.vars` bot token still invalid (prod CF secret is valid).
 - **DEC-068:** canonical `weekly_target={target,days,time}` и `interval={every,unit,anchorLocalDate,anchorLocalTime}` и local-calendar semantics остаются действующими; timezone ownership portion superseded DEC-069.
 - **DEC-069:** пользователь 2026-07-22 утвердил: habit не хранит/не показывает отдельный timezone; новые slots/jobs используют `users.timezone`, уже созданные occurrence rows сохраняют timezone snapshot и history immutable. T07 должен провести совместимый schema/API/UI cleanup.

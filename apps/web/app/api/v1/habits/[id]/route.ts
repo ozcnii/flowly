@@ -49,6 +49,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       status: row.status,
     },
     share: { showStreak: share.showStreak, showHistory: share.showHistory },
+    ownerId: row.ownerId,
   });
 }
 

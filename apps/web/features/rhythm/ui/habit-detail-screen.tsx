@@ -9,6 +9,8 @@ import { PrimaryNavbar } from "@/components/shell/primary-navbar";
 import { useModalFocus } from "@/components/use-modal-focus";
 import { formatRuDate } from "@/features/programs/model/program-dates";
 import { COLOR_OPTIONS, type Habit } from "../model/habits";
+import { useMutation } from "@tanstack/react-query";
+import { apiJson, jsonBody, ApiError } from "@/lib/api/client";
 import { useArchiveHabitMutation, useHabitLifecycleMutation, useHabitOccurrencesQuery, useHabitQuery, useOccurrenceQuery, useUpdateOccurrenceStatusMutation } from "../model/habits-queries";
 import { HABIT_OCCURRENCE_STATUSES, OCCURRENCE_STATUS_ICON, OCCURRENCE_STATUS_LABEL, type HabitOccurrence, type HabitOccurrenceStatus } from "../model/occurrences";
 import { HabitShareSheet } from "./habit-share-sheet";
@@ -34,7 +36,15 @@ export function HabitDetailScreen({ id }: { id: string }) {
   const [selected, setSelected] = useState<HabitOccurrence | null>(null);
   const [lifecycle, setLifecycle] = useState<"pause" | "resume" | "archive" | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
+  const [remindNotice, setRemindNotice] = useState("");
   const actionRef = useRef<HTMLElement>(null), lifecycleRef = useRef<HTMLElement>(null), shareRef = useRef<HTMLElement>(null), backgroundRef = useRef<HTMLDivElement>(null);
+  const remind = useMutation({
+    mutationFn: (recipientId: string) =>
+      apiJson<{ ok: true }>("/api/v1/partner-reminds", {
+        method: "POST",
+        body: jsonBody({ recipientId, entityType: "habit", entityId: id }),
+      }),
+  });
   const occurrenceDetail = useOccurrenceQuery(selected?.id ?? "", Boolean(selected));
   const statusMutation = useUpdateOccurrenceStatusMutation(id);
   const pause = useHabitLifecycleMutation(id, "pause");
@@ -80,7 +90,37 @@ export function HabitDetailScreen({ id }: { id: string }) {
         {loading ? <div className="grid min-h-48 place-items-center" role="status" aria-live="polite" aria-busy="true"><Preloader /><span className="sr-only">Загружаем привычку</span></div>
           : error ? <Card component="section" outline className="m-0 text-center" role="alert" contentWrapPadding="grid justify-items-center gap-3 p-6"><Icon name="triangle-alert" /><h1 className="m-0 text-lg font-semibold">Привычка не найдена</h1><p className="m-0 text-sm text-text-muted">Проверьте ссылку или вернитесь к списку привычек.</p><Button large rounded className={focusRing} onClick={() => router.replace("/rhythm" as never)}>К привычкам</Button></Card>
             : habit ? <>
-              {!isOwner ? <p className="m-0 text-sm text-text-muted" role="status"><Badge>Доступ друга</Badge> Только просмотр.</p> : null}
+              {!isOwner ? (
+                <div className="grid gap-2">
+                  <p className="m-0 text-sm text-text-muted" role="status"><Badge>Доступ друга</Badge> Только просмотр.</p>
+                  <Button
+                    large
+                    rounded
+                    tonal
+                    className={`w-full gap-2 ${focusRing}`}
+                    disabled={remind.isPending || !query.data?.ownerId}
+                    onClick={() => {
+                      const ownerId = query.data?.ownerId;
+                      if (!ownerId) return;
+                      setRemindNotice("");
+                      void remind
+                        .mutateAsync(ownerId)
+                        .then(() => setRemindNotice("Напоминание отправлено."))
+                        .catch((e) =>
+                          setRemindNotice(
+                            e instanceof ApiError
+                              ? ((e.body as { message?: string })?.message ?? "Не удалось напомнить.")
+                              : "Ошибка сети.",
+                          ),
+                        );
+                    }}
+                  >
+                    {remind.isPending ? <Preloader /> : <Icon name="bell" />}
+                    Напомнить
+                  </Button>
+                  <p className="m-0 min-h-5 text-xs text-text-muted" aria-live="polite">{remindNotice}</p>
+                </div>
+              ) : null}
               <Card component="section" outline className="m-0" contentWrapPadding="grid gap-3 p-4">
                 <div className="flex items-start gap-3">
                   <span className={`grid size-11 shrink-0 place-items-center rounded-full text-2xl leading-none ${cellClass}`} aria-hidden="true">{habit.emoji ?? <Icon name={habit.icon} className="size-5" />}</span>

@@ -2,13 +2,14 @@
 
 import { Badge, BlockTitle, Button, Card, List, ListItem, Navbar, Preloader, Progressbar, Sheet } from "konsta/react";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { Icon } from "@flowly/ui";
 import { ModalPortal } from "@/components/modal-portal";
 import { PrimaryNavbar } from "@/components/shell/primary-navbar";
 import { useModalFocus } from "@/components/use-modal-focus";
-import { apiJson } from "@/lib/api/client";
+import { apiJson, jsonBody } from "@/lib/api/client";
+import { useFriendsQuery } from "@/features/friends/model/friends-queries";
 import { formatRuDate } from "../model/program-dates";
 import { DAY_STATE_LABEL, type DayProgressState } from "../model/program-progress";
 import { DURATION_LABEL } from "../model/programs";
@@ -85,11 +86,31 @@ const CONFIRM_COPY: Record<ConfirmKind, { title: string; body: string; action: s
 
 export function EnrollmentScreen({ id }: { id: string }) {
   const router = useRouter();
+  const qc = useQueryClient();
   const query = useQuery({
     queryKey: programsKeys.enrollment(id),
     queryFn: ({ signal }) => apiJson<EnrollmentResponse>(`/api/v1/program-enrollments/${encodeURIComponent(id)}`, { signal }),
     enabled: Boolean(id),
     staleTime: 15_000,
+  });
+  const joint = useQuery({
+    queryKey: ["program-joint", id],
+    queryFn: ({ signal }) =>
+      apiJson<{
+        members: Array<{ userId: string; role: string; status: string; completedDays: number; peer: { firstName: string } | null }>;
+        myStatus: string;
+      }>(`/api/v1/program-enrollments/${encodeURIComponent(id)}/joint`, { signal }),
+    enabled: Boolean(id),
+    staleTime: 15_000,
+  });
+  const friends = useFriendsQuery();
+  const shareMut = useMutation({
+    mutationFn: (userId: string) =>
+      apiJson(`/api/v1/program-enrollments/${encodeURIComponent(id)}/share`, {
+        method: "POST",
+        body: jsonBody({ userId }),
+      }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ["program-joint", id] }),
   });
   const skip = useSkipEnrollmentDayMutation(id);
   const rest = useRestEnrollmentDayMutation(id);
@@ -100,6 +121,7 @@ export function EnrollmentScreen({ id }: { id: string }) {
   const progress = enrollment?.progress;
   const busy = skip.isPending || rest.isPending;
   const actionError = skip.isError ? "Не удалось пропустить." : rest.isError ? "Не удалось отметить отдых." : null;
+  const [jointNotice, setJointNotice] = useState("");
   const todayWorkoutId = progress?.todayWorkoutId ?? null;
   const activeToday = Boolean(todayWorkoutId && activeSession?.workoutId === todayWorkoutId);
   const openToday = () => {
@@ -170,6 +192,56 @@ export function EnrollmentScreen({ id }: { id: string }) {
                     </div>
                     : null}
               </Card>
+
+              <section aria-labelledby="joint-title" className="grid gap-2">
+                <BlockTitle component="h2" id="joint-title" className="!m-0">Вместе</BlockTitle>
+                <p className="m-0 text-sm text-text-muted">Пригласите друга — у каждого своё прохождение, даты не сдвигаются.</p>
+                <p className="m-0 min-h-5 text-xs text-text-muted" aria-live="polite">{jointNotice}</p>
+                {(joint.data?.members ?? []).length > 0 ? (
+                  <List strong inset dividers className="!m-0">
+                    {joint.data!.members.map((m) => (
+                      <ListItem
+                        key={m.userId}
+                        title={m.peer?.firstName ?? "Участник"}
+                        subtitle={m.role === "owner" ? "Организатор" : m.status === "invited" ? "Приглашён" : "Участник"}
+                        after={<Badge>{m.completedDays} дн.</Badge>}
+                      />
+                    ))}
+                  </List>
+                ) : null}
+                <List strong inset dividers className="!m-0">
+                  {(friends.data?.friends ?? [])
+                    .filter((f) => f.status === "accepted" && f.peer)
+                    .map((f) => {
+                      const peer = f.peer!;
+                      const already = joint.data?.members?.some((m) => m.userId === peer.id);
+                      return (
+                        <ListItem
+                          key={peer.id}
+                          title={peer.firstName}
+                          subtitle={already ? "Уже в joint" : "Можно пригласить"}
+                          after={
+                            <Button
+                              small
+                              tonal
+                              disabled={Boolean(already) || shareMut.isPending}
+                              className={focusRing}
+                              onClick={() => {
+                                setJointNotice("");
+                                void shareMut
+                                  .mutateAsync(peer.id)
+                                  .then(() => setJointNotice("Приглашение отправлено."))
+                                  .catch(() => setJointNotice("Не удалось пригласить."));
+                              }}
+                            >
+                              {already ? "Ок" : "Пригласить"}
+                            </Button>
+                          }
+                        />
+                      );
+                    })}
+                </List>
+              </section>
 
               <section aria-labelledby="enrollment-days-title" className="grid gap-2">
                 <BlockTitle component="h2" id="enrollment-days-title" className="!m-0">Календарь дней</BlockTitle>

@@ -22,6 +22,7 @@ export type HabitDetailResponse = {
   habit: Habit;
   access: HabitAccess;
   share?: { showStreak: boolean; showHistory: boolean };
+  ownerId?: string;
 };
 export type HabitShareRow = {
   userId: string;
