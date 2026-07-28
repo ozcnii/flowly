@@ -12,8 +12,10 @@ export const ALERT = {
 
 type Env = {
   DB: D1Database;
+  WEB?: Fetcher;
   TELEGRAM_BOT_TOKEN?: string;
   TELEGRAM_MODE?: string;
+  TELEGRAM_WEBHOOK_SECRET?: string;
   FLOWLY_OWNER_TELEGRAM_ID?: string;
 };
 
@@ -24,18 +26,61 @@ async function getState(db: D1Database, key: string): Promise<string | null> {
 
 async function setState(db: D1Database, key: string, value: string) {
   const ts = nowIso();
-  await db.prepare(`INSERT INTO ops_state (key, value, updated_at) VALUES (?, ?, ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at`).bind(key, value, ts).run();
+  await db
+    .prepare(
+      `INSERT INTO ops_state (key, value, updated_at) VALUES (?, ?, ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at`,
+    )
+    .bind(key, value, ts)
+    .run();
 }
 
+/** Same send path as delivery: WEB service binding → web outbound proxy. */
 async function sendOwner(env: Env, text: string): Promise<boolean> {
   const chatId = env.FLOWLY_OWNER_TELEGRAM_ID?.trim();
-  if (!chatId || !env.TELEGRAM_BOT_TOKEN) {
-    console.log(JSON.stringify({ event: "owner.alert.skip", reason: !chatId ? "no_owner_id" : "no_token", text: text.slice(0, 120) }));
+  if (!chatId) {
+    console.log(JSON.stringify({ event: "owner.alert.skip", reason: "no_owner_id", text: text.slice(0, 120) }));
     return false;
   }
-  if (env.TELEGRAM_MODE === "mock") {
+  const mode = (env.TELEGRAM_MODE || "production").toLowerCase();
+  if (mode === "mock") {
     console.log(JSON.stringify({ event: "owner.alert.mock", chatId, text: text.slice(0, 200) }));
     return true;
+  }
+
+  if (env.WEB && env.TELEGRAM_WEBHOOK_SECRET) {
+    try {
+      const res = await env.WEB.fetch(
+        new Request("https://flowly-web.internal/api/v1/telegram/outbound", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-telegram-bot-api-secret-token": env.TELEGRAM_WEBHOOK_SECRET,
+            accept: "application/json",
+          },
+          body: JSON.stringify({ chat_id: chatId, text }),
+        }),
+      );
+      const raw = await res.text();
+      let body: { ok?: boolean; code?: string; error?: string } = {};
+      try {
+        body = JSON.parse(raw) as typeof body;
+      } catch {
+        body = {};
+      }
+      if (!res.ok || !body.ok) {
+        console.log(JSON.stringify({ event: "owner.alert.proxy_fail", status: res.status, code: body.code || body.error || `http_${res.status}` }));
+        return false;
+      }
+      return true;
+    } catch (e) {
+      console.log(JSON.stringify({ event: "owner.alert.proxy_error", error: e instanceof Error ? e.message : "proxy_network" }));
+      return false;
+    }
+  }
+
+  if (!env.TELEGRAM_BOT_TOKEN) {
+    console.log(JSON.stringify({ event: "owner.alert.skip", reason: "no_token", text: text.slice(0, 120) }));
+    return false;
   }
   const res = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
     method: "POST",

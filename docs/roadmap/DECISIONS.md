@@ -611,11 +611,12 @@
 
 ### DEC-007 — Retry и rate limits
 
-- **Статус:** open
-- **Вопрос:** какие точные retry limits и rate limits использовать там, где PRD не задаёт чисел?
+- **Статус:** approved
+- **Дата:** 2026-07-28
+- **Решение:** зафиксировать как v1 contract уже реализованные числа (без новых product gates): (1) partner remind — **1** per (sender,recipient,entity) / **2h** (PRD §35); (2) reminder delivery retries — **MAX_ATTEMPTS=5**, backoff `min(60, 2^attempt)` minutes; (3) invite — **maxUses=1**, TTL **7d**; (4) custom policy — step interval ≥ **10m**, maxMessages ≤ **10** (PRD §24); (5) JSON body max **64 KiB** foundation; (6) delivery batch size **50**; (7) no separate global API RPM beyond Cloudflare Free + CSRF/auth ownership — Mini App scale; revisit only if abuse appears.
+- **Основание:** user 2026-07-28 «если точно есть смысл» — смысл закрыть DEC numbers from shipped code, not invent unused limits.
 - **PRD:** §35, §45.4, §47.1.
-- **Блокирует:** финальную настройку E5-D6-T06 и E7-D8-T07.
-- **Note 2026-07-28:** partner remind 2h already shipped stage 7; broader DEC-007 remains open only for unspecified numeric policies.
+- **Влияет на:** E5-D6-T06, E7-D8-T07, E8-D9-T05 residual.
 
 ### DEC-008 — Механизм backup schedule
 

@@ -10,8 +10,8 @@
 - **Статус:** Stages 0–8 closed except residual E2-D3-T03 (own-workout share, DEC-064).
 - **README sync:** 78 done / 1 blocked (E2) / 0 backlog / 0 in_progress / 0 review.
 - **Release:** `fc3504e` + docs `8eba9f0` · Deploy web **30372218254** PASS · scheduler `cb87f551` · health `backup: weekly_sun_03utc` · migration 0026 prod.
-- **Ops residual (optional):** `FLOWLY_OWNER_TELEGRAM_ID`; enable R2 + STORAGE; DEC-007 broader rates.
-- **Следующее точное действие:** none required.
+- **Ops residual:** R2 still requires enable in CF Dashboard (code 10042) — backups remain in D1 `system_backups` until then. `FLOWLY_OWNER_TELEGRAM_ID=528254266` set on scheduler; alerts use WEB outbound proxy. DEC-007 approved (shipped numbers).
+- **Следующее точное действие:** enable R2 in CF Dashboard when ready (optional).
 
 - **Production ops 2026-07-27:** code on `main` (`3e3d1da`); Deploy web GHA PASS (migrations 0021); bot `@getflowlybot`; `TELEGRAM_WEBHOOK_SECRET` on web prod/test + scheduler; `setWebhook` → `https://flowly-web.getflowly.workers.dev/api/v1/telegram/webhook` (secret_token set, last_error null); real send PASS (`outbound` message_id + `/app` webhook status ok); scheduler deployed `flowly-scheduler.getflowly.workers.dev` cron `* * * * *` with `FLOWLY_WEB_URL`/`TELEGRAM_MODE`/`TELEGRAM_WEBHOOK_SECRET` (send via web outbound proxy). Residual: no_response heuristic; DEC-007 rate limits stage 8; local `.dev.vars` bot token still invalid (prod CF secret is valid).
 - **DEC-068:** canonical `weekly_target={target,days,time}` и `interval={every,unit,anchorLocalDate,anchorLocalTime}` и local-calendar semantics остаются действующими; timezone ownership portion superseded DEC-069.
