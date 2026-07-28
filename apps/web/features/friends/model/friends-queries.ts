@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiJson } from "@/lib/api/client";
 
-export type FriendPeer = { id: string; firstName: string; username: string | null; telegramId: string };
+export type FriendPeer = { id: string; firstName: string; username: string | null };
 export type FriendRow = {
   id: string;
   status: "pending" | "accepted" | "rejected" | "removed" | "blocked";

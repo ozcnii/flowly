@@ -34,7 +34,6 @@ export async function listFriends(db: Database, userId: string) {
             id: schema.users.id,
             firstName: schema.users.firstName,
             username: schema.users.username,
-            telegramId: schema.users.telegramId,
           })
           .from(schema.users)
           .where(inArray(schema.users.id, peerIds))
@@ -50,9 +49,7 @@ export async function listFriends(db: Database, userId: string) {
       createdAt: r.createdAt,
       acceptedAt: r.acceptedAt,
       inviteCode: r.inviteCode,
-      peer: peer
-        ? { id: peer.id, firstName: peer.firstName, username: peer.username, telegramId: peer.telegramId }
-        : null,
+      peer: peer ? { id: peer.id, firstName: peer.firstName, username: peer.username } : null,
     };
   });
 }

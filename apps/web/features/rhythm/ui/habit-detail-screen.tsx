@@ -23,7 +23,11 @@ export function HabitDetailScreen({ id }: { id: string }) {
   const access = query.data?.access ?? "owner";
   const isOwner = access === "owner";
   const shareMeta = query.data?.share;
-  const occurrences = useHabitOccurrencesQuery(id, Boolean(query.data?.habit) && (isOwner || Boolean(shareMeta?.showHistory)));
+  // Shared: load owner progress when showStreak and/or history when showHistory (API gates).
+  const occurrences = useHabitOccurrencesQuery(
+    id,
+    Boolean(query.data?.habit) && (isOwner || Boolean(shareMeta?.showHistory || shareMeta?.showStreak)),
+  );
   const habit = query.data?.habit;
   const list = occurrences.data?.occurrences ?? [];
   const summary = occurrences.data?.summary;
