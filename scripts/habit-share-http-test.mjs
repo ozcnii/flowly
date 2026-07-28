@@ -137,6 +137,10 @@ check("A /habits/shared empty of own", r.status === 200 && !r.data.items?.some((
 r = await api(c.cookie, "GET", `/api/v1/habits/${hid}`);
 check("C still 404 after A→B share", r.status === 404, r);
 
+// occurrences: without toggles friend cannot read owner slots
+r = await api(b.cookie, "GET", `/api/v1/occurrences?habitId=${encodeURIComponent(hid)}`);
+check("B occurrences before toggles → 404", r.status === 404, r);
+
 // update toggles
 r = await api(a.cookie, "POST", `/api/v1/habits/${hid}/share`, {
   userId: b.userId,
@@ -146,6 +150,38 @@ r = await api(a.cookie, "POST", `/api/v1/habits/${hid}/share`, {
 check("update toggles → 200", r.status === 200, r);
 r = await api(b.cookie, "GET", `/api/v1/habits/${hid}`);
 check("B sees toggles on", r.data.share?.showStreak === true && r.data.share?.showHistory === true, r.data);
+
+// friend reads owner occurrences (not empty 401/404)
+r = await api(b.cookie, "GET", `/api/v1/occurrences?habitId=${encodeURIComponent(hid)}`);
+check("B occurrences after toggles → 200", r.status === 200, r);
+check("B occurrences has summary", r.data && typeof r.data.summary?.total === "number", r.data);
+
+// streak-only still allows occurrences read (progress)
+r = await api(a.cookie, "POST", `/api/v1/habits/${hid}/share`, {
+  userId: b.userId,
+  showStreak: true,
+  showHistory: false,
+});
+check("toggles streak only → 200", r.status === 200, r);
+r = await api(b.cookie, "GET", `/api/v1/occurrences?habitId=${encodeURIComponent(hid)}`);
+check("B occurrences with streak-only → 200", r.status === 200, r);
+
+// history+streak both off again → 404
+r = await api(a.cookie, "POST", `/api/v1/habits/${hid}/share`, {
+  userId: b.userId,
+  showStreak: false,
+  showHistory: false,
+});
+check("toggles both off → 200", r.status === 200, r);
+r = await api(b.cookie, "GET", `/api/v1/occurrences?habitId=${encodeURIComponent(hid)}`);
+check("B occurrences both off → 404", r.status === 404, r);
+
+// restore for remaining revoke tests
+await api(a.cookie, "POST", `/api/v1/habits/${hid}/share`, {
+  userId: b.userId,
+  showStreak: true,
+  showHistory: true,
+});
 
 // B cannot list shares (owner only)
 r = await api(b.cookie, "GET", `/api/v1/habits/${hid}/share`);
