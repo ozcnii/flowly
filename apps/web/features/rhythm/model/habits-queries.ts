@@ -9,15 +9,50 @@ import type { ReminderPolicy, ReminderPolicyInput } from "./reminder-policies";
 
 export const habitsKeys = {
   list: () => ["habits"] as const,
+  shared: () => ["habits-shared"] as const,
   detail: (id: string) => ["habit", id] as const,
+  shares: (id: string) => ["habit-shares", id] as const,
   occurrences: (id: string) => ["habit-occurrences", id] as const,
   occurrence: (id: string) => ["occurrence", id] as const,
   reminderPolicies: () => ["reminder-policies"] as const,
 };
 
+export type HabitAccess = "owner" | "shared";
+export type HabitDetailResponse = {
+  habit: Habit;
+  access: HabitAccess;
+  share?: { showStreak: boolean; showHistory: boolean };
+};
+export type HabitShareRow = {
+  userId: string;
+  showStreak: boolean;
+  showHistory: boolean;
+  createdAt: string;
+  peer: { id: string; firstName: string; username: string | null } | null;
+};
+export type SharedHabitItem = {
+  habit: Pick<Habit, "id" | "title" | "description" | "icon" | "color" | "emoji" | "startLocalDate" | "endLocalDate" | "status">;
+  share: { showStreak: boolean; showHistory: boolean; createdAt: string };
+  owner: { id: string; firstName: string; username: string | null } | null;
+};
+
 // DEC-029: client reads/mutations via react-query. Raw fetch lives only in apiJson + route handlers.
 export const getHabits = (signal?: AbortSignal) => apiJson<{ habits: HabitListItem[] }>("/api/v1/habits", { signal });
-export const getHabit = (id: string, signal?: AbortSignal) => apiJson<{ habit: Habit }>(`/api/v1/habits/${encodeURIComponent(id)}`, { signal });
+export const getHabit = (id: string, signal?: AbortSignal) =>
+  apiJson<HabitDetailResponse>(`/api/v1/habits/${encodeURIComponent(id)}`, { signal });
+export const getHabitShares = (id: string, signal?: AbortSignal) =>
+  apiJson<{ shares: HabitShareRow[] }>(`/api/v1/habits/${encodeURIComponent(id)}/share`, { signal });
+export const getSharedHabits = (signal?: AbortSignal) =>
+  apiJson<{ items: SharedHabitItem[] }>("/api/v1/habits/shared", { signal });
+export const shareHabitWith = (
+  id: string,
+  input: { userId: string; showStreak?: boolean; showHistory?: boolean },
+) => apiJson<{ ok: true }>(`/api/v1/habits/${encodeURIComponent(id)}/share`, { method: "POST", body: jsonBody(input) });
+export const revokeHabitShare = (id: string, userId: string) =>
+  apiJson<{ ok: true; idempotent: boolean }>(
+    `/api/v1/habits/${encodeURIComponent(id)}/share/${encodeURIComponent(userId)}`,
+    { method: "DELETE" },
+  );
 export const createHabit = (input: HabitCreateInput, schedule?: ScheduleRule) => apiJson<{ habit: Habit }>("/api/v1/habits", { method: "POST", body: jsonBody(schedule ? { ...input, schedule } : input) });
 export const updateHabit = (id: string, input: HabitUpdateInput) => apiJson<{ habit: Habit }>(`/api/v1/habits/${encodeURIComponent(id)}`, { method: "PATCH", body: jsonBody(input) });
 export const archiveHabit = (id: string) => apiJson<{ archived: true }>(`/api/v1/habits/${encodeURIComponent(id)}`, { method: "DELETE" });
@@ -39,8 +74,36 @@ export const updateReminderPolicy = (id: string, input: ReminderPolicyInput) => 
 export const useHabitsQuery = () =>
   useQuery({ queryKey: habitsKeys.list(), queryFn: ({ signal }) => getHabits(signal), staleTime: 30_000 });
 
+export const useSharedHabitsQuery = () =>
+  useQuery({ queryKey: habitsKeys.shared(), queryFn: ({ signal }) => getSharedHabits(signal), staleTime: 30_000 });
+
 export const useHabitQuery = (id: string, enabled = true) =>
   useQuery({ queryKey: habitsKeys.detail(id), queryFn: ({ signal }) => getHabit(id, signal), enabled: enabled && Boolean(id), staleTime: 30_000 });
+
+export const useHabitSharesQuery = (id: string, enabled = true) =>
+  useQuery({ queryKey: habitsKeys.shares(id), queryFn: ({ signal }) => getHabitShares(id, signal), enabled: enabled && Boolean(id), staleTime: 15_000 });
+
+export const useShareHabitMutation = (id: string) => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { userId: string; showStreak?: boolean; showHistory?: boolean }) => shareHabitWith(id, input),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: habitsKeys.shares(id) });
+      void qc.invalidateQueries({ queryKey: habitsKeys.shared() });
+    },
+  });
+};
+
+export const useRevokeHabitShareMutation = (id: string) => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) => revokeHabitShare(id, userId),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: habitsKeys.shares(id) });
+      void qc.invalidateQueries({ queryKey: habitsKeys.shared() });
+    },
+  });
+};
 
 export const useHabitScheduleQuery = (id: string, enabled = true) => useQuery({ queryKey: ["habit-schedule", id], queryFn: ({ signal }) => getHabitSchedule(id, signal), enabled: enabled && Boolean(id), staleTime: 30_000 });
 export const useHabitOccurrencesQuery = (id: string, enabled = true) => useQuery({ queryKey: habitsKeys.occurrences(id), queryFn: ({ signal }) => getHabitOccurrences(id, signal), enabled: enabled && Boolean(id), staleTime: 15_000 });

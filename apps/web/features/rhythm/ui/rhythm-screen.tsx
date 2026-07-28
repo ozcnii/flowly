@@ -4,7 +4,7 @@ import { Badge, BlockTitle, Button, Card, Chip, List, Preloader } from "konsta/r
 import { useRouter } from "next/navigation";
 import { Icon } from "@flowly/ui";
 import { HabitCard } from "./habit-card";
-import { useHabitsQuery } from "../model/habits-queries";
+import { useHabitsQuery, useSharedHabitsQuery } from "../model/habits-queries";
 import { habitsToCards } from "../model/habit-card-vm";
 import type { HabitCardVM } from "../model/rhythm-types";
 
@@ -27,7 +27,9 @@ const DEMO_HABITS: HabitCardVM[] = [
 export function RhythmScreen({ demo = false }: { demo?: boolean }) {
   const router = useRouter();
   const query = useHabitsQuery();
+  const shared = useSharedHabitsQuery();
   const cards: HabitCardVM[] = demo ? DEMO_HABITS : habitsToCards(query.data?.habits);
+  const sharedItems = !demo ? (shared.data?.items ?? []) : [];
   const loading = !demo && query.isPending && !query.data;
   const error = !demo && query.isError && !query.data;
 
@@ -45,6 +47,36 @@ export function RhythmScreen({ demo = false }: { demo?: boolean }) {
         <List strong inset dividers className="!my-0">
           {cards.map((habit) => <HabitCard key={habit.id} habit={habit} onEdit={!demo ? () => router.push(`/rhythm/${encodeURIComponent(habit.id)}` as never) : undefined} />)}
         </List>
+      ) : null}
+
+      {!demo && sharedItems.length > 0 ? (
+        <section aria-labelledby="shared-habits-title" className="grid gap-2">
+          <BlockTitle component="h2" id="shared-habits-title" className="!m-0 !p-0">
+            С вами поделились
+          </BlockTitle>
+          <List strong inset dividers className="!my-0">
+            {sharedItems.map((item) => (
+              <HabitCard
+                key={item.habit.id}
+                habit={{
+                  id: item.habit.id,
+                  title: item.habit.title,
+                  icon: item.habit.icon,
+                  emoji: item.habit.emoji,
+                  color: item.habit.color as HabitCardVM["color"],
+                  todayDone: 0,
+                  todayPartial: 0,
+                  todayTotal: 0,
+                  nextDueLabel: item.owner ? `от ${item.owner.firstName}` : "от друга",
+                  scheduleLabel: "Только просмотр",
+                  streak: 0,
+                  status: "pending",
+                }}
+                onEdit={() => router.push(`/rhythm/${encodeURIComponent(item.habit.id)}` as never)}
+              />
+            ))}
+          </List>
+        </section>
       ) : null}
 
       {!demo && loading ? (

@@ -11,6 +11,7 @@ import { formatRuDate } from "@/features/programs/model/program-dates";
 import { COLOR_OPTIONS, type Habit } from "../model/habits";
 import { useArchiveHabitMutation, useHabitLifecycleMutation, useHabitOccurrencesQuery, useHabitQuery, useOccurrenceQuery, useUpdateOccurrenceStatusMutation } from "../model/habits-queries";
 import { HABIT_OCCURRENCE_STATUSES, OCCURRENCE_STATUS_ICON, OCCURRENCE_STATUS_LABEL, type HabitOccurrence, type HabitOccurrenceStatus } from "../model/occurrences";
+import { HabitShareSheet } from "./habit-share-sheet";
 
 const focusRing = "focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent";
 const terminal = new Set<string>(HABIT_OCCURRENCE_STATUSES);
@@ -19,13 +20,17 @@ const statusCopy = (status: string) => OCCURRENCE_STATUS_LABEL[status as HabitOc
 export function HabitDetailScreen({ id }: { id: string }) {
   const router = useRouter();
   const query = useHabitQuery(id);
-  const occurrences = useHabitOccurrencesQuery(id, Boolean(query.data?.habit));
+  const access = query.data?.access ?? "owner";
+  const isOwner = access === "owner";
+  const shareMeta = query.data?.share;
+  const occurrences = useHabitOccurrencesQuery(id, Boolean(query.data?.habit) && (isOwner || Boolean(shareMeta?.showHistory)));
   const habit = query.data?.habit;
   const list = occurrences.data?.occurrences ?? [];
   const summary = occurrences.data?.summary;
   const [selected, setSelected] = useState<HabitOccurrence | null>(null);
   const [lifecycle, setLifecycle] = useState<"pause" | "resume" | "archive" | null>(null);
-  const actionRef = useRef<HTMLElement>(null), lifecycleRef = useRef<HTMLElement>(null), backgroundRef = useRef<HTMLDivElement>(null);
+  const [shareOpen, setShareOpen] = useState(false);
+  const actionRef = useRef<HTMLElement>(null), lifecycleRef = useRef<HTMLElement>(null), shareRef = useRef<HTMLElement>(null), backgroundRef = useRef<HTMLDivElement>(null);
   const occurrenceDetail = useOccurrenceQuery(selected?.id ?? "", Boolean(selected));
   const statusMutation = useUpdateOccurrenceStatusMutation(id);
   const pause = useHabitLifecycleMutation(id, "pause");
@@ -61,6 +66,8 @@ export function HabitDetailScreen({ id }: { id: string }) {
   const progress = total ? Math.min(1, (done + partial * 0.5) / total) : 0;
   const progressLabel = !total ? "Пока нет запланированных выполнений" : [`${done} из ${total} выполнено`, partial ? `${partial} частично` : null, rest ? `${rest} отдых` : null, skipped ? `${skipped} пропущено` : null, noResponse ? `${noResponse} без ответа` : null].filter(Boolean).join(" · ");
   const cellClass = habit ? COLOR_OPTIONS[habit.color as keyof typeof COLOR_OPTIONS]?.cell ?? COLOR_OPTIONS.sage.cell : COLOR_OPTIONS.sage.cell;
+  const showProgress = isOwner || Boolean(shareMeta?.showStreak);
+  const showHistory = isOwner || Boolean(shareMeta?.showHistory);
 
   return <div className="min-h-dvh">
     <div ref={backgroundRef}>
@@ -69,33 +76,35 @@ export function HabitDetailScreen({ id }: { id: string }) {
         {loading ? <div className="grid min-h-48 place-items-center" role="status" aria-live="polite" aria-busy="true"><Preloader /><span className="sr-only">Загружаем привычку</span></div>
           : error ? <Card component="section" outline className="m-0 text-center" role="alert" contentWrapPadding="grid justify-items-center gap-3 p-6"><Icon name="triangle-alert" /><h1 className="m-0 text-lg font-semibold">Привычка не найдена</h1><p className="m-0 text-sm text-text-muted">Проверьте ссылку или вернитесь к списку привычек.</p><Button large rounded className={focusRing} onClick={() => router.replace("/rhythm" as never)}>К привычкам</Button></Card>
             : habit ? <>
+              {!isOwner ? <p className="m-0 text-sm text-text-muted" role="status"><Badge>Доступ друга</Badge> Только просмотр.</p> : null}
               <Card component="section" outline className="m-0" contentWrapPadding="grid gap-3 p-4">
                 <div className="flex items-start gap-3">
                   <span className={`grid size-11 shrink-0 place-items-center rounded-full text-2xl leading-none ${cellClass}`} aria-hidden="true">{habit.emoji ?? <Icon name={habit.icon} className="size-5" />}</span>
                   <div className="min-w-0"><h1 className="m-0 break-words text-xl font-semibold">{habit.title}</h1><p className="m-0 text-sm text-text-muted">Начало: {formatRuDate(habit.startLocalDate)}{habit.status === "paused" ? " · на паузе" : ""}</p></div>
                 </div>
-                <div className="grid gap-2">
+                {showProgress ? <div className="grid gap-2">
                   <div className="flex items-baseline justify-between gap-2"><h2 className="m-0 text-base font-semibold">Сегодня</h2><span className="text-sm text-text-muted">{progressLabel}</span></div>
                   <Progressbar progress={progress} aria-label={`Прогресс сегодня: ${progressLabel}`} />
-                </div>
+                </div> : <p className="m-0 text-sm text-text-muted">Владелец не открыл прогресс для вас.</p>}
               </Card>
 
-              <section aria-labelledby="habit-slots-title" className="grid gap-2">
+              {showHistory ? <section aria-labelledby="habit-slots-title" className="grid gap-2">
                 <BlockTitle component="h2" id="habit-slots-title" className="!m-0">Выполнения</BlockTitle>
                 {list.length ? <List strong inset dividers className="!m-0">{list.map((occurrence) => {
                   const status = occurrence.status as HabitOccurrenceStatus;
-                  return <ListItem key={occurrence.id} link linkComponent="button" contentClassName="w-full" innerClassName="text-left" linkProps={{ type: "button", onClick: () => openOccurrence(occurrence), "aria-label": `Открыть выполнение ${occurrence.scheduledLocalTime}: ${statusCopy(occurrence.status)}` }} media={<Icon name={terminal.has(occurrence.status) ? OCCURRENCE_STATUS_ICON[status] : "clock-3"} className={occurrence.status === "completed" ? "text-primary" : undefined} />} title={occurrence.scheduledLocalTime} subtitle={statusCopy(occurrence.status)} after={occurrence.status === "completed" ? <Badge>Готово</Badge> : undefined} />;
-                })}</List> : <Card component="section" outline className="m-0" contentWrapPadding="p-4"><p className="m-0 text-sm leading-relaxed text-text-muted">История появится после создания расписанных выполнений. Настройка расписания уже сохранена.</p></Card>}
-              </section>
+                  return <ListItem key={occurrence.id} link={isOwner} linkComponent={isOwner ? "button" : undefined} contentClassName="w-full" innerClassName="text-left" linkProps={isOwner ? { type: "button", onClick: () => openOccurrence(occurrence), "aria-label": `Открыть слот ${occurrence.scheduledLocalTime}: ${statusCopy(occurrence.status)}` } : undefined} media={<Icon name={terminal.has(occurrence.status) ? OCCURRENCE_STATUS_ICON[status] : "clock-3"} className={occurrence.status === "completed" ? "text-primary" : undefined} />} title={occurrence.scheduledLocalTime} subtitle={statusCopy(occurrence.status)} after={occurrence.status === "completed" ? <Badge>Готово</Badge> : undefined} />;
+                })}</List> : <Card component="section" outline className="m-0" contentWrapPadding="p-4"><p className="m-0 text-sm leading-relaxed text-text-muted">История появится после создания расписанных выполнений.</p></Card>}
+              </section> : !isOwner ? <Card component="section" outline className="m-0" contentWrapPadding="p-4"><p className="m-0 text-sm text-text-muted">История скрыта владельцем.</p></Card> : null}
 
-              <section aria-labelledby="habit-controls-title" className="grid gap-2">
+              {isOwner ? <section aria-labelledby="habit-controls-title" className="grid gap-2">
                 <BlockTitle component="h2" id="habit-controls-title" className="!m-0">Управление</BlockTitle>
                 <List strong inset dividers className="!m-0">
+                  <ListItem link linkComponent="button" contentClassName="w-full" innerClassName="text-left" linkProps={{ type: "button", onClick: () => setShareOpen(true) }} media={<Icon name="share-2" className="text-accent" />} title="Поделиться" subtitle="Друзья, серия и история" after={<Icon name="chevron-right" />} />
                   <ListItem link linkComponent="button" contentClassName="w-full" innerClassName="text-left" linkProps={{ type: "button", onClick: () => router.push(`/rhythm/${encodeURIComponent(id)}/edit` as never) }} title="Изменить привычку" after={<Icon name="chevron-right" />} />
                   <ListItem link linkComponent="button" contentClassName="w-full" innerClassName="text-left" linkProps={{ type: "button", onClick: () => setLifecycle(habit.status === "paused" ? "resume" : "pause") }} title={habit.status === "paused" ? "Возобновить привычку" : "Поставить на паузу"} after={<Icon name={habit.status === "paused" ? "play" : "pause"} />} />
                   <ListItem link linkComponent="button" contentClassName="w-full" innerClassName="text-left" linkProps={{ type: "button", onClick: () => setLifecycle("archive") }} title={<span className="text-danger">Архивировать привычку</span>} after={<Icon name="trash-2" className="text-danger" />} />
                 </List>
-              </section>
+              </section> : null}
             </> : null}
       </main>
     </div>
@@ -112,7 +121,8 @@ export function HabitDetailScreen({ id }: { id: string }) {
       onClose={closeOccurrence}
       onSubmit={saveStatus}
     />}</ModalPortal>
-    <ModalPortal>{lifecycle && habit && <Sheet ref={lifecycleRef} opened backdrop onBackdropClick={closeLifecycle} className="flex max-h-[70dvh] max-w-full flex-col" role="dialog" aria-modal="true" aria-labelledby="habit-lifecycle-title">
+    <ModalPortal>{shareOpen && habit && isOwner ? <HabitShareSheet habitId={id} habitTitle={habit.title} sheetRef={shareRef} onClose={() => setShareOpen(false)} /> : null}</ModalPortal>
+    <ModalPortal>{lifecycle && habit && isOwner && <Sheet ref={lifecycleRef} opened backdrop onBackdropClick={closeLifecycle} className="flex max-h-[70dvh] max-w-full flex-col" role="dialog" aria-modal="true" aria-labelledby="habit-lifecycle-title">
       <Navbar title={<span id="habit-lifecycle-title">{lifecycle === "archive" ? "Архивировать привычку?" : lifecycle === "pause" ? "Поставить на паузу?" : "Возобновить привычку?"} </span>} />
       <div className="grid gap-3 overflow-y-auto px-4 pb-safe-6 pt-2">
         <p className="m-0 text-sm leading-relaxed text-text-muted">{lifecycle === "archive" ? "Привычка исчезнет из активного списка, а история сохранится." : lifecycle === "pause" ? "Новые выполнения не будут создаваться до возобновления. История останется без изменений." : "Будущие выполнения снова смогут появляться по сохранённому расписанию."}</p>

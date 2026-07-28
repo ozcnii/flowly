@@ -1,4 +1,4 @@
-import { and, eq, isNull, or } from "drizzle-orm";
+import { and, eq, inArray, isNull, or } from "drizzle-orm";
 import { nowIso } from "@flowly/core";
 import { schema, type Database } from "@flowly/database";
 
@@ -52,6 +52,85 @@ export async function activeWorkoutShare(db: Database, workoutId: string, viewer
       )
       .limit(1)
   )[0];
+}
+
+/** Active shares for a habit owned by ownerId (S-MA-084 editor). */
+export async function listHabitShares(db: Database, habitId: string, ownerId: string) {
+  const habit = (
+    await db
+      .select({ id: schema.habits.id })
+      .from(schema.habits)
+      .where(and(eq(schema.habits.id, habitId), eq(schema.habits.ownerId, ownerId)))
+      .limit(1)
+  )[0];
+  if (!habit) return { kind: "not_found" as const };
+  const rows = await db
+    .select()
+    .from(schema.habitShares)
+    .where(and(eq(schema.habitShares.habitId, habitId), isNull(schema.habitShares.revokedAt)));
+  if (rows.length === 0) return { kind: "ok" as const, shares: [] as Array<{ userId: string; showStreak: boolean; showHistory: boolean; createdAt: string; peer: { id: string; firstName: string; username: string | null } | null }> };
+  const peers = await db
+    .select({ id: schema.users.id, firstName: schema.users.firstName, username: schema.users.username })
+    .from(schema.users)
+    .where(inArray(schema.users.id, rows.map((r) => r.sharedWithUserId)));
+  const peerMap = new Map(peers.map((p) => [p.id, p]));
+  return {
+    kind: "ok" as const,
+    shares: rows.map((r) => ({
+      userId: r.sharedWithUserId,
+      showStreak: r.showStreak,
+      showHistory: r.showHistory,
+      createdAt: r.createdAt,
+      peer: peerMap.get(r.sharedWithUserId) ?? null,
+    })),
+  };
+}
+
+/** Habits shared with viewer (read-only list for /rhythm). */
+export async function listHabitsSharedWithMe(db: Database, viewerId: string) {
+  const rows = await db
+    .select()
+    .from(schema.habitShares)
+    .where(and(eq(schema.habitShares.sharedWithUserId, viewerId), isNull(schema.habitShares.revokedAt)));
+  if (rows.length === 0) return [] as Array<{
+    habit: { id: string; title: string; description: string | null; icon: string; color: string; emoji: string | null; startLocalDate: string; endLocalDate: string | null; status: string };
+    share: { showStreak: boolean; showHistory: boolean; createdAt: string };
+    owner: { id: string; firstName: string; username: string | null } | null;
+  }>;
+  const habitIds = rows.map((r) => r.habitId);
+  const habits = await db.select().from(schema.habits).where(inArray(schema.habits.id, habitIds));
+  const habitMap = new Map(habits.map((h) => [h.id, h]));
+  const ownerIds = [...new Set(habits.map((h) => h.ownerId))];
+  const owners =
+    ownerIds.length > 0
+      ? await db
+          .select({ id: schema.users.id, firstName: schema.users.firstName, username: schema.users.username })
+          .from(schema.users)
+          .where(inArray(schema.users.id, ownerIds))
+      : [];
+  const ownerMap = new Map(owners.map((o) => [o.id, o]));
+  return rows.flatMap((r) => {
+    const h = habitMap.get(r.habitId);
+    if (!h || h.status === "archived") return [];
+    const owner = ownerMap.get(h.ownerId);
+    return [
+      {
+        habit: {
+          id: h.id,
+          title: h.title,
+          description: h.description,
+          icon: h.icon,
+          color: h.color,
+          emoji: h.emoji,
+          startLocalDate: h.startLocalDate,
+          endLocalDate: h.endLocalDate,
+          status: h.status,
+        },
+        share: { showStreak: r.showStreak, showHistory: r.showHistory, createdAt: r.createdAt },
+        owner: owner ? { id: owner.id, firstName: owner.firstName, username: owner.username } : null,
+      },
+    ];
+  });
 }
 
 export async function shareHabit(
