@@ -69,6 +69,29 @@ const fallbackFor = (pathname: string) => {
   return "/";
 };
 
+/** Short label for the peek underlay (where swipe-back goes). */
+const titleForPath = (path: string) => {
+  const p = path.split("?")[0] || "/";
+  if (p === "/") return "Главная";
+  if (p === "/catalog") return "Йога";
+  if (p === "/programs") return "Программы";
+  if (p === "/rhythm") return "Ритм";
+  if (p === "/calendar") return "Дневник";
+  if (p === "/profile") return "Профиль";
+  if (p === "/settings") return "Настройки";
+  if (p === "/profile/data") return "Данные";
+  if (p === "/favorites") return "Избранное";
+  if (p === "/sources") return "Источники";
+  if (p === "/youtube") return "YouTube";
+  if (p.startsWith("/workouts/")) return "Тренировка";
+  if (p.startsWith("/sessions/")) return "Сессия";
+  if (p.startsWith("/programs/enrollments/")) return "Программа";
+  if (p.startsWith("/programs/")) return "Программа";
+  if (p.startsWith("/rhythm/")) return "Привычка";
+  if (p.startsWith("/calendar/")) return "Календарь";
+  return "Назад";
+};
+
 export function useTelegramBackOverride(handler: () => void, active: boolean) {
   const register = useContext(BackOverrideContext);
   useEffect(() => (active && register ? register(handler) : undefined), [active, handler, register]);
@@ -84,11 +107,13 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
   const backRef = useRef<() => void>(() => undefined);
   const canGoBackRef = useRef(false);
   const dragXRef = useRef(0);
+  const prevPathRef = useRef("/");
   const [index, setIndex] = useState(0);
   const [initialized, setInitialized] = useState(false);
   const [overrides, setOverrides] = useState<BackOverride[]>([]);
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
+  const [peekLabel, setPeekLabel] = useState("Назад");
   const registerOverride = useCallback<RegisterBackOverride>((handler) => {
     const override = { id: Symbol(), handler };
     setOverrides((current) => [...current, override]);
@@ -150,6 +175,7 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!initialized) return;
     if (pathnameRef.current !== pathname) {
+      prevPathRef.current = pathnameRef.current || "/";
       pathnameRef.current = pathname;
       lockedRef.current = false;
       if (unlockTimerRef.current) window.clearTimeout(unlockTimerRef.current);
@@ -160,6 +186,9 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
     const fallback = fallbackFor(pathname);
     const canGoBack = Boolean(override) || index > 0 || Boolean(fallback);
     canGoBackRef.current = canGoBack;
+    // Peek target: real history previous when possible, else contextual fallback.
+    const peekPath = index > 0 ? prevPathRef.current : fallback || prevPathRef.current || "/";
+    setPeekLabel(titleForPath(peekPath));
     const back = () => {
       if (override) {
         override();
@@ -295,16 +324,56 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
     };
   }, [initialized]);
 
-  const style: CSSProperties = {
+  // Progress 0..1 for underlay scale / scrim (iOS interactive pop feel without keeping prev route mounted).
+  const progress = Math.min(1, dragX / Math.max(1, 390 * MAX_DRAG_RATIO));
+  const underScale = 0.92 + 0.08 * progress;
+  const scrim = 0.38 * (1 - progress);
+  const peeking = dragX > 0 || dragging;
+
+  const frontStyle: CSSProperties = {
+    position: "relative",
+    zIndex: 2,
     transform: dragX > 0 ? `translate3d(${dragX}px,0,0)` : undefined,
-    transition: dragging ? "none" : "transform 180ms ease-out",
+    transition: dragging ? "none" : "transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1)",
     willChange: dragging ? "transform" : undefined,
     minHeight: "100%",
+    boxShadow: dragX > 0 ? "-12px 0 32px rgba(0,0,0,0.18)" : undefined,
+    background: "var(--color-canvas)",
+  };
+
+  const underStyle: CSSProperties = {
+    position: "fixed",
+    inset: 0,
+    zIndex: 1,
+    pointerEvents: "none",
+    display: peeking ? "grid" : "none",
+    placeItems: "center",
+    background: "var(--color-canvas)",
+    transform: `scale(${underScale})`,
+    transition: dragging ? "none" : "transform 200ms ease-out",
+  };
+
+  const scrimStyle: CSSProperties = {
+    position: "fixed",
+    inset: 0,
+    zIndex: 1,
+    pointerEvents: "none",
+    background: `rgba(0,0,0,${scrim})`,
+    opacity: peeking ? 1 : 0,
+    transition: dragging ? "none" : "opacity 160ms ease-out",
   };
 
   return (
     <BackOverrideContext.Provider value={registerOverride}>
-      <div className="flowly-swipe-shell" style={style}>
+      {/* Underlay = “previous screen” proxy (real prev page unmounts in App Router). */}
+      <div className="flowly-swipe-under" style={underStyle} aria-hidden="true">
+        <div className="grid max-w-[16rem] gap-2 px-6 text-center">
+          <p className="m-0 text-xs uppercase tracking-wide text-text-muted">Назад</p>
+          <p className="m-0 text-2xl font-semibold leading-tight text-text">{peekLabel}</p>
+        </div>
+      </div>
+      <div className="flowly-swipe-scrim" style={scrimStyle} aria-hidden="true" />
+      <div className="flowly-swipe-shell" style={frontStyle}>
         {children}
       </div>
     </BackOverrideContext.Provider>
