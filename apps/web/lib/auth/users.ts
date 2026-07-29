@@ -60,10 +60,15 @@ export async function getReportSettings(db: Database, userId: string) {
  * overwrite existing name fields on re-auth. Telegram username is refreshed; avatar data is ignored (DEC-046);
  * onboarding (S-MA-003) lets the user refine timezone/locale; week starts Monday (DEC-042).
  */
+const isValidIana = (value: string | undefined | null): value is string =>
+  Boolean(value && value.length <= 64 && value.includes("/") && !value.includes(".."));
+
 export async function findOrCreateUser(
   db: Database,
   tg: TelegramInitUser,
+  opts?: { timezone?: string },
 ): Promise<{ id: string; isNew: boolean }> {
+  const clientTz = isValidIana(opts?.timezone) ? opts!.timezone! : null;
   const existing = await db
     .select({ id: schema.users.id })
     .from(schema.users)
@@ -74,9 +79,11 @@ export async function findOrCreateUser(
     // DEC-020: re-auth during 7-day grace cancels account deletion.
     const cancelDeletion =
       row?.deletedAt && Date.now() < Date.parse(row.deletedAt) + 7 * 24 * 60 * 60 * 1000 ? { deletedAt: null as string | null } : {};
+    // Repair stuck UTC only when client sends a real IANA zone (onboarding skip left many on UTC).
+    const repairTz = row?.timezone === "UTC" && clientTz ? { timezone: clientTz } : {};
     await db
       .update(schema.users)
-      .set({ username: tg.username ?? null, weekStartsOn: 1, updatedAt: nowIso(), ...cancelDeletion })
+      .set({ username: tg.username ?? null, weekStartsOn: 1, updatedAt: nowIso(), ...cancelDeletion, ...repairTz })
       .where(eq(schema.users.id, existing[0].id));
     return { id: existing[0].id, isNew: false };
   }
@@ -89,7 +96,7 @@ export async function findOrCreateUser(
     username: tg.username ?? null,
     firstName: tg.first_name,
     lastName: tg.last_name ?? null,
-    timezone: "UTC",
+    timezone: clientTz ?? "UTC",
     weekStartsOn: 1,
     locale: tg.language_code ?? "ru",
     onboardingCompletedAt: null,

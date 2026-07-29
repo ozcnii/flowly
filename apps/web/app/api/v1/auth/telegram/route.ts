@@ -55,7 +55,8 @@ export async function POST(request: Request) {
       try {
         const devUser = JSON.parse(decodeURIComponent(devHeader)) as TelegramInitUser;
         const db = getDb();
-        const { id: userId } = await findOrCreateUser(db, devUser);
+        const body = await request.json().catch(() => ({})) as { timezone?: string };
+        const { id: userId } = await findOrCreateUser(db, devUser, { timezone: body.timezone });
         const token = await createSession(db, userId);
         const res = json(200, { ok: true, userId, dev: true });
         setSessionCookie(res, token);
@@ -86,7 +87,7 @@ export async function POST(request: Request) {
   try {
     const verified = await verifyInitData(parsed.data.initData, getBotToken(), INIT_DATA_FRESHNESS_MS);
     const db = getDb();
-    const { id: userId } = await findOrCreateUser(db, verified.user);
+    const { id: userId } = await findOrCreateUser(db, verified.user, { timezone: parsed.data.timezone });
     const token = await createSession(db, userId);
     audit("auth.login", { userId, ip });
     const res = json(200, { ok: true, userId });

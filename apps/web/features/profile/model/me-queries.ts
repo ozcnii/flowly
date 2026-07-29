@@ -34,6 +34,8 @@ export const getMe = (signal?: AbortSignal) => apiJson<MeResponse>("/api/v1/me",
 export const postTelegramAuth = async ({ initData, source, launchRaw }: TelegramAuthInput) => {
   const devUser = devUserHeader(initData);
   const webApp = globalThis.window?.Telegram?.WebApp;
+  const timezone =
+    typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : undefined;
   const headers: Record<string, string> = {
     "x-flowly-tg-source": source,
     "x-flowly-tg-init-fp": initData ? await fingerprint(initData) : "missing",
@@ -43,7 +45,11 @@ export const postTelegramAuth = async ({ initData, source, launchRaw }: Telegram
     "x-flowly-tg-version": webApp?.version ?? "unknown",
   };
   if (devUser) headers["x-flowly-dev-user"] = devUser;
-  return apiJson<TelegramAuthResponse>("/api/v1/auth/telegram", { method: "POST", headers, body: jsonBody({ initData }) });
+  return apiJson<TelegramAuthResponse>("/api/v1/auth/telegram", {
+    method: "POST",
+    headers,
+    body: jsonBody({ initData, timezone }),
+  });
 };
 export const patchMe = (patch: MePatch) => apiJson<MeResponse>("/api/v1/me", { method: "PATCH", body: jsonBody(patch) });
 export const completeOnboarding = () => apiJson<MeResponse>("/api/v1/onboarding/complete", { method: "POST" });

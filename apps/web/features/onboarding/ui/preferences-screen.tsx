@@ -54,21 +54,32 @@ function PreferencesForm({ user }: { user: PublicUser }) {
     update(next);
   };
 
-  const next = async () => {
+  const persistTimezone = async () => {
     setSaveError(null);
     setNotice("Сохраняем настройки…");
     try {
-      await patchMe.mutateAsync({ timezone });
-      router.push("/onboarding/capabilities" as never);
+      // Always persist explicit timezone (incl. device-detected when profile still UTC).
+      await patchMe.mutateAsync({ timezone: timezone || detectedTimezone });
+      return true;
     } catch (error) {
       setNotice("");
       if (error instanceof ApiError && error.status === 401) setSaveError({ title: "Сессия истекла", description: "Перезагрузите Flowly, чтобы снова подтвердить вход через Telegram.", reauth: true });
       else if (!navigator.onLine) setSaveError({ title: "Нет соединения", description: "Введённые настройки сохранены на экране. Подключитесь к интернету и повторите." });
       else setSaveError({ title: "Настройки не сохранены", description: error instanceof ApiError && error.status === 400 ? "Проверьте часовой пояс и повторите." : "Сервер временно не принял изменения. Введённые настройки сохранены на экране." });
+      return false;
     }
   };
 
-  const skip = () => router.push("/onboarding/capabilities" as never);
+  const next = async () => {
+    if (!(await persistTimezone())) return;
+    router.push("/onboarding/capabilities" as never);
+  };
+
+  /** Skip must still save timezone — otherwise profile stays UTC and reminders fire 3–4h late (Samara/MSK). */
+  const skip = async () => {
+    if (!(await persistTimezone())) return;
+    router.push("/onboarding/capabilities" as never);
+  };
 
   return (
     <main className="safe-shell flow-screen gap-5">
@@ -105,8 +116,8 @@ function PreferencesForm({ user }: { user: PublicUser }) {
       {saveError && <Card outline colors={{ bgIos: "bg-danger-soft", textIos: "text-text" }} contentWrapPadding="p-4 grid gap-2" role="alert"><strong>{saveError.title}</strong><p className="m-0 leading-6 text-text-muted">{saveError.description}</p><Button inline clear rounded onClick={saveError.reauth ? () => location.reload() : () => void next()}>{saveError.reauth ? "Войти снова" : "Повторить"}</Button></Card>}
       {notice && <p className="m-0 text-center text-xs leading-5 text-text-muted" aria-live="polite">{notice}</p>}
       <footer className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] gap-2">
-        <Button inline large rounded clear onClick={skip}>Пропустить</Button>
-        <Button large rounded disabled={patchMe.isPending} aria-busy={patchMe.isPending || undefined} onClick={next}>{patchMe.isPending && <Preloader />}Далее</Button>
+        <Button inline large rounded clear disabled={patchMe.isPending} onClick={() => void skip()}>Пропустить</Button>
+        <Button large rounded disabled={patchMe.isPending} aria-busy={patchMe.isPending || undefined} onClick={() => void next()}>{patchMe.isPending && <Preloader />}Далее</Button>
       </footer>
     </main>
   );

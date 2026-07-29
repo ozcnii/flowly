@@ -42,9 +42,16 @@ export async function PATCH(request: Request) {
   if (!parsed.success) return NextResponse.json({ error: "bad_request" }, { status: 400 });
 
   const db = getDb();
+  const before = await getUser(db, userId);
+  if (!before) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const { weeklyReportEnabled, monthlyReportEnabled, ...userPatch } = parsed.data;
   if (Object.keys(userPatch).length) await db.update(schema.users).set({ ...userPatch, updatedAt: nowIso() }).where(eq(schema.users.id, userId));
   if (weeklyReportEnabled !== undefined || monthlyReportEnabled !== undefined) await db.update(schema.userSettings).set({ ...(weeklyReportEnabled === undefined ? {} : { weeklyReportEnabled }), ...(monthlyReportEnabled === undefined ? {} : { monthlyReportEnabled }) }).where(eq(schema.userSettings.userId, userId));
+  if (userPatch.timezone && userPatch.timezone !== before.timezone) {
+    const { recomputeOpenHabitTimesForTimezone } = await import("@/lib/habits/recompute-timezone");
+    const shifted = await recomputeOpenHabitTimesForTimezone(db, userId, userPatch.timezone);
+    audit("me.timezone_shift", { userId, from: before.timezone, to: userPatch.timezone, ...shifted });
+  }
   audit("me.patch", { userId });
   const user = await getUser(db, userId);
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
