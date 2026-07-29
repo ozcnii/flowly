@@ -6,10 +6,23 @@ import { usePathname, useRouter } from "next/navigation";
 const HISTORY_STATE_KEY = "__flowlyHistory";
 const HISTORY_SESSION_KEY = "flowly-history-session";
 const RAPID_BACK_LOCK_MS = 700;
-/** iOS-like edge swipe: start within this many CSS px from the left. */
-const EDGE_PX = 28;
-const COMMIT_PX = 88;
-const MAX_DRAG_RATIO = 0.42;
+/** Commit back after this drag distance (or velocity). */
+const COMMIT_PX = 72;
+const MAX_DRAG_RATIO = 0.5;
+/**
+ * Left edge zone for starting swipe-back. Wider than stock iOS (~20pt) because
+ * Telegram Mini App + phone bezel/safe-area make a thin strip unusable.
+ * ~12–18% of width, floor 64px, ceiling 100px, plus left safe inset.
+ */
+const edgeStartPx = () => {
+  const w = window.innerWidth || 390;
+  const css = getComputedStyle(document.documentElement);
+  const safe =
+    Number.parseFloat(css.getPropertyValue("--component-safe-area-left")) ||
+    Number.parseFloat(css.getPropertyValue("--tg-safe-area-inset-left")) ||
+    0;
+  return Math.min(100, Math.max(64, w * 0.16, safe + 48));
+};
 
 type BackOverride = { id: symbol; handler: () => void };
 type RegisterBackOverride = (handler: () => void) => () => void;
@@ -198,9 +211,11 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
     const onStart = (event: TouchEvent) => {
       if (!canGoBackRef.current || lockedRef.current || event.touches.length !== 1) return;
       const touch = event.touches[0];
-      if (!touch || touch.clientX > EDGE_PX) return;
+      if (!touch) return;
+      // clientX is viewport-relative; include safe-area so bezels don't kill the gesture
+      if (touch.clientX > edgeStartPx()) return;
       const target = event.target as Element | null;
-      if (target?.closest?.("input, textarea, [contenteditable='true'], [data-no-swipe-back]")) return;
+      if (target?.closest?.("input, textarea, select, [contenteditable='true'], [data-no-swipe-back]")) return;
       startX = touch.clientX;
       startY = touch.clientY;
       lastX = touch.clientX;
@@ -218,9 +233,10 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
       const dx = touch.clientX - startX;
       const dy = touch.clientY - startY;
       if (!decided) {
-        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
         decided = true;
-        if (Math.abs(dy) > Math.abs(dx) || dx <= 0) {
+        // Prefer horizontal-right; allow slight diagonal (iOS-like)
+        if (dx <= 0 || Math.abs(dy) > Math.abs(dx) * 1.35) {
           tracking = false;
           return;
         }
@@ -250,7 +266,7 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
         return;
       }
       const distance = dragXRef.current;
-      const shouldCommit = distance >= COMMIT_PX || velocity > 0.45;
+      const shouldCommit = distance >= COMMIT_PX || velocity > 0.35;
       active = false;
       if (shouldCommit) {
         setDragX(Math.min(window.innerWidth, Math.max(distance, COMMIT_PX * 1.2)));
