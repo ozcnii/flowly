@@ -37,9 +37,12 @@ export default async function Page({ searchParams }: PageProps) {
     if (params.web === "unavailable") return <UnavailableDeepLinkScreen />;
   }
 
-  return scenario === "loading" ? (
+  // Dev scenario previews still use fixture; production always loads GET /api/v1/home.
+  const fixture = process.env.NODE_ENV !== "production" && homeScenario !== "base" && homeScenario !== "empty" && homeScenario !== "loading" ? homeBase : undefined;
+
+  return scenario === "loading" || homeScenario === "loading" ? (
     <div aria-label="Загрузка оболочки" className="grid gap-4"><div className="shell-skeleton h-9 w-2/3 rounded-full" /><div className="shell-skeleton h-40 rounded-3xl" /><div className="shell-skeleton h-24 rounded-2xl" /></div>
   ) : scenario === "error" ? (
     <ShellErrorState />
-  ) : <HomeScreen key={homeScenario} data={homeBase} scenario={homeScenario} />;
+  ) : <HomeScreen key={homeScenario} scenario={homeScenario} fixture={fixture} />;
 }
