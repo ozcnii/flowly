@@ -350,6 +350,7 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
   const underScale = 0.92 + 0.08 * progress;
   const scrim = 0.38 * (1 - progress);
   const peeking = dragX > 0 || dragging;
+  const exitMode = !override && index === 0 && !fallbackFor(pathname);
   const frontStyle: CSSProperties = {
     position: "relative",
     zIndex: 2,
