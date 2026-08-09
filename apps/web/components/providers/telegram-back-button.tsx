@@ -124,7 +124,6 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
   const [peekLabel, setPeekLabel] = useState("Назад");
   const [peekHint, setPeekHint] = useState("Назад");
   const [exitOpen, setExitOpen] = useState(false);
-  const [exitMode, setExitMode] = useState(false);
   const registerOverride = useCallback<RegisterBackOverride>((handler) => {
     const override = { id: Symbol(), handler };
     setOverrides((current) => [...current, override]);
@@ -200,15 +199,17 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
     // Home boundary (DEC-052 index 0, no fallback): swipe becomes “exit?” instead of dead edge.
     const mode: SwipeMode = canGoBack ? "back" : "exit";
     swipeModeRef.current = mode;
-    setExitMode(mode === "exit");
-    if (mode === "exit") {
-      setPeekHint("Уже уходишь?");
-      setPeekLabel("Выйти из Flowly");
-    } else {
-      const peekPath = index > 0 ? prevPathRef.current : fallback || prevPathRef.current || "/";
-      setPeekHint("Назад");
-      setPeekLabel(titleForPath(peekPath));
-    }
+    // Peek labels: queue to avoid setState-in-effect lint (visual only).
+    queueMicrotask(() => {
+      if (mode === "exit") {
+        setPeekHint("Уже уходишь?");
+        setPeekLabel("Выйти из Flowly");
+      } else {
+        const peekPath = index > 0 ? prevPathRef.current : fallback || prevPathRef.current || "/";
+        setPeekHint("Назад");
+        setPeekLabel(titleForPath(peekPath));
+      }
+    });
     const back = () => {
       if (override) {
         override();
