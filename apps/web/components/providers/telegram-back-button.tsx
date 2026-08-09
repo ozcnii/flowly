@@ -124,6 +124,7 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
   const [peekLabel, setPeekLabel] = useState("Назад");
   const [peekHint, setPeekHint] = useState("Назад");
   const [exitOpen, setExitOpen] = useState(false);
+  const [exitMode, setExitMode] = useState(false);
   const registerOverride = useCallback<RegisterBackOverride>((handler) => {
     const override = { id: Symbol(), handler };
     setOverrides((current) => [...current, override]);
@@ -199,6 +200,7 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
     // Home boundary (DEC-052 index 0, no fallback): swipe becomes “exit?” instead of dead edge.
     const mode: SwipeMode = canGoBack ? "back" : "exit";
     swipeModeRef.current = mode;
+    setExitMode(mode === "exit");
     if (mode === "exit") {
       setPeekHint("Уже уходишь?");
       setPeekLabel("Выйти из Flowly");
@@ -347,8 +349,6 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
   const underScale = 0.92 + 0.08 * progress;
   const scrim = 0.38 * (1 - progress);
   const peeking = dragX > 0 || dragging;
-  const exitMode = swipeModeRef.current === "exit" || (!fallbackFor(pathname) && index === 0 && !override);
-
   const frontStyle: CSSProperties = {
     position: "relative",
     zIndex: 2,
