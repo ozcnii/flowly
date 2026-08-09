@@ -2,17 +2,17 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { Block, Button, Navbar, Page, Sheet } from "konsta/react";
 
 const HISTORY_STATE_KEY = "__flowlyHistory";
 const HISTORY_SESSION_KEY = "flowly-history-session";
 const RAPID_BACK_LOCK_MS = 700;
-/** Commit back after this drag distance (or velocity). */
 const COMMIT_PX = 72;
 const MAX_DRAG_RATIO = 0.5;
+
 /**
  * Left edge zone for starting swipe-back. Wider than stock iOS (~20pt) because
  * Telegram Mini App + phone bezel/safe-area make a thin strip unusable.
- * ~12–18% of width, floor 64px, ceiling 100px, plus left safe inset.
  */
 const edgeStartPx = () => {
   const w = window.innerWidth || 390;
@@ -26,6 +26,7 @@ const edgeStartPx = () => {
 
 type BackOverride = { id: symbol; handler: () => void };
 type RegisterBackOverride = (handler: () => void) => () => void;
+type SwipeMode = "back" | "exit";
 const BackOverrideContext = createContext<RegisterBackOverride | null>(null);
 
 type FlowlyHistoryState = { session: string; index: number; url: string };
@@ -69,7 +70,6 @@ const fallbackFor = (pathname: string) => {
   return "/";
 };
 
-/** Short label for the peek underlay (where swipe-back goes). */
 const titleForPath = (path: string) => {
   const p = path.split("?")[0] || "/";
   if (p === "/") return "Главная";
@@ -97,6 +97,13 @@ export function useTelegramBackOverride(handler: () => void, active: boolean) {
   useEffect(() => (active && register ? register(handler) : undefined), [active, handler, register]);
 }
 
+const closeMiniApp = () => {
+  const webApp = window.Telegram?.WebApp;
+  // Keep confirmation on so Telegram may still ask; close() is the intentional exit.
+  webApp?.enableClosingConfirmation?.();
+  webApp?.close?.();
+};
+
 export function TelegramBackButton({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -105,7 +112,8 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
   const pathnameRef = useRef(pathname);
   const unlockTimerRef = useRef<number | undefined>(undefined);
   const backRef = useRef<() => void>(() => undefined);
-  const canGoBackRef = useRef(false);
+  /** Always allow edge swipe: either navigate back or offer exit. */
+  const swipeModeRef = useRef<SwipeMode>("back");
   const dragXRef = useRef(0);
   const prevPathRef = useRef("/");
   const [index, setIndex] = useState(0);
@@ -114,6 +122,8 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
   const [dragX, setDragX] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [peekLabel, setPeekLabel] = useState("Назад");
+  const [peekHint, setPeekHint] = useState("Назад");
+  const [exitOpen, setExitOpen] = useState(false);
   const registerOverride = useCallback<RegisterBackOverride>((handler) => {
     const override = { id: Symbol(), handler };
     setOverrides((current) => [...current, override]);
@@ -182,13 +192,21 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
       dragXRef.current = 0;
       setDragX(0);
       setDragging(false);
+      setExitOpen(false);
     }
     const fallback = fallbackFor(pathname);
     const canGoBack = Boolean(override) || index > 0 || Boolean(fallback);
-    canGoBackRef.current = canGoBack;
-    // Peek target: real history previous when possible, else contextual fallback.
-    const peekPath = index > 0 ? prevPathRef.current : fallback || prevPathRef.current || "/";
-    setPeekLabel(titleForPath(peekPath));
+    // Home boundary (DEC-052 index 0, no fallback): swipe becomes “exit?” instead of dead edge.
+    const mode: SwipeMode = canGoBack ? "back" : "exit";
+    swipeModeRef.current = mode;
+    if (mode === "exit") {
+      setPeekHint("Уже уходишь?");
+      setPeekLabel("Выйти из Flowly");
+    } else {
+      const peekPath = index > 0 ? prevPathRef.current : fallback || prevPathRef.current || "/";
+      setPeekHint("Назад");
+      setPeekLabel(titleForPath(peekPath));
+    }
     const back = () => {
       if (override) {
         override();
@@ -202,6 +220,7 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
       }, RAPID_BACK_LOCK_MS);
       if (indexRef.current > 0) router.back();
       else if (fallback) router.replace(fallback as never);
+      else setExitOpen(true);
     };
     backRef.current = back;
 
@@ -216,6 +235,7 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
         typeof webApp.disableClosingConfirmation === "function" &&
         webApp.isVersionAtLeast?.("6.2") !== false;
       if (supportsConfirmation) {
+        // At home boundary keep Telegram native close confirmation as safety net.
         if (canGoBack) webApp.disableClosingConfirmation?.();
         else webApp.enableClosingConfirmation?.();
       }
@@ -225,7 +245,7 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
     };
   }, [index, initialized, override, pathname, router]);
 
-  // iOS-style left-edge swipe → same back path as Telegram BackButton.
+  // Edge swipe: navigate back OR open exit sheet when at stack root.
   useEffect(() => {
     if (!initialized) return;
     let startX = 0;
@@ -238,10 +258,9 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
     let velocity = 0;
 
     const onStart = (event: TouchEvent) => {
-      if (!canGoBackRef.current || lockedRef.current || event.touches.length !== 1) return;
+      if (lockedRef.current || event.touches.length !== 1 || exitOpen) return;
       const touch = event.touches[0];
       if (!touch) return;
-      // clientX is viewport-relative; include safe-area so bezels don't kill the gesture
       if (touch.clientX > edgeStartPx()) return;
       const target = event.target as Element | null;
       if (target?.closest?.("input, textarea, select, [contenteditable='true'], [data-no-swipe-back]")) return;
@@ -264,7 +283,6 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
       if (!decided) {
         if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
         decided = true;
-        // Prefer horizontal-right; allow slight diagonal (iOS-like)
         if (dx <= 0 || Math.abs(dy) > Math.abs(dx) * 1.35) {
           tracking = false;
           return;
@@ -303,7 +321,8 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
           setDragging(false);
           dragXRef.current = 0;
           setDragX(0);
-          backRef.current();
+          if (swipeModeRef.current === "exit") setExitOpen(true);
+          else backRef.current();
         }, 160);
       } else {
         setDragging(false);
@@ -322,13 +341,13 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
       document.removeEventListener("touchend", onEnd, true);
       document.removeEventListener("touchcancel", onEnd, true);
     };
-  }, [initialized]);
+  }, [initialized, exitOpen]);
 
-  // Progress 0..1 for underlay scale / scrim (iOS interactive pop feel without keeping prev route mounted).
   const progress = Math.min(1, dragX / Math.max(1, 390 * MAX_DRAG_RATIO));
   const underScale = 0.92 + 0.08 * progress;
   const scrim = 0.38 * (1 - progress);
   const peeking = dragX > 0 || dragging;
+  const exitMode = swipeModeRef.current === "exit" || (!fallbackFor(pathname) && index === 0 && !override);
 
   const frontStyle: CSSProperties = {
     position: "relative",
@@ -348,7 +367,7 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
     pointerEvents: "none",
     display: peeking ? "grid" : "none",
     placeItems: "center",
-    background: "var(--color-canvas)",
+    background: exitMode ? "var(--color-accent-soft, var(--color-canvas))" : "var(--color-canvas)",
     transform: `scale(${underScale})`,
     transition: dragging ? "none" : "transform 200ms ease-out",
   };
@@ -365,17 +384,42 @@ export function TelegramBackButton({ children }: { children: ReactNode }) {
 
   return (
     <BackOverrideContext.Provider value={registerOverride}>
-      {/* Underlay = “previous screen” proxy (real prev page unmounts in App Router). */}
       <div className="flowly-swipe-under" style={underStyle} aria-hidden="true">
-        <div className="grid max-w-[16rem] gap-2 px-6 text-center">
-          <p className="m-0 text-xs uppercase tracking-wide text-text-muted">Назад</p>
+        <div className="grid max-w-[18rem] gap-2 px-6 text-center">
+          <p className="m-0 text-xs uppercase tracking-wide text-text-muted">{peekHint}</p>
           <p className="m-0 text-2xl font-semibold leading-tight text-text">{peekLabel}</p>
+          {exitMode ? <p className="m-0 text-sm leading-snug text-text-muted">Потяни сильнее — спросим наверняка</p> : null}
         </div>
       </div>
       <div className="flowly-swipe-scrim" style={scrimStyle} aria-hidden="true" />
       <div className="flowly-swipe-shell" style={frontStyle}>
         {children}
       </div>
+
+      <Sheet opened={exitOpen} onBackdropClick={() => setExitOpen(false)}>
+        <Page>
+          <Navbar title="Уже уходишь?" />
+          <Block className="space-y-3">
+            <p className="m-0 text-[15px] leading-snug text-text-muted">
+              Дальше назад некуда — это край Flowly. Можно остаться или закрыть мини-приложение.
+            </p>
+            <Button large rounded onClick={() => setExitOpen(false)}>
+              Остаться
+            </Button>
+            <Button
+              large
+              rounded
+              outline
+              onClick={() => {
+                setExitOpen(false);
+                closeMiniApp();
+              }}
+            >
+              Выйти
+            </Button>
+          </Block>
+        </Page>
+      </Sheet>
     </BackOverrideContext.Provider>
   );
 }

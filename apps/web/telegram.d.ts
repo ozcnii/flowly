@@ -27,6 +27,8 @@ interface TelegramWebApp {
   isVersionAtLeast?: (version: string) => boolean;
   enableClosingConfirmation?: () => void;
   disableClosingConfirmation?: () => void;
+  /** Closes Mini App (user may still see Telegram confirmation if enabled). */
+  close?: () => void;
   setHeaderColor?: (color: "bg_color" | "secondary_bg_color" | `#${string}`) => void;
   setBackgroundColor?: (color: `#${string}`) => void;
   setBottomBarColor?: (color: "bg_color" | "secondary_bg_color" | `#${string}`) => void;
